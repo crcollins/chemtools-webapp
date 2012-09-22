@@ -1,0 +1,21 @@
+#!/bin/bash
+#PBS -l nodes={{ nodes }}
+#PBS -l walltime={{ time }}
+#PBS -o {{ name }}.out
+#PBS -e {{ name }}.err
+#PBS -m bea
+#PBS -M {{ email }}
+#PBS -A TG-CHE120020
+#PBS -V
+
+cp {{ name }}.gjf /oasis/scratch/$USER/temp_project/
+cd /oasis/scratch/$USER/temp_project/
+export GAUSS_SCRDIR=/oasis/scratch/$USER/temp_project/
+. /etc/profile.d/modules.sh
+module load gaussian
+exe=`which g09`
+/usr/bin/time $exe < {{ name }}.gjf> {{ name }}.log
+
+mv {{ name }}.* $HOME/done/
+cd $HOME
+scp {{ name }}.* chris@mandelbrot.no-ip.org:/home/chris/Desktop/Fallgjfs/done

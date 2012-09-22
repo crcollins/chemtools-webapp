@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+<head>
+    {% block head %}
+    <link rel="stylesheet" href="{{ STATIC_URL }}style.css" />
+    <link rel="shortcut icon" href="{{ STATIC_URL }}favicon.ico" type="image/x-icon" />
+    <script src="{{ STATIC_URL }}jquery-1.7.1.min.js"></script>
+    <meta charset="utf-8">
+    <title>{% block title %}Demo{% endblock %}</title>
+    {% endblock %}
+</head>
+<body>
+<div class="header">
+    {% block header %}{% endblock %}
+</div>
+<div class="container">
+    <div class="container2">
+        {% block content %}
+        {% endblock %}
+    </div>
+</div>
+</body>
+<footer>
+    {% block footer %}{% endblock %}
+</footer>
+</html>

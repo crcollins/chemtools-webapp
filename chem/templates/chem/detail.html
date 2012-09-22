@@ -1,0 +1,19 @@
+{% extends "chem/generator.html" %}
+
+{% block content %}
+    <h1>{{ molecule }}</h1>
+    {% if known_errors %}
+        <h2>WARNING</h2>
+        This molecule is reported to have errors.<br />
+    {% endif %}
+    {% if error_message %}
+        <p><strong>{{ error_message }}</strong></p>
+    {% endif %}
+    <img src="png/?scale=10"></img>
+    <ul>
+        <li><a href="gjf">gjf File</a></li>
+        <li><a href="mol2">mol2 File</a></li>
+        <li><a href="job">Job File</a></li>
+    </ul>
+    <a href="report">Report Me!</a>
+{% endblock %}

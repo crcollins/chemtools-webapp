@@ -1,0 +1,50 @@
+#!/bin/csh
+#PBS -l walltime={{ time }}
+#PBS -l ncpus={{ ncpus }}
+#PBS -o {{ name }}.obj
+#PBS -joe
+#PBS -m bea
+#PBS -M {{ email }}
+
+
+# Make the module command available
+source /usr/share/modules/init/csh
+
+set echo
+
+# Load the gaussian module
+module load gaussian09
+
+
+# Copy the input files to the scratch directory.
+# The scratch directory offers large capacity and high performance,
+# HOWEVER:  it is not permanent storage and may be removed automatically
+# when the job ends.
+cp $HOME/{{ name }}.gjf $SCRATCH
+
+# move to the scratch directory
+
+cd $SCRATCH
+
+
+# Define OMP_NUM_THREADS
+setenv OMP_NUM_THREADS 16
+
+# Use SCRATCH_RAMDISK for intermediate files
+setenv GAUSS_SCRDIR $SCRATCH_RAMDISK
+
+# Execute Gaussian 09, writing the output files in the scratch directory.
+# Use omplace to run the job
+omplace -nt $OMP_NUM_THREADS g09 < {{ name }}.gjf >& {{ name }}.log
+
+# ********   IMPORTANT ****************
+# Remember to move the  checkpoint file to the file archiver
+# (so that it can be reused) when the job completes.
+#  Here it is called  'TON_B25i_mPW3PBE_6_31d_DFT.chk'
+#
+# You will also want to copy the log file to a permanent directory
+# Here we copy it back to a subdirectory of the home directory
+# *************************************
+
+cp {{ name }}.chk $HOME/{{ name }}.chk
+cp {{ name }}.log $HOME/{{ name }}.log

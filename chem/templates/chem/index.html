@@ -1,0 +1,14 @@
+{% extends "chem/generator.html" %}
+
+{% block content %}
+    Molecule name
+    <form enctype="multipart/form-data" action="/chem" method="get">
+        <input type="text" name="molecule">
+        <input type="submit" value="Submit" />
+    </form>
+    <ul>
+        <li><a href="frag">Fragments</a></li>
+        <li><a href="log">Logs</a></li>
+        <li><a href="data">Homo/Lumo Data</a></li>
+    </ul>
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends "chem/base.html" %}
+
+{% block content %}
+    The format of the fragments is: <br>
+    Element x y z
+    <br>
+    <br>
+    Atom1 Atom2 Connection
+    {% for title, parts in usable_parts %}
+    <h3>{{ title }}</h3>
+    <ul>
+        {% if "Groups" in title %}
+        {% for id, name in parts %}
+            {% if title == "X Groups" %}
+            <li><a href="{{ id|lower }}">{{ id }} : {{ name }}</a></li>
+            {% else %}
+            <li><a href="{{ id }}">{{ id }} : {{ name }}</a></li>
+            {% endif %}
+        {% endfor %}
+        {% else %}
+        {% for name in parts %}
+            <li><a href="{{ name }}">{{ name }}</a></li>
+        {% endfor %}
+        {% endif %}
+    </ul></ br>
+    {% endfor %}
+{% endblock %}

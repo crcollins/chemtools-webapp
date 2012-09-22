@@ -1,0 +1,15 @@
+#PBS -S /bin/csh
+#PBS -N g09_ccm
+#PBS -q ccm_queue
+#PBS -l mppwidth=48,walltime={{ time }}
+#PBS -j oe
+
+module load ccm
+setenv CRAY_ROOTFS DSL
+
+mkdir -p $SCRATCH/g09/$PBS_JOBID
+cd $SCRATCH/g09/$PBS_JOBID
+module load g09
+
+ccmrun g09l < $HOME/{{ name }}.gjf > $HOME/{{ name }}.log
+ls -l
