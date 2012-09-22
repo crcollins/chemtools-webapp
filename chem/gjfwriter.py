@@ -350,6 +350,7 @@ class Output(object):
         for side in struct:
             this = []
             for (char, parentid) in side:
+                parentid += 1 # offset for core
                 this.append((Molecule(read_data(char)), char, parentid))
             fragments.append(this)
 
@@ -360,7 +361,6 @@ class Output(object):
             this = [core]+side
 
             for (part, char, parentid) in side:
-                parentid += 1 # offset for core
                 bondb = part.next_open()
                 if not parentid:
                     bonda = cends[j]
