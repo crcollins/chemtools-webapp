@@ -349,41 +349,50 @@ class Output(object):
         fragments = []
         for side in struct:
             this = []
-            for (char, parentid) in side:
-                parentid += 1 # offset for core
-                this.append((Molecule(read_data(char)), char, parentid))
+            if side is not None:
+                for (char, parentid) in side:
+                    parentid += 1 # offset for core
+                    this.append((Molecule(read_data(char)), char, parentid))
+            else:
+                this.append(None)
             fragments.append(this)
 
-        # ends = []
+        ends = []
         #bond all of the fragments together
         cends = core[0].open_ends()
         for j, side in enumerate(fragments):
             this = [core]+side
 
-            for (part, char, parentid) in side:
-                bondb = part.next_open()
-                if not parentid:
-                    bonda = cends[j]
-                else:
-                    c = bondb.connection()
-                    #enforces lowercase to be r-group
-                    if char.islower():
-                        c = "+"
-                    elif char.isupper():
-                        c += "~"
-                    bonda = this[parentid][0].next_open(c)
+            if side[0] is not None:
+                for (part, char, parentid) in side:
+                    bondb = part.next_open()
+                    if not parentid:
+                        bonda = cends[j]
+                    else:
+                        c = bondb.connection()
+                        #enforces lowercase to be r-group
+                        if char.islower():
+                            c = "+"
+                        elif char.isupper():
+                            c += "~"
+                        bonda = this[parentid][0].next_open(c)
 
-                if bonda and bondb:
-                    this[parentid][0].merge(bonda, bondb, part)
-                else:
-                    raise Exception(6, "Part not connected")
-            # ends.append(this[max([x[1] for x in side])][0].next_open('~'))
+                    if bonda and bondb:
+                        this[parentid][0].merge(bonda, bondb, part)
+                    else:
+                        raise Exception(6, "Part not connected")
+                # find the furthest part and get its parent's next open
+                ends.append(this[max(x[2] for x in side)][0].next_open('~'))
+            else:
+                ends.append(cends[j])
+
 
         #merge the fragments into single molecule
         out = [core[0]]
-        for x in fragments:
-            for y in x:
-                out.append(y[0])
+        for side in fragments:
+                for part in side:
+                    if part is not None:
+                        out.append(part[0])
         a = Molecule(out)
         a.close_ends()
         return a
@@ -418,7 +427,7 @@ def parse_name(name):
         except:
             middle = None
 
-    parsedsides = tuple(parse_end_name(x) if x else parse_end_name(None) for x in (left, middle, right))
+    parsedsides = tuple(parse_end_name(x) if x else None for x in (left, middle, right))
     # >>> parse_name('4a_TON_4b_4c')
     # ('TON', (('4', -1), ('a', 0), ('a', 0)), (('4', -1), ('b', 0), ('b', 0)),
     #    (('4', -1), ('c', 0), ('c', 0))
@@ -429,10 +438,6 @@ def parse_end_name(name):
     rgroup = "abcdefghijkl"
     aryl0 = "2389"
     aryl2 = "4567"
-
-    # replace empty sides with just Hydrogen
-    if not name:
-        name = 'A'
 
     parts = []
     r = 0
