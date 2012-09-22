@@ -1,3 +1,4 @@
 *.pyc
 database
 scratch
+project/secret_key.py

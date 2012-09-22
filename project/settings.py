@@ -3,6 +3,8 @@
 import os
 ROOT_PATH = os.getcwd()
 
+from secret_key import SECRET_KEY
+
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
@@ -80,9 +82,6 @@ STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 #    'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
-
-# Make this unique, and don't share it with anybody.
-SECRET_KEY = '@no91bf5((mfk*%s&amp;^1t=a69p56uam#d5-zx50pyfw*y9uwe5k'
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
