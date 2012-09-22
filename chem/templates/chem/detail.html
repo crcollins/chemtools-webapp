@@ -9,10 +9,10 @@
     {% if error_message %}
         <p><strong>{{ error_message }}</strong></p>
     {% endif %}
-    <img src="/chem/{{ molecule }}.png?scale=10"></img>
+    <img src="../{{ molecule }}.png?scale=10"></img>
     <ul>
-        <li><a href="/chem/{{ molecule }}.gjf">gjf File</a></li>
-        <li><a href="/chem/{{ molecule }}.mol2">mol2 File</a></li>
+        <li><a href="../{{ molecule }}.gjf">gjf File</a></li>
+        <li><a href="../{{ molecule }}.mol2">mol2 File</a></li>
         <li><a href="job">Job File</a></li>
     </ul>
     <a href="report">Report Me!</a>
