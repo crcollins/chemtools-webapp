@@ -124,17 +124,6 @@ class Molecule(object):
                 bond.parent = self.bonds
                 self.bonds.append(bond)
 
-    def rotate(self, theta, point, offset):
-        '''Rotates all the atoms in the molecule around point (x,y) with an offset (x,y).'''
-        #point = (x,y); offset = (x,y)
-        ct = math.cos(theta)
-        st = math.sin(theta)
-        for atom in self.atoms:
-            x = atom.x - point[0]
-            y = atom.y - point[1]
-            atom.x = ct*x - st*y + offset[0]
-            atom.y = st*x + ct*y + offset[1]
-
     def rotate_3d(self, theta, phi, psi, point, offset):
         ct = math.cos(theta)
         st = math.sin(theta)
@@ -381,53 +370,6 @@ class Output(object):
                 middle = None
         return core, left, middle, right
 
-    def old_build(self, corename, leftname, middlename, rightname):
-        '''Returns a closed molecule based on the input of each of the edge names.'''
-        core = (Molecule(read_data(corename)), 0, corename, corename)
-        struct = [x if x else "A" for x in [rightname, leftname] + [middlename] * 2]
-        midx = 2
-
-        fragments = []
-        for side in struct:
-            this = []
-            for i, char in enumerate(side):
-                if char in "10":
-                    raise Exception(4, "10 not implemented")
-                this.append((Molecule(read_data(char)), i, char, side))
-                if char.islower() and i == len(side)-1 :
-                    #checks to make sure the prev group was aryl for r-groups
-                    if this[i-1][2] not in '2389' and this[i-1][2].isdigit():
-                        this.append((Molecule(read_data(char)), i, char, side))
-            fragments.append(this)
-        ends = []
-        #bond all of the fragments together
-        for j, side in enumerate(fragments):
-            this = [core]+side
-            for (part, partidx, char, sidename) in side:
-                bondb = part.next_open()
-                c = bondb.connection()
-                #enforces lowercase to be r-group
-                if char.islower():
-                    c = "+"
-                if j >= midx and c == "~":
-                    c = "*" + c
-                #fixes x-groups connecting to ~
-                if j >= midx and c == "*" and char.isupper():
-                    c = "~" + c
-                bonda = this[partidx][0].next_open(c)
-                if bonda and bondb:
-                    this[partidx][0].merge(bonda, bondb, part)
-            ends.append(this[max([x[1] for x in side])][0].next_open('~'))
-
-        #merge the fragments into single molecule
-        out = [core[0]]
-        for x in fragments:
-            for y in x:
-                out.append(y[0])
-        a = Molecule(out)
-        a.close_ends()
-        return a
-
     def build(self, corename, leftname, middlename, rightname):
         '''Returns a closed molecule based on the input of each of the edge names.'''
         core = (Molecule(read_data(corename)), 0, corename, corename)
@@ -537,7 +479,6 @@ def parse_name(name):
                     raise ValueError("too many rgroup")
         elif state == "start":
             if char not in xgroup + aryl0 + aryl2:
-                print char
                 raise ValueError("no rgroups allowed")
             else:
                 parts.append((char, lastconnect))
