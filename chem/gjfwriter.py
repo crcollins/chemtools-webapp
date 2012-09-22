@@ -343,12 +343,9 @@ class Output(object):
     def build(self, name):
         '''Returns a closed molecule based on the input of each of the edge names.'''
         corename, (leftparsed, middleparsed, rightparsed) = parse_name(name)
-
         core = (Molecule(read_data(corename)), 0, corename, corename)
-        # replace empty sides with just Hydrogen
-        struct = [rightparsed, leftparsed] + [middleparsed] * 2
-        midx = 2
 
+        struct = [middleparsed] * 2 + [rightparsed, leftparsed]
         fragments = []
         for side in struct:
             this = []
@@ -358,21 +355,24 @@ class Output(object):
 
         # ends = []
         #bond all of the fragments together
+        cends = core[0].open_ends()
         for j, side in enumerate(fragments):
             this = [core]+side
+
             for (part, partidx, char, sidename, parentid) in side:
-                parentid += 1
+                parentid += 1 # offset for core
                 bondb = part.next_open()
-                c = bondb.connection()
-                #enforces lowercase to be r-group
-                if char.islower():
-                    c = "+"
-                if j >= midx and c == "~":
-                    c = "*" + c
-                #fixes x-groups connecting to ~
-                if j >= midx and c == "*" and char.isupper():
-                    c = "~" + c
-                bonda = this[parentid][0].next_open(c)
+                if not parentid:
+                    bonda = cends[j]
+                else:
+                    c = bondb.connection()
+                    #enforces lowercase to be r-group
+                    if char.islower():
+                        c = "+"
+                    elif char.isupper():
+                        c += "~"
+                    bonda = this[parentid][0].next_open(c)
+
                 if bonda and bondb:
                     this[parentid][0].merge(bonda, bondb, part)
                 else:
