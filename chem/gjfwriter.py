@@ -318,9 +318,9 @@ def read_data(filename):
 
 class Output(object):
     def __init__(self, name, basis):
-        self.molecule = self.build(*self.parse(name))
         self.name = name
         self.basis = basis
+        self.molecule = self.build(name)
 
     def write_file(self, gjf=True):
         starter = [
@@ -340,47 +340,19 @@ class Output(object):
             string = self.molecule.mol2
         return string
 
-    def parse(self, name):
-        '''Parses a molecule name and returns the edge part names.'''
-        parts = name.split("_")
-        core = None
-
-        for part in parts:
-            if part.upper() in CORES :
-                core = part
-                break
-        if not core:
-            raise Exception(1, "Bad Core Name")
-        i = parts.index(core)
-        left = parts[:i][0] if parts[:i] else None
-        right = parts[i+1:]
-        if len(right) > 1:
-            middle = right[0]
-            right = right[1]
-        else:
-            try:
-                letter = right[0][0]
-                if letter.lower() in DB and letter.lower() != letter:
-                    middle = letter
-                    right = right[0][1:]
-                else:
-                    middle = None
-                    right = right[0]
-            except:
-                middle = None
-        return core, left, middle, right
-
-    def build(self, corename, leftname, middlename, rightname):
+    def build(self, name):
         '''Returns a closed molecule based on the input of each of the edge names.'''
+        corename, (leftparsed, middleparsed, rightparsed) = parse_name(name)
+
         core = (Molecule(read_data(corename)), 0, corename, corename)
         # replace empty sides with just Hydrogen
-        struct = [x if x else "A" for x in [rightname, leftname] + [middlename] * 2]
+        struct = [rightparsed, leftparsed] + [middleparsed] * 2
         midx = 2
 
         fragments = []
         for side in struct:
             this = []
-            for i, (char, parentid) in enumerate(parse_name(side)):
+            for i, (char, parentid) in enumerate(side):
                 this.append((Molecule(read_data(char)), i, char, side, parentid))
             fragments.append(this)
 
@@ -418,10 +390,49 @@ class Output(object):
 
 
 def parse_name(name):
+    '''Parses a molecule name and returns the edge part names.'''
+    parts = name.split("_")
+    core = None
+
+    for part in parts:
+        if part.upper() in CORES :
+            core = part
+            break
+    if not core:
+        raise Exception(1, "Bad Core Name")
+    i = parts.index(core)
+    left = parts[:i][0] if parts[:i] else None
+    right = parts[i+1:]
+    if len(right) > 1:
+        middle = right[0]
+        right = right[1]
+    else:
+        try:
+            letter = right[0][0]
+            if letter.lower() in DB and letter.lower() != letter:
+                middle = letter
+                right = right[0][1:]
+            else:
+                middle = None
+                right = right[0]
+        except:
+            middle = None
+
+    parsedsides = tuple(parse_end_name(x) if x else parse_end_name(None) for x in (left, middle, right))
+    # >>> parse_name('4a_TON_4b_4c')
+    # ('TON', (('4', -1), ('a', 0), ('a', 0)), (('4', -1), ('b', 0), ('b', 0)),
+    #    (('4', -1), ('c', 0), ('c', 0))
+    return core, parsedsides
+
+def parse_end_name(name):
     xgroup = "ABCDEFGHIJKL"
     rgroup = "abcdefghijkl"
     aryl0 = "2389"
     aryl2 = "4567"
+
+    # replace empty sides with just Hydrogen
+    if not name:
+        name = 'A'
 
     parts = []
     r = 0
@@ -503,4 +514,3 @@ def parse_name(name):
 # print parse_name("24c4J")
 # print parse_name("24c4")
 # print parse_name("2A")
-
