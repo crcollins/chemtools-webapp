@@ -230,7 +230,7 @@ class Molecule(object):
             pts = sum([x.xyz[:2] for x in bond.atoms], tuple())
             pts = [(coord-bounds[0][i%2])*scale for i,coord in enumerate(pts)]
 
-            draw.line(pts,fill=colors[bond.type])
+            draw.line(pts,fill=colors[bond.type], width=scale/10)
             s = (scale * .25)
             for x in xrange(2):
                 if bond.atoms[x].element not in "C":
