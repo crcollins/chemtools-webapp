@@ -6,7 +6,12 @@
     {% endif %}
     <form enctype="multipart/form-data" action="." method="post">
         {% csrf_token %}
-        <input type="file" name="myfiles" multiple>
+        <input type="file" name="myfiles" multiple />
+        <p>
+        <input type="radio" name="option" value="logparse">Log Parse</input>
+        <input type="radio" name="option" value="dataparse">Data Parse</input>
+        <input type="radio" name="option" value="gjfreset">Gjf Reset</input>
+        <p>
         <input type="submit" value="Submit" />
         <input type="reset" value="Reset" />
     </form>

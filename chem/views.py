@@ -162,83 +162,79 @@ def report(request, molecule):
         })
     return render(request, "chem/report.html", c)
 
-def upload_log(request):
-    if request.method == "POST":
-        parser = fileparser.LogParser()
-        for f in request.FILES.getlist('myfiles'):
-            if f.name.endswith(".zip"):
-                with zipfile.ZipFile(f, "r") as zfile:
-                    for name in zfile.namelist():
-                        parser.parse_file(zfile.open(name))
-            else:
-                parser.parse_file(f)
-        f = StringIO(parser.format_output())
-        response = HttpResponse(FileWrapper(f), content_type="text/plain")
-        return response
-    form = LogForm()
-    c = Context({
-        "form": form,
-        })
-    return render(request, "chem/upload_log.html", c)
-
 def upload_data(request):
     if request.method == "POST":
-        buff = StringIO()
-        zfile = zipfile.ZipFile(buff, 'w', zipfile.ZIP_DEFLATED)
+        if request.POST["option"] == "logparse":
+            return parse_log(request)
+        elif request.POST["option"] == "dataparse":
+            return parse_data(request)
+        elif request.POST["option"] == "gjfreset":
+            return reset_gjf(request)
+    form = LogForm()
+    c = Context({
+        "form": form,
+        })
+    return render(request, "chem/upload_log.html", c)
 
-        for f in request.FILES.getlist('myfiles'):
-            parser = fileparser.DataParser(f)
-            homolumo, gap = parser.get_graphs()
+def parse_log(request):
+    parser = fileparser.LogParser()
+    for f in request.FILES.getlist('myfiles'):
+        if f.name.endswith(".zip"):
+            with zipfile.ZipFile(f, "r") as zfile:
+                for name in zfile.namelist():
+                    parser.parse_file(zfile.open(name))
+        else:
+            parser.parse_file(f)
+    f = StringIO(parser.format_output())
+    response = HttpResponse(FileWrapper(f), content_type="text/plain")
+    return response
 
-            name, _ = os.path.splitext(f.name)
-            if len(request.FILES.getlist('myfiles')) != 1:
-                zfile.writestr(name+"/output.txt", parser.format_output())
-                zfile.writestr(name+"/homolumo.eps", homolumo.getvalue())
-                zfile.writestr(name+"/gap.eps", gap.getvalue())
-            else:
-                zfile.writestr("output.txt", parser.format_output())
-                zfile.writestr("homolumo.eps", homolumo.getvalue())
-                zfile.writestr("gap.eps", gap.getvalue())
+def parse_data(request):
+    buff = StringIO()
+    zfile = zipfile.ZipFile(buff, 'w', zipfile.ZIP_DEFLATED)
 
+    for f in request.FILES.getlist('myfiles'):
+        parser = fileparser.DataParser(f)
+        homolumo, gap = parser.get_graphs()
+
+        name, _ = os.path.splitext(f.name)
         if len(request.FILES.getlist('myfiles')) != 1:
-            name = "output"
-        zfile.close()
-        buff.flush()
+            zfile.writestr(name+"/output.txt", parser.format_output())
+            zfile.writestr(name+"/homolumo.eps", homolumo.getvalue())
+            zfile.writestr(name+"/gap.eps", gap.getvalue())
+        else:
+            zfile.writestr("output.txt", parser.format_output())
+            zfile.writestr("homolumo.eps", homolumo.getvalue())
+            zfile.writestr("gap.eps", gap.getvalue())
 
-        ret_zip = buff.getvalue()
-        buff.close()
+    if len(request.FILES.getlist('myfiles')) != 1:
+        name = "output"
+    zfile.close()
+    buff.flush()
 
-        response = HttpResponse(ret_zip, mimetype="application/zip")
-        response["Content-Disposition"] = "attachment; filename=%s.zip" % name
-        return response
-    form = LogForm()
-    c = Context({
-        "form": form,
-        })
-    return render(request, "chem/upload_log.html", c)
+    ret_zip = buff.getvalue()
+    buff.close()
 
-def a(request):
-    if request.method == "POST":
-        buff = StringIO()
-        zfile = zipfile.ZipFile(buff, 'w', zipfile.ZIP_DEFLATED)
+    response = HttpResponse(ret_zip, mimetype="application/zip")
+    response["Content-Disposition"] = "attachment; filename=%s.zip" % name
+    return response
 
-        for f in request.FILES.getlist('myfiles'):
-            parser = fileparser.LogReset(f)
+def reset_gjf(request):
+    buff = StringIO()
+    zfile = zipfile.ZipFile(buff, 'w', zipfile.ZIP_DEFLATED)
 
-            name, _ = os.path.splitext(f.name)
-            zfile.writestr("%s.gjf" % name, parser.format_output(errors=False))
+    for f in request.FILES.getlist('myfiles'):
+        parser = fileparser.LogReset(f)
 
-        zfile.close()
-        buff.flush()
+        name, _ = os.path.splitext(f.name)
+        zfile.writestr("%s.gjf" % name, parser.format_output(errors=False))
 
-        ret_zip = buff.getvalue()
-        buff.close()
+    zfile.close()
+    buff.flush()
 
-        response = HttpResponse(ret_zip, mimetype="application/zip")
-        response["Content-Disposition"] = "attachment; filename=output.zip"
-        return response
-    form = LogForm()
-    c = Context({
-        "form": form,
-        })
-    return render(request, "chem/upload_log.html", c)
+    ret_zip = buff.getvalue()
+    buff.close()
+
+    response = HttpResponse(ret_zip, mimetype="application/zip")
+    response["Content-Disposition"] = "attachment; filename=output.zip"
+    return response
