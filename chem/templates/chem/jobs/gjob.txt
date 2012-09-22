@@ -17,5 +17,4 @@ exe=`which g09`
 /usr/bin/time $exe < {{ name }}.gjf> {{ name }}.log
 
 mv {{ name }}.* $HOME/done/
-cd $HOME
-scp {{ name }}.* chris@mandelbrot.no-ip.org:/home/chris/Desktop/Fallgjfs/done
+
