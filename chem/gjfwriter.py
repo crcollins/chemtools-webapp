@@ -445,7 +445,12 @@ class Output(object):
 
 
 def parse_name(name):
-    '''Parses a molecule name and returns the edge part names.'''
+    '''Parses a molecule name and returns the edge part names.
+
+    >>> parse_name('4a_TON_4b_4c')
+    ('TON', (('4', -1), ('a', 0), ('a', 0)), (('4', -1), ('b', 0), ('b', 0)),
+    (('4', -1), ('c', 0), ('c', 0))
+    '''
     parts = name.split("_")
     core = None
 
@@ -485,9 +490,7 @@ def parse_name(name):
     parsedsides = tuple(parse_end_name(x) if x else None for x in (left, middle, right))
     nm = (varset['n'], varset['m'])
     xyz = (varset['x'], varset['y'], varset['z'])
-    # >>> parse_name('4a_TON_4b_4c')
-    # ('TON', (('4', -1), ('a', 0), ('a', 0)), (('4', -1), ('b', 0), ('b', 0)),
-    #    (('4', -1), ('c', 0), ('c', 0))
+
     return core, parsedsides, nm, xyz
 
 def parse_end_name(name):
