@@ -33,9 +33,15 @@ def frag_index(request):
     return render(request, "chem/frag_index.html", c)
 
 def gen_detail(request, molecule):
+    try:
+        gjfwriter.parse_name(molecule)
+        e = None
+    except Exception as e:
+        pass
     c = Context({
         "molecule": molecule,
-        "known_errors": ErrorReport.objects.filter(molecule=molecule)
+        "known_errors": ErrorReport.objects.filter(molecule=molecule),
+        "error_message": e,
         })
     return render(request, "chem/detail.html", c)
 

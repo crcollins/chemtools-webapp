@@ -8,12 +8,13 @@
     {% endif %}
     {% if error_message %}
         <p><strong>{{ error_message }}</strong></p>
+    {% else %}
+        <img src="../{{ molecule }}.png?scale=10"></img>
+        <ul>
+            <li><a href="../{{ molecule }}.gjf">gjf File</a></li>
+            <li><a href="../{{ molecule }}.mol2">mol2 File</a></li>
+            <li><a href="job">Job File</a></li>
+        </ul>
     {% endif %}
-    <img src="../{{ molecule }}.png?scale=10"></img>
-    <ul>
-        <li><a href="../{{ molecule }}.gjf">gjf File</a></li>
-        <li><a href="../{{ molecule }}.mol2">mol2 File</a></li>
-        <li><a href="job">Job File</a></li>
-    </ul>
     <a href="report">Report Me!</a>
 {% endblock %}
