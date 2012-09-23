@@ -45,8 +45,18 @@ def gen_detail(request, molecule):
         })
     return render(request, "chem/detail.html", c)
 
-
 def gen_multi_detail(request, molecules):
+    if request.GET.get("basis"):
+        basis = request.GET.get("basis")
+    else:
+        basis = ''
+    c = Context({
+        "molecules": molecules.split(','),
+        "pagename": molecules,
+        })
+    return render(request, "chem/multi_detail.html", c)
+
+def gen_multi_detail_zip(request, molecules):
     if request.GET.get("basis"):
         basis = request.GET.get("basis")
     else:

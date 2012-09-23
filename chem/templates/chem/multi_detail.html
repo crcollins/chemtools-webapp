@@ -1,0 +1,17 @@
+{% extends "chem/generator.html" %}
+
+{% block content %}
+    <table>
+    {% for molecule in molecules %}
+        <tr>
+            <td>{{ molecule }}</td>
+            <td><a href="../{{ molecule }}.gjf">gjf</a></td>
+            <td><a href="../{{ molecule }}.mol2">mol2</a></td>
+            <td><a href="../{{ molecule }}.png">Image</a></td>
+            <td><a href="job">Job</a></td>
+            <td><a href="report">Report</a></td>
+        </tr>
+    {% endfor %}
+    </table>
+    <a href='../{{ pagename }}.zip'>Download All</a>
+{% endblock %}
