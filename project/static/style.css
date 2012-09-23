@@ -99,3 +99,16 @@ footer {
     padding: 20px;
     height: 10%;
 }
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+tr#error {
+    background-color: #B43030;
+}
+
+tr#warning {
+    background-color: #252525;
+}

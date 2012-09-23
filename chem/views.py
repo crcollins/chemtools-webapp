@@ -50,9 +50,21 @@ def gen_multi_detail(request, molecules):
         basis = request.GET.get("basis")
     else:
         basis = ''
+
+    errors = []
+    warnings = []
+    for mol in molecules.split(','):
+        try:
+            gjfwriter.parse_name(mol)
+            errors.append(None)
+        except Exception as e:
+            errors.append(e)
+        warnings.append(ErrorReport.objects.filter(molecule=mol))
+
     c = Context({
-        "molecules": molecules.split(','),
+        "molecules": zip(molecules.split(','), errors, warnings),
         "pagename": molecules,
+        "basis": basis
         })
     return render(request, "chem/multi_detail.html", c)
 

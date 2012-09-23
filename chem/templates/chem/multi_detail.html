@@ -2,16 +2,19 @@
 
 {% block content %}
     <table>
-    {% for molecule in molecules %}
-        <tr>
+    {% for molecule, error, warning in molecules %}
+        <tr {% if error %}id="error"{% elif warning %}id="warning"{% endif %}>
             <td>{{ molecule }}</td>
-            <td><a href="../{{ molecule }}.gjf">gjf</a></td>
-            <td><a href="../{{ molecule }}.mol2">mol2</a></td>
-            <td><a href="../{{ molecule }}.png">Image</a></td>
-            <td><a href="job">Job</a></td>
-            <td><a href="report">Report</a></td>
+            {% if not error %}
+                <td><a href="../{{ molecule }}.gjf">gjf</a></td>
+                <td><a href="../{{ molecule }}.mol2">mol2</a></td>
+                <td><a href="../{{ molecule }}.png">Image</a></td>
+                <td><a href="job">Job</a></td>
+                <td><a href="../{{ molecule }}/report/">Report</a></td>
+            {% endif %}
         </tr>
     {% endfor %}
     </table>
+    <p>
     <a href='../{{ pagename }}.zip'>Download All</a>
 {% endblock %}
