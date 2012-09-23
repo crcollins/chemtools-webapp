@@ -302,6 +302,25 @@ class Molecule(object):
             frags.append(a)
         return Molecule(frags)
 
+    def stack(self, x, y, z):
+        '''Returns a molecule with x,y,z stacking.'''
+        frags = [self]
+        bb = self.bounding_box()
+        size = tuple(maxv-minv for minv, maxv in zip(bb[0], bb[1]))
+        for i,axis in enumerate((x,y,z)):
+            #means there is nothing to stack
+            if axis <= 1:
+                continue
+            axisfrags = copy.deepcopy(frags)
+            for num in xrange(1,axis):
+                use = [0,0,0]
+                use[i] = num*(2+size[i])
+                for f in axisfrags:
+                    a = copy.deepcopy(f)
+                    a.displace(*use)
+                    frags.append(a)
+        return Molecule(frags)
+
 ##############################################################################
 
 def read_data(filename):
@@ -357,7 +376,7 @@ class Output(object):
 
     def build(self, name):
         '''Returns a closed molecule based on the input of each of the edge names.'''
-        corename, (leftparsed, middleparsed, rightparsed), nm = parse_name(name)
+        corename, (leftparsed, middleparsed, rightparsed), nm, xyz = parse_name(name)
 
         core = (Molecule(read_data(corename)), corename, corename)
         struct = [middleparsed] * 2 + [rightparsed, leftparsed]
@@ -418,6 +437,9 @@ class Output(object):
         elif m > 1 and all(ends[:2]):
             a = a.chain(ends[0], ends[1], m)
 
+        if any(xyz):
+            a = a.stack(*xyz)
+
         a.close_ends()
         return a
 
@@ -427,7 +449,7 @@ def parse_name(name):
     parts = name.split("_")
     core = None
 
-    varset = {'n': 1, 'm': 1}
+    varset = {'n': 1, 'm': 1, 'x': 1, 'y': 1, 'z': 1}
     for part in parts[:]:
         for name in varset:
             if part.startswith(name):
@@ -462,11 +484,11 @@ def parse_name(name):
 
     parsedsides = tuple(parse_end_name(x) if x else None for x in (left, middle, right))
     nm = (varset['n'], varset['m'])
-
+    xyz = (varset['x'], varset['y'], varset['z'])
     # >>> parse_name('4a_TON_4b_4c')
     # ('TON', (('4', -1), ('a', 0), ('a', 0)), (('4', -1), ('b', 0), ('b', 0)),
     #    (('4', -1), ('c', 0), ('c', 0))
-    return core, parsedsides, nm
+    return core, parsedsides, nm, xyz
 
 def parse_end_name(name):
     xgroup = "ABCDEFGHIJKL"
