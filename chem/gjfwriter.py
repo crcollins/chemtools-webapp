@@ -287,6 +287,21 @@ class Molecule(object):
         #remove the extension parts
         [x.remove() for x in (bond2, R1, R2)]
 
+    def chain(self, left, right, n):
+        '''Returns an n length chain of the molecule.'''
+        frags = [copy.deepcopy(self)]
+        lidx, ridx = self.bonds.index(left), self.bonds.index(right)
+        # n=1 already in frags
+        for i in xrange(n-1):
+            a = copy.deepcopy(self)
+            if i == 0:
+                frags[i].merge(frags[i].bonds[ridx], a.bonds[lidx], a)
+            else:
+                #accounts for deleted bond
+                frags[i].merge(frags[i].bonds[ridx-1], a.bonds[lidx], a)
+            frags.append(a)
+        return Molecule(frags)
+
 ##############################################################################
 
 def read_data(filename):
@@ -342,9 +357,9 @@ class Output(object):
 
     def build(self, name):
         '''Returns a closed molecule based on the input of each of the edge names.'''
-        corename, (leftparsed, middleparsed, rightparsed) = parse_name(name)
-        core = (Molecule(read_data(corename)), corename, corename)
+        corename, (leftparsed, middleparsed, rightparsed), nm = parse_name(name)
 
+        core = (Molecule(read_data(corename)), corename, corename)
         struct = [middleparsed] * 2 + [rightparsed, leftparsed]
         fragments = []
         for side in struct:
@@ -386,7 +401,6 @@ class Output(object):
             else:
                 ends.append(cends[j])
 
-
         #merge the fragments into single molecule
         out = [core[0]]
         for side in fragments:
@@ -394,6 +408,16 @@ class Output(object):
                     if part is not None:
                         out.append(part[0])
         a = Molecule(out)
+
+        #multiplication of molecule/chain
+        (n, m) = nm
+        if n > 1 and m > 1:
+            raise Exception(7, "can not do N and M expansion")
+        elif n > 1 and all(ends[2:]):
+            a = a.chain(ends[2], ends[3], n)
+        elif m > 1 and all(ends[:2]):
+            a = a.chain(ends[0], ends[1], m)
+
         a.close_ends()
         return a
 
@@ -403,15 +427,24 @@ def parse_name(name):
     parts = name.split("_")
     core = None
 
+    varset = {'n': 1, 'm': 1}
+    for part in parts[:]:
+        for name in varset:
+            if part.startswith(name):
+                varset[name] = int(part[1:])
+                parts.remove(part)
+
     for part in parts:
-        if part.upper() in CORES :
+        if part.upper() in CORES:
             core = part
             break
     if not core:
         raise Exception(1, "Bad Core Name")
+
     i = parts.index(core)
     left = parts[:i][0] if parts[:i] else None
     right = parts[i+1:]
+
     if len(right) > 1:
         middle = right[0]
         right = right[1]
@@ -428,10 +461,12 @@ def parse_name(name):
             middle = None
 
     parsedsides = tuple(parse_end_name(x) if x else None for x in (left, middle, right))
+    nm = (varset['n'], varset['m'])
+
     # >>> parse_name('4a_TON_4b_4c')
     # ('TON', (('4', -1), ('a', 0), ('a', 0)), (('4', -1), ('b', 0), ('b', 0)),
     #    (('4', -1), ('c', 0), ('c', 0))
-    return core, parsedsides
+    return core, parsedsides, nm
 
 def parse_end_name(name):
     xgroup = "ABCDEFGHIJKL"
