@@ -430,9 +430,7 @@ class Output(object):
 
         #multiplication of molecule/chain
         (n, m) = nm
-        if n > 1 and m > 1:
-            raise Exception(7, "can not do N and M expansion")
-        elif n > 1 and all(ends[2:]):
+        if n > 1 and all(ends[2:]):
             a = a.chain(ends[2], ends[3], n)
         elif m > 1 and all(ends[:2]):
             a = a.chain(ends[0], ends[1], m)
@@ -460,6 +458,8 @@ def parse_name(name):
             if part.startswith(name):
                 varset[name] = int(part[1:])
                 parts.remove(part)
+    if varset['n'] > 1 and varset['m'] > 1:
+        raise Exception(7, "can not do N and M expansion")
 
     for part in parts:
         if part.upper() in CORES:
@@ -504,6 +504,10 @@ def parse_end_name(name):
     # start with -1 to add 1 later for core
     lastconnect = -1
     state = "start"
+    for char in name:
+        if char not in xgroup + aryl0 + aryl2 + rgroup:
+            raise ValueError("Bad Substituent Name: %s" % char)
+
     for i, char in enumerate(name):
         if state == "aryl0":
             if char not in xgroup + aryl0 + aryl2:
