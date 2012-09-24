@@ -100,6 +100,25 @@ footer {
     height: 10%;
 }
 
+#navbar {
+    width: 100%;
+}
+
+ul {
+    list-style-type: none;
+}
+
+#navbar ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+div#navbar li {
+    display: inline;
+}
+
+
 table {
     border-collapse: collapse;
     width: 100%;
