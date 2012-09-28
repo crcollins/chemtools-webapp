@@ -26,3 +26,9 @@ def login_user(request):
         "username": username,
         })
     return render(request, "account/login.html", c)
+
+def logout_user(request):
+    pass
+
+def logout_user(request):
+    pass

@@ -11,6 +11,17 @@
 </head>
 <body>
 <div class="header">
+    <div class="login">
+    {% block login %}
+    {% if user.is_authenticated %}
+        Welcome, <a href="/account/">{{ user }}</a>. |
+        <a href="/account/logout/">Log out</a>
+    {% else %}
+        <a href="/account/login/">Log in</a> |
+        <a href="/account/register/">Register</a>
+    {% endif %}
+    {% endblock %}
+    </div>
     {% block header %}{% endblock %}
     {% block navbar %}
     <div id="navbar">
