@@ -32,7 +32,7 @@ class Parser(object):
             else:
                 self.output.append(line)
         except IndexError:
-            self.ouput.append(line)
+            self.output.append(line)
 
     def format_output(self, errors=True):
         a = self.output
