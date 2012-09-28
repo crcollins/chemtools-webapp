@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block header %}
+    <h1>Login</h1>
+{% endblock %}
+
+{% block content %}
+<h3>{{ state }}</h3>
+<form action='/login/' method="post">
+    {% csrf_token %}
+    Username: <input type="text" name="username" value="{{ username }}" /><br>
+    Password: <input type="text" name="password" value="" /><br>
+    <input type="submit" value="Log In" />
+</form>
+{% endblock %}
+
+{% block footer %}
+    Note that all of the information here is very alpha. Use at your own risk.
+{% endblock %}

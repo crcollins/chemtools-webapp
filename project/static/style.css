@@ -16,6 +16,9 @@ h3 {
     padding: 0px 0px 0px 10px;
 }
 
+div.login {
+    text-align: right;
+}
 
 .container {
     background-color: #303030;
