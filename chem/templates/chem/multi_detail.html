@@ -11,6 +11,9 @@
                 <td><a href="../{{ molecule }}.png">Image</a></td>
                 <td><a href="job">Job</a></td>
                 <td><a href="../{{ molecule }}/report/">Report</a></td>
+            {% else %}
+                <td colspan='4'>{{ error }}</td>
+                <td><a href="../{{ molecule }}/report/">Report</a></td>
             {% endif %}
         </tr>
     {% endfor %}
