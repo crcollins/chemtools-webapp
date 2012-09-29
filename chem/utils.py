@@ -72,10 +72,8 @@ def kill_run_job(jobid):
     with open(os.path.expanduser("~/.ssh/id_rsa"), 'r') as pkey:
         ssh = get_ssh_connection("gordon.sdsc.edu", "ccollins", pkey)
 
-    _, stdout, _ = ssh.exec_command(". ~/.bash_profile; qstat -u ccollins")
-    a = stdout.readlines()
+    a = get_all_jobs()
     if a:
-        lines = a[5:]
         jobs = [int(x.split(".")[0]) for x in lines]
     else:
         ssh.close()
@@ -91,6 +89,14 @@ def kill_run_job(jobid):
     b = stderr.readlines()
     if b:
         return b
+
+def get_all_jobs():
+    with open(os.path.expanduser("~/.ssh/id_rsa"), 'r') as pkey:
+        ssh = get_ssh_connection("gordon.sdsc.edu", "ccollins", pkey)
+
+    _, stdout, _ = ssh.exec_command(". ~/.bash_profile; qstat -u ccollins")
+    ssh.close()
+    return stdout.readlines()[5:]
 
 def get_sftp_connection(hostname, username, key, port=22):
     pkey = paramiko.RSAKey.from_private_key(key)
