@@ -297,7 +297,7 @@ def start_run_molecule(molecule, **kwargs):
 
         pkey.seek(0)
         ssh = get_ssh_connection("gordon.sdsc.edu", "ccollins", pkey)
-        stdin, stdout, stderr = ssh.exec_command("ls test/")
+        stdin, stdout, stderr = ssh.exec_command(". ~/.bash_profile; ls test/")
         ssh.close()
         print "close ssh"
 
