@@ -9,3 +9,4 @@ Requirements
 - Python Imaging Library
 - Scipy 0.9.0
 - Numpy 1.6.1
+- Paramiko 1.7.7.1
