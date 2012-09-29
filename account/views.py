@@ -40,7 +40,12 @@ def login_user(request):
     return render(request, "account/login.html", c)
 
 def logout_user(request):
-    pass
+    logout(request)
+    if request.GET.get('next'):
+        next = request.GET.get('next')
+    else:
+        next = LOGIN_REDIRECT_URL
+    return redirect(next)
 
 
 def index(request):
