@@ -36,17 +36,22 @@ def start_run_molecule(molecule, **kwargs):
             sftp.close()
             return None, testerr2[0]
 
-    f = sftp.open("test/%s.gjf" % molecule, 'w')
+    if "name" in kwargs:
+        name = kwargs["name"]
+    else:
+        name = molecule
+
+    f = sftp.open("test/%s.gjf" % name, 'w')
     f.write(out.write_file())
     f.close()
 
-    f2 = sftp.open("test/%s.gjob" % molecule, 'w')
+    f2 = sftp.open("test/%s.gjob" % name, 'w')
     kwargs["cluster"] = "g"
     f2.write(write_job(**kwargs))
     f2.close()
     sftp.close()
 
-    stdin, stdout, stderr = ssh.exec_command(". ~/.bash_profile; qsub test/%s.gjob" % molecule)
+    stdin, stdout, stderr = ssh.exec_command(". ~/.bash_profile; qsub test/%s.gjob" % name)
     stderr = stderr.readlines()
     if stderr:
         ssh.close()
