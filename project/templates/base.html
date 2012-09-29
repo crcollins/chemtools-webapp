@@ -15,6 +15,9 @@
     {% block login %}
     {% if user.is_authenticated %}
         Welcome, <a href="/account/">{{ user }}</a>. |
+        {% if user.is_staff %}
+            <a href="/admin/">Admin Page</a> |
+        {% endif %}
         <a href="/account/logout/">Log out</a>
     {% else %}
         <a href="/account/login/?next={{request.path}}">Log in</a> |
