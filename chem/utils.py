@@ -7,7 +7,7 @@ import paramiko
 import gjfwriter
 
 def write_job(**kwargs):
-    if "cluster" in kwargs:
+    if "cluster" in kwargs and kwargs["cluster"] in "bcgbht":
         template = "chem/jobs/%sjob.txt" % kwargs["cluster"]
         t = loader.get_template(template)
         c = Context(kwargs)
@@ -21,24 +21,37 @@ def start_run_molecule(molecule, **kwargs):
         out = gjfwriter.Output(molecule, kwargs["basis"])
     except Exception as e:
         return e
+
     with open(os.path.expanduser("~/.ssh/id_rsa"), 'r') as pkey:
         sftp = get_sftp_connection("gordon.sdsc.edu", "ccollins", pkey)
-        f = sftp.open("test/%s.gjf" % molecule, 'w')
-        f.write(out.write_file())
-        f.close()
-        f = sftp.open("test/%s.gjob" % molecule, 'w')
-        kwargs["cluster"] = "g"
-        a = write_job(**kwargs)
-        f.write(a)
-        f.close()
-        sftp.close()
-
-
-        pkey.seek(0)
+        pkey.seek(0) # reset to start of key file
         ssh = get_ssh_connection("gordon.sdsc.edu", "ccollins", pkey)
-        stdin, stdout, stderr = ssh.exec_command(". ~/.bash_profile; ls test/")
+
+    _, _, testerr = ssh.exec_command("ls test/")
+    if testerr.readlines():
+        _, _, testerr2 = ssh.exec_command("mkdir test/")
+        testerr2 = testerr2.readlines()
+        if testerr2:
+            ssh.close()
+            sftp.close()
+            return testerr2[0]
+
+    f = sftp.open("test/%s.gjf" % molecule, 'w')
+    f.write(out.write_file())
+    f.close()
+
+    f2 = sftp.open("test/%s.gjob" % molecule, 'w')
+    kwargs["cluster"] = "g"
+    f2.write(write_job(**kwargs))
+    f2.close()
+    sftp.close()
+
+    stdin, stdout, stderr = ssh.exec_command(". ~/.bash_profile; ls test/")
+    stderr = stderr.readlines()
+    if stderr:
         ssh.close()
-        print "close ssh"
+        return stderr[0]
+
 
 
 def get_sftp_connection(hostname, username, key, port=22):
