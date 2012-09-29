@@ -9,9 +9,10 @@ from django.core.servers.basehttp import FileWrapper
 from django.contrib.auth.decorators import login_required
 import paramiko
 
+from models import ErrorReport, ErrorReportForm, JobForm, LogForm
 import gjfwriter
 import fileparser
-from models import ErrorReport, ErrorReportForm, JobForm, LogForm
+import utils
 
 
 def index(request):
@@ -278,41 +279,3 @@ def run_molecule(request, molecule):
             basis = ''
         start_run_molecule(molecule, basis=basis)
         return HttpResponse(request, "It worked")
-
-def start_run_molecule(molecule, **kwargs):
-    try:
-        out = gjfwriter.Output(molecule, kwargs["basis"])
-    except Exception as e:
-        return e
-    with open(os.path.expanduser("~/.ssh/id_rsa"), 'r') as pkey:
-        sftp = get_sftp_connection("gordon.sdsc.edu", "ccollins", pkey)
-        f = sftp.open("test/%s.gjf" % molecule, 'w')
-        f.write(out.write_file())
-        f.close()
-        f = sftp.open("test/%s.gjob" % molecule, 'w')
-        f.write("hello")
-        f.close()
-        sftp.close()
-
-
-        pkey.seek(0)
-        ssh = get_ssh_connection("gordon.sdsc.edu", "ccollins", pkey)
-        stdin, stdout, stderr = ssh.exec_command(". ~/.bash_profile; ls test/")
-        ssh.close()
-        print "close ssh"
-
-
-def get_sftp_connection(hostname, username, key, port=22):
-    pkey = paramiko.RSAKey.from_private_key(key)
-
-    transport = paramiko.Transport((hostname, port))
-    transport.connect(username=username, pkey=pkey)
-    return paramiko.SFTPClient.from_transport(transport)
-
-def get_ssh_connection(hostname, username, key, port=22):
-    pkey = paramiko.RSAKey.from_private_key(key)
-
-    client = paramiko.SSHClient()
-    client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    client.connect(hostname, username=username, pkey=pkey)
-    return client
