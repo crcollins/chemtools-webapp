@@ -266,8 +266,8 @@ def run_molecule(request, molecule):
         d = request.GET.dict()
         if "basis" not in d:
             d["basis"] = ''
-        e = utils.start_run_molecule(molecule, **d)
+        jobid, e = utils.start_run_molecule(molecule, **d)
         if e is None:
-            return HttpResponse("It worked")
+            return HttpResponse("It worked. Your job id is: %d" % jobid)
         else:
             return HttpResponse(e)

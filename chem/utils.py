@@ -20,7 +20,7 @@ def start_run_molecule(molecule, **kwargs):
     try:
         out = gjfwriter.Output(molecule, kwargs["basis"])
     except Exception as e:
-        return e
+        return None, e
 
     with open(os.path.expanduser("~/.ssh/id_rsa"), 'r') as pkey:
         sftp = get_sftp_connection("gordon.sdsc.edu", "ccollins", pkey)
@@ -34,7 +34,7 @@ def start_run_molecule(molecule, **kwargs):
         if testerr2:
             ssh.close()
             sftp.close()
-            return testerr2[0]
+            return None, testerr2[0]
 
     f = sftp.open("test/%s.gjf" % molecule, 'w')
     f.write(out.write_file())
@@ -46,11 +46,16 @@ def start_run_molecule(molecule, **kwargs):
     f2.close()
     sftp.close()
 
-    stdin, stdout, stderr = ssh.exec_command(". ~/.bash_profile; ls test/")
+    stdin, stdout, stderr = ssh.exec_command(". ~/.bash_profile; qsub test/%s.gjob" % molecule)
     stderr = stderr.readlines()
     if stderr:
         ssh.close()
-        return stderr[0]
+        return None, stderr[0]
+    try:
+        jobid = int(stdout.readlines()[0].split(".")[0])
+        return jobid, None
+    except Exception as e:
+        return None, e
 
 
 
