@@ -263,9 +263,11 @@ def reset_gjf(request):
 @login_required
 def run_molecule(request, molecule):
     if request.method == "GET":
-        if request.GET.get("basis"):
-            basis = request.GET.get("basis")
+        d = request.GET.dict()
+        if "basis" not in d:
+            d["basis"] = ''
+        e = utils.start_run_molecule(molecule, **d)
+        if e is None:
+            return HttpResponse("It worked")
         else:
-            basis = ''
-        start_run_molecule(molecule, basis=basis)
-        return HttpResponse(request, "It worked")
+            return HttpResponse(e)
