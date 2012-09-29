@@ -9,7 +9,6 @@ import gjfwriter
 def write_job(**kwargs):
     if "cluster" in kwargs and kwargs["cluster"] in "bcgbht":
         template = "chem/jobs/%sjob.txt" % kwargs["cluster"]
-        t = loader.get_template(template)
         c = Context({
             "name" : kwargs["name"],
             "email": kwargs["email"],
@@ -17,7 +16,7 @@ def write_job(**kwargs):
             "ncpus": int(kwargs["nodes"]) * 16,
             "time" : "%s:00:00" % kwargs["time"],
             })
-        return t.render(c)
+        return loader.render_to_string(template, c)
     else:
         return ''
 
