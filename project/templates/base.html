@@ -17,7 +17,7 @@
         Welcome, <a href="/account/">{{ user }}</a>. |
         <a href="/account/logout/">Log out</a>
     {% else %}
-        <a href="/account/login/">Log in</a> |
+        <a href="/account/login/?next={{request.path}}">Log in</a> |
         <a href="/account/register/">Register</a>
     {% endif %}
     {% endblock %}

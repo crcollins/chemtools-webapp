@@ -6,10 +6,11 @@
 
 {% block content %}
 <h3>{{ state }}</h3>
-<form action='/login/' method="post">
+<form action='' method="post">
     {% csrf_token %}
     Username: <input type="text" name="username" value="{{ username }}" /><br>
-    Password: <input type="text" name="password" value="" /><br>
+    Password: <input type="password" name="password" value="" /><br>
+    <input type="hidden" name="next" value="{{ next }}" />
     <input type="submit" value="Log In" />
 </form>
 {% endblock %}
