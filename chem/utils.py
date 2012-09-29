@@ -1,9 +1,20 @@
 import os
 
+from django.template import loader, Context
 from django.shortcuts import render
 import paramiko
 
 import gjfwriter
+
+def write_job(**kwargs):
+    if "cluster" in kwargs:
+        template = "chem/jobs/%sjob.txt" % kwargs["cluster"]
+        t = loader.get_template(template)
+        c = Context(kwargs)
+        return t.render(c)
+    else:
+        return ''
+
 
 def start_run_molecule(molecule, **kwargs):
     try:
@@ -16,7 +27,9 @@ def start_run_molecule(molecule, **kwargs):
         f.write(out.write_file())
         f.close()
         f = sftp.open("test/%s.gjob" % molecule, 'w')
-        f.write("hello")
+        kwargs["cluster"] = "g"
+        a = write_job(**kwargs)
+        f.write(a)
         f.close()
         sftp.close()
 

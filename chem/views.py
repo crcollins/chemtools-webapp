@@ -150,24 +150,14 @@ def get_frag(request, frag):
 
 def get_job(request, molecule):
     a = {}
-    for x in ("name", "email", "nodes", "ncpus", "time"):
+    for x in ("name", "email", "nodes", "ncpus", "time", "cluster"):
         if request.GET.get(x):
             a[x] = request.GET[x]
 
     if a:
         form = JobForm(request.GET, initial=a)
         if form.is_valid():
-            c = Context({
-                "name" : request.GET["name"],
-                "email": request.GET["email"],
-                "nodes": request.GET["nodes"],
-                "ncpus": int(request.GET["nodes"]) * 16,
-                "time" : "%s:00:00" % request.GET["time"],
-                "form" : form,
-                "molecule": molecule,
-                })
-            template = "chem/jobs/%sjob.txt" % request.GET["cluster"]
-            return render(request, template, c, content_type="text/plain")
+            return HttpResponse(utils.write_job(**a), content_type="text/plain")
     else:
         form = JobForm(initial={"name": molecule})
 
