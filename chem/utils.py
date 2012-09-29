@@ -21,7 +21,6 @@ def write_job(**kwargs):
     else:
         return ''
 
-
 def start_run_molecule(molecule, **kwargs):
     try:
         out = gjfwriter.Output(molecule, kwargs["basis"])
@@ -64,11 +63,34 @@ def start_run_molecule(molecule, **kwargs):
         return None, stderr[0]
     try:
         jobid = int(stdout.readlines()[0].split(".")[0])
-        return jobid, None
     except Exception as e:
         return None, e
 
+    return jobid, None
 
+def kill_run_job(jobid):
+    with open(os.path.expanduser("~/.ssh/id_rsa"), 'r') as pkey:
+        ssh = get_ssh_connection("gordon.sdsc.edu", "ccollins", pkey)
+
+    _, stdout, _ = ssh.exec_command(". ~/.bash_profile; qstat -u ccollins")
+    a = stdout.readlines()
+    if a:
+        lines = a[5:]
+        jobs = [int(x.split(".")[0]) for x in lines]
+    else:
+        ssh.close()
+        return "There are no jobs running."
+
+    if jobid in jobs:
+        _, _, stderr = ssh.exec_command(". ~/.bash_profile; qdel %d" % jobid)
+        ssh.close()
+    else:
+        ssh.close()
+        return "That job number is not running."
+
+    b = stderr.readlines()
+    if b:
+        return b
 
 def get_sftp_connection(hostname, username, key, port=22):
     pkey = paramiko.RSAKey.from_private_key(key)
