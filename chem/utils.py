@@ -5,6 +5,7 @@ from django.shortcuts import render
 import paramiko
 
 import gjfwriter
+import fileparser
 
 def write_job(**kwargs):
     if "cluster" in kwargs and kwargs["cluster"] in "bcgbht":
@@ -118,6 +119,33 @@ def recover_output(name):
                 f2.write(line)
             f.close()
             f2.close()
+    sftp.close()
+    ssh.close()
+
+def reset_output(name):
+    with open(os.path.expanduser("~/.ssh/id_rsa"), 'r') as pkey:
+        sftp = get_sftp_connection("gordon.sdsc.edu", "ccollins", pkey)
+        pkey.seek(0) # reset to start of key file
+        ssh = get_ssh_connection("gordon.sdsc.edu", "ccollins", pkey)
+
+    _, stdout, stderr = ssh.exec_command("ls done/%s.*" % name)
+    files = [x.replace("\n", "").lstrip("done/") for x in stdout.readlines()]
+    err = stderr.readlines()
+
+    if err:
+        return err
+    for fname in files:
+        if ".log" in fname: # only download log files for now
+            f = sftp.open("done/"+fname, "r")
+            f.name = fname
+            parser = fileparser.LogReset(f)
+            f.close()
+
+            # f2 = sftp.open("done/"+fname, "w")
+            f2 = open(fname, "w")
+            f2.write(parser.format_output(errors=False))
+            f2.close()
+
     sftp.close()
     ssh.close()
 
