@@ -1,4 +1,7 @@
 import os
+import bz2
+from cStringIO import StringIO
+import time
 
 from django.template import loader, Context
 from django.shortcuts import render
@@ -136,12 +139,47 @@ def reset_output(name):
         return err
     for fname in files:
         if ".log" in fname: # only download log files for now
-            f = sftp.open("done/"+fname, "r")
-            f.name = fname
-            parser = fileparser.LogReset(f)
-            f.close()
+            ssh.exec_command("bzip2 -c < done/%s > done/temp.bz2" % fname)
 
-            # f2 = sftp.open("done/"+fname, "w")
+            # wait until comression on cluster is done
+            done = False
+            while not done:
+                _, stdout, _ = ssh.exec_command("ls -lah done/temp.bz2")
+                if stdout.readlines()[0].split()[4] != "0":
+                    done = True
+                else:
+                    time.sleep(.01)
+
+            decompresser = bz2.BZ2Decompressor()
+            ftemp = sftp.open("done/temp.bz2", "rb").read()
+            f = StringIO(decompresser.decompress(ftemp))
+            ssh.exec_command("rm done/temp.bz2")
+            parser = fileparser.LogReset(f, fname)
+            f.close()
+            f2 = open(fname, "w")
+            f2.write(parser.format_output(errors=False))
+            f2.close()
+
+    sftp.close()
+    ssh.close()
+
+def reset_output2(name):
+    with open(os.path.expanduser("~/.ssh/id_rsa"), 'r') as pkey:
+        sftp = get_sftp_connection("gordon.sdsc.edu", "ccollins", pkey)
+        pkey.seek(0) # reset to start of key file
+        ssh = get_ssh_connection("gordon.sdsc.edu", "ccollins", pkey)
+
+    _, stdout, stderr = ssh.exec_command("ls done/%s.*" % name)
+    files = [x.replace("\n", "").lstrip("done/") for x in stdout.readlines()]
+    err = stderr.readlines()
+
+    if err:
+        return err
+    for fname in files:
+        if ".log" in fname: # only download log files for now
+            f = sftp.open("done/%s" % fname, "r")
+            parser = fileparser.LogReset(f, fname)
+            f.close()
             f2 = open(fname, "w")
             f2.write(parser.format_output(errors=False))
             f2.close()
