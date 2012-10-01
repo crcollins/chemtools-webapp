@@ -194,10 +194,12 @@ class LogParser(Parser):
 
 
 class LogReset(Parser):
-    def __init__(self, f):
+    def __init__(self, f, fname=None):
         super(LogReset, self).__init__()
         self.write("%mem=59GB")
-        name, _ = os.path.splitext(f.name)
+        if fname is None:
+            fname = f.name
+        name, _ = os.path.splitext(fname)
         self.write("%%chk=%s.chk" % name)
         self.parse_file(f)
 
