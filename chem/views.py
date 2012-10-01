@@ -265,8 +265,8 @@ def run_molecule(request, molecule):
     if not request.user.is_staff:
         return HttpResponse("You must be a staff user to submit a job.")
 
-    if request.method == "GET":
-        d = request.GET.dict()
+    if request.method == "POST":
+        d = request.POST.dict()
         if "basis" not in d:
             d["basis"] = ''
         jobid, e = utils.start_run_molecule(molecule, **d)
@@ -274,3 +274,6 @@ def run_molecule(request, molecule):
             return HttpResponse("It worked. Your job id is: %d" % jobid)
         else:
             return HttpResponse(e)
+    else:
+        return redirect(get_job, molecule)
+

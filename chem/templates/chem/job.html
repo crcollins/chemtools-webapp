@@ -6,13 +6,15 @@
         <p><strong>{{ error_message }}</strong></p>
     {% endif %}
     <form action="." method="get">
+        {% csrf_token %}
         <table>
             {{ form.as_table }}
 
         </table>
         <table>
             <tr><th>
-                <input type="submit" value="Submit" />
+                <input type="submit" value="Submit Job" formmethod="post" formaction="run/"/>
+                <input type="submit" value="Get Job File" />
                 <input type="reset" value="Reset" />
             </th></tr>
         </table>
