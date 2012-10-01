@@ -262,6 +262,9 @@ def reset_gjf(request):
 
 @login_required
 def run_molecule(request, molecule):
+    if not request.user.is_staff:
+        return HttpResponse("You must be a staff user to submit a job.")
+
     if request.method == "GET":
         d = request.GET.dict()
         if "basis" not in d:
