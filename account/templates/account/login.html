@@ -8,8 +8,16 @@
 <h3>{{ state }}</h3>
 <form action='' method="post">
     {% csrf_token %}
-    Username: <input type="text" name="username" value="{{ username }}" /><br>
-    Password: <input type="password" name="password" value="" /><br>
+    <table>
+        <tr>
+            <th>Username:</th>
+            <td><input type="text" name="username" value="{{ username }}" /></td>
+        </tr>
+        <tr>
+            <th>Password:</th>
+            <td><input type="password" name="password" value="" /></td>
+        </tr>
+    </table>
     <input type="hidden" name="next" value="{{ next }}" />
     <input type="submit" value="Log In" />
 </form>
