@@ -159,7 +159,11 @@ def get_job(request, molecule):
         if form.is_valid():
             return HttpResponse(utils.write_job(**a), content_type="text/plain")
     else:
-        form = JobForm(initial={"name": molecule})
+        if request.user.is_authenticated():
+            email = request.user.email
+        else:
+            email = ""
+        form = JobForm(initial={"name": molecule, "email": email})
 
     c = Context({
         "form": form,
