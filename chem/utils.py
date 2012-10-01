@@ -31,14 +31,15 @@ def start_run_molecule(molecule, **kwargs):
         pkey.seek(0) # reset to start of key file
         ssh = get_ssh_connection("gordon.sdsc.edu", "ccollins", pkey)
 
-    _, _, testerr = ssh.exec_command("ls test/")
-    if testerr.readlines():
-        _, _, testerr2 = ssh.exec_command("mkdir test/")
-        testerr2 = testerr2.readlines()
-        if testerr2:
-            ssh.close()
-            sftp.close()
-            return None, testerr2[0]
+    for folder in ["test/", "done/"]:
+        _, _, testerr = ssh.exec_command("ls %s" % folder)
+        if testerr.readlines():
+            _, _, testerr2 = ssh.exec_command("mkdir %s" % folder)
+            testerr2 = testerr2.readlines()
+            if testerr2:
+                ssh.close()
+                sftp.close()
+                return None, testerr2[0]
 
     if "name" in kwargs:
         name = kwargs["name"]
