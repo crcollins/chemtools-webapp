@@ -131,34 +131,39 @@ def reset_output(name):
         pkey.seek(0) # reset to start of key file
         ssh = get_ssh_connection("gordon.sdsc.edu", "ccollins", pkey)
 
-    _, stdout, stderr = ssh.exec_command("ls done/%s.*" % name)
-    files = [x.replace("\n", "").lstrip("done/") for x in stdout.readlines()]
+    _, stdout, stderr = ssh.exec_command("ls test/%s.*" % name)
+    files = [x.replace("\n", "").lstrip("test/") for x in stdout.readlines()]
     err = stderr.readlines()
 
     if err:
         return err
     for fname in files:
-        if ".log" in fname: # only download log files for now
-            ssh.exec_command("bzip2 -c < done/%s > done/temp.bz2" % fname)
+        if name+".log" == fname: # only download log files for now
+            ext = int(time.time())
+            s = "bzip2 -c < test/{0} > test/temp{1}.bz2; mv test/{0} test/{0}.bak".format(fname, ext)
+            ssh.exec_command(s)
 
             # wait until comression on cluster is done
             done = False
             while not done:
-                _, stdout, _ = ssh.exec_command("ls -lah done/temp.bz2")
+                _, stdout, _ = ssh.exec_command("ls -lah test/temp%d.bz2" % ext)
+                # check that the size is not 0
                 if stdout.readlines()[0].split()[4] != "0":
                     done = True
                 else:
                     time.sleep(.01)
 
             decompresser = bz2.BZ2Decompressor()
-            ftemp = sftp.open("done/temp.bz2", "rb").read()
+            ftemp = sftp.open("test/temp%d.bz2" % ext, "rb").read()
+
             f = StringIO(decompresser.decompress(ftemp))
-            ssh.exec_command("rm done/temp.bz2")
             parser = fileparser.LogReset(f, fname)
             f.close()
-            f2 = open(fname, "w")
+
+            f2 = sftp.open("test/%s" % fname, "w")
             f2.write(parser.format_output(errors=False))
             f2.close()
+            ssh.exec_command("rm test/temp%d.bz2" % ext)
 
     sftp.close()
     ssh.close()
