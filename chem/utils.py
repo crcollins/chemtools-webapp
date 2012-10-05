@@ -98,7 +98,8 @@ def get_all_jobs():
     with open(os.path.expanduser("~/.ssh/id_rsa"), 'r') as pkey:
         ssh = get_ssh_connection("gordon.sdsc.edu", "ccollins", pkey)
 
-    _, stdout, _ = ssh.exec_command(". ~/.bash_profile; qstat -u ccollins")
+    _, stdout, stderr = ssh.exec_command(". ~/.bash_profile; qstat -u ccollins")
+    stderr.readlines() # seems to need this slight delay to display the jobs
     ssh.close()
     return stdout.readlines()[5:]
 
