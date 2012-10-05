@@ -223,7 +223,7 @@ class LogReset(Parser):
         blanklines = 0
         end = False
         for x in positions.replace(",", " ").replace("\n ", '').split("\\"):
-            x = x.replace("geom=connectivity ", "")
+            x = x.replace("geom=connectivity", "")
             if x.startswith("#"):
                 start = True
             if start and not x:
