@@ -1,0 +1,14 @@
+{% extends "chem/base.html" %}
+
+{% block content %}
+    <table>
+    {% for job in jobs %}
+        <tr>
+            {% for part in job %}
+                <td>{{ part }}</td>
+            {% endfor %}
+        </tr>
+    {% endfor %}
+    </table>
+    <p>
+{% endblock %}

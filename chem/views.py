@@ -153,7 +153,6 @@ def get_job(request, molecule):
     for x in ("name", "email", "nodes", "ncpus", "time", "cluster"):
         if request.GET.get(x):
             a[x] = request.GET[x]
-
     if a:
         form = JobForm(request.GET, initial=a)
         if form.is_valid():
@@ -263,6 +262,23 @@ def reset_gjf(request):
     response = HttpResponse(ret_zip, mimetype="application/zip")
     response["Content-Disposition"] = "attachment; filename=output.zip"
     return response
+
+def job_index(request):
+    try:
+        jobs = []
+        for job in utils.get_all_jobs():
+            t = job.split()
+            temp = t[0].split('.') + t[2:2] + t[3:3] + t[5:7] + t[8:]
+            jobs.append(temp)
+
+        e = None
+    except Exception as e:
+        pass
+    c = Context({
+        "jobs": jobs,
+        "error_message": e,
+        })
+    return render(request, "chem/job_index.html", c)
 
 @login_required
 def run_molecule(request, molecule):

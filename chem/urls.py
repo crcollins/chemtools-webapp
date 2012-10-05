@@ -9,6 +9,7 @@ urlpatterns = patterns('chem.views',
     url(r"^frag/(?P<frag>[A-Za-z0-9]*)/$", "get_frag"),
 
     url(r"^upload/$", "upload_data"),
+    url(r"^jobs/$", "job_index"),
 
     url(r"^(?P<molecule>[A-Za-z0-9_]*)/$", "gen_detail"),
     url(r"^(?P<molecule>[A-Za-z0-9_]*)\.gjf$", "write_gjf"),
