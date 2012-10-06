@@ -336,3 +336,17 @@ def reset_job(request, jobid):
             return HttpResponse("It worked. Your job id is: %s" % jobid)
         else:
             return HttpResponse(e)
+
+@login_required
+def kill_job(request, jobid):
+    """Used to restart jobs that have hit the time limit."""
+    if not request.user.is_staff:
+        return HttpResponse("You must be a staff user to reset a job.")
+
+    if request.method == "POST":
+
+        e = utils.kill_run_job(jobid)
+        if e is None:
+            return HttpResponse("It worked. Your job id is: %s" % jobid)
+        else:
+            return HttpResponse(e)
