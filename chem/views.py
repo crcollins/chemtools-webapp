@@ -268,7 +268,7 @@ def job_index(request):
         jobs = []
         for job in utils.get_all_jobs():
             t = job.split()
-            temp = t[0].split('.') + t[2:2] + t[3:3] + t[5:7] + t[8:]
+            temp = t[0].split('.') + t[3:4] + t[5:7] + t[8:]
             jobs.append(temp)
 
         e = None
