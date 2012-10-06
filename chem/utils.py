@@ -78,7 +78,7 @@ def kill_run_job(jobid):
 
     a = get_all_jobs()
     if a:
-        jobs = [int(x[0]) for x in a]
+        jobs = [x[0] for x in a]
     else:
         ssh.close()
         return "There are no jobs running."
