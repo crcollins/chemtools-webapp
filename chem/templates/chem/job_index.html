@@ -8,7 +8,7 @@
                 <td>{{ part }}</td>
             {% endfor %}
             <td>
-                <form action='{{ job.0 }}/' method="post">
+                <form action='{{ job.0 }}/reset/' method="post">
                     {% csrf_token %}
                     <input type="submit" value="Reset" />
                 </form>
