@@ -1,0 +1,11 @@
+{% extends "chem/base.html" %}
+
+{% block content %}
+    {% if error_message %}
+        {{ error_message }}
+    {% endif %}
+
+    {% for part in job %}
+        {{ part }}<p>
+    {% endfor %}
+{% endblock %}

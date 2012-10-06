@@ -289,6 +289,22 @@ def job_multi_detail(request, jobids):
         })
     return render(request, "chem/job_index.html", c)
 
+def job_detail(request, jobid):
+    e = None
+    for job in utils.get_all_jobs():
+        if job[0] == jobid:
+            job = temp
+            break
+    else:
+        job = None
+        e = "That job number is not running."
+    print job
+    c = Context({
+        "job":job,
+        "error_message": e,
+        })
+    return render(request, "chem/job_detail.html", c)
+
 @login_required
 def run_molecule(request, molecule):
     if not request.user.is_staff:
