@@ -7,6 +7,12 @@
             {% for part in job %}
                 <td>{{ part }}</td>
             {% endfor %}
+            <td>
+                <form action='{{ job.0 }}/' method="post">
+                    {% csrf_token %}
+                    <input type="submit" value="Reset" />
+                </form>
+            </td>
         </tr>
     {% endfor %}
     </table>
