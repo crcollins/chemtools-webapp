@@ -293,12 +293,10 @@ def job_detail(request, jobid):
     e = None
     for job in utils.get_all_jobs():
         if job[0] == jobid:
-            job = temp
             break
     else:
         job = None
         e = "That job number is not running."
-    print job
     c = Context({
         "job":job,
         "error_message": e,
