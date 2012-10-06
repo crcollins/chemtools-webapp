@@ -78,7 +78,7 @@ def kill_run_job(jobid):
 
     a = get_all_jobs()
     if a:
-        jobs = [int(x.split(".")[0]) for x in lines]
+        jobs = [int(x[0]) for x in a]
     else:
         ssh.close()
         return "There are no jobs running."
@@ -101,7 +101,13 @@ def get_all_jobs():
     _, stdout, stderr = ssh.exec_command(". ~/.bash_profile; qstat -u ccollins")
     stderr.readlines() # seems to need this slight delay to display the jobs
     ssh.close()
-    return stdout.readlines()[5:]
+
+    jobs = []
+    for job in stdout.readlines()[5:]:
+        t = job.split()
+        temp = t[0].split('.') + t[3:4] + t[5:7] + t[8:]
+        jobs.append(temp)
+    return jobs
 
 def recover_output(name):
     with open(os.path.expanduser("~/.ssh/id_rsa"), 'r') as pkey:

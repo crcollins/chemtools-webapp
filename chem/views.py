@@ -265,12 +265,7 @@ def reset_gjf(request):
 
 def job_index(request):
     try:
-        jobs = []
-        for job in utils.get_all_jobs():
-            t = job.split()
-            temp = t[0].split('.') + t[3:4] + t[5:7] + t[8:]
-            jobs.append(temp)
-
+        jobs = utils.get_all_jobs()
         e = None
     except Exception as e:
         pass
@@ -285,10 +280,8 @@ def job_multi_detail(request, jobids):
 
     jobs = []
     for job in utils.get_all_jobs():
-        t = job.split()
-        temp = t[0].split('.') + t[3:4] + t[5:7] + t[8:]
-        if temp[0] in jobids:
-            jobs.append(temp)
+        if job[0] in jobids:
+            jobs.append(job)
     e = None
     c = Context({
         "jobs":jobs,
