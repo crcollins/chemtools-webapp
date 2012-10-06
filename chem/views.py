@@ -297,3 +297,17 @@ def run_molecule(request, molecule):
     else:
         return redirect(get_job, molecule)
 
+@login_required
+def reset_job(request, jobid):
+    """Used to restart jobs that have hit the time limit."""
+    if not request.user.is_staff:
+        return HttpResponse("You must be a staff user to reset a job.")
+
+    if request.method == "POST":
+        e = None
+        # d = request.GET.dict()
+        # jobid, e = utils.start_run_molecule(molecule, **d)
+        if e is None:
+            return HttpResponse("It worked. Your job id is: %s" % jobid)
+        else:
+            return HttpResponse(e)
