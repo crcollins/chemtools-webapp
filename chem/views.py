@@ -280,6 +280,22 @@ def job_index(request):
         })
     return render(request, "chem/job_index.html", c)
 
+def job_multi_detail(request, jobids):
+    jobids = jobids.split(',')
+
+    jobs = []
+    for job in utils.get_all_jobs():
+        t = job.split()
+        temp = t[0].split('.') + t[3:4] + t[5:7] + t[8:]
+        if temp[0] in jobids:
+            jobs.append(temp)
+    e = None
+    c = Context({
+        "jobs":jobs,
+        "error_message": e,
+        })
+    return render(request, "chem/job_index.html", c)
+
 @login_required
 def run_molecule(request, molecule):
     if not request.user.is_staff:
