@@ -5,7 +5,7 @@
     <tr>
         <th>Job ID</th>
         <th>Site</th>
-        <th>Nameame</th>
+        <th>Name</th>
         <th>Nodes</th>
         <th>ncpus</th>
         <th>Wall Time</th>
@@ -15,7 +15,11 @@
     {% for job in jobs %}
         <tr>
             {% for part in job %}
-                <td>{{ part }}</td>
+                {% if forloop.counter0 == 0 %}
+                    <td><a href="{{ part }}">{{ part }}</a></td>
+                {% else %}
+                    <td>{{ part }}</td>
+                {% endif %}
             {% endfor %}
             <td>
                 <form action='{{ job.0 }}/reset/' method="post">
