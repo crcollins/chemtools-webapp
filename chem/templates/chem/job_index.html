@@ -2,6 +2,16 @@
 
 {% block content %}
     <table>
+    <tr>
+        <th>Job ID</th>
+        <th>Site</th>
+        <th>Nameame</th>
+        <th>Nodes</th>
+        <th>ncpus</th>
+        <th>Wall Time</th>
+        <th>Status</th>
+        <th>Running Time</th>
+    </tr>
     {% for job in jobs %}
         <tr>
             {% for part in job %}
