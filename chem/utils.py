@@ -72,7 +72,7 @@ def start_run_molecule(molecule, **kwargs):
 
     return jobid, None
 
-def kill_run_job(jobid):
+def kill_job(jobid):
     with open(os.path.expanduser("~/.ssh/id_rsa"), 'r') as pkey:
         ssh = get_ssh_connection("gordon.sdsc.edu", "ccollins", pkey)
 

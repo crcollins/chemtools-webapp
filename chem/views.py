@@ -329,7 +329,7 @@ def kill_job(request, jobid):
 
     if request.method == "POST":
 
-        e = utils.kill_run_job(jobid)
+        e = utils.kill_job(jobid)
         if e is None:
             return HttpResponse("It worked. Your job id is: %s" % jobid)
         else:
