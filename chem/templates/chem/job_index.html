@@ -22,9 +22,9 @@
                 {% endif %}
             {% endfor %}
             <td>
-                <form action='{{ job.0 }}/reset/' method="post">
+                <form action='{{ job.0 }}/kill/' method="post">
                     {% csrf_token %}
-                    <input type="submit" value="Reset" />
+                    <input type="submit" value="Kill" />
                 </form>
             </td>
         </tr>
