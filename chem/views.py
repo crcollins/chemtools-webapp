@@ -49,10 +49,7 @@ def gen_detail(request, molecule):
     return render(request, "chem/detail.html", c)
 
 def gen_multi_detail(request, molecules):
-    if request.GET.get("basis"):
-        basis = request.GET.get("basis")
-    else:
-        basis = ''
+    basis = request.GET.get("basis", "")
 
     errors = []
     warnings = []
@@ -72,10 +69,7 @@ def gen_multi_detail(request, molecules):
     return render(request, "chem/multi_detail.html", c)
 
 def gen_multi_detail_zip(request, molecules):
-    if request.GET.get("basis"):
-        basis = request.GET.get("basis")
-    else:
-        basis = ''
+    basis = request.GET.get("basis", "")
 
     buff = StringIO()
     zfile = zipfile.ZipFile(buff, "w", zipfile.ZIP_DEFLATED)
@@ -108,11 +102,7 @@ def gen_multi_detail_zip(request, molecules):
 
 def write_gjf(request, molecule):
     filename = molecule + ".gjf"
-
-    if request.GET.get("basis"):
-        basis = request.GET.get("basis")
-    else:
-        basis = ''
+    basis = request.GET.get("basis", "")
 
     out = gjfwriter.Output(molecule, basis)
     f = StringIO(out.write_file())
@@ -131,11 +121,7 @@ def write_mol2(request, molecule):
 
 def write_png(request, molecule):
     filename = molecule + ".png"
-
-    if request.GET.get("scale"):
-        scale = request.GET.get("scale")
-    else:
-        scale = 10
+    scale = request.GET.get("scale", 10)
 
     out = gjfwriter.Output(molecule, '')
     response = HttpResponse(content_type="image/png")
@@ -320,7 +306,6 @@ def run_molecule(request, molecule):
         form = JobForm(request.POST)
         if form.is_valid():
             d = dict(form.cleaned_data)
-            print d is form.cleaned_data
             if "basis" not in d:
                 d["basis"] = ''
             jobid, e = 1, None #utils.start_run_molecule(molecule, **d)
