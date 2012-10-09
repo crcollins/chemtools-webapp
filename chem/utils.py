@@ -18,7 +18,7 @@ def write_job(**kwargs):
             "email": kwargs["email"],
             "nodes": kwargs["nodes"],
             "ncpus": int(kwargs["nodes"]) * 16,
-            "time" : "%s:00:00" % kwargs["time"],
+            "time" : "%s:00:00" % kwargs["walltime"],
             })
         return loader.render_to_string(template, c)
     else:

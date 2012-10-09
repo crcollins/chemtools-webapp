@@ -150,7 +150,7 @@ def get_frag(request, frag):
 
 def get_job(request, molecule):
     a = {}
-    for x in ("name", "email", "nodes", "ncpus", "time", "cluster"):
+    for x in ("name", "email", "nodes", "ncpus", "walltime", "cluster"):
         if request.GET.get(x):
             a[x] = request.GET[x]
     if a:
