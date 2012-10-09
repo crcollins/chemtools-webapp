@@ -11,9 +11,6 @@ import gjfwriter
 import fileparser
 
 def write_job(**kwargs):
-    for x in kwargs:
-        kwargs[x] = kwargs[x][0]
-
     if "cluster" in kwargs and kwargs["cluster"] in "bcgbht":
         template = "chem/jobs/%sjob.txt" % kwargs["cluster"]
         c = Context({

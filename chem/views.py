@@ -151,16 +151,15 @@ def get_job(request, molecule):
         form = JobForm(initial={"name": molecule, "email": email})
 
     if form.is_valid():
+        d = dict(form.cleaned_data)
         if request.method == "GET":
-            return HttpResponse(utils.write_job(**a), content_type="text/plain")
+            return HttpResponse(utils.write_job(**d), content_type="text/plain")
         elif request.method == "POST":
             if not request.user.is_staff:
                 return HttpResponse("You must be a staff user to submit a job.")
 
-            d = dict(form.cleaned_data)
             if "basis" not in d:
                 d["basis"] = ''
-
             jobid, e = 1, None #utils.start_run_molecule(molecule, **d)
             if e is None:
                 job = Job(molecule=molecule, jobid=jobid, **form.cleaned_data)
