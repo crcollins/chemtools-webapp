@@ -9,7 +9,7 @@ from django.core.servers.basehttp import FileWrapper
 from django.contrib.auth.decorators import login_required
 import paramiko
 
-from models import ErrorReport, ErrorReportForm, JobForm, LogForm
+from models import ErrorReport, ErrorReportForm, JobForm, LogForm, Job
 import gjfwriter
 import fileparser
 import utils
@@ -308,17 +308,43 @@ def run_molecule(request, molecule):
     if not request.user.is_staff:
         return HttpResponse("You must be a staff user to submit a job.")
 
-    if request.method == "POST":
-        d = request.POST.dict()
-        if "basis" not in d:
-            d["basis"] = ''
-        jobid, e = utils.start_run_molecule(molecule, **d)
-        if e is None:
-            return HttpResponse("It worked. Your job id is: %d" % jobid)
-        else:
-            return HttpResponse(e)
-    else:
+    if request.method != "POST":
         return redirect(get_job, molecule)
+
+    a = {}
+    for x in ("name", "email", "nodes", "ncpus", "walltime", "cluster"):
+        if request.POST.get(x):
+            a[x] = request.POST[x]
+
+    if a:
+        form = JobForm(request.POST)
+        if form.is_valid():
+            d = dict(form.cleaned_data)
+            print d is form.cleaned_data
+            if "basis" not in d:
+                d["basis"] = ''
+            jobid, e = 1, None #utils.start_run_molecule(molecule, **d)
+            if e is None:
+
+                job = Job(molecule=molecule, jobid=jobid, **form.cleaned_data)
+                job.save()
+                return HttpResponse("It worked. Your job id is: %d" % jobid)
+            else:
+                return HttpResponse(e)
+    else:
+        if request.user.is_authenticated():
+            email = request.user.email
+        else:
+            email = ""
+        form = JobForm(initial={"name": molecule, "email": email})
+
+    c = Context({
+        "form": form,
+        "molecule": molecule,
+        })
+    return redirect(get_job, molecule, c)
+
+
 
 @login_required
 def reset_job(request, jobid):
