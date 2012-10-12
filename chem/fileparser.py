@@ -38,7 +38,7 @@ class Parser(object):
         a = self.output
         if errors:
             a += ["\n---- Errors (%i) ----" % len(self.errors)]+self.errors
-        return '\n'.join(a)
+        return '\n'.join(a) + "\n"
 
     @catch
     def parse_file(self, f):
