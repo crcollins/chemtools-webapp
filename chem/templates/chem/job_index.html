@@ -21,12 +21,14 @@
                     <td>{{ part }}</td>
                 {% endif %}
             {% endfor %}
+            {% if user.is_authenticated %}
             <td>
                 <form action='{{ job.0 }}/kill/' method="post">
                     {% csrf_token %}
                     <input type="submit" value="Kill" />
                 </form>
             </td>
+            {% endif %}
         </tr>
     {% endfor %}
     </table>
