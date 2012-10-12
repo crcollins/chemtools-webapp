@@ -200,6 +200,7 @@ class LogReset(Parser):
         if fname is None:
             fname = f.name
         name, _ = os.path.splitext(fname)
+        name = os.path.basename(name)
         self.write("%%chk=%s.chk" % name)
         self.parse_file(f)
 
