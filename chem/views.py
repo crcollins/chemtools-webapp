@@ -330,6 +330,11 @@ def kill_job(request, jobid):
     if request.method == "POST":
         e = utils.kill_job(jobid)
         if e is None:
+            try:
+                job = Job.objects.filter(jobid=jobid)[0]
+                job.delete()
+            except IndexError:
+                pass
             return redirect(job_index)
         else:
             return HttpResponse(e)
