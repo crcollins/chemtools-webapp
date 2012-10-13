@@ -84,7 +84,7 @@ def kill_job(jobid):
         return "There are no jobs running."
 
     if jobid in jobs:
-        _, _, stderr = ssh.exec_command(". ~/.bash_profile; qdel %d" % jobid)
+        _, _, stderr = ssh.exec_command(". ~/.bash_profile; qdel %s" % jobid)
         ssh.close()
     else:
         ssh.close()
