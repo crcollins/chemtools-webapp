@@ -160,7 +160,7 @@ def get_job(request, molecule):
 
             if "basis" not in d:
                 d["basis"] = ''
-            jobid, e = 1, None #utils.start_run_molecule(molecule, **d)
+            jobid, e = utils.start_run_molecule(molecule, **d)
             if e is None:
                 job = Job(molecule=molecule, jobid=jobid, **form.cleaned_data)
                 job.save()
