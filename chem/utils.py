@@ -143,7 +143,9 @@ def reset_output(name):
     err = stderr.readlines()
 
     if err:
-        return err
+        sftp.close()
+        ssh.close()
+        return None, err
     for fname in files:
         if name+".log" == fname: # only download log files for now
             ext = int(time.time())
@@ -171,9 +173,21 @@ def reset_output(name):
             f2.write(parser.format_output(errors=False))
             f2.close()
             ssh.exec_command("rm test/temp%d.bz2" % ext)
+            _, stdout, stderr = ssh.exec_command("qsub test/%s.gjob" % fname)
+    err = stderr.readlines()
+    if err:
+        sftp.close()
+        ssh.close()
+        return None, err
 
+    e = None
+    try:
+        jobid = stdout.readlines()[0].split('.')[0]
+    except Exception as e:
+        jobid = None
     sftp.close()
     ssh.close()
+    return jobid, e
 
 def get_sftp_connection(hostname, username, key, port=22):
     pkey = paramiko.RSAKey.from_private_key(key)

@@ -314,10 +314,10 @@ def reset_job(request, jobid):
 
     if request.method == "POST":
         e = None
-        # d = request.GET.dict()
-        # jobid, e = utils.start_run_molecule(molecule, **d)
+        name = Job.objects.filter(jobid=jobid).name
+        njobid, e = utils.reset_output(name)
         if e is None:
-            return HttpResponse("It worked. Your job id is: %s" % jobid)
+            return HttpResponse("It worked. Your new job id is: %d" % njobid)
         else:
             return HttpResponse(e)
 
