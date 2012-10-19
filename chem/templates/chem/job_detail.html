@@ -8,4 +8,14 @@
     {% for part in job %}
         {{ part }}<p>
     {% endfor %}
+    {% if user.is_authenticated %}
+        <form action="kill/"  method="post">
+            {% csrf_token %}
+            <input type="Submit" value="Kill" />
+        </form>
+        <form action="reset/" method="post">
+            {% csrf_token %}
+            <input type="Submit" value="Reset" />
+        </form>
+    {% endif %}
 {% endblock %}
