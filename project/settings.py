@@ -1,9 +1,18 @@
 # Django settings for project project.
 
 import os
+import random
+
 ROOT_PATH = os.getcwd()
 
-from secret_key import SECRET_KEY
+try:
+    from secret_key import SECRET_KEY
+except ImportError:
+    path = os.path.join(ROOT_PATH, "project/secret_key.py")
+    key = ''.join([random.choice("abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)") for i in xrange(50)])
+    with open("secret_key.py", "w") as f:
+        f.write("SECRET_KEY = %s" % key)
+    from secret_key import SECRET_KEY
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
