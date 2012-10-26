@@ -4,9 +4,9 @@ from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns('account.views',
-    url(r'^$', "index"),
+    url(r'^$', "change_settings"),
     url(r"^login/$", "login_user"),
     url(r"^logout/$", "logout_user"),
-    url(r"^register/$", "register_user")
+    url(r"^register/$", "register_user"),
 )
 

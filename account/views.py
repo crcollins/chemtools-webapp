@@ -2,9 +2,11 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.template import Context, RequestContext
 from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
 
 from project.settings import LOGIN_REDIRECT_URL
-from account.models import RegistrationForm
+from account.models import RegistrationForm, SettingsForm
+
 
 def login_user(request):
     state = "Please log in"
@@ -79,3 +81,29 @@ def register_user(request):
         "form": form,
         })
     return render(request, "account/register.html", c)
+
+@login_required
+def change_settings(request):
+
+    state = "Change Settings"
+    if request.POST:
+        form = SettingsForm(request.POST)
+        if form.is_valid():
+            d = dict(form.cleaned_data)
+
+            if d.get("password1"):
+                request.user.set_password(d.get("password1"))
+            request.user.email = d.get("email")
+            request.user.save()
+            state = "Settings Successfully Saved"
+    else:
+        a = {
+            "email": request.user.email,
+            }
+        form = SettingsForm(initial=a)
+
+    c = Context({
+    "state": state,
+    "form": form,
+    })
+    return render(request, "account/settings.html", c)
