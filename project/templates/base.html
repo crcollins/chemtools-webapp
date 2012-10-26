@@ -10,39 +10,39 @@
     {% endblock %}
 </head>
 <body>
-<div class="header">
-    <div class="login">
-    {% block login %}
-    {% if user.is_authenticated %}
-        Welcome, <a href="/account/">{{ user }}</a>. |
-        {% if user.is_staff %}
-            <a href="/admin/">Admin Page</a> |
-        {% endif %}
-        <a href="/account/logout/">Log out</a>
-    {% else %}
-        <a href="/account/login/?next={{request.path}}">Log in</a> |
-        <a href="/account/register/">Register</a>
-    {% endif %}
-    {% endblock %}
-    </div>
-    {% block header %}{% endblock %}
-    {% block navbar %}
-    <div id="navbar">
-        <ul>
-            <li><a href="/chem/">Home</a></li> |
-            <li><a href="/chem/jobs/">Jobs</a></li> |
-            <li><a href="/chem/upload/">Upload</a></li> |
-            <li><a href="https://github.com/chris0076/chemtools-webapp">Code</a></li>
-        </ul>
-    </div>
-    {% endblock %}
-</div>
-<div class="container">
-    <div class="container2">
-        {% block content %}
+    <div class="header">
+        <div class="login">
+        {% block login %}
+            {% if user.is_authenticated %}
+                Welcome, <a href="/account/">{{ user }}</a>. |
+                {% if user.is_staff %}
+                    <a href="/admin/">Admin Page</a> |
+                {% endif %}
+                <a href="/account/logout/">Log out</a>
+            {% else %}
+                <a href="/account/login/?next={{request.path}}">Log in</a> |
+                <a href="/account/register/">Register</a>
+            {% endif %}
+        {% endblock %}
+        </div>
+        {% block header %}{% endblock %}
+        {% block navbar %}
+        <div id="navbar">
+            <ul>
+                <li><a href="/chem/">Home</a></li> |
+                <li><a href="/chem/jobs/">Jobs</a></li> |
+                <li><a href="/chem/upload/">Upload</a></li> |
+                <li><a href="https://github.com/chris0076/chemtools-webapp">Code</a></li>
+            </ul>
+        </div>
         {% endblock %}
     </div>
-</div>
+    <div class="container">
+        <div class="container2">
+            {% block content %}
+            {% endblock %}
+        </div>
+    </div>
 </body>
 <footer>
     {% block footer %}{% endblock %}
