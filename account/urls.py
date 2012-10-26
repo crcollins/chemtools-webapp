@@ -8,5 +8,6 @@ urlpatterns = patterns('account.views',
     url(r"^login/$", "login_user"),
     url(r"^logout/$", "logout_user"),
     url(r"^register/$", "register_user"),
+    url(r"^genkeys/$", "generate_key"),
 )
 

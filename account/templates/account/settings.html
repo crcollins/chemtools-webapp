@@ -2,19 +2,52 @@
 
 {% block header %}
     <h1>Settings</h1>
+<script>
+function fetchKeys(){
+$.getJSON('/account/genkeys/', function(data) {
+    $('.public').val(data['public']);
+    $('.private').val(data['private']);
+});
+}
+</script>
 {% endblock %}
 
 {% block content %}
+
 <h3>{{ state }}</h3>
 <form action='' method="post">
     {% csrf_token %}
     <table>
         {{ form.as_table }}
+    <tr>
+        <th>
+            <label for="id_public">Public Key:</label>
+        </th>
+        <td>
+            <textarea cols="40" rows="5" name="public" class="public"></textarea>
+        </td>
+    </tr>
+    <tr>
+        <th>
+            <label for="id_private">Private Key:</label>
+        </th>
+        <td>
+            <textarea cols="40" rows="5" name="private" class="private"></textarea>
+        </td>
+    </tr>
+    <tr>
+        <th></th>
+        <td>
+            <input type="button" value="Generate Keys" onClick="fetchKeys()"/>
+        </td>
+    </tr>
     </table>
     <input type="submit" value="Submit" />
     <input type="reset" value="Reset" />
 </form>
 {% endblock %}
+
+
 
 {% block footer %}
     Note that all of the information here is very alpha. Use at your own risk.

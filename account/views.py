@@ -3,10 +3,14 @@ from django.contrib.auth import authenticate, login, logout
 from django.template import Context, RequestContext
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
+from django.utils import simplejson
+from django.http import HttpResponse
+
+from Crypto.PublicKey import RSA
+from Crypto import Random
 
 from project.settings import LOGIN_REDIRECT_URL
 from account.models import RegistrationForm, SettingsForm
-
 
 def login_user(request):
     state = "Please log in"
@@ -107,3 +111,12 @@ def change_settings(request):
     "form": form,
     })
     return render(request, "account/settings.html", c)
+
+def generate_key(request):
+    random_generator = Random.new().read
+    key = RSA.generate(2048, random_generator)
+    a = {
+        "public"  : key.publickey().exportKey(),
+        "private" : key.exportKey('PEM'),
+    }
+    return HttpResponse(simplejson.dumps(a), mimetype="application/json")
