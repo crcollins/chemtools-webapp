@@ -60,6 +60,9 @@ def index(request):
     pass
 
 def register_user(request):
+    if request.user.is_authenticated():
+        return redirect("/chem/")
+
     a = {}
     for x in ("username", "email", "password1", "password2"):
         if request.POST.get(x):
