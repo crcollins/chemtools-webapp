@@ -69,14 +69,15 @@ def register_user(request):
     if request.POST:
         form = RegistrationForm(request.POST, initial=a)
         if form.is_valid():
-            username = a["username"]
-            password = a["password1"]
-            User.objects.create_user(username, a["email"], password)
+            d = dict(form.cleaned_data)
+            username = d["username"]
+            password = d["password1"]
+            User.objects.create_user(d["username"], d["email"], d["password1"])
             user = authenticate(username=username, password=password)
             login(request, user)
             return redirect("/chem/")
         else:
-            state =" Failure."
+            state ="Failure."
     else:
         form = RegistrationForm()
 
