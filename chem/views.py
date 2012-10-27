@@ -174,14 +174,21 @@ def get_job(request, molecule):
     return render(request, "chem/job.html", c)
 
 def report(request, molecule):
+    if request.user.is_authenticated():
+        email = request.user.email
+    else:
+        email = ""
+
     if request.method == "POST":
         report = ErrorReport(molecule=molecule)
-        form = ErrorReportForm(request.POST, instance=report)
+        form = ErrorReportForm(request.POST,
+            instance=report,
+            initial={"email" : email})
         if form.is_valid():
             form.save()
             return HttpResponseRedirect('/%s' % (molecule, ))
     else:
-        form = ErrorReportForm()
+        form = ErrorReportForm(initial={"email" : email})
 
     c = Context({
         "form": form,
