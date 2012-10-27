@@ -2,12 +2,13 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 
-from account.models import UserProfile
+from account.models import UserProfile, UserProfileForm
 
 class UserProfileInline(admin.StackedInline):
     model = UserProfile
     can_delete = False
     verbose_name_plural = "profile"
+    form = UserProfileForm
 
 class UserAdmin(UserAdmin):
     inlines = (UserProfileInline, )

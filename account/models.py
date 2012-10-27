@@ -59,7 +59,12 @@ class UserProfile(models.Model):
     private_key = models.CharField(max_length=2048)
     public_key = models.CharField(max_length=512)
 
-
+class UserProfileForm(forms.ModelForm):
+    private_key = forms.CharField(widget=forms.Textarea)
+    public_key = forms.CharField(widget=forms.Textarea)
+    class Meta:
+        model = UserProfile
+        fields = ("xsede_username", "private_key", "public_key")
 
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
