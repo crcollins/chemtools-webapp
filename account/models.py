@@ -1,5 +1,7 @@
 from django.contrib.auth.models import User
+from django.db.models.signals import post_save
 from django import forms
+from django.db import models
 
 
 attributes = {"class": "required"}
@@ -48,3 +50,19 @@ class SettingsForm(forms.Form):
             if self.cleaned_data["password1"] != self.cleaned_data["password2"]:
                 raise forms.ValidationError("The two password fields did not match.")
         return self.cleaned_data
+
+
+class UserProfile(models.Model):
+    user = models.OneToOneField(User)
+
+    xsede_username = models.CharField(max_length=50)
+    private_key = models.CharField(max_length=2048)
+    public_key = models.CharField(max_length=512)
+
+
+
+def create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        UserProfile.objects.create(user=instance)
+
+post_save.connect(create_user_profile, sender=User)

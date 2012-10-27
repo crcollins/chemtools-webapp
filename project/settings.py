@@ -80,6 +80,7 @@ LOGIN_URL = "/account/login/"
 LOGIN_REDIRECT_URL = "/chem/"
 LOGOUT_URL = "/account/logout/"
 
+AUTH_PROFILE_MODULE = 'account.UserProfile'
 
 # Additional locations of static files
 STATICFILES_DIRS = (
@@ -151,7 +152,6 @@ INSTALLED_APPS = (
     # 'django.contrib.admindocs',
     'chem',
     'account',
-    'south',
  )
 
 # A sample logging configuration. The only tangible logging

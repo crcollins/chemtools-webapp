@@ -11,4 +11,3 @@ Requirements
 - Numpy 1.6.1
 - Paramiko 1.7.7.1
 - PyCrypto 2.26
-- South 0.7.6
