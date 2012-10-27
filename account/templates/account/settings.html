@@ -4,7 +4,7 @@
     <h1>Settings</h1>
 <script>
 function fetchKeys(){
-$.getJSON('/account/genkeys/', function(data) {
+$.getJSON('/account/genkey/', function(data) {
     $('.public').val(data['public']);
     $('.private').val(data['private']);
 });
