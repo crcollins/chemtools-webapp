@@ -1,4 +1,7 @@
-from django.shortcuts import render, redirect
+import random
+import hashlib
+
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.template import Context, RequestContext
 from django.contrib.auth.models import User
@@ -10,7 +13,7 @@ from Crypto.PublicKey import RSA
 from Crypto import Random
 
 from project.settings import LOGIN_REDIRECT_URL
-from account.models import RegistrationForm, SettingsForm
+from account.models import RegistrationForm, SettingsForm, UserProfile
 
 def login_user(request):
     state = "Please log in"
@@ -63,22 +66,29 @@ def register_user(request):
     if request.user.is_authenticated():
         return redirect("/chem/")
 
-    a = {}
-    for x in ("username", "email", "password1", "password2"):
-        if request.POST.get(x):
-            a[x] = request.POST[x]
     state = "Please register"
 
     if request.POST:
-        form = RegistrationForm(request.POST, initial=a)
+        form = RegistrationForm(request.POST)
         if form.is_valid():
             d = dict(form.cleaned_data)
             username = d["username"]
             password = d["password1"]
-            User.objects.create_user(d["username"], d["email"], d["password1"])
-            user = authenticate(username=username, password=password)
-            login(request, user)
-            return redirect("/chem/")
+
+            new_user = User.objects.create_user(d["username"], d["email"], d["password1"])
+            new_user.is_active = False
+
+            # generate activation key
+            salt = hashlib.sha1(str(random.random())).hexdigest()[:10]
+            activation_key = hashlib.sha1(salt + d["username"]).hexdigest()
+            new_user.get_profile().activation_key = activation_key
+
+            new_user.save()
+            new_user.get_profile().save()
+            c =  Context({
+                "key": activation_key,
+                })
+            return render(request, "account/post_register.html", c)
         else:
             state ="Failure."
     else:
@@ -115,6 +125,15 @@ def change_settings(request):
     "form": form,
     })
     return render(request, "account/settings.html", c)
+
+def activate_user(request, activation_key):
+    user = get_object_or_404(UserProfile, activation_key=activation_key).user
+    if not user.is_active:
+        user.is_active = True
+        user.save()
+        return render(request, "account/activate.html")
+    else:
+        return redirect("/chem/")
 
 def generate_key(request):
     random_generator = Random.new().read

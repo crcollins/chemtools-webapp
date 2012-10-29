@@ -8,6 +8,7 @@ urlpatterns = patterns('account.views',
     url(r"^login/$", "login_user"),
     url(r"^logout/$", "logout_user"),
     url(r"^register/$", "register_user"),
+    url(r"^register/(?P<activation_key>[a-f0-9]*)$", "activate_user"),
     url(r"^genkey/$", "generate_key"),
 )
 
