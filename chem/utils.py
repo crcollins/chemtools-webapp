@@ -71,6 +71,12 @@ def get_ssh_connection(hostname, username, key, port=22):
     client.connect(hostname, username=username, pkey=pkey)
     return client
 
+def get_connections(server, username, pkey):
+    sftp = get_sftp_connection(server, username, pkey)
+    pkey.seek(0) # reset to start of key file
+    ssh = get_ssh_connection(server, username, pkey)
+    return ssh, sftp
+
 def start_run_molecule(molecule, **kwargs):
     try:
         out = gjfwriter.Output(molecule, kwargs["basis"])
@@ -78,9 +84,7 @@ def start_run_molecule(molecule, **kwargs):
         return None, e
 
     with open(os.path.expanduser("~/.ssh/id_rsa"), 'r') as pkey:
-        sftp = get_sftp_connection("gordon.sdsc.edu", "ccollins", pkey)
-        pkey.seek(0) # reset to start of key file
-        ssh = get_ssh_connection("gordon.sdsc.edu", "ccollins", pkey)
+        ssh, sftp = get_connections("gordon.sdsc.edu", "ccollins", pkey)
 
     for folder in ["test/", "done/"]:
         _, _, testerr = ssh.exec_command("ls %s" % folder)
@@ -158,9 +162,7 @@ def get_all_jobs():
 
 def recover_output(name):
     with open(os.path.expanduser("~/.ssh/id_rsa"), 'r') as pkey:
-        sftp = get_sftp_connection("gordon.sdsc.edu", "ccollins", pkey)
-        pkey.seek(0) # reset to start of key file
-        ssh = get_ssh_connection("gordon.sdsc.edu", "ccollins", pkey)
+        ssh, sftp = get_connections("gordon.sdsc.edu", "ccollins", pkey)
 
     _, stdout, stderr = ssh.exec_command("ls done/%s.*" % name)
     files = [x.replace("\n", "").lstrip("done/") for x in stdout.readlines()]
@@ -181,9 +183,7 @@ def recover_output(name):
 
 def reset_output(name):
     with open(os.path.expanduser("~/.ssh/id_rsa"), 'r') as pkey:
-        sftp = get_sftp_connection("gordon.sdsc.edu", "ccollins", pkey)
-        pkey.seek(0) # reset to start of key file
-        ssh = get_ssh_connection("gordon.sdsc.edu", "ccollins", pkey)
+        ssh, sftp = get_connections("gordon.sdsc.edu", "ccollins", pkey)
 
     _, stdout, stderr = ssh.exec_command("ls test/%s.*" % name)
     files = [x.replace("\n", "").lstrip("test/") for x in stdout.readlines()]
