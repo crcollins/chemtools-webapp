@@ -96,66 +96,61 @@ def start_run_molecule(molecule, **kwargs):
     with open(os.path.expanduser("~/.ssh/id_rsa"), 'r') as pkey:
         ssh, sftp = get_connections("gordon.sdsc.edu", "ccollins", pkey)
 
-    error = make_folders(ssh)
-    if error:
-        return None, error
+    with ssh, sftp:
+        error = make_folders(ssh)
+        if error:
+            return None, error
 
-    if "name" in kwargs:
-        name = kwargs["name"]
-    else:
-        name = molecule
+        name = kwargs.get("name", molecule)
 
-    f = sftp.open("test/%s.gjf" % name, 'w')
-    f.write(out.write_file())
-    f.close()
+        f = sftp.open("test/%s.gjf" % name, 'w')
+        f.write(out.write_file())
+        f.close()
 
-    f2 = sftp.open("test/%s.gjob" % name, 'w')
-    kwargs["cluster"] = "g"
-    f2.write(write_job(**kwargs))
-    f2.close()
-    sftp.close()
+        f2 = sftp.open("test/%s.gjob" % name, 'w')
+        kwargs["cluster"] = "g"
+        f2.write(write_job(**kwargs))
+        f2.close()
 
-    stdin, stdout, stderr = ssh.exec_command(". ~/.bash_profile; qsub test/%s.gjob" % name)
-    stderr = stderr.readlines()
-    if stderr:
-        ssh.close()
-        return None, stderr[0]
-    try:
-        jobid = int(stdout.readlines()[0].split(".")[0])
-    except Exception as e:
-        return None, e
+        s = ". ~/.bash_profile; qsub test/%s.gjob" % name
+        _, stdout, stderr = ssh.exec_command(s)
+        stderr = stderr.readlines()
+        if stderr:
+            return None, stderr[0]
+        try:
+            jobid = int(stdout.readlines()[0].split(".")[0])
+        except Exception as e:
+            return None, e
 
-    return jobid, None
+        return jobid, None
 
 def kill_job(jobid):
     with open(os.path.expanduser("~/.ssh/id_rsa"), 'r') as pkey:
         ssh = get_ssh_connection("gordon.sdsc.edu", "ccollins", pkey)
 
-    a = get_all_jobs()
-    if a:
-        jobs = [x[0] for x in a]
-    else:
-        ssh.close()
-        return "There are no jobs running."
+    with ssh:
+        a = get_all_jobs()
+        if a:
+            jobs = [x[0] for x in a]
+        else:
+            return "There are no jobs running."
 
-    if jobid in jobs:
-        _, _, stderr = ssh.exec_command(". ~/.bash_profile; qdel %s" % jobid)
-        ssh.close()
-    else:
-        ssh.close()
-        return "That job number is not running."
+        if jobid in jobs:
+            _, _, stderr = ssh.exec_command(". ~/.bash_profile; qdel %s" % jobid)
+        else:
+            return "That job number is not running."
 
-    b = stderr.readlines()
-    if b:
-        return b
+        b = stderr.readlines()
+        if b:
+            return b
 
 def get_all_jobs():
     with open(os.path.expanduser("~/.ssh/id_rsa"), 'r') as pkey:
         ssh = get_ssh_connection("gordon.sdsc.edu", "ccollins", pkey)
 
-    _, stdout, stderr = ssh.exec_command(". ~/.bash_profile; qstat -u ccollins")
-    stderr.readlines() # seems to need this slight delay to display the jobs
-    ssh.close()
+    with ssh:
+        _, stdout, stderr = ssh.exec_command(". ~/.bash_profile; qstat -u ccollins")
+        stderr.readlines() # seems to need this slight delay to display the jobs
 
     jobs = []
     for job in stdout.readlines()[5:]:
