@@ -11,9 +11,9 @@
     {% else %}
         <img src="../{{ molecule }}.png?scale=10"></img>
         <ul>
-            <li><a href="../{{ molecule }}.gjf">gjf File</a></li>
-            <li><a href="../{{ molecule }}.mol2">mol2 File</a></li>
-            <li><a href="job">Job File</a></li>
+            <li><a href="../{{ molecule }}.gjf?{{basis}}">gjf File</a></li>
+            <li><a href="../{{ molecule }}.mol2?{{basis}}">mol2 File</a></li>
+            <li><a href="job/?{{basis}}">Job File</a></li>
         </ul>
     {% endif %}
     <a href="report">Report Me!</a>

@@ -6,10 +6,10 @@
         <tr {% if error %}id="error"{% elif warning %}id="warning"{% endif %}>
             <td>{{ molecule }}</td>
             {% if not error %}
-                <td><a href="../{{ molecule }}.gjf">gjf</a></td>
-                <td><a href="../{{ molecule }}.mol2">mol2</a></td>
+                <td><a href="../{{ molecule }}.gjf?{{ basis }}">gjf</a></td>
+                <td><a href="../{{ molecule }}.mol2?{{ basis }}">mol2</a></td>
                 <td><a href="../{{ molecule }}.png">Image</a></td>
-                <td><a href="../{{ molecule }}/job">Job</a></td>
+                <td><a href="../{{ molecule }}/job/?{{ basis }}">Job</a></td>
                 <td><a href="../{{ molecule }}/report/">Report</a></td>
             {% else %}
                 <td colspan='4'>{{ error }}</td>

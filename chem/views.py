@@ -1,12 +1,14 @@
 from cStringIO import StringIO
 import zipfile
 import os
+import urllib
 
 from django.shortcuts import render, redirect
 from django.template import Context, RequestContext
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.servers.basehttp import FileWrapper
 from django.contrib.auth.decorators import login_required
+from django.core.urlresolvers import reverse
 import paramiko
 
 from models import ErrorReport, ErrorReportForm, JobForm, LogForm, Job
@@ -17,7 +19,10 @@ import utils
 
 def index(request):
     if request.GET.get("molecule"):
-        return redirect(gen_detail, request.GET.get("molecule"))
+        a = {"basis" : request.GET.get("basis", "B3LYP/6-31g(d)")}
+        b = "%s?%s" % (reverse(gen_detail, args=(request.GET.get("molecule"), )),
+            urllib.urlencode(a))
+        return HttpResponseRedirect(b)
     return render(request, "chem/index.html")
 
 def frag_index(request):
@@ -41,16 +46,16 @@ def gen_detail(request, molecule):
         e = None
     except Exception as e:
         pass
+    a = {"basis" : request.GET.get("basis", "B3LYP/6-31g(d)")}
     c = Context({
         "molecule": molecule,
         "known_errors": ErrorReport.objects.filter(molecule=molecule),
         "error_message": e,
+        "basis": urllib.urlencode(a),
         })
     return render(request, "chem/detail.html", c)
 
 def gen_multi_detail(request, molecules):
-    basis = request.GET.get("basis", "")
-
     errors = []
     warnings = []
     for mol in molecules.split(','):
@@ -61,10 +66,11 @@ def gen_multi_detail(request, molecules):
             errors.append(e)
         warnings.append(ErrorReport.objects.filter(molecule=mol))
 
+    a = {"basis" : request.GET.get("basis", "B3LYP/6-31g(d)")}
     c = Context({
         "molecules": zip(molecules.split(','), errors, warnings),
         "pagename": molecules,
-        "basis": basis
+        "basis": urllib.urlencode(a),
         })
     return render(request, "chem/multi_detail.html", c)
 
@@ -141,7 +147,8 @@ def get_job(request, molecule):
     elif request.method == "POST":
         req = request.POST
         a = dict(request.POST)
-    if a:
+
+    if a and a.keys() != ["basis"]:
         form = JobForm(req, initial=a)
     else:
         if request.user.is_authenticated():
@@ -158,8 +165,10 @@ def get_job(request, molecule):
             if not request.user.is_staff:
                 return HttpResponse("You must be a staff user to submit a job.")
 
-            if "basis" not in d:
+            if "basis" not in a:
                 d["basis"] = ''
+            else:
+                d["basis"] = a["basis"]
             jobid, e = utils.start_run_molecule(molecule, **d)
             if e is None:
                 job = Job(molecule=molecule, jobid=jobid, **form.cleaned_data)
