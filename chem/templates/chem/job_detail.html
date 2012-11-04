@@ -8,7 +8,7 @@
     {% for part in job %}
         {{ part }}<p>
     {% endfor %}
-    {% if user.is_authenticated %}
+    {% if user.is_authenticated and job.6 != "C" %}
         <form action="kill/"  method="post">
             {% csrf_token %}
             <input type="Submit" value="Kill" />
