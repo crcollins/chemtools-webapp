@@ -77,6 +77,16 @@ def get_connections(server, username, pkey):
     ssh = get_ssh_connection(server, username, pkey)
     return ssh, sftp
 
+def make_folders(ssh):
+    for folder in ["test/", "done/"]:
+        _, _, testerr = ssh.exec_command("ls %s" % folder)
+        if testerr.readlines():
+            _, _, testerr2 = ssh.exec_command("mkdir %s" % folder)
+            testerr2 = testerr2.readlines()
+            if testerr2:
+                return testerr2[0]
+    return None
+
 def start_run_molecule(molecule, **kwargs):
     try:
         out = gjfwriter.Output(molecule, kwargs["basis"])
@@ -86,15 +96,9 @@ def start_run_molecule(molecule, **kwargs):
     with open(os.path.expanduser("~/.ssh/id_rsa"), 'r') as pkey:
         ssh, sftp = get_connections("gordon.sdsc.edu", "ccollins", pkey)
 
-    for folder in ["test/", "done/"]:
-        _, _, testerr = ssh.exec_command("ls %s" % folder)
-        if testerr.readlines():
-            _, _, testerr2 = ssh.exec_command("mkdir %s" % folder)
-            testerr2 = testerr2.readlines()
-            if testerr2:
-                ssh.close()
-                sftp.close()
-                return None, testerr2[0]
+    error = make_folders(ssh)
+    if error:
+        return None, error
 
     if "name" in kwargs:
         name = kwargs["name"]
