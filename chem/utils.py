@@ -159,6 +159,16 @@ def get_all_jobs():
         jobs.append(temp)
     return jobs
 
+def wait_for_compression(ssh, zippath):
+    done = False
+    while not done:
+        _, stdout, _ = ssh.exec_command("ls -lah %s" % zippath)
+        # check that the size is not 0
+        if stdout.readlines()[0].split()[4] != "0":
+            done = True
+        else:
+            time.sleep(.01)
+
 def recover_output(name):
     with open(os.path.expanduser("~/.ssh/id_rsa"), 'r') as pkey:
         ssh, sftp = get_connections("gordon.sdsc.edu", "ccollins", pkey)
@@ -199,14 +209,7 @@ def reset_output(name):
             ssh.exec_command(s)
 
             # wait until comression on cluster is done
-            done = False
-            while not done:
-                _, stdout, _ = ssh.exec_command("ls -lah test/temp%d.bz2" % ext)
-                # check that the size is not 0
-                if stdout.readlines()[0].split()[4] != "0":
-                    done = True
-                else:
-                    time.sleep(.01)
+            wait_for_compression(ssh, "test/temp%d.bz2" % ext)
 
             decompresser = bz2.BZ2Decompressor()
             ftemp = sftp.open("test/temp%d.bz2" % ext, "rb").read()
