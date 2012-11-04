@@ -169,6 +169,29 @@ def wait_for_compression(ssh, zippath):
         else:
             time.sleep(.01)
 
+def get_compressed_file(ssh, sftp, path):
+    dirname, fname = os.path.split(path)
+    fbakpath = path + ".bak"
+
+    ext = int(time.time())
+    zipname = "temp%s.bz2" % ext
+    zippath = os.path.join(dirname, zipname)
+
+    s = "bzip2 -c < {0} > {1}; cp {0} {2}".format(path, zippath, fbakpath)
+    _, _, err = ssh.exec_command(s)
+    err = err.readlines()
+
+    if err:
+        s = "rm {0}; mv {1} {2}".format(zippath, fbakpath, path)
+        ssh.exec_command(s)
+        return None, err, None
+
+    wait_for_compression(ssh, zippath)
+
+    decompresser = bz2.BZ2Decompressor()
+    ftemp = sftp.open(zippath, "rb").read()
+    return StringIO(decompresser.decompress(ftemp)), None, zippath
+
 def recover_output(name):
     with open(os.path.expanduser("~/.ssh/id_rsa"), 'r') as pkey:
         ssh, sftp = get_connections("gordon.sdsc.edu", "ccollins", pkey)
@@ -191,49 +214,39 @@ def recover_output(name):
     ssh.close()
 
 def reset_output(name):
+    '''If successful this is successful, it will start the file that was reset,
+    and it will leave the old backup file. Otherwise, it will return to the
+    original state.
+    '''
     with open(os.path.expanduser("~/.ssh/id_rsa"), 'r') as pkey:
         ssh, sftp = get_connections("gordon.sdsc.edu", "ccollins", pkey)
 
-    _, stdout, stderr = ssh.exec_command("ls test/%s.*" % name)
-    files = [x.replace("\n", "").lstrip("test/") for x in stdout.readlines()]
-    err = stderr.readlines()
+    with ssh, sftp:
+        fpath = ''.join([os.path.join("test", name), '.log'])
+        jobpath = ''.join([os.path.join("test", name), '.gjob'])
+        fbakpath = fpath + ".bak"
 
-    if err:
-        sftp.close()
-        ssh.close()
-        return None, err
-    for fname in files:
-        if name+".log" == fname: # only download log files for now
-            ext = int(time.time())
-            s = "bzip2 -c < test/{0} > test/temp{1}.bz2; mv test/{0} test/{0}.bak".format(fname, ext)
-            ssh.exec_command(s)
+        f, err, zippath = get_compressed_file(ssh, sftp, fpath)
+        if f:
+            with f:
+                parser = fileparser.LogReset(f, fpath)
+                ssh.exec_command("rm %s" % zippath)
+        else:
+            return None, err
 
-            # wait until comression on cluster is done
-            wait_for_compression(ssh, "test/temp%d.bz2" % ext)
+        f2 = sftp.open(fpath, "w")
+        f2.write(parser.format_output(errors=False))
+        f2.close()
 
-            decompresser = bz2.BZ2Decompressor()
-            ftemp = sftp.open("test/temp%d.bz2" % ext, "rb").read()
+        _, stdout, stderr = ssh.exec_command("qsub %s" % jobpath)
+        err = stderr.readlines()
+        if err:
+            ssh.exec_command("mv {0} {1}".format(fbakpath, fpath))
+            return None, err
 
-            f = StringIO(decompresser.decompress(ftemp))
-            parser = fileparser.LogReset(f, fname)
-            f.close()
-
-            f2 = sftp.open("test/%s" % fname, "w")
-            f2.write(parser.format_output(errors=False))
-            f2.close()
-            ssh.exec_command("rm test/temp%d.bz2" % ext)
-            _, stdout, stderr = ssh.exec_command("qsub test/%s.gjob" % fname)
-    err = stderr.readlines()
-    if err:
-        sftp.close()
-        ssh.close()
-        return None, err
-
-    e = None
-    try:
-        jobid = stdout.readlines()[0].split('.')[0]
-    except Exception as e:
-        jobid = None
-    sftp.close()
-    ssh.close()
+        e = None
+        try:
+            jobid = stdout.readlines()[0].split('.')[0]
+        except Exception as e:
+            jobid = None
     return jobid, e
