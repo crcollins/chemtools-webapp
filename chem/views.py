@@ -330,7 +330,6 @@ def reset_job(request, jobid):
 
 @login_required
 def kill_job(request, jobid):
-    """Used to restart jobs that have hit the time limit."""
     if not request.user.is_staff:
         return HttpResponse("You must be a staff user to kill a job.")
 
