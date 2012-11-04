@@ -196,22 +196,22 @@ def recover_output(name):
     with open(os.path.expanduser("~/.ssh/id_rsa"), 'r') as pkey:
         ssh, sftp = get_connections("gordon.sdsc.edu", "ccollins", pkey)
 
-    _, stdout, stderr = ssh.exec_command("ls done/%s.*" % name)
-    files = [x.replace("\n", "").lstrip("done/") for x in stdout.readlines()]
-    err = stderr.readlines()
+    with ssh, sftp:
+        _, stdout, stderr = ssh.exec_command("ls done/%s.*" % name)
+        files = [x.replace("\n", "").lstrip("done/") for x in stdout.readlines()]
 
-    if err:
-        return err
-    for fname in files:
-        if ".log" in fname: # only download log files for now
-            f = sftp.open("done/"+fname, "r")
-            f2 = open(fname, "w")
-            for line in f:
-                f2.write(line)
-            f.close()
-            f2.close()
-    sftp.close()
-    ssh.close()
+        err = stderr.readlines()
+        if err:
+            return err
+
+        for fname in files:
+            if fname.endswith(".log"): # only download log files for now
+                path = os.path.join("done/",fname)
+                f, err, zippath = get_compressed_file(ssh, sftp, path)
+                with open(fname, "w") as f2, f:
+                    for line in f:
+                        f2.write(line)
+                ssh.exec_command("rm %s %s" % (zippath, path + ".bak"))
 
 def reset_output(name):
     '''If successful this is successful, it will start the file that was reset,
