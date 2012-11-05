@@ -153,3 +153,13 @@ def generate_key(request):
         "private" : key.exportKey('PEM'),
     }
     return HttpResponse(simplejson.dumps(a), mimetype="application/json")
+
+def get_public_key(request, username):
+    pubkey = ''
+    try:
+        user = User.objects.filter(username=username)
+        user_profile, _ = UserProfile.objects.get_or_create(user=user)
+        pubkey = user_profile.public_key
+    except:
+        pass
+    return HttpResponse(pubkey, content_type="text/plain")
