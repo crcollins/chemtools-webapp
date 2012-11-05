@@ -5,8 +5,8 @@
 <script>
 function fetchKeys(){
 $.getJSON('/account/genkey/', function(data) {
-    $('.public').val(data['public']);
-    $('.private').val(data['private']);
+    $('#id_public_key').val(data['public']);
+    $('#id_private_key').val(data['private']);
 });
 }
 </script>
@@ -19,22 +19,6 @@ $.getJSON('/account/genkey/', function(data) {
     {% csrf_token %}
     <table>
         {{ form.as_table }}
-    <tr>
-        <th>
-            <label for="id_public">Public Key:</label>
-        </th>
-        <td>
-            <textarea cols="40" rows="5" name="public" class="public"></textarea>
-        </td>
-    </tr>
-    <tr>
-        <th>
-            <label for="id_private">Private Key:</label>
-        </th>
-        <td>
-            <textarea cols="40" rows="5" name="private" class="private"></textarea>
-        </td>
-    </tr>
     <tr>
         <th></th>
         <td>

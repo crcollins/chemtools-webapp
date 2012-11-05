@@ -44,6 +44,8 @@ class SettingsForm(forms.Form):
                                 render_value=False),
                                 label="Password (again)",
                                 required=False)
+    public_key = forms.CharField(widget=forms.Textarea, max_length=512)
+    private_key = forms.CharField(widget=forms.Textarea, max_length=2048)
 
     def clean(self):
         if "password1" in self.cleaned_data and "password2" in self.cleaned_data:

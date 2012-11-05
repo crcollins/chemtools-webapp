@@ -102,21 +102,28 @@ def register_user(request):
 
 @login_required
 def change_settings(request):
-
     state = "Change Settings"
+    user_profile, _ = UserProfile.objects.get_or_create(user=request.user)
+
     if request.POST:
         form = SettingsForm(request.POST)
         if form.is_valid():
             d = dict(form.cleaned_data)
-
             if d.get("password1"):
                 request.user.set_password(d.get("password1"))
+            if d.get("private_key") and d.get("public_key"):
+                user_profile.public_key = d.get("public_key")
+                user_profile.private_key = d.get("private_key")
+
             request.user.email = d.get("email")
             request.user.save()
+            user_profile.save()
             state = "Settings Successfully Saved"
     else:
         a = {
             "email": request.user.email,
+            "public_key": user_profile.public_key,
+            "private_key": user_profile.private_key,
             }
         form = SettingsForm(initial=a)
 
