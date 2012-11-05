@@ -114,6 +114,8 @@ def change_settings(request):
             if d.get("private_key") and d.get("public_key"):
                 user_profile.public_key = d.get("public_key")
                 user_profile.private_key = d.get("private_key")
+            if d.get("xsede_username"):
+                user_profile.xsede_username = d.get("xsede_username")
 
             request.user.email = d.get("email")
             request.user.save()
@@ -124,6 +126,7 @@ def change_settings(request):
             "email": request.user.email,
             "public_key": user_profile.public_key,
             "private_key": user_profile.private_key,
+            "xsede_username": user_profile.xsede_username,
             }
         form = SettingsForm(initial=a)
 

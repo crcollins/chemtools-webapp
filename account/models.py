@@ -45,6 +45,9 @@ class SettingsForm(forms.Form):
                                 render_value=False),
                                 label="Password (again)",
                                 required=False)
+    xsede_username = forms.CharField(max_length=50,
+                                required=False,
+                                label="XSEDE Username")
     public_key = forms.CharField(widget=forms.Textarea, max_length=512)
     private_key = forms.CharField(widget=forms.Textarea, max_length=2048)
 
