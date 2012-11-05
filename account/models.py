@@ -3,6 +3,7 @@ from django.db.models.signals import post_save
 from django import forms
 from django.db import models
 
+from Crypto.PublicKey import RSA
 
 attributes = {"class": "required"}
 
@@ -51,6 +52,20 @@ class SettingsForm(forms.Form):
         if "password1" in self.cleaned_data and "password2" in self.cleaned_data:
             if self.cleaned_data["password1"] != self.cleaned_data["password2"]:
                 raise forms.ValidationError("The two password fields did not match.")
+        if "public_key" in self.cleaned_data and "private_key" in self.cleaned_data:
+            try:
+                key = RSA.importKey(self.cleaned_data["private_key"])
+            except:
+                raise forms.ValidationError("The private key is invalid.")
+            try:
+                pubkey = RSA.importKey(self.cleaned_data["public_key"])
+            except:
+                raise forms.ValidationError("The public key is invalid.")
+
+            message = "The quick brown fox jumps over the lazy dog."
+            sig = key.sign(message, '')
+            if not pubkey.verify(message, sig):
+                raise forms.ValidationError("The key pair fields did not match.")
         return self.cleaned_data
 
 
