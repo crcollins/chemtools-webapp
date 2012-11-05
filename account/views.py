@@ -12,7 +12,7 @@ from django.http import HttpResponse
 from Crypto.PublicKey import RSA
 from Crypto import Random
 
-from project.settings import LOGIN_REDIRECT_URL
+from project.settings import LOGIN_REDIRECT_URL, HOME_URL
 from account.models import RegistrationForm, SettingsForm, UserProfile
 
 def login_user(request):
@@ -64,7 +64,7 @@ def index(request):
 
 def register_user(request):
     if request.user.is_authenticated():
-        return redirect("/chem/")
+        return redirect(HOME_URL)
 
     state = "Please register"
 
@@ -143,7 +143,7 @@ def activate_user(request, activation_key):
         user.save()
         return render(request, "account/activate.html")
     else:
-        return redirect("/chem/")
+        return redirect(HOME_URL)
 
 def generate_key(request):
     random_generator = Random.new().read

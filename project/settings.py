@@ -79,6 +79,7 @@ STATIC_URL = '/static/'
 LOGIN_URL = "/account/login/"
 LOGIN_REDIRECT_URL = "/chem/"
 LOGOUT_URL = "/account/logout/"
+HOME_URL = "/chem/"
 
 AUTH_PROFILE_MODULE = 'account.UserProfile'
 
