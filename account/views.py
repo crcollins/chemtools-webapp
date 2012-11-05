@@ -149,7 +149,7 @@ def generate_key(request):
     random_generator = Random.new().read
     key = RSA.generate(2048, random_generator)
     a = {
-        "public"  : key.publickey().exportKey(),
+        "public"  : key.publickey().exportKey("OpenSSH"),
         "private" : key.exportKey('PEM'),
     }
     return HttpResponse(simplejson.dumps(a), mimetype="application/json")
