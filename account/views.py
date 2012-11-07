@@ -103,7 +103,7 @@ def register_user(request):
 @login_required
 def change_settings(request):
     state = "Change Settings"
-    user_profile, _ = UserProfile.objects.get_or_create(user=request.user)
+    user_profile = request.user.get_profile()
     keymessage = False
 
     if request.POST:
