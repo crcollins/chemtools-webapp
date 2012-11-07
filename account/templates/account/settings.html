@@ -23,6 +23,9 @@ $.getJSON('/account/genkey/', function(data) {
         <th></th>
         <td>
             <input type="button" value="Generate Keys" onClick="fetchKeys()"/>
+            {% if keymessage %}<br>
+            wget http://mandelbrot.no-ip.org:8000/account/public/{{ user }} -O- >> ~/.ssh
+            {% endif %}
         </td>
     </tr>
     </table>

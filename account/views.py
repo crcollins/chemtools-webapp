@@ -104,6 +104,7 @@ def register_user(request):
 def change_settings(request):
     state = "Change Settings"
     user_profile, _ = UserProfile.objects.get_or_create(user=request.user)
+    keymessage = False
 
     if request.POST:
         form = SettingsForm(request.POST)
@@ -114,6 +115,7 @@ def change_settings(request):
             if d.get("private_key") and d.get("public_key"):
                 user_profile.public_key = d.get("public_key")
                 user_profile.private_key = d.get("private_key")
+                keymessage = True
             if d.get("xsede_username"):
                 user_profile.xsede_username = d.get("xsede_username")
 
@@ -133,6 +135,7 @@ def change_settings(request):
     c = Context({
     "state": state,
     "form": form,
+    "keymessage": keymessage
     })
     return render(request, "account/settings.html", c)
 
