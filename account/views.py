@@ -113,13 +113,15 @@ def change_settings(request):
             if d.get("password1"):
                 request.user.set_password(d.get("password1"))
             if d.get("private_key") and d.get("public_key"):
-                user_profile.public_key = d.get("public_key")
-                user_profile.private_key = d.get("private_key")
-                keymessage = True
+                if user_profile.public_key != d.get("public_key"):
+                    user_profile.public_key = d.get("public_key")
+                    user_profile.private_key = d.get("private_key")
+                    keymessage = True
             if d.get("xsede_username"):
                 user_profile.xsede_username = d.get("xsede_username")
 
-            request.user.email = d.get("email")
+            if request.user.email != d.get("email"):
+                request.user.email = d.get("email")
             request.user.save()
             user_profile.save()
             state = "Settings Successfully Saved"
