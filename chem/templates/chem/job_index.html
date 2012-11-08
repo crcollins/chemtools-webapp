@@ -12,6 +12,9 @@
         <th>Status</th>
         <th>Running Time</th>
     </tr>
+    {% if error_message %}
+        {{ error_message }}
+    {% endif %}
     {% for job in jobs %}
         <tr>
             {% for part in job %}
