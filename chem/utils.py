@@ -71,10 +71,20 @@ def get_ssh_connection(hostname, username, key, port=22):
     client.connect(hostname, username=username, pkey=pkey)
     return client
 
-def get_connections(server, username, pkey):
-    sftp = get_sftp_connection(server, username, pkey)
-    pkey.seek(0) # reset to start of key file
-    ssh = get_ssh_connection(server, username, pkey)
+def get_connections(server, user):
+    try:
+        profile = user.get_profile()
+    except AttributeError:
+        profile = None
+    if profile and profile.xsede_username and profile.private_key:
+        username = profile.xsede_username
+        key = StringIO(profile.private_key)
+    else:
+        username = "ccollins"
+        key = open(os.path.expanduser("~/.ssh/id_rsa"), 'r')
+    sftp = get_sftp_connection(server, username, key)
+    key.seek(0) # reset to start of key file
+    ssh = get_ssh_connection(server, username, key)
     return ssh, sftp
 
 def make_folders(ssh):
@@ -87,15 +97,13 @@ def make_folders(ssh):
                 return testerr2[0]
     return None
 
-def start_run_molecule(molecule, **kwargs):
+def start_run_molecule(user, molecule, **kwargs):
     try:
         out = gjfwriter.Output(molecule, kwargs["basis"])
     except Exception as e:
         return None, e
 
-    with open(os.path.expanduser("~/.ssh/id_rsa"), 'r') as pkey:
-        ssh, sftp = get_connections("gordon.sdsc.edu", "ccollins", pkey)
-
+    ssh, sftp = get_connections("gordon.sdsc.edu", user)
     with ssh, sftp:
         error = make_folders(ssh)
         if error:
@@ -124,12 +132,11 @@ def start_run_molecule(molecule, **kwargs):
 
         return jobid, None
 
-def kill_job(jobid):
-    with open(os.path.expanduser("~/.ssh/id_rsa"), 'r') as pkey:
-        ssh = get_ssh_connection("gordon.sdsc.edu", "ccollins", pkey)
+def kill_job(user, jobid):
+    ssh, _ = get_connections("gordon.sdsc.edu", user)
 
     with ssh:
-        a = get_all_jobs()
+        a = get_all_jobs(user)
         if a:
             jobs = [x[0] for x in a]
         else:
@@ -144,9 +151,8 @@ def kill_job(jobid):
         if b:
             return b
 
-def get_all_jobs():
-    with open(os.path.expanduser("~/.ssh/id_rsa"), 'r') as pkey:
-        ssh = get_ssh_connection("gordon.sdsc.edu", "ccollins", pkey)
+def get_all_jobs(user):
+    ssh, _ = get_connections("gordfon.sdsc.edu", user)
 
     with ssh:
         _, stdout, stderr = ssh.exec_command(". ~/.bash_profile; qstat -u ccollins")
@@ -192,9 +198,8 @@ def get_compressed_file(ssh, sftp, path):
     ftemp = sftp.open(zippath, "rb").read()
     return StringIO(decompresser.decompress(ftemp)), None, zippath
 
-def recover_output(name):
-    with open(os.path.expanduser("~/.ssh/id_rsa"), 'r') as pkey:
-        ssh, sftp = get_connections("gordon.sdsc.edu", "ccollins", pkey)
+def recover_output(user, name):
+    ssh, sftp = get_connections("gordon.sdsc.edu", user)
 
     with ssh, sftp:
         _, stdout, stderr = ssh.exec_command("ls done/%s.*" % name)
@@ -213,13 +218,12 @@ def recover_output(name):
                         f2.write(line)
                 ssh.exec_command("rm %s %s" % (zippath, path + ".bak"))
 
-def reset_output(name):
+def reset_output(user, name):
     '''If successful this is successful, it will start the file that was reset,
     and it will leave the old backup file. Otherwise, it will return to the
     original state.
     '''
-    with open(os.path.expanduser("~/.ssh/id_rsa"), 'r') as pkey:
-        ssh, sftp = get_connections("gordon.sdsc.edu", "ccollins", pkey)
+    ssh, sftp = get_connections("gordon.sdsc.edu", user)
 
     with ssh, sftp:
         fpath = ''.join([os.path.join("test", name), '.log'])

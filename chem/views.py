@@ -169,7 +169,7 @@ def get_job(request, molecule):
                 d["basis"] = ''
             else:
                 d["basis"] = a["basis"]
-            jobid, e = utils.start_run_molecule(molecule, **d)
+            jobid, e = utils.start_run_molecule(request.user, molecule, **d)
             if e is None:
                 job = Job(molecule=molecule, jobid=jobid, **form.cleaned_data)
                 job.save()
@@ -284,7 +284,7 @@ def reset_gjf(request):
 
 def job_index(request):
     try:
-        jobs = utils.get_all_jobs()
+        jobs = utils.get_all_jobs(request.user)
         e = None
     except Exception as e:
         jobs = []
@@ -298,7 +298,7 @@ def job_multi_detail(request, jobids):
     jobids = jobids.split(',')
 
     jobs = []
-    for job in utils.get_all_jobs():
+    for job in utils.get_all_jobs(request.user):
         if job[0] in jobids:
             jobs.append(job)
     e = None
@@ -310,7 +310,7 @@ def job_multi_detail(request, jobids):
 
 def job_detail(request, jobid):
     e = None
-    for job in utils.get_all_jobs():
+    for job in utils.get_all_jobs(request.user):
         if job[0] == jobid:
             break
     else:
@@ -331,7 +331,7 @@ def reset_job(request, jobid):
     if request.method == "POST":
         e = None
         name = Job.objects.filter(jobid=jobid).name
-        njobid, e = utils.reset_output(name)
+        njobid, e = utils.reset_output(request.user, name)
         if e is None:
             return HttpResponse("It worked. Your new job id is: %d" % njobid)
         else:
@@ -343,7 +343,7 @@ def kill_job(request, jobid):
         return HttpResponse("You must be a staff user to kill a job.")
 
     if request.method == "POST":
-        e = utils.kill_job(jobid)
+        e = utils.kill_job(request.user, jobid)
         if e is None:
             try:
                 job = Job.objects.filter(jobid=jobid)[0]
