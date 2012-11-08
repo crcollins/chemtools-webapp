@@ -287,7 +287,7 @@ def job_index(request):
         jobs = utils.get_all_jobs()
         e = None
     except Exception as e:
-        pass
+        jobs = []
     c = Context({
         "jobs": jobs,
         "error_message": e,
