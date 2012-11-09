@@ -23,10 +23,7 @@ def login_user(request):
     if request.POST:
         username = request.POST.get('username')
         password = request.POST.get('password')
-        if request.POST.get('next'):
-            next = request.POST.get('next')
-        else:
-            next = LOGIN_REDIRECT_URL
+        next = request.POST.get("next", LOGIN_REDIRECT_URL):
 
         user = authenticate(username=username, password=password)
         if user is not None:
@@ -38,10 +35,7 @@ def login_user(request):
         else:
             state = "Invalid username/password."
     else:
-        if request.GET.get('next'):
-            next = request.GET.get('next')
-        else:
-            next = LOGIN_REDIRECT_URL
+        next = request.GET.get("next", LOGIN_REDIRECT_URL)
 
     c = Context({
         "state": state,
@@ -52,12 +46,8 @@ def login_user(request):
 
 def logout_user(request):
     logout(request)
-    if request.GET.get('next'):
-        next = request.GET.get('next')
-    else:
-        next = LOGIN_REDIRECT_URL
+    next = request.GET.get("next", LOGIN_REDIRECT_URL)
     return redirect(next)
-
 
 def index(request):
     pass
