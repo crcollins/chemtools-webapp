@@ -237,3 +237,12 @@ class LogReset(Parser):
         self.write('')
         if not start or not end:
             raise ValueError
+
+def get_homo_orbital(f):
+    homocount = 0
+    for line in f:
+        if "Alpha  occ. eigenvalues" in line:
+            homocount += len(line.split()[4:])
+        elif homocount:
+            break
+    return homocount
