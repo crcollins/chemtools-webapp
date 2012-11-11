@@ -141,12 +141,8 @@ def get_frag(request, frag):
     return response
 
 def get_job(request, molecule):
-    if request.method == "GET":
-        req = request.GET
-        a = dict(request.GET)
-    elif request.method == "POST":
-        req = request.POST
-        a = dict(request.POST)
+    req = request.REQUEST
+    a = dict(req)
 
     if a and a.keys() != ["basis"]:
         form = JobForm(req, initial=a)
