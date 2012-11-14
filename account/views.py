@@ -9,11 +9,10 @@ from django.contrib.auth.decorators import login_required
 from django.utils import simplejson
 from django.http import HttpResponse
 
-from Crypto.PublicKey import RSA
-from Crypto import Random
-
 from project.settings import LOGIN_REDIRECT_URL, HOME_URL
 from account.models import RegistrationForm, SettingsForm, UserProfile
+
+import utils
 
 def login_user(request):
     state = "Please log in"
@@ -141,12 +140,11 @@ def activate_user(request, activation_key):
         return redirect(HOME_URL)
 
 def generate_key(request):
-    random_generator = Random.new().read
-    key = RSA.generate(2048, random_generator)
-    a = {
-        "public"  : key.publickey().exportKey("OpenSSH"),
-        "private" : key.exportKey('PEM'),
-    }
+    if request.user:
+        user = request.user.username
+    else:
+        user = None
+    a = utils.generate_key_pair(user)
     return HttpResponse(simplejson.dumps(a), mimetype="application/json")
 
 def get_public_key(request, username):
@@ -154,7 +152,7 @@ def get_public_key(request, username):
     try:
         user = User.objects.filter(username=username)
         user_profile, _ = UserProfile.objects.get_or_create(user=user)
-        pubkey = user_profile.public_key
+        pubkey = user_profile.public_key+"\n"
     except:
         pass
     return HttpResponse(pubkey, content_type="text/plain")
