@@ -23,7 +23,7 @@ def login_user(request):
     if request.POST:
         username = request.POST.get('username')
         password = request.POST.get('password')
-        next = request.POST.get("next", LOGIN_REDIRECT_URL):
+        next = request.POST.get("next", LOGIN_REDIRECT_URL)
 
         user = authenticate(username=username, password=password)
         if user is not None:
