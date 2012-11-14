@@ -72,6 +72,10 @@ def register_user(request):
             activation_key = hashlib.sha1(salt + d["username"]).hexdigest()
             new_user.get_profile().activation_key = activation_key
 
+            pair = utils.generate_key_pair(d["username"])
+            new_user.get_profile().private_key = pair["private"]
+            new_user.get_profile().public_key = pair["public"]
+
             new_user.save()
             new_user.get_profile().save()
             c =  Context({

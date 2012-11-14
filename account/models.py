@@ -82,13 +82,6 @@ class UserProfile(models.Model):
     public_key = models.CharField(max_length=512)
 
     activation_key = models.CharField(max_length=40)
-    def __init__(self, *args, **kwargs):
-        super(UserProfile, self).__init__(*args, **kwargs)
-        if not self.private_key:
-            pair = utils.generate_key_pair(self.user.username)
-            self.private_key = pair["private"]
-            self.public_key = pair["public"]
-
 
 class UserProfileForm(forms.ModelForm):
     private_key = forms.CharField(widget=forms.Textarea)
