@@ -18,6 +18,7 @@ def write_job(**kwargs):
             "nodes": kwargs["nodes"],
             "ncpus": int(kwargs["nodes"]) * 16,
             "time" : "%s:00:00" % kwargs["walltime"],
+            "internal": kwargs.get("internal", ''),
             })
         return loader.render_to_string(template, c)
     else:
@@ -88,7 +89,7 @@ def get_connections(server, user):
     return ssh, sftp
 
 def make_folders(ssh):
-    for folder in ["test/", "done/"]:
+    for folder in ["chemtools/", "chemtools/done/"]:
         _, _, testerr = ssh.exec_command("ls %s" % folder)
         if testerr.readlines():
             _, _, testerr2 = ssh.exec_command("mkdir %s" % folder)
@@ -111,16 +112,16 @@ def start_run_molecule(user, molecule, **kwargs):
 
         name = kwargs.get("name", molecule)
 
-        f = sftp.open("test/%s.gjf" % name, 'w')
+        f = sftp.open("chemtools/%s.gjf" % name, 'w')
         f.write(out.write_file())
         f.close()
 
-        f2 = sftp.open("test/%s.gjob" % name, 'w')
+        f2 = sftp.open("chemtools/%s.gjob" % name, 'w')
         kwargs["cluster"] = "g"
         f2.write(write_job(**kwargs))
         f2.close()
 
-        s = ". ~/.bash_profile; qsub test/%s.gjob" % name
+        s = ". ~/.bash_profile; qsub chemtools/%s.gjob" % name
         _, stdout, stderr = ssh.exec_command(s)
         stderr = stderr.readlines()
         if stderr:

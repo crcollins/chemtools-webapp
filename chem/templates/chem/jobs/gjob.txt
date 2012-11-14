@@ -8,13 +8,16 @@
 #PBS -A TG-CHE120020
 #PBS -V
 
-cp {{ name }}.gjf /oasis/scratch/$USER/temp_project/
-cd /oasis/scratch/$USER/temp_project/
+name={{ name }}
+base=$HOME{% if internal %}/chemtools/{% endif %}
+temp=/oasis/scratch/$USER/temp_project/
+
+cp $base/$name.gjf $temp
 export GAUSS_SCRDIR=/oasis/scratch/$USER/temp_project/
 . /etc/profile.d/modules.sh
 module load gaussian
 exe=`which g09`
-/usr/bin/time $exe < {{ name }}.gjf> {{ name }}.log
+/usr/bin/time $exe < $temp/$name.gjf > $temp/$name.log
 
-mv {{ name }}.* $HOME/done/
+mv $temp/$name.* $base/done/
 

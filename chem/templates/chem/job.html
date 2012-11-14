@@ -8,8 +8,8 @@
     <form action="." method="get">
         <table>
             {{ form.as_table }}
-
         </table>
+        {% if basis %}<input type="hidden" name="basis" value="{{ basis }}">{% endif %}
         <table>
             <tr><th>
                 {% if user.is_authenticated %}

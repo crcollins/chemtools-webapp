@@ -161,10 +161,8 @@ def get_job(request, molecule):
             if not request.user.is_staff:
                 return HttpResponse("You must be a staff user to submit a job.")
 
-            if "basis" not in a:
-                d["basis"] = ''
-            else:
-                d["basis"] = a["basis"]
+            d["basis"] = a.get("basis", '')
+            d["internal"] = True
             jobid, e = utils.start_run_molecule(request.user, molecule, **d)
             if e is None:
                 job = Job(molecule=molecule, jobid=jobid, **form.cleaned_data)
@@ -175,6 +173,7 @@ def get_job(request, molecule):
     c = Context({
         "form": form,
         "molecule": molecule,
+        "basis": a.get("basis"),
         })
     return render(request, "chem/job.html", c)
 
