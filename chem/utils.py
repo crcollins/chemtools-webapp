@@ -152,7 +152,7 @@ def kill_job(user, jobid):
             return b
 
 def get_all_jobs(user):
-    ssh, _ = get_connections("gordfon.sdsc.edu", user)
+    ssh, _ = get_connections("gordon.sdsc.edu", user)
 
     with ssh:
         _, stdout, stderr = ssh.exec_command(". ~/.bash_profile; qstat -u ccollins")
