@@ -238,7 +238,7 @@ class Molecule(object):
     @property
     def mol2(self):
         '''Returns a string with the in the proper .mol2 format.'''
-        string = """@<TRIPOS>MOLECULE\nMolecule Name\n%d %d\nSMALL\nNO_CHARGES\n\n@<TRIPOS>ATOM""" %(len(self.atoms), len(self.bonds))
+        string = """@<TRIPOS>MOLECULE\nMolecule Name\n%d %d\nSMALL\nNO_CHARGES\n\n@<TRIPOS>ATOM\n""" %(len(self.atoms), len(self.bonds))
         string += "\n".join([x.mol2 for x in self.atoms] +
                         ["@<TRIPOS>BOND", ] +
                         [x.mol2 for x in self.bonds])
