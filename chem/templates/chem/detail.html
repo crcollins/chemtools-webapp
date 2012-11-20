@@ -2,6 +2,7 @@
 
 {% block content %}
     <h1>{{ molecule }}</h1>
+    <a href="report">Report Me</a><br><br>
     {% if known_errors %}
         <h2>WARNING</h2>
         This molecule is reported to have errors.<br />
@@ -13,8 +14,22 @@
         <ul>
             <li><a href="../{{ molecule }}.gjf?{{basis}}">gjf File</a></li>
             <li><a href="../{{ molecule }}.mol2?{{basis}}">mol2 File</a></li>
-            <li><a href="job/?{{basis}}">Job File</a></li>
         </ul>
+    <form action="." method="get">
+        <table>
+            {{ form.as_table }}
+        </table>
+        {% if basis %}<input type="hidden" name="basis" value="{{ basis }}">{% endif %}
+        <table>
+            <tr><th>
+                {% if user.is_authenticated %}
+                    {% csrf_token %}
+                    <input type="submit" value="Submit Job" formmethod="post" formaction="."/>
+                {% endif %}
+                <input type="submit" value="Get Job File" />
+                <input type="reset" value="Reset" />
+            </th></tr>
+        </table>
+    </form>
     {% endif %}
-    <a href="report">Report Me!</a>
 {% endblock %}

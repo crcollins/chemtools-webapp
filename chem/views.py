@@ -51,12 +51,46 @@ def gen_detail(request, molecule):
         e = None
     except Exception as e:
         pass
-    a = {"basis" : request.GET.get("basis", "B3LYP/6-31g(d)")}
+
+    req = request.REQUEST
+    a = dict(req)
+
+    if a and a.keys() != ["basis"]:
+        form = JobForm(req, initial=a)
+    else:
+        if request.user.is_authenticated():
+            email = request.user.email
+        else:
+            email = ""
+        form = JobForm(initial={"name": molecule, "email": email})
+
+    if form.is_valid():
+        d = dict(form.cleaned_data)
+        if request.method == "GET":
+            return HttpResponse(utils.write_job(**d), content_type="text/plain")
+        elif request.method == "POST":
+            if not request.user.is_staff:
+                return HttpResponse("You must be a staff user to submit a job.")
+
+            d["basis"] = a.get("basis", '')
+            d["internal"] = True
+            jobid, e = utils.start_run_molecule(request.user, molecule, **d)
+            if e is None:
+                job = Job(molecule=molecule, jobid=jobid, **form.cleaned_data)
+                job.save()
+                return HttpResponse("It worked. Your job id is: %d" % jobid)
+            else:
+                return HttpResponse(e)
+
     c = Context({
         "molecule": molecule,
+        "form": form,
         "known_errors": ErrorReport.objects.filter(molecule=molecule),
         "error_message": e,
-        "basis": urllib.urlencode(a),
+        "encode_basis": urllib.urlencode(
+            {"basis" : request.GET.get("basis", "B3LYP/6-31g(d)")}
+            ),
+        "basis": a.get("basis", "B3LYP/6-31g(d)")
         })
     return render(request, "chem/detail.html", c)
 
@@ -144,43 +178,6 @@ def get_frag(request, frag):
     f = open("chem/data/"+frag, "r")
     response = HttpResponse(FileWrapper(f), content_type="text/plain")
     return response
-
-def get_job(request, molecule):
-    req = request.REQUEST
-    a = dict(req)
-
-    if a and a.keys() != ["basis"]:
-        form = JobForm(req, initial=a)
-    else:
-        if request.user.is_authenticated():
-            email = request.user.email
-        else:
-            email = ""
-        form = JobForm(initial={"name": molecule, "email": email})
-
-    if form.is_valid():
-        d = dict(form.cleaned_data)
-        if request.method == "GET":
-            return HttpResponse(utils.write_job(**d), content_type="text/plain")
-        elif request.method == "POST":
-            if not request.user.is_staff:
-                return HttpResponse("You must be a staff user to submit a job.")
-
-            d["basis"] = a.get("basis", '')
-            d["internal"] = True
-            jobid, e = utils.start_run_molecule(request.user, molecule, **d)
-            if e is None:
-                job = Job(molecule=molecule, jobid=jobid, **form.cleaned_data)
-                job.save()
-                return HttpResponse("It worked. Your job id is: %d" % jobid)
-            else:
-                return HttpResponse(e)
-    c = Context({
-        "form": form,
-        "molecule": molecule,
-        "basis": a.get("basis"),
-        })
-    return render(request, "chem/job.html", c)
 
 def report(request, molecule):
     if request.user.is_authenticated():
