@@ -72,7 +72,7 @@ def gen_detail(request, molecule):
             if not request.user.is_staff:
                 return HttpResponse("You must be a staff user to submit a job.")
 
-            d["basis"] = a.get("basis", '')
+            d["basis"] = a.get("basis", "B3LYP/6-31g(d)")
             d["internal"] = True
             jobid, e = utils.start_run_molecule(request.user, molecule, **d)
             if e is None:
@@ -87,8 +87,8 @@ def gen_detail(request, molecule):
         "form": form,
         "known_errors": ErrorReport.objects.filter(molecule=molecule),
         "error_message": e,
-        "encode_basis": urllib.urlencode(
-            {"basis" : request.GET.get("basis", "B3LYP/6-31g(d)")}
+        "encoded_basis": urllib.urlencode(
+            {"basis" : a.get("basis", "B3LYP/6-31g(d)")}
             ),
         "basis": a.get("basis", "B3LYP/6-31g(d)")
         })

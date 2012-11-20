@@ -12,8 +12,8 @@
     {% else %}
         <img src="../{{ molecule }}.png?scale=10"></img>
         <ul>
-            <li><a href="../{{ molecule }}.gjf?{{basis}}">gjf File</a></li>
-            <li><a href="../{{ molecule }}.mol2?{{basis}}">mol2 File</a></li>
+            <li><a href="../{{ molecule }}.gjf?{{ encoded_basis }}">gjf File</a></li>
+            <li><a href="../{{ molecule }}.mol2?{{ encoded_basis }}">mol2 File</a></li>
         </ul>
     <form action="." method="get">
         <table>
