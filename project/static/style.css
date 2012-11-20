@@ -134,3 +134,7 @@ tr#error {
 tr#warning {
     background-color: #252525;
 }
+
+table.left-min {
+    width: 0%;
+}

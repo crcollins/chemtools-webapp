@@ -1,12 +1,29 @@
 {% extends "chem/base.html" %}
 
 {% block content %}
-    Molecule name
-    <form enctype="multipart/form-data" action="/chem" method="get">
-        <input type="text" name="molecule">
-        <input type="text" name="basis" value="B3LYP/6-31g(d)">
-        <input type="submit" value="Submit" />
-    </form>
+    <table class="left-min">
+        <tr>
+            <th>
+                Molecule name
+            </th>
+            <th>
+                Basis
+            </th>
+            <th></th>
+        </tr>
+        <form enctype="multipart/form-data" action="/chem" method="get">
+        <tr>
+            <td>
+                <input type="text" name="molecule">
+            </td>
+            <td>
+                <input type="text" name="basis" value="B3LYP/6-31g(d)">
+            <td>
+                <input type="submit" value="Submit" />
+            </td>
+        </tr>
+        </form>
+    </table>
     <ul>
         <li><a href="frag">Fragments</a></li>
         <li><a href="upload">Upload</a></li>
