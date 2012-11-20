@@ -20,7 +20,12 @@ import utils
 def index(request):
     if request.GET.get("molecule"):
         a = {"basis" : request.GET.get("basis", "B3LYP/6-31g(d)")}
-        b = "%s?%s" % (reverse(gen_detail, args=(request.GET.get("molecule"), )),
+
+        func = gen_detail
+        if "," in request.GET.get("molecule"):
+            func = gen_multi_detail
+
+        b = "%s?%s" % (reverse(func, args=(request.GET.get("molecule"), )),
             urllib.urlencode(a))
         return HttpResponseRedirect(b)
     return render(request, "chem/index.html")
