@@ -18,6 +18,22 @@
         </tr>
     {% endfor %}
     </table>
+    <form action="." method="get">
+        <table>
+            {{ form.as_table }}
+        </table>
+        {% if basis %}<input type="hidden" name="basis" value="{{ basis }}">{% endif %}
+        <table>
+            <tr><th>
+                {% if user.is_authenticated %}
+                    {% csrf_token %}
+                    <input type="submit" value="Submit Job" formmethod="post" formaction="."/>
+                {% endif %}
+                <input type="submit" value="Get Job File" />
+                <input type="reset" value="Reset" />
+            </th></tr>
+        </table>
+    </form>
     <p>
     <a href='../{{ pagename }}.zip'>Download All</a>
 {% endblock %}

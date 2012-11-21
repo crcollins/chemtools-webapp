@@ -105,11 +105,53 @@ def gen_multi_detail(request, molecules):
             errors.append(e)
         warnings.append(ErrorReport.objects.filter(molecule=mol))
 
-    a = {"basis" : request.GET.get("basis", "B3LYP/6-31g(d)")}
+    req = request.REQUEST
+    a = dict(req)
+
+    if a and a.keys() != ["basis"]:
+        form = JobForm(req, initial=a)
+    else:
+        if request.user.is_authenticated():
+            email = request.user.email
+        else:
+            email = ""
+        form = JobForm(initial={"name": "{{ name }}", "email": email})
+
+    if form.is_valid():
+        d = dict(form.cleaned_data)
+        if request.method == "GET":
+            return HttpResponse(utils.write_job(**d), content_type="text/plain")
+        elif request.method == "POST":
+            if not request.user.is_staff:
+                return HttpResponse("You must be a staff user to submit a job.")
+
+            d["basis"] = a.get("basis", "B3LYP/6-31g(d)")
+            d["internal"] = True
+            worked = []
+            failed = []
+            for molecule in molecules.split(','):
+                dnew = d.copy()
+                dnew["name"] = dnew["name"].replace("{{ name }}", molecule)
+                jobid, e = utils.start_run_molecule(request.user, molecule, **dnew)
+                if e is None:
+                    job = Job(molecule=molecule, jobid=jobid, **form.cleaned_data)
+                    job.save()
+                    worked.append("%s -- %d" % (molecule, jobid))
+                else:
+                    failed.append("%s -- %s" % (molecule, e))
+
+            message = "Worked:\n%s" % '\n'.join(worked)
+            if failed:
+                message += "\nFailed:\n%s" % '\n'.join(failed)
+            return HttpResponse(message, content_type="text/plain")
+
     c = Context({
         "molecules": zip(molecules.split(','), errors, warnings),
         "pagename": molecules,
-        "basis": urllib.urlencode(a),
+        "form": form,
+        "basis": urllib.urlencode(
+            {"basis" : a.get("basis", "B3LYP/6-31g(d)")}
+            ),
         })
     return render(request, "chem/multi_detail.html", c)
 
