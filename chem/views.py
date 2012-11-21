@@ -45,13 +45,7 @@ def frag_index(request):
     c = Context({"usable_parts": data})
     return render(request, "chem/frag_index.html", c)
 
-def gen_detail(request, molecule):
-    try:
-        gjfwriter.parse_name(molecule)
-        e = None
-    except Exception as e:
-        pass
-
+def get_form(request, molecule):
     req = request.REQUEST
     a = dict(req)
 
@@ -63,6 +57,16 @@ def gen_detail(request, molecule):
         else:
             email = ""
         form = JobForm(initial={"name": molecule, "email": email})
+    return form
+
+def gen_detail(request, molecule):
+    try:
+        gjfwriter.parse_name(molecule)
+        e = None
+    except Exception as e:
+        pass
+
+    form = get_form(request, molecule)
 
     if form.is_valid():
         d = dict(form.cleaned_data)
@@ -94,6 +98,7 @@ def gen_detail(request, molecule):
         })
     return render(request, "chem/detail.html", c)
 
+
 def gen_multi_detail(request, molecules):
     errors = []
     warnings = []
@@ -105,17 +110,7 @@ def gen_multi_detail(request, molecules):
             errors.append(e)
         warnings.append(ErrorReport.objects.filter(molecule=mol))
 
-    req = request.REQUEST
-    a = dict(req)
-
-    if a and a.keys() != ["basis"]:
-        form = JobForm(req, initial=a)
-    else:
-        if request.user.is_authenticated():
-            email = request.user.email
-        else:
-            email = ""
-        form = JobForm(initial={"name": "{{ name }}", "email": email})
+    form = get_form(request, "{{ name }}")
 
     if form.is_valid():
         d = dict(form.cleaned_data)
