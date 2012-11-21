@@ -67,6 +67,7 @@ def gen_detail(request, molecule):
         pass
 
     form = get_form(request, molecule)
+    basis = request.REQUEST.get("basis", "B3LYP/6-31g(d)")
 
     if form.is_valid():
         d = dict(form.cleaned_data)
@@ -76,7 +77,7 @@ def gen_detail(request, molecule):
             if not request.user.is_staff:
                 return HttpResponse("You must be a staff user to submit a job.")
 
-            d["basis"] = a.get("basis", "B3LYP/6-31g(d)")
+            d["basis"] = basis
             d["internal"] = True
             jobid, e = utils.start_run_molecule(request.user, molecule, **d)
             if e is None:
@@ -91,10 +92,8 @@ def gen_detail(request, molecule):
         "form": form,
         "known_errors": ErrorReport.objects.filter(molecule=molecule),
         "error_message": e,
-        "encoded_basis": urllib.urlencode(
-            {"basis" : a.get("basis", "B3LYP/6-31g(d)")}
-            ),
-        "basis": a.get("basis", "B3LYP/6-31g(d)")
+        "encoded_basis": urllib.urlencode({"basis" : basis}),
+        "basis": basis,
         })
     return render(request, "chem/detail.html", c)
 
@@ -111,6 +110,7 @@ def gen_multi_detail(request, molecules):
         warnings.append(ErrorReport.objects.filter(molecule=mol))
 
     form = get_form(request, "{{ name }}")
+    basis = request.REQUEST.get("basis", "B3LYP/6-31g(d)")
 
     if form.is_valid():
         d = dict(form.cleaned_data)
@@ -120,7 +120,7 @@ def gen_multi_detail(request, molecules):
             if not request.user.is_staff:
                 return HttpResponse("You must be a staff user to submit a job.")
 
-            d["basis"] = a.get("basis", "B3LYP/6-31g(d)")
+            d["basis"] = basis
             d["internal"] = True
             worked = []
             failed = []
@@ -144,14 +144,12 @@ def gen_multi_detail(request, molecules):
         "molecules": zip(molecules.split(','), errors, warnings),
         "pagename": molecules,
         "form": form,
-        "basis": urllib.urlencode(
-            {"basis" : a.get("basis", "B3LYP/6-31g(d)")}
-            ),
+        "basis": urllib.urlencode({"basis" : basis}),
         })
     return render(request, "chem/multi_detail.html", c)
 
 def gen_multi_detail_zip(request, molecules):
-    basis = request.GET.get("basis", "")
+    basis = request.GET.get("basis", "B3LYP/6-31g(d)")
 
     buff = StringIO()
     zfile = zipfile.ZipFile(buff, "w", zipfile.ZIP_DEFLATED)
