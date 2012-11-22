@@ -98,11 +98,11 @@ def gen_detail(request, molecule):
         })
     return render(request, "chem/detail.html", c)
 
-
-def gen_multi_detail(request, molecules):
+def gen_multi_detail(request, string):
     errors = []
     warnings = []
-    for mol in molecules.split(','):
+    molecules = utils.name_expansion(string)
+    for mol in molecules:
         try:
             gjfwriter.parse_name(mol)
             errors.append(None)
@@ -125,16 +125,16 @@ def gen_multi_detail(request, molecules):
             d["internal"] = True
             worked = []
             failed = []
-            for molecule in molecules.split(','):
+            for mol in molecules:
                 dnew = d.copy()
-                dnew["name"] = re.sub(r"{{\s*name\s*}}", molecule, dnew["name"])
-                jobid, e = utils.start_run_molecule(request.user, molecule, **dnew)
+                dnew["name"] = re.sub(r"{{\s*name\s*}}", mol, dnew["name"])
+                jobid, e = utils.start_run_molecule(request.user, mol, **dnew)
                 if e is None:
-                    job = Job(molecule=molecule, jobid=jobid, **form.cleaned_data)
+                    job = Job(molecule=mol, jobid=jobid, **form.cleaned_data)
                     job.save()
-                    worked.append("%s -- %d" % (molecule, jobid))
+                    worked.append("%s -- %d" % (mol, jobid))
                 else:
-                    failed.append("%s -- %s" % (molecule, e))
+                    failed.append("%s -- %s" % (mol, e))
 
             message = "Worked:\n%s" % '\n'.join(worked)
             if failed:
@@ -142,20 +142,20 @@ def gen_multi_detail(request, molecules):
             return HttpResponse(message, content_type="text/plain")
 
     c = Context({
-        "molecules": zip(molecules.split(','), errors, warnings),
-        "pagename": molecules,
+        "molecules": zip(molecules, errors, warnings),
+        "pagename": string,
         "form": form,
         "basis": urllib.urlencode({"basis" : basis}),
         })
     return render(request, "chem/multi_detail.html", c)
 
-def gen_multi_detail_zip(request, molecules):
+def gen_multi_detail_zip(request, string):
     basis = request.GET.get("basis", "B3LYP/6-31g(d)")
 
     buff = StringIO()
     zfile = zipfile.ZipFile(buff, "w", zipfile.ZIP_DEFLATED)
     errors = ''
-    for name in molecules.split(','):
+    for name in utils.name_expansion(string):
         try:
             out = gjfwriter.Output(name, basis)
             if request.GET.get("image"):

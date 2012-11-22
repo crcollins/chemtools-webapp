@@ -2,6 +2,7 @@ import os
 import bz2
 import cStringIO
 import time
+import re
 
 from django.template import loader, Context
 import paramiko
@@ -23,6 +24,72 @@ def write_job(**kwargs):
         return loader.render_to_string(template, c)
     else:
         return ''
+
+def name_expansion(string):
+    braceparse = re.compile(r"""(\{[^\{\}]*\})""")
+    variables = {
+        "CORES": "CON,TON,CSN,TSN,CNN,TNN,CCC,TCC",
+        "RGROUPS": "a,b,c,d,e,f,g,h,i,j,k,l",
+        "XGROUPS": "A,B,C,D,E,F,G,H,I,J,K,L",
+        "ARYL": "2,3,4,5,6,7,8,9",
+        "ARYL0": "2,3,8,9",
+        "ARYL2": "4,5,6,7",
+    }
+
+    def split(string):
+        count = 0
+        parts = ['']
+        for i, char in enumerate(string):
+            if char == "," and not count:
+                parts.append('')
+            else:
+                if char == "{":
+                    count += 1
+                elif char == "}":
+                    count -= 1
+                parts[-1] += char
+        assert not count
+        return parts
+
+    def expand(remaining, curlist=None):
+        out = []
+        if curlist is None:
+            out = remaining[0]
+        else:
+            for base in curlist:
+                for end in remaining[0]:
+                    out.append(base + end)
+        if len(remaining) > 1:
+            out = expand(remaining[1:], out)
+        return out
+
+    def compress(item):
+        out = []
+        if len(item) > 1:
+            # used to find the last iteration
+            len2 = (len(item) / 2) - 1
+            for i, (start, end) in enumerate(zip(item[::2], item[1::2])):
+                temp = []
+                # [1:-1] removes braces
+                for part in end[1:-1].split(','):
+                    if i == len2:
+                        temp.append(start + part + item[-1])
+                    else:
+                        temp.append(start + part)
+                out.append(temp)
+        else:
+            out.append(item)
+        return out
+
+    braces = []
+    inter = set('{}').intersection
+    for part in split(string):
+        if inter(part):
+            compressed = compress(re.split(braceparse, part))
+            braces.extend(expand(compressed))
+        else:
+            braces.append(part)
+    return braces
 
 ###########################################################
 #  SSH stuff
