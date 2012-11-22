@@ -26,20 +26,25 @@
         </tr>
     {% endfor %}
     </table>
-    <form action="." method="post">
-        <table>
-            {{ form.as_table }}
-        </table>
-        {% if basis %}<input type="hidden" name="basis" value="{{ basis }}">{% endif %}
-        <table>
-            <tr><th>
-                {% if user.is_authenticated %}
-                    {% csrf_token %}
-                    <input type="submit" value="Submit Job" />
-                {% endif %}
-                <input type="reset" value="Reset" />
-            </th></tr>
-        </table>
-    </form>
+    <div class="hide-title">
+        Job Form
+    </div>
+    <div class="hide">
+        <form action="." method="post">
+            <table>
+                {{ form.as_table }}
+            </table>
+            {% if basis %}<input type="hidden" name="basis" value="{{ basis }}">{% endif %}
+            <table>
+                <tr><th>
+                    {% if user.is_authenticated %}
+                        {% csrf_token %}
+                        <input type="submit" value="Submit Job" />
+                    {% endif %}
+                    <input type="reset" value="Reset" />
+                </th></tr>
+            </table>
+        </form>
+    </div>
     <a href='../{{ pagename }}.zip'>Download All</a>
 {% endblock %}
