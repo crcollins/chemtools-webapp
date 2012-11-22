@@ -1,7 +1,15 @@
 {% extends "chem/base.html" %}
 
 {% block content %}
-    <table>
+    <table class="centered">
+        <tr>
+            <th>Name</th>
+            <th>gjf</th>
+            <th>mol2</th>
+            <th>Image</th>
+            <th>Job</th>
+            <th></th>
+        </tr>
     {% for molecule, error, warning in molecules %}
         <tr {% if error %}id="error"{% elif warning %}id="warning"{% endif %}>
             <td>{{ molecule }}</td>

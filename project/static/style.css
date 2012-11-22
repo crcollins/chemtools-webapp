@@ -127,6 +127,10 @@ table {
     width: 100%;
 }
 
+table.centered {
+    text-align: center;
+}
+
 tr#error {
     background-color: #B43030;
 }
