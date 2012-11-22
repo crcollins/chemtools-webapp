@@ -2,6 +2,7 @@ from cStringIO import StringIO
 import zipfile
 import os
 import urllib
+import re
 
 from django.shortcuts import render, redirect
 from django.template import Context, RequestContext
@@ -126,7 +127,7 @@ def gen_multi_detail(request, molecules):
             failed = []
             for molecule in molecules.split(','):
                 dnew = d.copy()
-                dnew["name"] = dnew["name"].replace("{{ name }}", molecule)
+                dnew["name"] = re.sub(r"{{\s*name\s*}}", molecule, dnew["name"])
                 jobid, e = utils.start_run_molecule(request.user, molecule, **dnew)
                 if e is None:
                     job = Job(molecule=molecule, jobid=jobid, **form.cleaned_data)
