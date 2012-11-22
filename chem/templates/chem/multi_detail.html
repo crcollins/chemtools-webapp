@@ -26,7 +26,7 @@
         </tr>
     {% endfor %}
     </table>
-    <form action="." method="get">
+    <form action="." method="post">
         <table>
             {{ form.as_table }}
         </table>
@@ -35,13 +35,11 @@
             <tr><th>
                 {% if user.is_authenticated %}
                     {% csrf_token %}
-                    <input type="submit" value="Submit Job" formmethod="post" formaction="."/>
+                    <input type="submit" value="Submit Job" />
                 {% endif %}
-                <input type="submit" value="Get Job File" />
                 <input type="reset" value="Reset" />
             </th></tr>
         </table>
     </form>
-    <p>
     <a href='../{{ pagename }}.zip'>Download All</a>
 {% endblock %}
