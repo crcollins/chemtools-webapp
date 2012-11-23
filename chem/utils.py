@@ -3,6 +3,7 @@ import bz2
 import cStringIO
 import time
 import re
+import itertools
 
 from django.template import loader, Context
 import paramiko
@@ -44,10 +45,15 @@ def name_expansion(string):
         except AttributeError:
             x = variables[name.lstrip("$")]
         except:
-            x = ''
+            try:
+                x = "*" + name.group(0).lstrip("$")
+            except AttributeError:
+                x = "*" + name.lstrip("$")
+            except:
+                x = name
         return x
 
-    def split(string):
+    def split_molecules(string):
         count = 0
         parts = ['']
         for i, char in enumerate(string):
@@ -62,45 +68,30 @@ def name_expansion(string):
         assert not count
         return parts
 
-    def expand(remaining, curlist=None):
-        out = []
-        if curlist is None:
-            out = remaining[0]
-        else:
-            for base in curlist:
-                for end in remaining[0]:
-                    out.append(base + end)
-        if len(remaining) > 1:
-            out = expand(remaining[1:], out)
-        return out
+    def expand(items):
+        swapped = [re.sub(varparse, get_var, x) for x in items]
+        a = [x[1:-1].split(',') for x in swapped[1::2] if x[1] != "*"]
 
-    def compress(item):
         out = []
-        if len(item) > 1:
-            # used to find the last iteration
-            len2 = (len(item) / 2) - 1
-            for i, (start, end) in enumerate(zip(item[::2], item[1::2])):
-                temp = []
-                # [1:-1] removes braces
-                if '$' in end[1:-1]:
-                    end = re.sub(varparse, get_var, end)
+        for stuff in itertools.product(*a):
+            temp = []
+            i = 0
+            for thing in swapped[1::2]:
+                if thing[1] == "*":
+                    x = stuff[int(thing[2:-1])]
+                else:
+                    x = stuff[i]
+                    i += 1
+                temp.append(x)
+            out.append(temp)
 
-                for part in end[1:-1].split(','):
-                    if i == len2:
-                        temp.append(start + part + item[-1])
-                    else:
-                        temp.append(start + part)
-                out.append(temp)
-        else:
-            out.append(item)
-        return out
+        return [''.join(sum(zip(swapped[::2], x), ())) for x in out]
 
     braces = []
     inter = set('{}').intersection
-    for part in split(string):
+    for part in split_molecules(string):
         if inter(part):
-            compressed = compress(re.split(braceparse, part))
-            braces.extend(expand(compressed))
+            braces.extend(expand(re.split(braceparse, part)))
         else:
             braces.append(part)
     return braces
