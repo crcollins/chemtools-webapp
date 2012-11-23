@@ -41,16 +41,18 @@ def name_expansion(string):
 
     def get_var(name):
         try:
-            x = variables[name.group(0).lstrip("$")]
+            newname = name.group(0).lstrip("$")
         except AttributeError:
-            x = variables[name.lstrip("$")]
+            newname = name.lstrip("$")
+
+        try:
+            x = variables[newname]
         except:
             try:
-                x = "*" + name.group(0).lstrip("$")
-            except AttributeError:
-                x = "*" + name.lstrip("$")
+                int(newname)
+                x = "*" + newname
             except:
-                x = name
+                x = newname
         return x
 
     def split_molecules(string):
