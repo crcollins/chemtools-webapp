@@ -27,6 +27,8 @@ def write_job(**kwargs):
 
 def name_expansion(string):
     braceparse = re.compile(r"""(\{[^\{\}]*\})""")
+    varparse = re.compile(r"\$\w*")
+
     variables = {
         "CORES": "CON,TON,CSN,TSN,CNN,TNN,CCC,TCC",
         "RGROUPS": "a,b,c,d,e,f,g,h,i,j,k,l",
@@ -35,6 +37,15 @@ def name_expansion(string):
         "ARYL0": "2,3,8,9",
         "ARYL2": "4,5,6,7",
     }
+
+    def get_var(name):
+        try:
+            x = variables[name.group(0).lstrip("$")]
+        except AttributeError:
+            x = variables[name.lstrip("$")]
+        except:
+            x = ''
+        return x
 
     def split(string):
         count = 0
@@ -71,6 +82,9 @@ def name_expansion(string):
             for i, (start, end) in enumerate(zip(item[::2], item[1::2])):
                 temp = []
                 # [1:-1] removes braces
+                if '$' in end[1:-1]:
+                    end = re.sub(varparse, get_var, end)
+
                 for part in end[1:-1].split(','):
                     if i == len2:
                         temp.append(start + part + item[-1])
