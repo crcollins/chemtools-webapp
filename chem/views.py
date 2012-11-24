@@ -119,6 +119,7 @@ def gen_multi_detail(request, string):
     if form.is_valid():
         d = dict(form.cleaned_data)
         if request.method == "GET":
+            d["name"] = d["name"].replace("{{ name }}", request.REQUEST.get("molname"))
             return HttpResponse(utils.write_job(**d), content_type="text/plain")
         elif request.method == "POST":
             if not request.user.is_staff:

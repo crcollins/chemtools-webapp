@@ -1,5 +1,17 @@
 {% extends "chem/base.html" %}
 
+{% block header %}
+{{ block.super }}
+<script>
+{% autoescape on %}
+function submitForm(name){
+    $("form input#id_molname").val(name);
+    $("form#newform").submit();
+}
+{% endautoescape %}
+</script>
+{% endblock %}
+
 {% block content %}
     <h1>{{ pagename }}</h1>
     <table class="centered">
@@ -18,7 +30,7 @@
                 <td><a href="../{{ molecule }}.gjf{{ basis }}">gjf</a></td>
                 <td><a href="../{{ molecule }}.mol2{{ basis }}">mol2</a></td>
                 <td><a href="../{{ molecule }}.png">Image</a></td>
-                <td><a href="../{{ molecule }}/job/{{ basis }}">Job</a></td>
+                <td><a onClick="submitForm('{{ molecule }}')">Job</a></td>
                 <td><a href="../{{ molecule }}/report/">Report</a></td>
             {% else %}
                 <td colspan='4'>{{ error }}</td>
@@ -31,16 +43,17 @@
         Job Form
     </div>
     <div class="hide">
-        <form action="." method="post">
+        <form id="newform" action="." method="get">
             <table>
                 {{ form.as_table }}
             </table>
             {% if basis %}<input type="hidden" name="basis" value="{{ basis }}">{% endif %}
+            <input type="hidden" id="id_molname" name="molname" value="">
             <table>
                 <tr><th>
                     {% if user.is_authenticated %}
                         {% csrf_token %}
-                        <input type="submit" value="Submit Job" />
+                        <input type="submit" value="Submit Job" formmethod="post" formaction="."/>
                     {% endif %}
                     <input type="reset" value="Reset" />
                 </th></tr>
