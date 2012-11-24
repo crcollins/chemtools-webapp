@@ -15,8 +15,9 @@
             <li><a href="../{{ molecule }}.gjf{{ encoded_basis }}">gjf File</a></li>
             <li><a href="../{{ molecule }}.mol2{{ encoded_basis }}">mol2 File</a></li>
         </ul>
+    <div class="hide-container">
     <div class="hide-title">
-        Job Form
+        <a>Job Form</a>
     </div>
     <div class="hide">
         <form action="." method="get">
@@ -35,6 +36,7 @@
                 </th></tr>
             </table>
         </form>
+    </div>
     </div>
     {% endif %}
 {% endblock %}

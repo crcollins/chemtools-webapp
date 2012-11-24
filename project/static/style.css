@@ -142,3 +142,8 @@ tr#warning {
 table.left-min {
     width: 0%;
 }
+
+div.hide-container {
+    margin-top: 25px;
+    margin-bottom: 10px;
+}

@@ -39,8 +39,9 @@ function submitForm(name){
         </tr>
     {% endfor %}
     </table>
+    <div class="hide-container">
     <div class="hide-title">
-        Job Form
+        <a >Job Form</a>
     </div>
     <div class="hide">
         <form id="newform" action="." method="get">
@@ -59,6 +60,7 @@ function submitForm(name){
                 </th></tr>
             </table>
         </form>
+    </div>
     </div>
     <a href='../{{ pagename }}.zip'>Download All</a>
 {% endblock %}
