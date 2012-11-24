@@ -87,7 +87,7 @@ def name_expansion(string):
                 temp.append(x)
             out.append(temp)
 
-        return [''.join(sum(zip(swapped[::2], x), ())) for x in out]
+        return [''.join(sum(zip(swapped[::2], x), ()) + (swapped[-1], )) for x in out]
 
     braces = []
     inter = set('{}').intersection
