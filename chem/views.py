@@ -20,15 +20,18 @@ import utils
 
 def index(request):
     if request.GET.get("molecule"):
-        a = {"basis" : request.GET.get("basis", "B3LYP/6-31g(d)")}
 
         func = gen_detail
         if "," in request.GET.get("molecule"):
             func = gen_multi_detail
 
-        b = "%s?%s" % (reverse(func, args=(request.GET.get("molecule"), )),
-            urllib.urlencode(a))
-        return HttpResponseRedirect(b)
+        a = {"basis" : request.GET.get("basis")}
+        if a["basis"] != "B3LYP/6-31g(d)":
+            b = "%s?%s" % (reverse(func, args=(request.GET.get("molecule"), )),
+                urllib.urlencode(a))
+            return HttpResponseRedirect(b)
+        else:
+            return redirect(func, request.GET.get("molecule"))
     return render(request, "chem/index.html")
 
 def frag_index(request):
@@ -68,7 +71,7 @@ def gen_detail(request, molecule):
         pass
 
     form = get_form(request, molecule)
-    basis = request.REQUEST.get("basis", "B3LYP/6-31g(d)")
+    basis = request.REQUEST.get("basis")
 
     if form.is_valid():
         d = dict(form.cleaned_data)
@@ -93,7 +96,7 @@ def gen_detail(request, molecule):
         "form": form,
         "known_errors": ErrorReport.objects.filter(molecule=molecule),
         "error_message": e,
-        "encoded_basis": urllib.urlencode({"basis" : basis}),
+        "encoded_basis": '?' + urllib.urlencode({"basis" : basis}) if basis else '',
         "basis": basis,
         })
     return render(request, "chem/detail.html", c)
@@ -111,7 +114,7 @@ def gen_multi_detail(request, string):
         warnings.append(ErrorReport.objects.filter(molecule=mol))
 
     form = get_form(request, "{{ name }}")
-    basis = request.REQUEST.get("basis", "B3LYP/6-31g(d)")
+    basis = request.REQUEST.get("basis", "")
 
     if form.is_valid():
         d = dict(form.cleaned_data)
@@ -145,12 +148,12 @@ def gen_multi_detail(request, string):
         "molecules": zip(molecules, errors, warnings),
         "pagename": string,
         "form": form,
-        "basis": urllib.urlencode({"basis" : basis}),
+        "basis": '?' + urllib.urlencode({"basis" : basis}) if basis else '',
         })
     return render(request, "chem/multi_detail.html", c)
 
 def gen_multi_detail_zip(request, string):
-    basis = request.GET.get("basis", "B3LYP/6-31g(d)")
+    basis = request.GET.get("basis")
 
     buff = StringIO()
     zfile = zipfile.ZipFile(buff, "w", zipfile.ZIP_DEFLATED)
@@ -183,7 +186,7 @@ def gen_multi_detail_zip(request, string):
 
 def write_gjf(request, molecule):
     filename = molecule + ".gjf"
-    basis = request.GET.get("basis", "")
+    basis = request.GET.get("basis")
 
     out = gjfwriter.Output(molecule, basis)
     f = StringIO(out.write_file())

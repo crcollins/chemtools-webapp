@@ -10,10 +10,10 @@
     {% if error_message %}
         <p><strong>{{ error_message }}</strong></p>
     {% else %}
-        <img src="../{{ molecule }}.png?scale=10"></img>
+        <img src="../{{ molecule }}.png"></img>
         <ul>
-            <li><a href="../{{ molecule }}.gjf?{{ encoded_basis }}">gjf File</a></li>
-            <li><a href="../{{ molecule }}.mol2?{{ encoded_basis }}">mol2 File</a></li>
+            <li><a href="../{{ molecule }}.gjf{{ encoded_basis }}">gjf File</a></li>
+            <li><a href="../{{ molecule }}.mol2{{ encoded_basis }}">mol2 File</a></li>
         </ul>
     <div class="hide-title">
         Job Form
