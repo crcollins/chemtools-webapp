@@ -196,7 +196,7 @@ This takes multiple log files and returns a page with a list of filenames and th
 ### Users ###
 #### Account ####
 
-Chemtools-Webapp has a very simplified view of user accounts. They are mainly used as a shell to persistantly store information like emails and usernames for submitting jobs on the supercomputers. As well as the needed ssh keys.
+Chemtools-Webapp has a very simplified view of user accounts. They are mainly used as a shell to persistently store information like emails and usernames for submitting jobs on the supercomputers. As well as the needed ssh keys.
 
 Registering an account is much like any other site. An email server is not set up yet so it does not do email verification, but that is more of a formality anyways. After registering, click the activation key link to active your account. From there, it is a matter of setting up your directory structure. SSH into all of the different supercomputers and run the following command.
 
@@ -224,7 +224,7 @@ Right now, the API is very minimal, the current access is just enough to give th
 
 ### Molecule Specific ###
 
-For all of the molecules there is a basic API access to allow getting the different types of outputs. The first, and most common, being the gjf output. This is the standard gaussian file type and is what should be used for running the calculations. There is also an added possible parameter called "basis" that can be added to add/change the basis/settings of the molecule. If none is given, then "B3LYP/6-31g(d)" is assumed.
+For all of the molecules there is a basic API access to allow getting the different types of outputs. The first, and most common, being the gjf output. This is the standard Gaussian file type and is what should be used for running the calculations. There is also an added possible parameter called "basis" that can be added to add/change the basis/settings of the molecule. If none is given, then "B3LYP/6-31g(d)" is assumed.
 
     /chem/<NAME>.gjf
     /chem/<NAME>.gjf?basis=B3LYP/6-31g(d)
@@ -253,7 +253,7 @@ Similar to the gjf file, the images can be parameterized, with their scaling. Th
     /chem/<NAME>.png
     /chem/<NAME>.png?size=20
 
-The whole thing is very hackish and is just intended to allow a preview of the molecule without having to open it in gaussian. As expected of a 2D Image, Three demensionality is poorly shown. this is especiially apparent in molecules with TMS and Carbazole. (also compounded with the fact that the fragments have a hackish transform to align them)
+The whole thing is very hackish and is just intended to allow a preview of the molecule without having to open it in Gaussian. As expected of a 2D Image, Three dimensionality is poorly shown. this is especially apparent in molecules with TMS and Carbazole. (also compounded with the fact that the fragments have a hackish transform to align them)
 
     /chem/7k_TON_7k_7k.png
 
@@ -323,6 +323,33 @@ This case creating 4 * 4 * 12 * 8 * 4 = 6144 molecules. Due to optimizations, ge
 Added with this main display page is another API type access to allow generating zip files with all the molecules of a given pattern/set.
 
     /chem/<pattern>.zip
+
+### Fragments ###
+
+All of the fragments used in generating the molecules can be found here:
+
+    /chem/frag/<name>/
+
+They use a slightly altered XYZ file format in the form of:
+
+    Element x y z
+
+    Atom1 Atom2 Connection
+
+Where x, y, and z are all floats. Element is a String from the set of all the elements plus the addition of a few special characters to signify where to bond to. Atom1 and Atom2 are both Integers corresponding to the location of the atom in the coordinate list. The connection is a string in the set ["1", "2", "3", "Ar"], where 1, 2, and 3 are single, double and triple bonds, respectively. Ar is an Aromatic (1.5 bond).
+
+Here is an example of the Triple Bond.
+
+    C 0.402800 -0.479100 -0.000100
+    C 1.209100 0.607700 -0.000300
+    ~0 2.383000 2.189800 -0.000700
+    ~1 -0.747300 -2.029000 0.000300
+
+    1 2 3
+    1 4 Ar
+    2 3 Ar
+
+There are 3 added symbols in the charater set for the element names and those are "~", "*", and "+". These are used to signify the type of things the element can bond to. After the set of possible things to bond to is a number that indicates the order that the bonds get used. So, in the case of the cores, the correct parts of the molecule are built in the correct order.
 
 
 ### Generate SSH Key Pair ###
