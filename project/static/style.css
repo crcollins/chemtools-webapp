@@ -36,38 +36,6 @@ div.login {
     padding: 10px 0px 0px 0px;
 }
 
-.content {
-    background-color: #404040;
-    color: #DDDDDD;
-    margin: 0px 20px 10px 20px;
-    padding: 10px 10px 10px 10px;
-
-    -moz-border-radius: 10px;
-    border-radius: 10px;
-}
-.content:hover{
-    background-color: #505050;
-}
-
-.text {
-    background-color: #666;
-    color: #DDDDDD;
-    padding: 10px 10px 10px 10px;
-
-    -moz-border-radius: 10px;
-    border-radius: 10px;
-}
-
-.title {
-    background-color: #2288FF;
-    color: #DDDDDD;
-    padding: 10px 10px 10px 10px;
-    font-weight: bold;
-    font-size: 120%;
-
-    -moz-border-radius: 10px;
-    border-radius: 10px;
-}
 a {
     text-decoration:  none;
     color: #00AAAA;
@@ -78,10 +46,6 @@ a:visited {
 }
 a:hover {
     color: #00FFFF;
-}
-
-.shadow {
-    box-shadow: 3px 3px 4px #000;
 }
 
 footer {
