@@ -233,7 +233,7 @@ The next form of output is the mol2 format. This is added because it is a fairly
 
     /chem/<NAME>.mol2
 
-The last molecule specific access is the png image. It is a very basis rendering over the overall structure of the molecule.
+The last molecule specific access is the png image. It is a very basic rendering over the overall structure of the molecule.
 
     Single Bond     = single white line
     Aromatic Bond   = single red line
