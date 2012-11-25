@@ -11,12 +11,20 @@ from django.core.servers.basehttp import FileWrapper
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 import paramiko
+import misaka
 
 from models import ErrorReport, ErrorReportForm, JobForm, LogForm, Job
 import gjfwriter
 import fileparser
 import utils
 
+
+def docs(request):
+    a = "".join(open("README.md", "r").readlines())
+    c = Context({
+        "docs": misaka.html(a),
+        })
+    return render(request, "chem/docs.html", c)
 
 def index(request):
     if request.GET.get("molecule"):

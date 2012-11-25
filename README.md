@@ -15,6 +15,7 @@ Build/Run Requirements
 - Paramiko 1.7.7.1
 - PyCrypto 2.26
 - South 0.7.6
+- Misaka 1.0.2
 
 _______________________________________________________________________
 Naming Scheme
