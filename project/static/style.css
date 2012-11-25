@@ -111,3 +111,21 @@ div.hide-container {
     margin-top: 25px;
     margin-bottom: 10px;
 }
+
+pre {
+    padding: 10px 10px 10px 10px;
+    margin: 20px 15px 20px 15px;
+    background-color: #383838;
+    color: #DDDDDD;
+    overflow: auto;
+    overflow-y: hidden;
+}
+
+hr {
+    border: 1;
+    border-color: #383838;
+    background-color: #202020;
+    height: 2px;
+    width: 50%;
+    margin-bottom: 50px;
+}
