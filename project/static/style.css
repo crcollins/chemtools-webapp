@@ -9,10 +9,8 @@ body {
     /*height: 90%;*/
 }
 
-h1 {
-    padding: 0px 0px 0px 10px;
-}
-h3 {
+h1,h2,h3,h4 {
+    color: #EEEEEE;
     padding: 0px 0px 0px 10px;
 }
 
@@ -22,7 +20,7 @@ div.login {
 
 .container {
     background-color: #303030;
-    color: #DDDDDD;
+    color: #BCBCBC;
     margin-right: auto;
     margin-left: auto;
     width: 720px;
@@ -32,8 +30,8 @@ div.login {
 .container2 {
     margin-right: auto;
     margin-left: auto;
-    width: 720px;
-    padding: 10px 0px 0px 0px;
+    width: 700px;
+    padding: 10px 10px 10px 10px;
 }
 
 a {
@@ -51,7 +49,7 @@ a:hover {
 footer {
     background-color: #202020;
     text-align: center;
-    color: #DDDDDD;
+    color: #EEEEEE;
     margin: 0;
     padding: 20px;
     height: 10%;
@@ -61,7 +59,7 @@ footer {
 .header {
     background-color: #202020;
     text-align: center;
-    color: #DDDDDD;
+    color: #EEEEEE;
     margin: 0;
     padding: 20px;
     height: 10%;
@@ -116,7 +114,6 @@ pre {
     padding: 10px 10px 10px 10px;
     margin: 20px 15px 20px 15px;
     background-color: #383838;
-    color: #DDDDDD;
     overflow: auto;
     overflow-y: hidden;
 }
