@@ -1,5 +1,7 @@
 {% extends "chem/base.html" %}
 
+{% block title %}Job {{ job.0 }}{% endblock %}
+
 {% block content %}
     {% if error_message %}
         {{ error_message }}
