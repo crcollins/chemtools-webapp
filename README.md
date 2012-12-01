@@ -24,72 +24,75 @@ There are four main classifications of the parts of the name.
 
 ### Cores ###
 
-- CON = Cis Oxygen Nitrogen
-- TON = Trans Oxygen Nitrogen
-- CSN = Cis Sulfur Nitrogen
-- TSN = Trans Sulfur Nitrogen
-- CNN = Cis Nitrogen Nitrogen
-- TNN = Trans Nitrogen Nitrogen
-- CCC = Cis Carbon Carbon
-- TCC = Trans Carbon Carbon
+    CON = Cis Oxygen Nitrogen
+    TON = Trans Oxygen Nitrogen
+    CSN = Cis Sulfur Nitrogen
+    TSN = Trans Sulfur Nitrogen
+    CNN = Cis Nitrogen Nitrogen
+    TNN = Trans Nitrogen Nitrogen
+    CCC = Cis Carbon Carbon
+    TCC = Trans Carbon Carbon
 
 
 ### Aryl ###
 
-- 2 = Double Bond
-- 3 = Triple Bond
-- 4 = Phenyl
-- 5 = Thiophene
-- 6 = Pyridine
-- 7 = Carbazole
-- 8 = TZ
-- 9 = EDOT
-- [DTP]
+    2 = Double Bond
+    3 = Triple Bond
+    4 = Phenyl
+    5 = Thiophene
+    6 = Pyridine
+    7 = Carbazole
+    8 = TZ
+    9 = EDOT
+    [DTP]
 
 Within Aryl there are also two minor sub classifications of Aryl groups.
 #### Zero Substituent ####
-2,3,8,9
+
+    2,3,8,9
+
 #### Two Substituent ####
-4,5,6,7
+
+    4,5,6,7
 
 
 ### X-Groups ####
 
-- A = Hydrogen
-- B = Chlorine
-- C = Bromine
-- D = CN
-- E = CCH
-- F = OH
-- G = SH
-- H = NH_2
-- I = CH_3
-- J = Phenyl
-- K = TMS
-- L = OCH_3
+    A = Hydrogen
+    B = Chlorine
+    C = Bromine
+    D = CN
+    E = CCH
+    F = OH
+    G = SH
+    H = NH_2
+    I = CH_3
+    J = Phenyl
+    K = TMS
+    L = OCH_3
 
 
 ### R-Groups ####
 
-- a = Hydrogen
-- b = Chlorine
-- c = Bromine
-- d = CN
-- e = CCH
-- f = OH
-- g = SH
-- h = NH_2
-- i = CH_3
-- j = Phenyl
-- k = TMS
-- l = OCH_3
+    a = Hydrogen
+    b = Chlorine
+    c = Bromine
+    d = CN
+    e = CCH
+    f = OH
+    g = SH
+    h = NH_2
+    i = CH_3
+    j = Phenyl
+    k = TMS
+    l = OCH_3
 
 
 From there the name takes a form similar to this:
 
     24a_TON_35b_24c
 
-The left part (24a in this case) corresponds to the left side of the cruciform. The next part is the core. The next part goes with the two vertical parts. In an edge case this segment can be substituted to being just an X-group and added to the beginning of the last part.
+The left part (`24a` in this case) corresponds to the left side of the cruciform. The next part is the core. The next part goes with the two vertical parts. In an edge case this segment can be substituted to being just an X-group and added to the beginning of the last part.
 
     24a_TON_B24a
 
@@ -99,7 +102,7 @@ The last part of the name is the right side of the molecule. Beyond the slight o
     24a_TON_24a
     24a_TON
 
-Added to the naming scheme are two types of expansion. They are polymer type and stacking type. The former is a direct linking of the parts of the molecule. The latter is, basically, just a copy and paste along the respective axis. In the case of polymer type expansion, one can not have both an "n" (along the horizontal axis) and "m" (along the vertical) expansion due to conflicts in the connection points.
+Added to the naming scheme are two types of expansion. They are polymer type and stacking type. The former is a direct linking of the parts of the molecule. The latter is, basically, just a copy and paste along the respective axis. In the case of polymer type expansion, one can not have both an `n` (along the horizontal axis) and `m` (along the vertical) expansion due to conflicts in the connection points.
 
     4a_TON_n2
     4a_TON_B24c_n3
@@ -111,29 +114,15 @@ For some fun with the naming:
     4a_TON_5555555555_4a
     5_TON_n13
 
-Any errors in the naming scheme will be denoted on the respective molecules page. The error reporting is currently very primitive, but it gives an idea of the problem. If there are errors in the molecule, or if the molecule gives an error when it should work, feel free to submit an error report by clicking the "Report Me" button seen on all of the molecule pages. This button is also listed for each molecule on the multi molecule pages.
+Any errors in the naming scheme will be denoted on the respective molecules page. The error reporting is currently very primitive, but it gives an idea of the problem. An example problem being
 
+`no rgroups allowed`
 
-The formal grammar definition is roughly as follows:
+[/chem/2a\_TON](/chem/2a_TON)
 
-    digit       = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" ;
-    int         = digit, { digit } ;
+This is caused because the double bond can not have any R-Group substituants. This can be fixed by using `A` instead of `a` because the former is an X-Group.
 
-    core        = "CON" | "TON" | "CSN" | "TSN" | "CNN" | "TNN" | "CCC" | "TCC" ;
-    aryl0       = "2" | "3" | "8" | "9" ;
-    aryl2       = "4" | "5" | "6" | "7" ;
-    aryl        = aryl0 | aryl2 ;
-    xgroup      = "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" | "K" | "L" ;
-    rgroup      = "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k" | "l" ;
-    full        = aryl2, [rgroup], [rgroup]
-    end         = [aryl0, {aryl0}], [full, {full}], [xgroup]
-    end2        = "_", end
-
-    extend      = ("n" | "m"), int ;
-    stack       = ("x" | "y" | "z"), int ;
-
-    molecule    = [end2], core, ([end2], [end2] | ["_", xgroup, end]), ["_", extend], ["_", stack] {"_", stack}
-
+If there are errors in the molecule, or if the molecule gives an error when it should work, feel free to submit an error report by clicking the "Report Me" button seen on all of the molecule pages. This button is also listed for each molecule on the multi molecule pages.
 
 _______________________________________________________________________
 Functionality
@@ -186,7 +175,7 @@ Where lines starting with "#" are comments. The n values can be given as either 
 
 #### Gjf Reset ####
 
-This takes a log file (assumed to be correct) and returns a gjf file with the extracted geometry. This is intended to be used to extract the optimized geometry from the DFT log files to then use as the TDDFT gjf file. WARNING will not work in some cases where the job stopped part way through writing.
+This takes a log file (assumed to be correct) and returns a gjf file with the extracted geometry. This is intended to be used to extract the optimized geometry from the DFT log files to then use as the TDDFT gjf file. WARNING: this will not work in some cases where the job stopped part way through writing.
 
 
 #### Homo Orbital ####
@@ -210,9 +199,9 @@ After your directories on the supercomputer are setup, then you need to setup yo
 
 SSH keys can be generated for direct access to the supercomputers, or you can provide your own. The ones being used are generated by PyCrypto and are 2048 bit keys.
 
-For the initial setup of the SSH keys, it does require a little bit of foot work. Which amounts to SSH-ing into the supercomputer of choice and running the following command, where <username> is your username.
+For the initial setup of the SSH keys, it does require a little bit of foot work. Which amounts to SSH-ing into the supercomputer of choice and running the following command, where $USERNAME is your username.
 
-    $ wget /account/public/<username>/ -O- >> ~/.ssh/authorized_keys
+    $ wget /account/public/$USERNAME/ -O- >> ~/.ssh/authorized_keys
 
 After this key is added nothing else will have to be done.
 
@@ -222,17 +211,38 @@ API
 
 Right now, the API is very minimal, the current access is just enough to give the basic functionality to the entire site. These features include: dynamic generation of .gjf, .mol, and .png files for any molecule given the name.
 
+### Naming ###
+
+For generating the molecules, there is a very rough FSM that parses through the names given and spits out either the molecule requested or an error. Here is roughly what the EBNF grammar would look like.
+
+    digit       = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" ;
+    int         = digit, { digit } ;
+
+    core        = "CON" | "TON" | "CSN" | "TSN" | "CNN" | "TNN" | "CCC" | "TCC" ;
+    aryl0       = "2" | "3" | "8" | "9" ;
+    aryl2       = "4" | "5" | "6" | "7" ;
+    aryl        = aryl0 | aryl2 ;
+    xgroup      = "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" | "K" | "L" ;
+    rgroup      = "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k" | "l" ;
+    full        = aryl2, [rgroup], [rgroup]
+    end         = [aryl0, {aryl0}], [full, {full}], [xgroup]
+    end2        = "_", end
+
+    extend      = ("n" | "m"), int ;
+    stack       = ("x" | "y" | "z"), int ;
+
+    molecule    = [end2], core, ([end2], [end2] | ["_", xgroup, end]), ["_", extend], ["_", stack] {"_", stack}
 
 ### Molecule Specific ###
 
 For all of the molecules there is a basic API access to allow getting the different types of outputs. The first, and most common, being the gjf output. This is the standard Gaussian file type and is what should be used for running the calculations. There is also an added possible parameter called "basis" that can be added to add/change the basis/settings of the molecule. If none is given, then "B3LYP/6-31g(d)" is assumed.
 
-    /chem/<NAME>.gjf
-    /chem/<NAME>.gjf?basis=B3LYP/6-31g(d)
+    /chem/$NAME.gjf
+    /chem/$NAME.gjf?basis=B3LYP/6-31g(d)
 
 The next form of output is the mol2 format. This is added because it is a fairly simple interchange format for different software packages.
 
-    /chem/<NAME>.mol2
+    /chem/$NAME.mol2
 
 The last molecule specific access is the png image. It is a very basic rendering over the overall structure of the molecule.
 
@@ -251,19 +261,19 @@ The last molecule specific access is the png image. It is a very basic rendering
 
 Similar to the gjf file, the images can be parameterized, with their scaling. The default view is a size 10 which means the atoms have a diameter of 10.
 
-    /chem/<NAME>.png
-    /chem/<NAME>.png?size=20
+    /chem/$NAME.png
+    /chem/$NAME.png?size=20
 
 The whole thing is very hackish and is just intended to allow a preview of the molecule without having to open it in Gaussian. As expected of a 2D Image, Three dimensionality is poorly shown. this is especially apparent in molecules with TMS and Carbazole. (also compounded with the fact that the fragments have a hackish transform to align them)
 
-    /chem/7k_TON_7k_7k.png
+[/chem/7k\_TON\_7k\_7k.png](/chem/7k_TON_7k_7k.png)
 
 
 ### Multi Molecule ###
 
 The multi molecule view works much as you might expect with molecule names comma delimited. This is useful when looking at just a couple of molecules.
 
-    /chem/<NAME1>,<NAME2>,<NAME3>/
+    /chem/$NAME1,$NAME2,$NAME3/
 
 Along with comma separated names, there is also an added feature that works much like Unix brace expansion.
 
@@ -276,10 +286,9 @@ Example:
 
 In the case of chemtools-webapp, the usage is much the same.
 
-    /chem/24{a,b,c}_TON/
-    # lots of stuff
-    /chem/2{4,5}{a,b,c}_TON/
-    # lots of stuff
+[/chem/24{a,b,c}\_TON/](/chem/24{a,b,c}_TON/)
+
+[/chem/2{4,5}{a,b,c}\_TON/](/chem/2{4,5}{a,b,c}_TON/)
 
 Along with that functionality, there are some added variables that can be accessed the same as shell variables.
 
@@ -292,44 +301,44 @@ Example:
 
 With chemtools-webapp there are six variables each of which correspond to a set of the naming scheme.
 
-- "CORES"   = "CON,TON,CSN,TSN,CNN,TNN,CCC,TCC"
-- "RGROUPS" = "a,b,c,d,e,f,g,h,i,j,k,l"
-- "XGROUPS" = "A,B,C,D,E,F,G,H,I,J,K,L"
-- "ARYL"    = "2,3,4,5,6,7,8,9"
-- "ARYL0"   = "2,3,8,9"
-- "ARYL2"   = "4,5,6,7"
+    CORES   = "CON,TON,CSN,TSN,CNN,TNN,CCC,TCC"
+    RGROUPS = "a,b,c,d,e,f,g,h,i,j,k,l"
+    XGROUPS = "A,B,C,D,E,F,G,H,I,J,K,L"
+    ARYL0   = "2,3,4,5,6,7,8,9"
+    aryl0   = "2,3,8,9"
+    ARYL2   = "4,5,6,7"
 
 So, if you wanted to create all of the substituant combinations for 4X_TON, rather than typing all the substituants out, you can just use:
 
-    /chem/4{$RGROUPS}_TON/
+[/chem/4{$RGROUPS}\_TON/](/chem/4{$RGROUPS}_TON/)
 
-    /chem/4{$RGROUPS}_{$CORES}/
+[/chem/4{$RGROUPS}\_{$CORES}/](/chem/4{$RGROUPS}_{$CORES}/)
 
-Now, that may seem well and good, except in the case where you may have multiple parts that you want the same. Like with 4X_TON_4X_4X. In that case, there are some special variables that correspond to the number of the replacement.
+Now, that may seem well and good, except in the case where you may have multiple parts that you want the same. Like with 4X\_TON\_4X\_4X. In that case, there are some special variables that correspond to the number of the replacement.
 
-    /chem/4{$RGROUPS}_TON_4{$0}_4{$0}/
+[/chem/4{$RGROUPS}\_TON\_4{$0}\_4{$0}/](/chem/4{$RGROUPS}_TON_4{$0}_4{$0}/)
 
-    /chem/{$ARYL2}{$RGROUPS}_TON_{$0}{$1}_{$0}{$1}/
+[/chem/{$ARYL2}{$RGROUPS}\_TON\_{$0}{$1}\_{$0}{$1}/](/chem/{$ARYL2}{$RGROUPS}_TON_{$0}{$1}_{$0}{$1}/)
 
 Currently, there is no way to simplify the name with heavy repetitions in it. An example being something like the first one below without major changes in the grammar. That being said, this method does make it trivial to make several thousand molecules in the matter of a second or two.
 
     4X4X4X4X_TON_4X4X4X4X_4X4X4X4X
 
-    /chem/{$ARYL2}{$ARYL2}{$RGROUPS}_{$CORES}_{$0}{$1}{$2}_{$0}{$1}{$2}_n{1,2,3,4}/
+[/chem/{$ARYL2}{$ARYL2}{$RGROUPS}\_{$CORES}\_{$0}{$1}{$2}\_{$0}{$1}{$2}\_n{1,2,3,4}/](/chem/{$ARYL2}{$ARYL2}{$RGROUPS}_{$CORES}_{$0}{$1}{$2}_{$0}{$1}{$2}_n{1,2,3,4}/)
 
 This case creating 4 * 4 * 12 * 8 * 4 = 6144 molecules. Due to optimizations, generating the page with all of these molecules is trivial (within a second or so), generating the zip file with all of them in it; however, is not (~5 minutes and ~100 megs of just gjf files). This could be optimized later to at least seem more responsive, but it is not a concern because no one is going to be dealing with more than about 100 molecules at a time. With a reasonable case as follows. Which is completed in a fraction of a second for both the generation and the download.
 
-    /chem/4{$RGROUPS}_TON_4{$0}_4{$0}_n{1,2,3,4},4a_{$CORES}_4a_4a_n{1,2,3,4}/
+[/chem/4{$RGROUPS}\_TON\_4{$0}\_4{$0}\_n{1,2,3,4},4a\_{$CORES}\_4a\_4a\_n{1,2,3,4}/](/chem/4{$RGROUPS}_TON_4{$0}_4{$0}_n{1,2,3,4},4a_{$CORES}_4a_4a_n{1,2,3,4}/)
 
 Added with this main display page is another API type access to allow generating zip files with all the molecules of a given pattern/set.
 
-    /chem/<pattern>.zip
+    /chem/$PATTERN.zip
 
 ### Fragments ###
 
 All of the fragments used in generating the molecules can be found here:
 
-    /chem/frag/<name>/
+    /chem/frag/$NAME/
 
 They use a slightly altered XYZ file format in the form of:
 
@@ -340,6 +349,8 @@ They use a slightly altered XYZ file format in the form of:
 Where x, y, and z are all floats. Element is a String from the set of all the elements plus the addition of a few special characters to signify where to bond to. Atom1 and Atom2 are both Integers corresponding to the location of the atom in the coordinate list. The connection is a string in the set ["1", "2", "3", "Ar"], where 1, 2, and 3 are single, double and triple bonds, respectively. Ar is an Aromatic (1.5 bond).
 
 Here is an example of the Triple Bond.
+
+[/chem/frag/3/](/chem/frags/3/)
 
     C 0.402800 -0.479100 -0.000100
     C 1.209100 0.607700 -0.000300
@@ -356,7 +367,7 @@ There are 3 added symbols in the charater set for the element names and those ar
 ### Generate SSH Key Pair ###
 This will return json with with two values. The public key is in the OpenSSH format.
 
-    /account/genkey/
+[/account/genkey/](/account/genkey/)
 
     {
         "public": "ssh-rsa ... chemtools-webapp",
@@ -367,12 +378,12 @@ This will return json with with two values. The public key is in the OpenSSH for
         -----END RSA PRIVATE KEY-----"
     }
 
-If the caller is logged in then it will return a public key with <username>@chemtools-webapp.
+If the caller is logged in then it will return a public key with $USERNAME@chemtools-webapp.
 
 
 ### Get User's Public Key ###
 This is used mainly for getting the user's public key for use on the supercomputers. So instead of having to copy the file to the supercomputer and then append it to the authorized_keys file one can just wget and append.
 
-    /account/public/<username>/
+    /account/public/$USERNAME/
 
-    wget /account/public/<username>/ -O- >> ~/.ssh/authorized_keys
+    wget /account/public/$USERNAME/ -O- >> ~/.ssh/authorized_keys
