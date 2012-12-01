@@ -116,6 +116,8 @@ pre {
     background-color: #383838;
     overflow: auto;
     overflow-y: hidden;
+    border-radius: 4px;
+    -moz-border-radius: 4px;
 }
 
 hr {
