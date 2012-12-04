@@ -41,14 +41,16 @@
         </div>
         {% endblock %}
     </div>
-    <div class="container">
-        <div class="container2">
-            {% block content %}
-            {% endblock %}
+    <div class="wrapper">
+        <div class="container">
+            <div class="container2">
+                {% block content %}
+                {% endblock %}
+            </div>
         </div>
     </div>
+    <footer class="footer">
+        {% block footer %}{% endblock %}
+    </footer>
 </body>
-<footer>
-    {% block footer %}{% endblock %}
-</footer>
 </html>

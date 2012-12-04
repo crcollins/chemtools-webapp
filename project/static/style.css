@@ -1,21 +1,46 @@
-html {
-    /*height: 100%;*/
+
+* {
+    margin:0; /* zero out margin */
+    padding:0; /* zero out padding */
 }
+
+html, body {
+    height:100%; /* gives layout 100% height */
+    overflow:inherit; /* triggers 100% height in Opera 9.5 */
+}
+.wrapper {
+    min-height:100%; /* gives layout 100% height */
+    width:720px; /* centered div must be given a width */
+    margin:0 auto; /* centers #wrapper */
+    background:#303030;
+}
+
+* html #wrapper {
+    height:100%; /* IE6 treats height as min-height */
+}
+.container {
+    padding:0px 0 80px; /* bottom padding clears the #footer */
+}
+footer {
+    height:80px;
+    width:100%; /* centered div must be given a width */
+    margin:-80px auto 0; /* -80px sucks it back in & auto centers it */
+}
+
 
 body {
     background-color: #383838;
-    margin: 0;
-    padding: 0;
-    /*height: 90%;*/
 }
 
 h1,h2,h3,h4 {
     color: #EEEEEE;
-    padding: 0px 0px 0px 10px;
+    padding: 5px 0px 0px 0px;
+    margin: 10px 0px 0px 0px;
 }
 
-div.login {
-    text-align: right;
+p {
+    padding: 5px 0px 10px 0px;
+    margin: 10px 0px 15px 0px;
 }
 
 .container {
@@ -24,7 +49,6 @@ div.login {
     margin-right: auto;
     margin-left: auto;
     width: 720px;
-    height: 100%;
 }
 
 .container2 {
@@ -32,30 +56,20 @@ div.login {
     margin-left: auto;
     width: 700px;
     padding: 10px 10px 10px 10px;
+    height: 100%;
 }
 
-a {
-    text-decoration:  none;
-    color: #00AAAA;
-}
-a:visited {
-    color: #006666;
-
-}
-a:hover {
-    color: #00FFFF;
-}
 
 footer {
     background-color: #202020;
     text-align: center;
     color: #EEEEEE;
-    margin: 0;
-    padding: 20px;
-    height: 10%;
+    padding: 20px 0px 20px 0px;
     font-size: 90%;
 }
 
+
+/* *********************** */
 .header {
     background-color: #202020;
     text-align: center;
@@ -71,6 +85,7 @@ footer {
 
 ul {
     list-style-type: none;
+    margin: 10px 10px 25px 10px;
 }
 
 #navbar ul {
@@ -83,16 +98,45 @@ div#navbar li {
     display: inline;
 }
 
+div.login {
+    text-align: right;
+}
 
+
+/* *********************** */
+a {
+    text-decoration:  none;
+    color: #00AAAA;
+}
+a:visited {
+    color: #006666;
+
+}
+a:hover {
+    color: #00FFFF;
+}
+
+
+/* *********************** */
 table {
     border-collapse: collapse;
     width: 100%;
+    padding: 10px;
+}
+
+tr, th, td {
+    padding: 2.5px;
 }
 
 table.centered {
     text-align: center;
 }
 
+table.left-min {
+    width: 0%;
+}
+
+/* *********************** */
 tr#error {
     background-color: #B43030;
 }
@@ -101,9 +145,6 @@ tr#warning {
     background-color: #252525;
 }
 
-table.left-min {
-    width: 0%;
-}
 
 div.hide-container {
     margin-top: 25px;
