@@ -10,16 +10,19 @@
     {% csrf_token %}
     <table>
         <tr>
-            <th>Username:</th>
-            <td><input type="text" name="username" value="{{ username }}" /></td>
+            <th><label for="id_username">Username:</label></th>
+            <td><input id="id_username" type="text" name="username" value="{{ username }}" /></td>
         </tr>
         <tr>
-            <th>Password:</th>
-            <td><input type="password" name="password" value="" /></td>
+            <th><label for="id_password">Password:</label></th>
+            <td><input id="id_password" type="password" name="password" value="" /></td>
+        </tr>
+        <tr>
+            <th></th>
+            <td><input type="submit" value="Log In" /></td>
         </tr>
     </table>
     <input type="hidden" name="next" value="{{ next }}" />
-    <input type="submit" value="Log In" />
 </form>
 {% endblock %}
 
