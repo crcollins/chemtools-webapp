@@ -3,5 +3,10 @@
 {% block title %}Docs{% endblock %}
 
 {% block content %}
+    {{ header|safe }}
+    <div class="table-of-contents">
+        <h2>Table of Contents</h2>
+        {{ toc|safe }}
+    </div>
     {{ docs|safe }}
 {% endblock %}

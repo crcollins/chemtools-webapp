@@ -21,8 +21,12 @@ import utils
 
 def docs(request):
     a = "".join(open("README.md", "r").readlines())
+    headerend = a.index("Build")
+    bodystart = a.index("_"*71 + "\nNaming")
     c = Context({
-        "docs": misaka.html(a),
+        "header": misaka.html(a[:headerend]),
+        "toc": misaka.html(a[bodystart:], render_flags=misaka.HTML_TOC_TREE),
+        "docs": misaka.html(a[bodystart:], render_flags=misaka.HTML_TOC),
         })
     return render(request, "chem/docs.html", c)
 

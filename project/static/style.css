@@ -120,8 +120,28 @@ a:hover {
     color: #00FFFF;
 }
 
+/* *********************** */
+
+div.table-of-contents {
+    background-color: #383838;
+    border-radius: 4px;
+    -moz-border-radius: 4px;
+    margin: 20px 15px 20px 15px;
+    padding: 5px 5px 5px 5px;
+}
+
+div.table-of-contents ul {
+    list-style-type: none;
+    margin: 0px 20px 10px 20px;
+}
+div.table-of-contents h2 {
+    list-style-type: none;
+    /*margin-bottom: 10px ;*/
+}
+
 
 /* *********************** */
+
 table {
     border-collapse: collapse;
     width: 100%;
