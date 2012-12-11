@@ -211,16 +211,17 @@ class Molecule(object):
             }
 
         bounds = self.bounding_box()
-        xres = int(scale * abs(bounds[0][0] - bounds[1][0]))
-        yres = int(scale * abs(bounds[0][1] - bounds[1][1]))
+        xres = int(scale * abs(bounds[0][0] - bounds[1][0])) + int(.5 * scale)
+        yres = int(scale * abs(bounds[0][1] - bounds[1][1])) + int(.5 * scale)
+
         img = Image.new("RGB", (xres, yres))
         draw = ImageDraw.Draw(img)
+        s = int(scale * .25)
         for bond in self.bonds:
             pts = sum([x.xyz[:2] for x in bond.atoms], tuple())
-            pts = [(coord-bounds[0][i%2])*scale for i,coord in enumerate(pts)]
+            pts = [(coord-bounds[0][i%2])*scale+s for i,coord in enumerate(pts)]
 
             draw.line(pts,fill=colors[bond.type], width=scale/10)
-            s = (scale * .25)
             for x in xrange(2):
                 if bond.atoms[x].element not in "C":
                     circle = (pts[x*2] - s,pts[x*2+1] - s, pts[x*2] + s, pts[x*2+1] + s)
