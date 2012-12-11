@@ -66,9 +66,25 @@ h1,h2,h3,h4 {
     margin: 10px 0px 0px 0px;
 }
 
+h1 {
+    font-size: 225%;
+}
+
+h2 {
+    font-size: 175%;
+}
+
+h3 {
+    font-size: 150%;
+}
+h4 {
+    font-size: 100%;
+}
+
+
 p {
-    padding: 5px 0px 10px 0px;
-    margin: 10px 0px 15px 0px;
+    padding: 0px 0px 10px 0px;
+    margin: 5px 0px 15px 0px;
 }
 
 .container2 {
