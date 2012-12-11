@@ -4,10 +4,13 @@
 
 {% block content %}
     The format of the fragments is: <br>
-    Element x y z
-    <br>
-    <br>
-    Atom1 Atom2 Connection
+    <pre><code>
+Element x y z
+
+Atom1 Atom2 Connection
+    </code></pre>
+    Where <code>Element</code> is either the symbol of the element, or a special identifier to allow multiple molecules fragments together. <code>Atom1</code> and <code>Atom2</code> are the index number of the atoms in the bonds (1-indexed). The <code>Connection</code> compenent is the type of bond the atoms have. The possible bonds are in the set <code>{'1', '2', '3', 'Ar'}</code> where <code>'Ar'</code> stands for aromatic.
+
     {% for title, parts in usable_parts %}
     <h3>{{ title }}</h3>
     <ul>
