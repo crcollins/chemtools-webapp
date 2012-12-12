@@ -2,8 +2,58 @@
 
 {% block title %}Jobs{% endblock %}
 
+{% block head %}
+{{ block.super }}
+<script>
+$(document).ready(function() {
+    $.getJSON('/chem/jobs.json', function(data) {
+        var table = $("#id_jobs")
+
+        var output = '';
+
+        for (i = 0; i < data.jobs.length; i++ ) {
+            output += "<tr>"
+            for (j = 0; j < data.jobs[i].length; j++ ) {
+                if (j == 0) {
+                    output += "<td><a href=\'" + data.jobs[i][j] + "\'>" + data.jobs[i][j] + "</td>";
+                } else {
+                    output += "<td>" + data.jobs[i][j] + "</td>";
+                }
+            }
+            if (data.is_authenticated && data.jobs[i][6] != "C") {
+                var csrftoken = getCookie('csrftoken');
+                output += "<td><form action='"
+                output += data.jobs[i][0] + "/kill/' method='post'>"
+                output += "<input type='hidden' name='csrfmiddlewaretoken' value='" + csrftoken + "' />"
+                output += "<input type='submit' value='Kill' /></form></td>"
+            }
+            output += "</tr>"
+        }
+        table.append(output);
+    });
+    })
+
+// getCookie function from here:
+// https://docs.djangoproject.com/en/dev/ref/contrib/csrf/#ajax
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie != '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
+{% endblock %}
+
 {% block content %}
-    <table>
+    <table id="id_jobs">
     <tr>
         <th>Job ID</th>
         <th>Site</th>
@@ -14,28 +64,6 @@
         <th>Status</th>
         <th>Running Time</th>
     </tr>
-    {% if error_message %}
-        {{ error_message }}
-    {% endif %}
-    {% for job in jobs %}
-        <tr>
-            {% for part in job %}
-                {% if forloop.counter0 == 0 %}
-                    <td><a href="{{ part }}">{{ part }}</a></td>
-                {% else %}
-                    <td>{{ part }}</td>
-                {% endif %}
-            {% endfor %}
-            {% if user.is_authenticated and job.6 != "C" %}
-            <td>
-                <form action='{{ job.0 }}/kill/' method="post">
-                    {% csrf_token %}
-                    <input type="submit" value="Kill" />
-                </form>
-            </td>
-            {% endif %}
-        </tr>
-    {% endfor %}
     </table>
     <p>
 {% endblock %}

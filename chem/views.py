@@ -10,6 +10,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.core.servers.basehttp import FileWrapper
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
+from django.utils import simplejson
 import paramiko
 import misaka
 
@@ -344,16 +345,19 @@ def reset_gjf(request):
     return response
 
 def job_index(request):
+    return render(request, "chem/job_index.html")
+
+def get_job_list(request):
     try:
         jobs = utils.get_all_jobs(request.user)
         e = None
     except Exception as e:
         jobs = []
-    c = Context({
+    a = {
+        "is_authenticated": request.user.is_authenticated(),
         "jobs": jobs,
-        "error_message": e,
-        })
-    return render(request, "chem/job_index.html", c)
+    }
+    return HttpResponse(simplejson.dumps(a), mimetype="application/json")
 
 def job_multi_detail(request, jobids):
     jobids = jobids.split(',')

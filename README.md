@@ -387,3 +387,17 @@ This is used mainly for getting the user's public key for use on the supercomput
     /account/public/$USERNAME/
 
     wget /account/public/$USERNAME/ -O- >> ~/.ssh/authorized_keys
+
+### Get Running Jobs ###
+This is used to allow viewing the currently running jobs of the logged in user. It returns two values. The first is `is_authenticated` which is used internally to determine whether or not the user is logged in. The second is a 2D array of jobs. The first dimension is all of the jobs themselves. The second is the properties. The properties are the same as what is given by the command `qstat` on the supercomputers split up based on spaces.
+
+[/chem/jobs.json](/chem/jobs.json)
+
+    {
+        "is_authenticated" : true,
+        "jobs" : [
+            [100, "gordon", "24a_TON", 1, 16, "16:00:00", "R", "11:15:00"],
+            ...
+            ...
+        ]
+    }

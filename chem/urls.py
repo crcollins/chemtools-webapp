@@ -12,6 +12,7 @@ urlpatterns = patterns('chem.views',
 
     url(r"^upload/$", "upload_data"),
     url(r"^jobs/$", "job_index"),
+    url(r"^jobs.json$", "get_job_list"),
     url(r"^jobs/(?P<jobid>[0-9]*)/$", "job_detail"),
     url(r"^jobs/(?P<jobid>[0-9]*)/reset/$", "reset_job"),
     url(r"^jobs/(?P<jobid>[0-9]*)/kill/$", "kill_job"),
