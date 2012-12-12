@@ -2,7 +2,6 @@
 <html>
 <head>
     {% block head %}
-    <link rel="stylesheet" href="{{ STATIC_URL }}basic.css" />
     <link rel="stylesheet" href="{{ STATIC_URL }}style.css" />
     <link rel="shortcut icon" href="{{ STATIC_URL }}favicon.ico" type="image/x-icon" />
     <script src="{{ STATIC_URL }}jquery-1.7.1.min.js"></script>
@@ -47,6 +46,7 @@
             <div class="container2">
                 {% block content %}
                 {% endblock %}
+            <div class="modal"></div>​
             </div>
         </div>
         <div id="clearfooter"></div>
