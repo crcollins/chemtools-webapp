@@ -201,7 +201,7 @@ SSH keys can be generated for direct access to the supercomputers, or you can pr
 
 For the initial setup of the SSH keys, it does require a little bit of foot work. Which amounts to SSH-ing into the supercomputer of choice and running the following command, where $USERNAME is your username.
 
-    $ wget /u/public/$USERNAME/ -O- >> ~/.ssh/authorized_keys
+    $ wget /u/$USERNAME/id_rsa.pub -O- >> ~/.ssh/authorized_keys
 
 After this key is added nothing else will have to be done.
 
@@ -384,9 +384,9 @@ If the caller is logged in then it will return a public key with $USERNAME@chemt
 ### Get User's Public Key ###
 This is used mainly for getting the user's public key for use on the supercomputers. So instead of having to copy the file to the supercomputer and then append it to the authorized_keys file one can just wget and append.
 
-    /u/public/$USERNAME/
+    /u/$USERNAME/id_rsa.pub
 
-    wget /u/public/$USERNAME/ -O- >> ~/.ssh/authorized_keys
+    wget /u/$USERNAME/id_rsa.pub -O- >> ~/.ssh/authorized_keys
 
 ### Get Running Jobs ###
 This is used to allow viewing the currently running jobs of the logged in user. It returns two values. The first is `is_authenticated` which is used internally to determine whether or not the user is logged in. The second is a 2D array of jobs. The first dimension is all of the jobs themselves. The second is the properties. The properties are the same as what is given by the command `qstat` on the supercomputers split up based on spaces.

@@ -10,6 +10,6 @@ urlpatterns = patterns('account.views',
     url(r"^register/$", "register_user", name="register"),
     url(r"^register/(?P<activation_key>[a-f0-9]*)$", "activate_user", name="activate"),
     url(r"^genkey/$", "generate_key", name="generate_key"),
-    url(r"^public/(?P<username>[\w.@+-]+)$", "get_public_key", name="get_public_key"),
+    url(r"^(?P<username>[\w.@+-]+)/id_rsa.pub$", "get_public_key", name="get_public_key"),
 )
 
