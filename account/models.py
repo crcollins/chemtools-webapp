@@ -25,9 +25,12 @@ class RegistrationForm(forms.Form):
                                 label="Password (again)")
 
     def clean_username(self):
-        existing = User.objects.filter(username__iexact=self.cleaned_data["username"])
+        username = self.cleaned_data["username"]
+        existing = User.objects.filter(username__iexact=username)
         if existing.exists():
             raise forms.ValidationError("A user with that username already exists.")
+        elif username == "getkey":
+            raise forms.ValidationError("That is not a valid username.")
         else:
             return self.cleaned_data["username"]
 

@@ -16,7 +16,7 @@
         <div class="login">
         {% block login %}
             {% if user.is_authenticated %}
-                Welcome, <a href="{% url user_settings %}">{{ user }}</a>. |
+                Welcome, <a href="{% url user_settings request.user %}">{{ user }}</a>. |
                 {% if user.is_staff %}
                     <a href="/admin/">Admin Page</a> |
                 {% endif %}

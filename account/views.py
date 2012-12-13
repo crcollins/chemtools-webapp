@@ -94,45 +94,48 @@ def register_user(request):
     return render(request, "account/register.html", c)
 
 @login_required
-def change_settings(request):
-    state = "Change Settings"
-    user_profile = request.user.get_profile()
+def change_settings(request, username):
+    if request.user.username == username:
+        state = "Change Settings"
+        user_profile = request.user.get_profile()
 
-    if request.POST:
-        form = SettingsForm(request.POST)
-        if form.is_valid():
-            d = dict(form.cleaned_data)
-            if d.get("password1"):
-                request.user.set_password(d.get("password1"))
-            if d.get("private_key") and d.get("public_key"):
-                if user_profile.public_key != d.get("public_key"):
-                    utils.update_all_ssh_keys(user_profile.xsede_username,
-                                        user_profile.private_key,
-                                        d.get("public_key"))
-                    user_profile.public_key = d.get("public_key")
-                    user_profile.private_key = d.get("private_key")
-            if d.get("xsede_username"):
-                user_profile.xsede_username = d.get("xsede_username")
+        if request.POST:
+            form = SettingsForm(request.POST)
+            if form.is_valid():
+                d = dict(form.cleaned_data)
+                if d.get("password1"):
+                    request.user.set_password(d.get("password1"))
+                if d.get("private_key") and d.get("public_key"):
+                    if user_profile.public_key != d.get("public_key"):
+                        utils.update_all_ssh_keys(user_profile.xsede_username,
+                                            user_profile.private_key,
+                                            d.get("public_key"))
+                        user_profile.public_key = d.get("public_key")
+                        user_profile.private_key = d.get("private_key")
+                if d.get("xsede_username"):
+                    user_profile.xsede_username = d.get("xsede_username")
 
-            if request.user.email != d.get("email"):
-                request.user.email = d.get("email")
-            request.user.save()
-            user_profile.save()
-            state = "Settings Successfully Saved"
+                if request.user.email != d.get("email"):
+                    request.user.email = d.get("email")
+                request.user.save()
+                user_profile.save()
+                state = "Settings Successfully Saved"
+        else:
+            a = {
+                "email": request.user.email,
+                "public_key": user_profile.public_key,
+                "private_key": user_profile.private_key,
+                "xsede_username": user_profile.xsede_username,
+                }
+            form = SettingsForm(initial=a)
+
+        c = Context({
+        "state": state,
+        "form": form,
+        })
+        return render(request, "account/settings.html", c)
     else:
-        a = {
-            "email": request.user.email,
-            "public_key": user_profile.public_key,
-            "private_key": user_profile.private_key,
-            "xsede_username": user_profile.xsede_username,
-            }
-        form = SettingsForm(initial=a)
-
-    c = Context({
-    "state": state,
-    "form": form,
-    })
-    return render(request, "account/settings.html", c)
+        return redirect(change_settings, request.user.username)
 
 def activate_user(request, activation_key):
     user = get_object_or_404(UserProfile, activation_key=activation_key).user
