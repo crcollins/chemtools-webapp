@@ -4,7 +4,7 @@
 {{ block.super }}
 <script>
     function fetchKeys(){
-    $.getJSON('/account/genkey/', function(data) {
+    $.getJSON('/u/genkey/', function(data) {
         $('#id_public_key').val(data['public']);
         $('#id_private_key').val(data['private']);
     });

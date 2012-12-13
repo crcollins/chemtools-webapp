@@ -76,9 +76,9 @@ STATIC_ROOT = ''
 # Example: "http://media.lawrence.com/static/"
 STATIC_URL = '/static/'
 
-LOGIN_URL = "/account/login/"
+LOGIN_URL = "/u/login/"
 LOGIN_REDIRECT_URL = "/chem/"
-LOGOUT_URL = "/account/logout/"
+LOGOUT_URL = "/u/logout/"
 HOME_URL = "/chem/"
 
 AUTH_PROFILE_MODULE = 'account.UserProfile'

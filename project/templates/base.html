@@ -16,14 +16,14 @@
         <div class="login">
         {% block login %}
             {% if user.is_authenticated %}
-                Welcome, <a href="/account/">{{ user }}</a>. |
+                Welcome, <a href="{% url user_settings %}">{{ user }}</a>. |
                 {% if user.is_staff %}
                     <a href="/admin/">Admin Page</a> |
                 {% endif %}
-                <a href="/account/logout/">Log out</a>
+                <a href="{% url logout %}">Log out</a>
             {% else %}
-                <a href="/account/login/?next={{request.path}}">Log in</a> |
-                <a href="/account/register/">Register</a>
+                <a href="{% url login %}?next={{request.path}}">Log in</a> |
+                <a href="{% url register %}">Register</a>
             {% endif %}
         {% endblock %}
         </div>
