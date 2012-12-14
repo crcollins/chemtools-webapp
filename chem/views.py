@@ -135,7 +135,7 @@ def gen_detail(request, molecule):
         "encoded_basis": '?' + urllib.urlencode({"basis" : basis}) if basis else '',
         "basis": basis,
         })
-    return render(request, "chem/detail.html", c)
+    return render(request, "chem/molecule_detail.html", c)
 
 def gen_multi_detail(request, string):
     errors = []
@@ -187,7 +187,7 @@ def gen_multi_detail(request, string):
         "form": form,
         "basis": '?' + urllib.urlencode({"basis" : basis}) if basis else '',
         })
-    return render(request, "chem/multi_detail.html", c)
+    return render(request, "chem/multi_molecule.html", c)
 
 def gen_multi_detail_zip(request, string):
     basis = request.GET.get("basis")
