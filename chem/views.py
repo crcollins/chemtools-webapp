@@ -20,7 +20,23 @@ import gjfwriter
 import fileparser
 import utils
 
-def postprocess(text, base):
+def index(request):
+    if request.GET.get("molecule"):
+
+        func = gen_detail
+        if "," in request.GET.get("molecule"):
+            func = gen_multi_detail
+
+        a = {"basis" : request.GET.get("basis")}
+        if a["basis"] != "B3LYP/6-31g(d)":
+            b = "%s?%s" % (reverse(func, args=(request.GET.get("molecule"), )),
+                urllib.urlencode(a))
+            return HttpResponseRedirect(b)
+        else:
+            return redirect(func, request.GET.get("molecule"))
+    return render(request, "chem/index.html")
+
+def _postprocess(text, base):
     usednames = {}
     finaltext = ''
     k = 0
@@ -49,26 +65,10 @@ def docs(request):
     bodystart = a.index("_"*71 + "\nNaming")
     c = Context({
         "header": misaka.html(a[:headerend]),
-        "toc": postprocess(misaka.html(a[bodystart:], render_flags=misaka.HTML_TOC_TREE), "#"),
-        "docs": postprocess(misaka.html(a[bodystart:], render_flags=misaka.HTML_TOC), 'id="'),
+        "toc": _postprocess(misaka.html(a[bodystart:], render_flags=misaka.HTML_TOC_TREE), "#"),
+        "docs": _postprocess(misaka.html(a[bodystart:], render_flags=misaka.HTML_TOC), 'id="'),
         })
     return render(request, "chem/docs.html", c)
-
-def index(request):
-    if request.GET.get("molecule"):
-
-        func = gen_detail
-        if "," in request.GET.get("molecule"):
-            func = gen_multi_detail
-
-        a = {"basis" : request.GET.get("basis")}
-        if a["basis"] != "B3LYP/6-31g(d)":
-            b = "%s?%s" % (reverse(func, args=(request.GET.get("molecule"), )),
-                urllib.urlencode(a))
-            return HttpResponseRedirect(b)
-        else:
-            return redirect(func, request.GET.get("molecule"))
-    return render(request, "chem/index.html")
 
 def frag_index(request):
     data = (
@@ -85,7 +85,20 @@ def frag_index(request):
     c = Context({"usable_parts": data})
     return render(request, "chem/frag_index.html", c)
 
-def get_form(request, molecule):
+def get_frag(request, frag):
+    f = open("chem/data/"+frag, "r")
+    response = HttpResponse(FileWrapper(f), content_type="text/plain")
+    return response
+
+
+###########################################################
+###########################################################
+# Generation Stuff
+###########################################################
+###########################################################
+
+
+def _get_form(request, molecule):
     req = request.REQUEST
     a = dict(req)
 
@@ -106,7 +119,7 @@ def gen_detail(request, molecule):
     except Exception as e:
         pass
 
-    form = get_form(request, molecule)
+    form = _get_form(request, molecule)
     basis = request.REQUEST.get("basis")
 
     if form.is_valid():
@@ -149,7 +162,7 @@ def gen_multi_detail(request, string):
             errors.append(e)
         warnings.append(ErrorReport.objects.filter(molecule=mol))
 
-    form = get_form(request, "{{ name }}")
+    form = _get_form(request, "{{ name }}")
     basis = request.REQUEST.get("basis", "")
 
     if form.is_valid():
@@ -220,7 +233,6 @@ def gen_multi_detail_zip(request, string):
     response["Content-Disposition"] = "attachment; filename=molecules.zip"
     return response
 
-
 def write_gjf(request, molecule):
     filename = molecule + ".gjf"
     basis = request.GET.get("basis")
@@ -250,11 +262,6 @@ def write_png(request, molecule):
     response['Content-Disposition'] = 'filename=%s.png' % molecule
     return response
 
-def get_frag(request, frag):
-    f = open("chem/data/"+frag, "r")
-    response = HttpResponse(FileWrapper(f), content_type="text/plain")
-    return response
-
 def report(request, molecule):
     if request.user.is_authenticated():
         email = request.user.email
@@ -277,6 +284,14 @@ def report(request, molecule):
         "molecule": molecule
         })
     return render(request, "chem/report.html", c)
+
+
+###########################################################
+###########################################################
+# Upload Stuff
+###########################################################
+###########################################################
+
 
 def upload_data(request):
     if request.method == "POST":
@@ -366,6 +381,14 @@ def reset_gjf(request):
     response = HttpResponse(ret_zip, mimetype="application/zip")
     response["Content-Disposition"] = "attachment; filename=output.zip"
     return response
+
+
+###########################################################
+###########################################################
+# SSH Stuff
+###########################################################
+###########################################################
+
 
 @login_required
 def job_index(request):
