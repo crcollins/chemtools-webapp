@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "account/base.html" %}
 
 {% block header %}
     <h1>Login</h1>
@@ -24,8 +24,4 @@
     </table>
     <input type="hidden" name="next" value="{{ next }}" />
 </form>
-{% endblock %}
-
-{% block footer %}
-    Note that all of the information here is very alpha. Use at your own risk.
 {% endblock %}
