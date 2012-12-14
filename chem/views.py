@@ -344,9 +344,11 @@ def reset_gjf(request):
     response["Content-Disposition"] = "attachment; filename=output.zip"
     return response
 
+@login_required
 def job_index(request):
     return render(request, "chem/job_index.html")
 
+@login_required
 def get_job_list(request):
     try:
         jobs = utils.get_all_jobs(request.user)
@@ -359,6 +361,7 @@ def get_job_list(request):
     }
     return HttpResponse(simplejson.dumps(a), mimetype="application/json")
 
+@login_required
 def job_multi_detail(request, jobids):
     jobids = jobids.split(',')
 
@@ -373,6 +376,7 @@ def job_multi_detail(request, jobids):
         })
     return render(request, "chem/job_index.html", c)
 
+@login_required
 def job_detail(request, jobid):
     e = None
     for job in utils.get_all_jobs(request.user):
