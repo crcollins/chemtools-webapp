@@ -8,14 +8,14 @@ Build/Run Requirements
 ----------------------
 
 - Python 2.7+
-- Django 1.4
-- Python Imaging Library
-- Scipy 0.9.0
+- Django 1.4.1
+- Misaka 1.0.2
+- Matplotlib 1.1.1rc
 - Numpy 1.6.1
 - Paramiko 1.7.7.1
+- PIL 1.1.7
 - PyCrypto 2.26
-- South 0.7.6
-- Misaka 1.0.2
+- Scipy 0.9.0
 
 _______________________________________________________________________
 Naming Scheme
