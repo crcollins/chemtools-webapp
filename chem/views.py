@@ -343,9 +343,18 @@ def upload_data(request):
         })
     return render(request, "chem/upload_log.html", c)
 
+def _parse_file_list(files):
+    for f in files:
+        if f.name.endswith(".zip"):
+            with zipfile.ZipFile(f, "r") as zfile:
+                for name in [x for x in zfile.namelist() if not x.endswith("/")]:
+                     yield zfile.open(name)
+        else:
+            yield f
+
 def get_homo_orbital(request):
     string = ''
-    for f in request.FILES.getlist('myfiles'):
+    for f in _parse_file_list(request.FILES.getlist('myfiles')):
         string += f.name + " " + str(fileparser.get_homo_orbital(f)) + "\n"
 
     f = StringIO(string)
@@ -355,13 +364,9 @@ def get_homo_orbital(request):
 
 def parse_log(request):
     parser = fileparser.LogParser()
-    for f in request.FILES.getlist('myfiles'):
-        if f.name.endswith(".zip"):
-            with zipfile.ZipFile(f, "r") as zfile:
-                for name in zfile.namelist():
-                    parser.parse_file(zfile.open(name))
-        else:
-            parser.parse_file(f)
+    for f in _parse_file_list(request.FILES.getlist('myfiles')):
+        parser.parse_file(f)
+
     f = StringIO(parser.format_output())
     response = HttpResponse(FileWrapper(f), content_type="text/plain")
     return response
@@ -370,12 +375,13 @@ def parse_data(request):
     buff = StringIO()
     zfile = zipfile.ZipFile(buff, 'w', zipfile.ZIP_DEFLATED)
 
-    for f in request.FILES.getlist('myfiles'):
+    n = len(list(_parse_file_list(request.FILES.getlist('myfiles'))))
+    for f in _parse_file_list(request.FILES.getlist('myfiles')):
         parser = fileparser.DataParser(f)
         homolumo, gap = parser.get_graphs()
 
         name, _ = os.path.splitext(f.name)
-        if len(request.FILES.getlist('myfiles')) != 1:
+        if n > 1:
             zfile.writestr(name+"/output.txt", parser.format_output())
             zfile.writestr(name+"/homolumo.eps", homolumo.getvalue())
             zfile.writestr(name+"/gap.eps", gap.getvalue())
@@ -384,7 +390,7 @@ def parse_data(request):
             zfile.writestr("homolumo.eps", homolumo.getvalue())
             zfile.writestr("gap.eps", gap.getvalue())
 
-    if len(request.FILES.getlist('myfiles')) != 1:
+    if n > 1:
         name = "output"
     zfile.close()
     buff.flush()
@@ -400,7 +406,7 @@ def reset_gjf(request):
     buff = StringIO()
     zfile = zipfile.ZipFile(buff, 'w', zipfile.ZIP_DEFLATED)
 
-    for f in request.FILES.getlist('myfiles'):
+    for f in _parse_file_list(request.FILES.getlist('myfiles')):
         parser = fileparser.LogReset(f)
 
         name, _ = os.path.splitext(f.name)
