@@ -415,21 +415,6 @@ def get_job_list(request):
     return HttpResponse(simplejson.dumps(a), mimetype="application/json")
 
 @login_required
-def job_multi_detail(request, jobids):
-    jobids = jobids.split(',')
-
-    jobs = []
-    for job in utils.get_all_jobs(request.user):
-        if job[0] in jobids:
-            jobs.append(job)
-    e = None
-    c = Context({
-        "jobs":jobs,
-        "error_message": e,
-        })
-    return render(request, "chem/job_index.html", c)
-
-@login_required
 def job_detail(request, jobid):
     e = None
     for job in utils.get_all_jobs(request.user):
