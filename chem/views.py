@@ -133,12 +133,14 @@ def gen_detail(request, molecule):
             d["basis"] = basis
             d["internal"] = True
             jobid, e = utils.start_run_molecule(request.user, molecule, **d)
+            a = {
+                "jobid": jobid,
+                "error": e,
+            }
             if e is None:
                 job = Job(molecule=molecule, jobid=jobid, **form.cleaned_data)
                 job.save()
-                return HttpResponse("It worked. Your job id is: %d" % jobid)
-            else:
-                return HttpResponse(e)
+            return HttpResponse(simplejson.dumps(a), mimetype="application/json")
 
     c = Context({
         "molecule": molecule,
@@ -174,25 +176,21 @@ def gen_multi_detail(request, string):
             if not request.user.is_staff:
                 return HttpResponse("You must be a staff user to submit a job.")
 
-            d["basis"] = basis
-            d["internal"] = True
-            worked = []
-            failed = []
+            a = {
+                "worked": [],
+                "failed": [],
+            }
             for mol in molecules:
                 dnew = d.copy()
                 dnew["name"] = re.sub(r"{{\s*name\s*}}", mol, dnew["name"])
-                jobid, e = utils.start_run_molecule(request.user, mol, **dnew)
+                jobid, e = utils.start_run_molecule(request.user, mol, basis=basis, internal=True, **dnew)
                 if e is None:
-                    job = Job(molecule=mol, jobid=jobid, **form.cleaned_data)
+                    job = Job(molecule=mol, jobid=jobid, **dnew)
                     job.save()
-                    worked.append("%s -- %d" % (mol, jobid))
+                    a["worked"].append((mol, jobid))
                 else:
-                    failed.append("%s -- %s" % (mol, e))
-
-            message = "Worked:\n%s" % '\n'.join(worked)
-            if failed:
-                message += "\nFailed:\n%s" % '\n'.join(failed)
-            return HttpResponse(message, content_type="text/plain")
+                    a["failed"].append((mol, e))
+            return HttpResponse(simplejson.dumps(a), mimetype="application/json")
 
     c = Context({
         "molecules": zip(molecules, errors, warnings),

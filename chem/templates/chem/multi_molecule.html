@@ -6,10 +6,37 @@
 {{ block.super }}
 <script>
 {% autoescape on %}
-function submitForm(name){
+function submitForm(name) {
     $("form input#id_molname").val(name);
     $("form#newform").submit();
 }
+
+$(function() {
+    $("#id_post").click(function() {
+        event.preventDefault();
+        var a = $('#newform').serialize();
+        $.post('', a, function(data) {
+            var text = '<ul>Worked:';
+            for (var i = 0; i < data["worked"].length; i++) {
+                text += "<li>" + data["worked"][i][0] + " -- " + data["worked"][i][1] + "</li>";
+            }
+            text += "</ul><ul>Failed:";
+            for (var i = 0; i < data["failed"].length; i++) {
+                text += "<li>" + data["failed"][i][0] + " -- " + data["failed"][i][1] + "</li>";
+            }
+            text += "</ul>"
+
+            var newdialog = $('<div id="id_results">' + text + '</div>');
+            newdialog.dialog({
+                modal: true,
+                title: "Results",
+                });
+            },
+            'json'
+            );
+        }
+    );
+});
 {% endautoescape %}
 </script>
 {% endblock %}
@@ -43,7 +70,7 @@ function submitForm(name){
     </table>
     <div class="hide-container">
     <div class="hide-title">
-        <a >Job Form</a>
+        <a href="#">Job Form</a>
     </div>
     <div class="hide">
         <form id="newform" action="." method="get">
@@ -56,7 +83,7 @@ function submitForm(name){
                 <tr><th>
                     {% if user.is_authenticated %}
                         {% csrf_token %}
-                        <input type="submit" value="Submit Job" formmethod="post" formaction="."/>
+                        <input type="submit" value="Submit Job" id="id_post"/>
                     {% endif %}
                     <input type="reset" value="Reset" />
                 </th></tr>
