@@ -121,11 +121,14 @@ def gen_detail(request, molecule):
 
     form = _get_form(request, molecule)
     basis = request.REQUEST.get("basis")
+    add = "" if request.GET.get("view") else "attachment; "
 
     if form.is_valid():
         d = dict(form.cleaned_data)
         if request.method == "GET":
-            return HttpResponse(utils.write_job(**d), content_type="text/plain")
+            response = HttpResponse(utils.write_job(**d), content_type="text/plain")
+            response['Content-Disposition'] = add + 'filename=%s.job' % molecule
+            return response
         elif request.method == "POST":
             if not request.user.is_staff:
                 return HttpResponse("You must be a staff user to submit a job.")
@@ -166,12 +169,16 @@ def gen_multi_detail(request, string):
 
     form = _get_form(request, "{{ name }}")
     basis = request.REQUEST.get("basis", "")
+    add = "" if request.GET.get("view") else "attachment; "
 
     if form.is_valid():
         d = dict(form.cleaned_data)
         if request.method == "GET":
-            d["name"] = d["name"].replace("{{ name }}", request.REQUEST.get("molname"))
-            return HttpResponse(utils.write_job(**d), content_type="text/plain")
+            molecule = request.REQUEST.get("molname")
+            d["name"] = re.sub(r"{{\s*name\s*}}", molecule, d["name"])
+            response = HttpResponse(utils.write_job(**d), content_type="text/plain")
+            response['Content-Disposition'] = add + 'filename=%s.job' % molecule
+            return response
         elif request.method == "POST":
             if not request.user.is_staff:
                 return HttpResponse("You must be a staff user to submit a job.")
@@ -234,20 +241,22 @@ def gen_multi_detail_zip(request, string):
 def write_gjf(request, molecule):
     filename = molecule + ".gjf"
     basis = request.GET.get("basis")
+    add = "" if request.GET.get("view") else "attachment; "
 
     out = gjfwriter.Output(molecule, basis)
     f = StringIO(out.write_file())
     response = HttpResponse(FileWrapper(f), content_type="text/plain")
-    response['Content-Disposition'] = 'filename=%s.gjf' % molecule
+    response['Content-Disposition'] = add + 'filename=%s.gjf' % molecule
     return response
 
 def write_mol2(request, molecule):
     filename = molecule + ".mol2"
+    add = "" if request.GET.get("view") else "attachment; "
 
     out = gjfwriter.Output(molecule, '')
     f = StringIO(out.write_file(False))
     response = HttpResponse(FileWrapper(f), content_type="text/plain")
-    response['Content-Disposition'] = 'filename=%s.mol2' % molecule
+    response['Content-Disposition'] = add + 'filename=%s.mol2' % molecule
     return response
 
 def write_png(request, molecule):
