@@ -36,6 +36,16 @@ $(function() {
             );
         }
     );
+
+    $("#id_zip_download").click(function() {
+        event.preventDefault();
+        var a = $('#headerform').serialize();
+        if ($('#id_job').val() === 'on'){
+            a += '&' + $('#newform').serialize()
+        }
+        window.location = "/chem/{{ pagename }}.zip?" + a;
+    })
+
 });
 {% endautoescape %}
 </script>
@@ -45,12 +55,25 @@ $(function() {
     <h1>{{ pagename }}</h1>
     <table class="centered">
         <tr>
+            <form id="headerform">
             <th>Name</th>
-            <th>gjf</th>
-            <th>mol2</th>
-            <th>Image</th>
-            <th>Job</th>
+            <th>
+                <input type="checkbox" id="id_gjf" name="gjf" checked/>
+                <label for="id_gjf">gjf</label>
+            </th>
+            <th>
+                <input type="checkbox" id="id_mol2" name="mol2"/>
+                <label for="id_mol2">mol2</label>
+            </th>
+            <th><input type="checkbox" id="id_image" name="image"/>
+                <label for="id_image">Image</label>
+            </th>
+            <th>
+                <input type="checkbox" id="id_job" name="job"/>
+                <label for="id_job">Job</label>
+            </th>
             <th></th>
+            </form>
         </tr>
     {% for molecule, error, warning in molecules %}
         <tr {% if error %}id="error"{% elif warning %}id="warning"{% endif %}>
@@ -59,7 +82,7 @@ $(function() {
                 <td><a href="../{{ molecule }}.gjf{{ basis }}">gjf</a></td>
                 <td><a href="../{{ molecule }}.mol2{{ basis }}">mol2</a></td>
                 <td><a href="../{{ molecule }}.png">Image</a></td>
-                <td><a onClick="submitForm('{{ molecule }}')">Job</a></td>
+                <td><a href='#' onClick="submitForm('{{ molecule }}')">Job</a></td>
                 <td><a href="../{{ molecule }}/report/">Report</a></td>
             {% else %}
                 <td colspan='4'>{{ error }}</td>
@@ -91,5 +114,5 @@ $(function() {
         </form>
     </div>
     </div>
-    <a href='../{{ pagename }}.zip'>Download All</a>
+    <a href='../{{ pagename }}.zip' id="id_zip_download">Download All</a>
 {% endblock %}

@@ -212,21 +212,54 @@ def gen_multi_detail_zip(request, string):
 
     buff = StringIO()
     zfile = zipfile.ZipFile(buff, "w", zipfile.ZIP_DEFLATED)
-    errors = ''
-    for name in utils.name_expansion(string):
+
+    errors = []
+    warnings = []
+    molecules = utils.name_expansion(string)
+    for mol in molecules:
+        try:
+            gjfwriter.parse_name(mol)
+            errors.append(None)
+        except Exception as e:
+            errors.append(e)
+        warnings.append(ErrorReport.objects.filter(molecule=mol))
+
+
+    if request.GET.get("job"):
+        form = _get_form(request, "{{ name }}")
+        if form.is_valid():
+            d = dict(form.cleaned_data)
+        else:
+            basis = request.GET.get("basis")
+            c = Context({
+                "molecules": zip(molecules, errors, warnings),
+                "pagename": string,
+                "form": form,
+                "basis": '?' + urllib.urlencode({"basis" : basis}) if basis else '',
+                })
+            return render(request, "chem/multi_molecule.html", c)
+
+    generrors = ''
+    for name in molecules:
         try:
             out = gjfwriter.Output(name, basis)
             if request.GET.get("image"):
                 f = StringIO()
                 out.molecule.draw(10).save(f, "PNG")
                 zfile.writestr(out.name+".png", f.getvalue())
-
-            if request.GET.get("gjf") is None or request.GET.get("gjf").lower() != "false":
+            if request.GET.get("gjf"):
                 zfile.writestr(name+".gjf", out.write_file())
+            if request.GET.get("mol2"):
+                zfile.writestr(name+".mol2", out.write_file(False))
+            if request.GET.get("job"):
+                dnew = d.copy()
+                dnew["name"] = re.sub(r"{{\s*name\s*}}", name, dnew["name"])
+                zfile.writestr(name+".job", utils.write_job(**dnew))
+
         except Exception as e:
-            errors += "%s - %s\n" % (name,  e)
-    if errors:
-        zfile.writestr("errors.txt", errors)
+            generrors += "%s - %s\n" % (name,  e)
+    if generrors:
+        zfile.writestr("errors.txt", generrors)
 
     zfile.close()
     buff.flush()
