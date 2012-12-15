@@ -201,6 +201,7 @@ def gen_multi_detail(request, string):
         "molecules": zip(molecules, errors, warnings),
         "pagename": string,
         "form": form,
+        "gjf": "checked",
         "basis": '?' + urllib.urlencode({"basis" : basis}) if basis else '',
         })
     return render(request, "chem/multi_molecule.html", c)
@@ -218,10 +219,16 @@ def gen_multi_detail_zip(request, string):
             d = dict(form.cleaned_data)
         else:
             basis = request.GET.get("basis")
+            f = lambda x: 'checked' if request.GET.get(x) else ''
+
             c = Context({
                 "molecules": zip(molecules, errors, warnings),
                 "pagename": string,
                 "form": form,
+                "gjf": f("gjf"),
+                "mol2": f("mol2"),
+                "image": f("image"),
+                "job": f("job"),
                 "basis": '?' + urllib.urlencode({"basis" : basis}) if basis else '',
                 })
             return render(request, "chem/multi_molecule.html", c)
