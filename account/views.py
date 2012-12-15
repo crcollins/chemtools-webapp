@@ -107,9 +107,10 @@ def change_settings(request, username):
                     request.user.set_password(d.get("password1"))
                 if d.get("private_key") and d.get("public_key"):
                     if user_profile.public_key != d.get("public_key"):
-                        utils.update_all_ssh_keys(user_profile.xsede_username,
-                                            user_profile.private_key,
-                                            d.get("public_key"))
+                        if user_profile.public_key:
+                            utils.update_all_ssh_keys(user_profile.xsede_username,
+                                                user_profile.private_key,
+                                                d.get("public_key"))
                         user_profile.public_key = d.get("public_key")
                         user_profile.private_key = d.get("private_key")
                 if d.get("xsede_username"):
