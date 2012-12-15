@@ -112,13 +112,21 @@ def _get_form(request, molecule):
         form = JobForm(initial={"name": molecule, "email": email})
     return form
 
-def gen_detail(request, molecule):
-    try:
-        gjfwriter.parse_name(molecule)
-        e = None
-    except Exception as e:
-        pass
+def _get_molecules_info(request, string):
+    errors = []
+    warnings = []
+    molecules = utils.name_expansion(string)
+    for mol in molecules:
+        try:
+            gjfwriter.parse_name(mol)
+            errors.append(None)
+        except Exception as e:
+            errors.append(e)
+        warnings.append(ErrorReport.objects.filter(molecule=mol))
+    return molecules, warnings, errors
 
+def gen_detail(request, molecule):
+    _, warnings, errors = _get_molecules_info(request, molecule)
     form = _get_form(request, molecule)
     basis = request.REQUEST.get("basis")
     add = "" if request.GET.get("view") else "attachment; "
@@ -132,7 +140,6 @@ def gen_detail(request, molecule):
         elif request.method == "POST":
             if not request.user.is_staff:
                 return HttpResponse("You must be a staff user to submit a job.")
-
             d["basis"] = basis
             d["internal"] = True
             jobid, e = utils.start_run_molecule(request.user, molecule, **d)
@@ -148,24 +155,15 @@ def gen_detail(request, molecule):
     c = Context({
         "molecule": molecule,
         "form": form,
-        "known_errors": ErrorReport.objects.filter(molecule=molecule),
-        "error_message": e,
+        "known_errors": warnings[0],
+        "error_message": errors[0],
         "encoded_basis": '?' + urllib.urlencode({"basis" : basis}) if basis else '',
         "basis": basis,
         })
     return render(request, "chem/molecule_detail.html", c)
 
 def gen_multi_detail(request, string):
-    errors = []
-    warnings = []
-    molecules = utils.name_expansion(string)
-    for mol in molecules:
-        try:
-            gjfwriter.parse_name(mol)
-            errors.append(None)
-        except Exception as e:
-            errors.append(e)
-        warnings.append(ErrorReport.objects.filter(molecule=mol))
+    molecules, warnings, errors = _get_molecules_info(request, string)
 
     form = _get_form(request, "{{ name }}")
     basis = request.REQUEST.get("basis", "")
@@ -213,18 +211,7 @@ def gen_multi_detail_zip(request, string):
     buff = StringIO()
     zfile = zipfile.ZipFile(buff, "w", zipfile.ZIP_DEFLATED)
 
-    errors = []
-    warnings = []
-    molecules = utils.name_expansion(string)
-    for mol in molecules:
-        try:
-            gjfwriter.parse_name(mol)
-            errors.append(None)
-        except Exception as e:
-            errors.append(e)
-        warnings.append(ErrorReport.objects.filter(molecule=mol))
-
-
+    molecules, warnings, errors = _get_molecules_info(request, string)
     if request.GET.get("job"):
         form = _get_form(request, "{{ name }}")
         if form.is_valid():
