@@ -5,50 +5,31 @@
 {% block head %}
 {{ block.super }}
 <script>
-$(document).ready(function() {
+$(function() {
     $.getJSON('/chem/jobs.json', function(data) {
         var table = $("#id_jobs")
-
         var output = '';
-
         for (i = 0; i < data.jobs.length; i++ ) {
             output += "<tr>"
             for (j = 0; j < data.jobs[i].length; j++ ) {
+                var cell = data.jobs[i][j];
                 if (j == 0) {
-                    output += "<td><a href=\'" + data.jobs[i][j] + "\'>" + data.jobs[i][j] + "</td>";
+                    output += "<td><a href=\'" + cell + "\'>" + cell + "</td>";
                 } else {
-                    output += "<td>" + data.jobs[i][j] + "</td>";
+                    output += "<td>" + cell + "</td>";
                 }
             }
             if (data.is_authenticated && data.jobs[i][6] != "C") {
-                var csrftoken = getCookie('csrftoken');
                 output += "<td><form action='"
                 output += data.jobs[i][0] + "/kill/' method='post'>"
-                output += "<input type='hidden' name='csrfmiddlewaretoken' value='" + csrftoken + "' />"
+                output += "{% csrf_token %}";
                 output += "<input type='submit' value='Kill' /></form></td>"
             }
             output += "</tr>"
         }
         table.append(output);
     });
-    })
-
-// getCookie function from here:
-// https://docs.djangoproject.com/en/dev/ref/contrib/csrf/#ajax
-function getCookie(name) {
-    var cookieValue = null;
-    if (document.cookie && document.cookie != '') {
-        var cookies = document.cookie.split(';');
-        for (var i = 0; i < cookies.length; i++) {
-            var cookie = jQuery.trim(cookies[i]);
-            if (cookie.substring(0, name.length + 1) == (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
-    }
-    return cookieValue;
-}
+})
 </script>
 {% endblock %}
 
