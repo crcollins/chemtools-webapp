@@ -24,7 +24,7 @@ def index(request):
     if request.GET.get("molecule"):
 
         func = gen_detail
-        if "," in request.GET.get("molecule"):
+        if set(",{}$") & set(request.GET.get("molecule")):
             func = gen_multi_detail
 
         a = {"basis" : request.GET.get("basis")}
