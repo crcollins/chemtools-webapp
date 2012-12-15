@@ -355,7 +355,7 @@ def _parse_file_list(files):
 def get_homo_orbital(request):
     string = ''
     for f in _parse_file_list(request.FILES.getlist('myfiles')):
-        string += f.name + " " + str(fileparser.get_homo_orbital(f)) + "\n"
+        string += f.name + ", " + str(fileparser.get_homo_orbital(f)) + "\n"
 
     f = StringIO(string)
     response = HttpResponse(FileWrapper(f), content_type="text/plain")
