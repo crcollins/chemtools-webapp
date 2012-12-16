@@ -310,7 +310,7 @@ def report(request, molecule):
             initial={"email" : email})
         if form.is_valid():
             form.save()
-            return HttpResponseRedirect('/%s' % (molecule, ))
+            return redirect(gen_detail, molecule)
     else:
         form = ErrorReportForm(initial={"email" : email})
 
