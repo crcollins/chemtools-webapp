@@ -15,7 +15,7 @@ $(function() {
         $.post('', a, function(data) {
             var text = '';
             if (data["error"] !== null ) {
-                text = "There was an error.";
+                text = data["error"];
             } else {
                 text = "Your job id is <a href='/chem/jobs/" +  data["jobid"] + "/'>" +  data["jobid"] + ".</a>";
             }

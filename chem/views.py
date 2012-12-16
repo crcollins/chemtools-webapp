@@ -140,7 +140,8 @@ def gen_detail(request, molecule):
             return response
         elif request.method == "POST":
             if not request.user.is_staff:
-                return HttpResponse("You must be a staff user to submit a job.")
+                a = {"error" : "You must be a staff user to submit a job."}
+                return HttpResponse(simplejson.dumps(a), mimetype="application/json")
             d["basis"] = basis
             d["internal"] = True
             jobid, e = utils.start_run_molecule(request.user, molecule, **d)
@@ -180,8 +181,8 @@ def gen_multi_detail(request, string):
             return response
         elif request.method == "POST":
             if not request.user.is_staff:
-                return HttpResponse("You must be a staff user to submit a job.")
-
+                a = {"error" : "You must be a staff user to submit a job."}
+                return HttpResponse(simplejson.dumps(a), mimetype="application/json")
             a = {
                 "worked": [],
                 "failed": [],
