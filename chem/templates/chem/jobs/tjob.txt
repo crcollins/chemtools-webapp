@@ -8,7 +8,7 @@
 #PBS -A TG-CHE120020
 #PBS -V
 cd $PBS_O_WORKDIR
-export GAUSS_SCRDIR=/state/partition1/${{USER}}/${{PBS_JOBID}}
+export GAUSS_SCRDIR=/state/partition1/${% templatetag openvariable %}USER{% templatetag closevariable %}/${% templatetag openvariable %}PBS_JOBID{% templatetag closevariable %}
 . /etc/profile.d/modules.sh
 module load gaussian
 exe=`which g09`
