@@ -62,6 +62,9 @@ $(function() {
 {% endblock %}
 
 {% block content %}
+    {% if error %}
+        <h1>{{ error }}</h1>
+    {% else %}
     <h1>{{ pagename }}</h1>
     <table class="centered">
         <tr>
@@ -125,4 +128,5 @@ $(function() {
     </div>
     </div>
     <a href='../{{ pagename }}.zip' id="id_zip_download">Download All</a>
+    {% endif %}
 {% endblock %}

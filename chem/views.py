@@ -4,6 +4,7 @@ import tarfile
 import os
 import urllib
 import re
+import time
 
 from django.shortcuts import render, redirect
 from django.template import Context, RequestContext
@@ -117,7 +118,10 @@ def _get_molecules_info(request, string):
     errors = []
     warnings = []
     molecules = utils.name_expansion(string)
+    start = time.time()
     for mol in molecules:
+        if time.time() - start > 1:
+            raise ValueError("The operation has timed out.")
         try:
             gjfwriter.parse_name(mol)
             errors.append(None)
@@ -165,7 +169,13 @@ def gen_detail(request, molecule):
     return render(request, "chem/molecule_detail.html", c)
 
 def gen_multi_detail(request, string):
-    molecules, warnings, errors = _get_molecules_info(request, string)
+    try:
+        molecules, warnings, errors = _get_molecules_info(request, string)
+    except ValueError:
+        c = Context({
+            "error": "The operation timed out."
+            })
+        return render(request, "chem/multi_molecule.html", c)
 
     form = _get_form(request, "{{ name }}")
     basis = request.REQUEST.get("basis", "")
@@ -214,7 +224,14 @@ def gen_multi_detail_zip(request, string):
     buff = StringIO()
     zfile = zipfile.ZipFile(buff, "w", zipfile.ZIP_DEFLATED)
 
-    molecules, warnings, errors = _get_molecules_info(request, string)
+    try:
+        molecules, warnings, errors = _get_molecules_info(request, string)
+    except ValueError:
+        c = Context({
+            "error": "The operation timed out."
+            })
+        return render(request, "chem/multi_molecule.html", c)
+
     if request.GET.get("job"):
         form = _get_form(request, "{{ name }}")
         if form.is_valid():
