@@ -340,24 +340,9 @@ def upload_data(request):
         })
     return render(request, "chem/upload_log.html", c)
 
-def _parse_file_list(files):
-    for f in files:
-        if f.name.endswith(".zip"):
-            with zipfile.ZipFile(f, "r") as zfile:
-                for name in [x for x in zfile.namelist() if not x.endswith("/")]:
-                     yield zfile.open(name)
-        elif f.name.endswith(".tar.bz2") or f.name.endswith(".tar.gz"):
-            end = f.name.split(".")[-1]
-            with tarfile.open(fileobj=f, mode='r:'+end) as tfile:
-                for name in tfile.getnames():
-                    if tfile.getmember(name).isfile():
-                        yield tfile.extractfile(name)
-        else:
-            yield f
-
 def get_homo_orbital(request):
     string = ''
-    for f in _parse_file_list(request.FILES.getlist('myfiles')):
+    for f in utils.parse_file_list(request.FILES.getlist('myfiles')):
         string += f.name + ", " + str(fileparser.get_homo_orbital(f)) + "\n"
 
     f = StringIO(string)
@@ -367,7 +352,7 @@ def get_homo_orbital(request):
 
 def parse_log(request):
     parser = fileparser.LogParser()
-    for f in _parse_file_list(request.FILES.getlist('myfiles')):
+    for f in utils.parse_file_list(request.FILES.getlist('myfiles')):
         parser.parse_file(f)
 
     f = StringIO(parser.format_output())
@@ -378,8 +363,8 @@ def parse_data(request):
     buff = StringIO()
     zfile = zipfile.ZipFile(buff, 'w', zipfile.ZIP_DEFLATED)
 
-    n = len(list(_parse_file_list(request.FILES.getlist('myfiles'))))
-    for f in _parse_file_list(request.FILES.getlist('myfiles')):
+    n = len(list(utils.parse_file_list(request.FILES.getlist('myfiles'))))
+    for f in utils.parse_file_list(request.FILES.getlist('myfiles')):
         parser = fileparser.DataParser(f)
         homolumo, gap = parser.get_graphs()
 
@@ -409,7 +394,7 @@ def reset_gjf(request):
     buff = StringIO()
     zfile = zipfile.ZipFile(buff, 'w', zipfile.ZIP_DEFLATED)
 
-    for f in _parse_file_list(request.FILES.getlist('myfiles')):
+    for f in utils.parse_file_list(request.FILES.getlist('myfiles')):
         parser = fileparser.LogReset(f)
 
         name, _ = os.path.splitext(f.name)
