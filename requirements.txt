@@ -1,8 +1,8 @@
 Django==1.4.1
 PIL==1.1.7
-matplotlib==1.1.1rc
-misaka==1.0.2
 numpy==1.6.1
+matplotlib==1.1.1
+misaka==1.0.2
 paramiko==1.7.7.1
 pycrypto==2.6
 scipy==0.9.0
