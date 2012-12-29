@@ -363,8 +363,7 @@ def parse_data(request):
     buff = StringIO()
     zfile = zipfile.ZipFile(buff, 'w', zipfile.ZIP_DEFLATED)
 
-    n = len(list(utils.parse_file_list(request.FILES.getlist('myfiles'))))
-    for f in utils.parse_file_list(request.FILES.getlist('myfiles')):
+    for i, f in enumerate(utils.parse_file_list(request.FILES.getlist('myfiles'))):
         parser = fileparser.DataParser(f)
         homolumo, gap = parser.get_graphs()
 
@@ -378,7 +377,7 @@ def parse_data(request):
             zfile.writestr("homolumo.eps", homolumo.getvalue())
             zfile.writestr("gap.eps", gap.getvalue())
 
-    if n > 1:
+    if i > 1:
         name = "output"
     zfile.close()
     buff.flush()
