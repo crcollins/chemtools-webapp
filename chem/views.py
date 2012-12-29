@@ -8,7 +8,6 @@ import time
 
 from django.shortcuts import render, redirect
 from django.template import Context, RequestContext
-from django.template.defaultfilters import slugify
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.servers.basehttp import FileWrapper
 from django.contrib.auth.decorators import login_required
@@ -38,37 +37,16 @@ def index(request):
             return redirect(func, request.GET.get("molecule"))
     return render(request, "chem/index.html")
 
-def _postprocess(text, base):
-    usednames = {}
-    finaltext = ''
-    k = 0
-    while True:
-        try:
-            i = text.index(base+"toc_", k)
-            finaltext += text[k:i+len(base)]
-            j = text.index(">", i)
-            k = text.index("<", j+1)
-            name = text[j+1:k]
-            if name.lower() in usednames:
-                newname = name + str(usednames[name])
-            else:
-                newname = name
-                usednames[name.lower()] = 0
-            finaltext += slugify(newname) + text[j-1:j+1] + name
-            usednames[name.lower()] += 1
-        except ValueError:
-            break
-    finaltext += text[k:]
-    return finaltext
-
 def docs(request):
     a = "".join(open("README.md", "r").readlines())
     headerend = a.index("Build")
     bodystart = a.index("_"*71 + "\nNaming")
+    tree = misaka.html(a[bodystart:], render_flags=misaka.HTML_TOC_TREE)
+    body = misaka.html(a[bodystart:], render_flags=misaka.HTML_TOC)
     c = Context({
         "header": misaka.html(a[:headerend]),
-        "toc": _postprocess(misaka.html(a[bodystart:], render_flags=misaka.HTML_TOC_TREE), "#"),
-        "docs": _postprocess(misaka.html(a[bodystart:], render_flags=misaka.HTML_TOC), 'id="'),
+        "toc": utils.postprocess_toc(tree, "#"),
+        "docs": utils.postprocess_toc(body, 'id="'),
         })
     return render(request, "chem/docs.html", c)
 
