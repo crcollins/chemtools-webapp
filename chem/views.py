@@ -234,18 +234,24 @@ def gen_multi_detail_zip(request, string):
     for name in molecules:
         try:
             out = gjfwriter.Output(name, basis)
+            others = False
+
             if request.GET.get("image"):
                 f = StringIO()
                 out.molecule.draw(10).save(f, "PNG")
                 zfile.writestr(out.name+".png", f.getvalue())
-            if request.GET.get("gjf"):
-                zfile.writestr(name+".gjf", out.write_file())
+                others = True
             if request.GET.get("mol2"):
                 zfile.writestr(name+".mol2", out.write_file(False))
+                others = True
             if request.GET.get("job"):
                 dnew = d.copy()
                 dnew["name"] = re.sub(r"{{\s*name\s*}}", name, dnew["name"])
                 zfile.writestr(name+".job", utils.write_job(**dnew))
+                others = True
+
+            if request.GET.get("gjf") or not others:
+                zfile.writestr(name+".gjf", out.write_file())
 
         except Exception as e:
             generrors.append("%s - %s" % (name,  e))
