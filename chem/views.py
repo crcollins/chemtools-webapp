@@ -192,7 +192,8 @@ def gen_multi_detail(request, string):
         "pagename": string,
         "form": form,
         "gjf": "checked",
-        "basis": '?' + urllib.urlencode({"basis" : basis}) if basis else '',
+        "encoded_basis": '?' + urllib.urlencode({"basis" : basis}) if basis else '',
+        "basis": basis,
         })
     return render(request, "chem/multi_molecule.html", c)
 
