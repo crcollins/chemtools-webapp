@@ -78,7 +78,7 @@ def get_frag(request, frag):
 ###########################################################
 
 
-def _get_form(request, molecule):
+def _get_job_form(request, molecule):
     req = request.REQUEST
     a = dict(req)
 
@@ -110,7 +110,7 @@ def _get_molecules_info(request, string):
 
 def gen_detail(request, molecule):
     _, warnings, errors = _get_molecules_info(request, molecule)
-    form = _get_form(request, molecule)
+    form = _get_job_form(request, molecule)
     basis = request.REQUEST.get("basis")
     add = "" if request.GET.get("view") else "attachment; "
 
@@ -155,7 +155,7 @@ def gen_multi_detail(request, string):
             })
         return render(request, "chem/multi_molecule.html", c)
 
-    form = _get_form(request, "{{ name }}")
+    form = _get_job_form(request, "{{ name }}")
     basis = request.REQUEST.get("basis", "")
     add = "" if request.GET.get("view") else "attachment; "
 
@@ -211,7 +211,7 @@ def gen_multi_detail_zip(request, string):
         return render(request, "chem/multi_molecule.html", c)
 
     if request.GET.get("job"):
-        form = _get_form(request, "{{ name }}")
+        form = _get_job_form(request, "{{ name }}")
         if form.is_valid():
             d = dict(form.cleaned_data)
         else:
