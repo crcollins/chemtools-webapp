@@ -162,7 +162,7 @@ def gen_multi_detail(request, string):
     if form.is_valid():
         d = dict(form.cleaned_data)
         if request.method == "GET":
-            molecule = request.REQUEST.get("molname")
+            molecule = request.REQUEST.get("molname","")
             d["name"] = re.sub(r"{{\s*name\s*}}", molecule, d["name"])
             response = HttpResponse(utils.write_job(**d), content_type="text/plain")
             response['Content-Disposition'] = add + 'filename=%s.job' % molecule
