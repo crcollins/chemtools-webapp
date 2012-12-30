@@ -3,6 +3,9 @@ ChemTools-WebApp
 A Django webapp built around the functionality of chemtools.
 
 
+
+
+
 _______________________________________________________________________
 Build/Run Requirements
 ----------------------
@@ -16,6 +19,9 @@ Build/Run Requirements
 - PIL 1.1.7
 - PyCrypto 2.26
 - Scipy 0.9.0
+
+
+
 
 _______________________________________________________________________
 Naming Scheme
@@ -124,6 +130,9 @@ This is caused because the double bond can not have any R-Group substituants. Th
 
 If there are errors in the molecule, or if the molecule gives an error when it should work, feel free to submit an error report by clicking the "Report Me" button seen on all of the molecule pages. This button is also listed for each molecule on the multi molecule pages.
 
+
+
+
 _______________________________________________________________________
 Functionality
 -------------
@@ -205,11 +214,15 @@ For the initial setup of the SSH keys, it does require a little bit of foot work
 
 After this key is added nothing else will have to be done.
 
+
+
+
 _______________________________________________________________________
 API
 ---
 
-Right now, the API is very minimal, the current access is just enough to give the basic functionality to the entire site. These features include: dynamic generation of .gjf, .mol, and .png files for any molecule given the name.
+Right now, the API is very minimal, the current access is just enough to give the basic functionality to the entire site. These features include: dynamic generation of .gjf, .mol2, and .png files for any molecule given the name.
+
 
 ### Naming ###
 
@@ -233,9 +246,10 @@ For generating the molecules, there is a very rough FSM that parses through the 
 
     molecule    = [end2], core, ([end2], [end2] | ["_", xgroup, end]), ["_", extend], ["_", stack] {"_", stack}
 
+
 ### Molecule Specific ###
 
-For all of the molecules there is a basic API access to allow getting the different types of outputs. The first, and most common, being the gjf output. This is the standard Gaussian file type and is what should be used for running the calculations. There is also an added possible parameter called "basis" that can be added to add/change the basis/settings of the molecule. If none is given, then "B3LYP/6-31g(d)" is assumed. Another possible parameter is "view". If this is enabled the output will be browser viewable rather than a download.
+For all of the molecules there is a basic API access to allow getting the different types of outputs. The first, and most common, being the gjf output. This is the standard Gaussian file type and is what should be used for running the calculations. There is also an added possible parameter called "basis" that can be added to add/change the basis/settings of the molecule. If none is given, then `B3LYP/6-31g(d)` is assumed. Another possible parameter is "view". If this is enabled the output will be browser viewable rather than a download.
 
     /chem/$NAME.gjf
     /chem/$NAME.gjf?basis=B3LYP/6-31g(d)
@@ -257,18 +271,38 @@ The last molecule specific access is the png image. It is a very basic rendering
     Oxygen          = red dot
     Nitrogen        = blue dot
     Chlorine        = green dot
-    Carbon          = medium grey dot
+    Carbon          = medium gray dot
     Hydrogen        = off white dot
-    Silicon         = green/grey dot
+    Silicon         = green/gray dot
 
 Similar to the gjf file, the images can be parameterized, with their scaling. The default view is a size 10 which means the atoms have a diameter of 10.
 
     /chem/$NAME.png
     /chem/$NAME.png?size=20
 
-The whole thing is very hackish and is just intended to allow a preview of the molecule without having to open it in Gaussian. As expected of a 2D Image, Three dimensionality is poorly shown. this is especially apparent in molecules with TMS and Carbazole. (also compounded with the fact that the fragments have a hackish transform to align them)
+The whole thing is very hackish and is just intended to allow a preview of the molecule without having to open it in Gaussian. As expected of a 2D Image, three dimensionality is poorly shown. this is especially apparent in molecules with TMS or Carbazole. This is also compounded with the fact that the fragments have a hackish transform to align them)
 
 [/chem/7k\_TON\_7k\_7k.png](/chem/7k_TON_7k_7k.png)
+
+#### Jobs ####
+
+Jobs have a few required parameters: `name`, `email`, `cluster`, `nodes`, and `walltime`. `name` and `email` are just as they seem. The former being the name of the job/file (this can be used to setup time dependent files). The latter just being the email to send the job updates to. `cluster` corresponds to the single letter at the start of the supercomputer's name.
+
+    Gordon      = g
+    Blacklight  = b
+    Trestles    = t
+    Hooper      = h
+    Carver      = c
+
+`nodes` is the number of nodes to use on the supercomputer. This value is multiplied by 16 for the supercomputers that require ncpu numbers instead of nodes. The final value `walltime` is the maximum amount of time, in hours, that the job should run.
+
+
+When submitting jobs, it returns a bit of information to tell the state of the jobs submission. This comes in the form of a simple json object with two values. `error` and `jobid`. If `error` is not `None` then that means the job submission failed and it will display the error that occored. Otherwise `jobid` will display the number of the job submitted.
+
+    {
+        "jobid": 123,
+        "error": None,
+    }
 
 
 ### Multi Molecule ###
@@ -276,6 +310,17 @@ The whole thing is very hackish and is just intended to allow a preview of the m
 The multi molecule view works much as you might expect with molecule names comma delimited. This is useful when looking at just a couple of molecules.
 
     /chem/$NAME1,$NAME2,$NAME3/
+
+This method makes it simple to make a few nonrelated molecules quickly.
+
+[/chem/24a\_TON,35b\_TNN,4g\_CCC\_4g/](/chem/24a_TON,35b_TNN,4g_CCC_4g/)
+
+Just like with single molecules, it is possible to set the basis to be something other than `B3LYP/6-31g(d)`.
+
+    /chem/$NAME1,$NAME2,$NAME3/?basis=HF/3-21G
+
+
+#### Brace Expansion ####
 
 Along with comma separated names, there is also an added feature that works much like Unix brace expansion.
 
@@ -291,6 +336,9 @@ In the case of chemtools-webapp, the usage is much the same.
 [/chem/24{a,b,c}\_TON/](/chem/24{a,b,c}_TON/)
 
 [/chem/2{4,5}{a,b,c}\_TON/](/chem/2{4,5}{a,b,c}_TON/)
+
+
+#### Variables ####
 
 Along with that functionality, there are some added variables that can be accessed the same as shell variables.
 
@@ -310,13 +358,18 @@ With chemtools-webapp there are six variables each of which correspond to a set 
     aryl0   = "2,3,8,9"
     ARYL2   = "4,5,6,7"
 
-So, if you wanted to create all of the substituant combinations for 4X_TON, rather than typing all the substituants out, you can just use:
+So, if you wanted to create all of the substituant combinations for `4X_TON`, rather than typing all the substituants out, you can just use:
 
 [/chem/4{$RGROUPS}\_TON/](/chem/4{$RGROUPS}_TON/)
 
+Or if you wanted all the R-groups and all the cores:
+
 [/chem/4{$RGROUPS}\_{$CORES}/](/chem/4{$RGROUPS}_{$CORES}/)
 
-Now, that may seem well and good, except in the case where you may have multiple parts that you want the same. Like with 4X\_TON\_4X\_4X. In that case, there are some special variables that correspond to the number of the replacement.
+
+#### Internal Variables ####
+
+Now, that may seem well and good, except in the case where you may have multiple parts that you want the same. Like with `4X_TON_4X_4X`. In that case, there are some special variables that correspond to the number of the replacement.
 
 [/chem/4{$RGROUPS}\_TON\_4{$0}\_4{$0}/](/chem/4{$RGROUPS}_TON_4{$0}_4{$0}/)
 
@@ -328,13 +381,59 @@ Currently, there is no way to simplify the name with heavy repetitions in it. An
 
 [/chem/{$ARYL2}{$ARYL2}{$RGROUPS}\_{$CORES}\_{$0}{$1}{$2}\_{$0}{$1}{$2}\_n{1,2,3,4}/](/chem/{$ARYL2}{$ARYL2}{$RGROUPS}_{$CORES}_{$0}{$1}{$2}_{$0}{$1}{$2}_n{1,2,3,4}/)
 
-This case creating 4 * 4 * 12 * 8 * 4 = 6144 molecules. Due to optimizations, generating the page with all of these molecules is trivial (within a second or so), generating the zip file with all of them in it; however, is not (~5 minutes and ~100 megs of just gjf files). This could be optimized later to at least seem more responsive, but it is not a concern because no one is going to be dealing with more than about 100 molecules at a time. With a reasonable case as follows. Which is completed in a fraction of a second for both the generation and the download.
+This case creating `4 * 4 * 12 * 8 * 4 = 6144` molecules. Due to optimizations, generating the page with all of these molecules is trivial (within a second or so), generating the zip file with all of them in it; however, is not (~5 minutes and ~100 megs of just gjf files). Because of this, there is a arbitrary timeout limit when generating molecules of 1 second. This could be optimized later to at least seem more responsive, but it is not a concern because no one is going to be dealing with more than about 100 molecules at a time. With a reasonable case as follows. Which is completed in a fraction of a second for both the generation and the download.
 
 [/chem/4{$RGROUPS}\_TON\_4{$0}\_4{$0}\_n{1,2,3,4},4a\_{$CORES}\_4a\_4a\_n{1,2,3,4}/](/chem/4{$RGROUPS}_TON_4{$0}_4{$0}_n{1,2,3,4},4a_{$CORES}_4a_4a_n{1,2,3,4}/)
 
-Added with this main display page is another API type access to allow generating zip files with all the molecules of a given pattern/set.
+
+#### Zip Output ####
+
+Added with this main display page is another API type access to allow generating zip files with all the molecules of a given pattern/set. By default this will include all of the .gjf files for the molecules. The following two examples are equivalent.
 
     /chem/$PATTERN.zip
+    /chem/$PATTERN.zip?gjf=true
+
+In addition to being able to get gjf files this can also be used to download jobs, .mol2, and .png files of the molecules. This can be done by setting `job`, `mol2`, and `image` to `true`, respectively.
+
+    /chem/$PATTERN.zip?mol2=true
+    /chem/$PATTERN.zip?gjf=true
+    /chem/$PATTERN.zip?image=true&gjf=true
+
+Note that the job option requires the inclusion of all of the job parameters.
+
+    /chem/$PATTERN.zip?job=true&name={{name}}&email=e@t.com&cluster=b&nodes=1&walltime=1
+
+Any errors in the output will be written to a file called `errors.txt`.
+
+[/chem/24{a,ball}_TON.zip](/chem/24{a,ball}_TON.zip)
+
+
+#### Jobs ####
+
+With multiple molecules this adds a small layer of complexity with respect to naming. This comes in the form of a generic naming variable `{{ name }}`. So for example, if you wanted to create all the time dependent job names. The following two names would be equivalent.
+
+    {{ name }}_TD
+    {{name}}_TD
+
+Just like with single molecules, at this time there is Alpha functionality to be able submit jobs to the supercomputers. When the jobs are submitted a bit of json will be returned to display the status of the jobs. There are two main lists, the first being `failed`. It corresponds to the jobs that failed for some reason. Each item in the list is a list of the name of the job and the reason why it failed. The second list is a list of name and jobid pairs. The last value returned is an overall `error` value that is only non-null if the person trying to submit is not a staff user.
+
+POST
+[/chem/24{a,ball}_TON?name={{name}}&email=e@t.com&cluster=b&nodes=1&walltime=1](/chem/24{a,ball}_TON?name={{name}}&email=e@t.com&cluster=b&nodes=1&walltime=1)
+
+    {
+        "failed": [
+            ["24ball_TON", "no rgroups allowed"],
+            ...
+            ...
+        ],
+        "worked" : [
+            ["24a_TON", 1000],
+            ...
+            ...
+        ],
+        "error" : None,
+    }
+
 
 ### Fragments ###
 
@@ -348,7 +447,7 @@ They use a slightly altered XYZ file format in the form of:
 
     Atom1 Atom2 Connection
 
-Where x, y, and z are all floats. Element is a String from the set of all the elements plus the addition of a few special characters to signify where to bond to. Atom1 and Atom2 are both Integers corresponding to the location of the atom in the coordinate list. The connection is a string in the set ["1", "2", "3", "Ar"], where 1, 2, and 3 are single, double and triple bonds, respectively. Ar is an Aromatic (1.5 bond).
+Where x, y, and z are all floats. Element is a String from the set of all the elements plus the addition of a few special characters to signify where to bond to. Atom1 and Atom2 are both Integers corresponding to the location of the atom in the coordinate list. The connection is a string in the set `["1", "2", "3", "Ar"]`, where 1, 2, and 3 are single, double and triple bonds, respectively. Ar is an Aromatic (1.5 bond).
 
 Here is an example of the Triple Bond.
 
@@ -363,7 +462,7 @@ Here is an example of the Triple Bond.
     1 4 Ar
     2 3 Ar
 
-There are 3 added symbols in the charater set for the element names and those are "~", "*", and "+". These are used to signify the type of things the element can bond to. After the set of possible things to bond to is a number that indicates the order that the bonds get used. So, in the case of the cores, the correct parts of the molecule are built in the correct order.
+There are 3 added symbols in the character set for the element names and those are "~", "*", and "+". These are used to signify the type of things the element can bond to. After the set of possible things to bond to is a number that indicates the order that the bonds get used. So, in the case of the cores, the correct parts of the molecule are built in the correct order.
 
 
 ### Generate SSH Key Pair ###
