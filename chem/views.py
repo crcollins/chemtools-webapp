@@ -230,7 +230,7 @@ def gen_multi_detail_zip(request, string):
                 })
             return render(request, "chem/multi_molecule.html", c)
 
-    generrors = ''
+    generrors = []
     for name in molecules:
         try:
             out = gjfwriter.Output(name, basis)
@@ -248,9 +248,9 @@ def gen_multi_detail_zip(request, string):
                 zfile.writestr(name+".job", utils.write_job(**dnew))
 
         except Exception as e:
-            generrors += "%s - %s\n" % (name,  e)
+            generrors.append("%s - %s" % (name,  e))
     if generrors:
-        zfile.writestr("errors.txt", generrors)
+        zfile.writestr("errors.txt", '\n'.join(generrors))
 
     zfile.close()
     buff.flush()
