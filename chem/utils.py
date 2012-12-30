@@ -26,7 +26,7 @@ def postprocess_toc(text, base):
             k = text.index("<", j+1)
             name = text[j+1:k]
             if name.lower() in usednames:
-                newname = name + str(usednames[name])
+                newname = name + str(usednames[name.lower()])
             else:
                 newname = name
                 usednames[name.lower()] = 0
