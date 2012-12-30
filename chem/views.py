@@ -168,13 +168,15 @@ def gen_multi_detail(request, string):
             response['Content-Disposition'] = add + 'filename=%s.job' % molecule
             return response
         elif request.method == "POST":
-            if not request.user.is_staff:
-                a = {"error" : "You must be a staff user to submit a job."}
-                return HttpResponse(simplejson.dumps(a), mimetype="application/json")
             a = {
                 "worked": [],
                 "failed": [],
+                "error": None,
             }
+            if not request.user.is_staff:
+                a["error"] = "You must be a staff user to submit a job."
+                return HttpResponse(simplejson.dumps(a), mimetype="application/json")
+
             for mol in molecules:
                 dnew = d.copy()
                 dnew["name"] = re.sub(r"{{\s*name\s*}}", mol, dnew["name"])
