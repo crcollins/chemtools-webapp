@@ -235,14 +235,16 @@ For generating the molecules, there is a very rough FSM that parses through the 
 
 ### Molecule Specific ###
 
-For all of the molecules there is a basic API access to allow getting the different types of outputs. The first, and most common, being the gjf output. This is the standard Gaussian file type and is what should be used for running the calculations. There is also an added possible parameter called "basis" that can be added to add/change the basis/settings of the molecule. If none is given, then "B3LYP/6-31g(d)" is assumed.
+For all of the molecules there is a basic API access to allow getting the different types of outputs. The first, and most common, being the gjf output. This is the standard Gaussian file type and is what should be used for running the calculations. There is also an added possible parameter called "basis" that can be added to add/change the basis/settings of the molecule. If none is given, then "B3LYP/6-31g(d)" is assumed. Another possible parameter is "view". If this is enabled the output will be browser viewable rather than a download.
 
     /chem/$NAME.gjf
     /chem/$NAME.gjf?basis=B3LYP/6-31g(d)
+    /chem/$NAME.gjf?view=true
 
 The next form of output is the mol2 format. This is added because it is a fairly simple interchange format for different software packages.
 
     /chem/$NAME.mol2
+    /chem/$NAME.mol2?view=true
 
 The last molecule specific access is the png image. It is a very basic rendering over the overall structure of the molecule.
 
