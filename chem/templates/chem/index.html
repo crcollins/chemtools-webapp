@@ -3,6 +3,21 @@
 {% block title %}Chemtools{% endblock %}
 
 {% block content %}
+    <h2>
+        Welcome to the Chemtools-Webapp!
+    </h2>
+    <p>
+        <ul>
+            <li>To make a molecule or set a molecules, enter their name(s) in the form below.</li>
+            <li>To extract data from log files or to do other file operations click the <a href="upload">Upload</a> link.</li>
+            <li>For more information refer to the <a href="docs">documentation</a>.</li>
+            {% if user.is_authenticated %}
+                <li>Change your <a href="/u/{{ user }}">account</a> information.</li>
+            {% else %}
+                <li><a href="/register">Register an account.</a></li>
+            {% endif %}
+        </ul>
+    </p>
     <table class="left-min">
         <tr>
             <th>
@@ -26,8 +41,4 @@
         </tr>
         </form>
     </table>
-    <ul>
-        <li><a href="frag">Fragments</a></li>
-        <li><a href="upload">Upload</a></li>
-    </ul>
 {% endblock %}
