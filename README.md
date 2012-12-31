@@ -155,7 +155,7 @@ Job files can be made on the respective molecule pages using the Job Form. The j
 Added with just being able to view the job file there is Alpha functionality to be able to directly upload both jobs and molecules to a supercomputer (just Gordon for now) and run the respective job.
 
 
-#### Show Currently Running Jobs ####
+#### Show Running Jobs ####
 
 If you are logged in, and have set up your ssh keys, then under the Jobs page you can see your currently running jobs on Gordon. Along with seeing the currently running jobs, there are also buttons there to allow you to kill running jobs.
 
@@ -184,7 +184,7 @@ Where lines starting with "#" are comments. The n values can be given as either 
 
 #### Gjf Reset ####
 
-This takes a log file (assumed to be correct) and returns a gjf file with the extracted geometry. This is intended to be used to extract the optimized geometry from the DFT log files to then use as the TDDFT gjf file. WARNING: this will not work in some cases where the job stopped part way through writing.
+This takes a log file (assumed to be correct) and returns a gjf file with the extracted geometry. This is intended to be used to extract the optimized geometry from the DFT log files to then use as the TDDFT gjf file. _WARNING: this will not work in some cases where the job stopped part way through writing._
 
 
 #### Homo Orbital ####
@@ -283,6 +283,7 @@ Similar to the gjf file, the images can be parameterized, with their scaling. Th
 The whole thing is very hackish and is just intended to allow a preview of the molecule without having to open it in Gaussian. As expected of a 2D Image, three dimensionality is poorly shown. this is especially apparent in molecules with TMS or Carbazole. This is also compounded with the fact that the fragments have a hackish transform to align them)
 
 [/chem/7k\_TON\_7k\_7k.png](/chem/7k_TON_7k_7k.png)
+
 
 #### Jobs ####
 
@@ -488,6 +489,7 @@ This is used mainly for getting the user's public key for use on the supercomput
     /u/$USERNAME/id_rsa.pub
 
     wget /u/$USERNAME/id_rsa.pub -O- >> ~/.ssh/authorized_keys
+
 
 ### Get Running Jobs ###
 This is used to allow viewing the currently running jobs of the logged in user. It returns two values. The first is `is_authenticated` which is used internally to determine whether or not the user is logged in. The second is a 2D array of jobs. The first dimension is all of the jobs themselves. The second is the properties. The properties are the same as what is given by the command `qstat` on the supercomputers split up based on spaces.
