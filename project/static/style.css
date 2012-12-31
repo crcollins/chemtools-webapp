@@ -210,6 +210,14 @@ hr {
     margin-bottom: 50px;
 }
 
+div.welcome {
+    text-align: center;
+    background-color: #383838;
+    border-radius: 4px;
+    -moz-border-radius: 4px;
+    padding: 10px 20px 20px 20px;
+    margin: 10px 10px 10px 10px;
+}
 
 /* *********************** */
 

@@ -6,18 +6,18 @@
     <h2>
         Welcome to the Chemtools-Webapp!
     </h2>
-    <p>
+    <div class="welcome">
         <ul>
             <li>To make a molecule or set a molecules, enter their name(s) in the form below.</li>
-            <li>To extract data from log files or to do other file operations click the <a href="upload">Upload</a> link.</li>
-            <li>For more information refer to the <a href="docs">documentation</a>.</li>
+            <li>To extract data from log files or to do other file operations click the <a href="upload">Upload</a>.</li>
             {% if user.is_authenticated %}
-                <li>Change your <a href="/u/{{ user }}">account</a> information.</li>
+                <li><a href="/u/{{ user }}">Click here</a> to change your account information.</li>
             {% else %}
                 <li><a href="/register">Register an account.</a></li>
             {% endif %}
+            <li>For more information refer to the <a href="docs">Docs</a>.</li>
         </ul>
-    </p>
+    </div>
     <table class="left-min">
         <tr>
             <th>
