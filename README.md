@@ -298,11 +298,11 @@ Jobs have a few required parameters: `name`, `email`, `cluster`, `nodes`, and `w
 `nodes` is the number of nodes to use on the supercomputer. This value is multiplied by 16 for the supercomputers that require ncpu numbers instead of nodes. The final value `walltime` is the maximum amount of time, in hours, that the job should run.
 
 
-When submitting jobs, it returns a bit of information to tell the state of the jobs submission. This comes in the form of a simple json object with two values. `error` and `jobid`. If `error` is not `None` then that means the job submission failed and it will display the error that occored. Otherwise `jobid` will display the number of the job submitted.
+When submitting jobs, it returns a bit of information to tell the state of the jobs submission. This comes in the form of a simple json object with two values. `error` and `jobid`. If `error` is not `null` then that means the job submission failed and it will display the error that occored. Otherwise `jobid` will display the number of the job submitted.
 
     {
         "jobid": 123,
-        "error": None,
+        "error": null,
     }
 
 
