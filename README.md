@@ -409,6 +409,21 @@ Any errors in the output will be written to a file called `errors.txt`.
 [/chem/24{a,ball}_TON.zip](/chem/24{a,ball}_TON.zip)
 
 
+#### Name Check ####
+
+If you want to check the validity of a name or set of names you can use the name checker. The API call returns a json object with two values: `molecules` and `error`. `error` is used to keep track of problems when doing the entire set. Most time this is just a timeout error due to the query taking longer than an arbitrary limit of 1 second. The second value is a array of arrays. With each array corresponding to a molecule name. Within each one they come in the form `[name, warning, error]`. Errors are actual problems in the name, whereas warnings are user submitted problems.
+
+[/chem/24{a,ball}_TON/check/](/chem/24{a,ball}_TON/check/)
+
+    {
+        "molecules": [
+            ["24a_TON", true, null],
+            ["24ball_TON", null, "no rgroups allowed"]
+        ],
+        "error": null
+    }
+
+
 #### Jobs ####
 
 With multiple molecules this adds a small layer of complexity with respect to naming. This comes in the form of a generic naming variable `{{ name }}`. So for example, if you wanted to create all the time dependent job names. The following two names would be equivalent.
@@ -432,7 +447,7 @@ POST
             ...
             ...
         ],
-        "error" : None,
+        "error" : null,
     }
 
 

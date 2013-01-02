@@ -25,5 +25,7 @@ urlpatterns = patterns('chem.views',
 
     url(r"^(?P<string>[A-Za-z0-9_,\{\}\$]*)/$", "gen_multi_detail"),
     url(r"^(?P<string>[A-Za-z0-9_,\{\}\$]*)\.zip$", "gen_multi_detail_zip"),
+
+    url(r"^(?P<string>[A-Za-z0-9_,\{\}\$]*)/check/$", "molecule_check"),
 )
 

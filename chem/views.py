@@ -92,7 +92,7 @@ def _get_job_form(request, molecule):
         form = JobForm(initial={"name": molecule, "email": email})
     return form
 
-def _get_molecules_info(request, string):
+def _get_molecules_info(string):
     errors = []
     warnings = []
     molecules = utils.name_expansion(string)
@@ -104,12 +104,26 @@ def _get_molecules_info(request, string):
             gjfwriter.parse_name(mol)
             errors.append(None)
         except Exception as e:
-            errors.append(e)
-        warnings.append(ErrorReport.objects.filter(molecule=mol))
+            errors.append(str(e))
+        warn = ErrorReport.objects.filter(molecule=mol)
+        warnings.append(True if warn else None)
     return molecules, warnings, errors
 
+def molecule_check(request, string):
+    a = {
+        "error": None,
+        "molecules": [[x] for x in utils.name_expansion(string)]
+    }
+    try:
+        molecules, warnings, errors = _get_molecules_info(string)
+        a["molecules"] = zip(molecules, warnings, errors)
+    except ValueError:
+        a["error"] = "The operation timed out."
+        a["molecules"] = None
+    return HttpResponse(simplejson.dumps(a), mimetype="application/json")
+
 def gen_detail(request, molecule):
-    _, warnings, errors = _get_molecules_info(request, molecule)
+    _, warnings, errors = _get_molecules_info(molecule)
     form = _get_job_form(request, molecule)
     basis = request.REQUEST.get("basis")
     add = "" if request.GET.get("view") else "attachment; "
@@ -147,14 +161,6 @@ def gen_detail(request, molecule):
     return render(request, "chem/molecule_detail.html", c)
 
 def gen_multi_detail(request, string):
-    try:
-        molecules, warnings, errors = _get_molecules_info(request, string)
-    except ValueError:
-        c = Context({
-            "error": "The operation timed out."
-            })
-        return render(request, "chem/multi_molecule.html", c)
-
     form = _get_job_form(request, "{{ name }}")
     basis = request.REQUEST.get("basis", "")
     add = "" if request.GET.get("view") else "attachment; "
@@ -167,6 +173,7 @@ def gen_multi_detail(request, string):
             response = HttpResponse(utils.write_job(**d), content_type="text/plain")
             response['Content-Disposition'] = add + 'filename=%s.job' % molecule
             return response
+
         elif request.method == "POST":
             a = {
                 "worked": [],
@@ -177,7 +184,7 @@ def gen_multi_detail(request, string):
                 a["error"] = "You must be a staff user to submit a job."
                 return HttpResponse(simplejson.dumps(a), mimetype="application/json")
 
-            for mol in molecules:
+            for mol in utils.name_expansion(string):
                 dnew = d.copy()
                 dnew["name"] = re.sub(r"{{\s*name\s*}}", mol, dnew["name"])
                 jobid, e = utils.start_run_molecule(request.user, mol, basis=basis, internal=True, **dnew)
@@ -190,7 +197,6 @@ def gen_multi_detail(request, string):
             return HttpResponse(simplejson.dumps(a), mimetype="application/json")
 
     c = Context({
-        "molecules": zip(molecules, errors, warnings),
         "pagename": string,
         "form": form,
         "gjf": "checked",
@@ -206,7 +212,7 @@ def gen_multi_detail_zip(request, string):
     zfile = zipfile.ZipFile(buff, "w", zipfile.ZIP_DEFLATED)
 
     try:
-        molecules, warnings, errors = _get_molecules_info(request, string)
+        molecules, warnings, errors = _get_molecules_info(string)
     except ValueError:
         c = Context({
             "error": "The operation timed out."

@@ -56,6 +56,35 @@ $(function() {
         window.location = "/chem/{{ pagename }}.zip?" + a;
     })
 
+    $.getJSON('check/', function(data) {
+        var table = $("table.centered");
+        var text = '';
+        for (var i=0; i < data.molecules.length; i++) {
+            var name = data.molecules[i][0];
+            var warning = data.molecules[i][1];
+            var error = data.molecules[i][2];
+            var message = ''
+            if (error) message = 'id="error"';
+            else if (warning) message = 'id="warning"';
+
+            text += '<tr ' + message + '>'
+            text += '<td>' + name + '</td>';
+
+            if (!(error)) {
+                text += '<td><a href="../' + name + '.gjf{{ encoded_basis }}">gjf</a></td>';
+                text += '<td><a href="../' + name + '.mol2{{ encoded_basis }}">mol2</a></td>';
+                text += '<td><a href="../' + name + '.png{{ encoded_basis }}">Image</a></td>';
+                text += '<td><a href="#"" onClick="submitForm("' + name + '")">Job</a></td>';
+            }
+            else {
+                text += '<td colspan="4">' + error + '</td>';
+            }
+            text += '<td><a href="../' + name + '/report/">Report</a></td>';
+            text += '</tr>';
+        }
+        table.append(text);
+    })
+
 });
 {% endautoescape %}
 </script>
@@ -88,21 +117,6 @@ $(function() {
             <th></th>
             </form>
         </tr>
-    {% for molecule, error, warning in molecules %}
-        <tr {% if error %}id="error"{% elif warning %}id="warning"{% endif %}>
-            <td>{{ molecule }}</td>
-            {% if not error %}
-                <td><a href="../{{ molecule }}.gjf{{ encoded_basis }}">gjf</a></td>
-                <td><a href="../{{ molecule }}.mol2{{ encoded_basis }}">mol2</a></td>
-                <td><a href="../{{ molecule }}.png">Image</a></td>
-                <td><a href='#' onClick="submitForm('{{ molecule }}')">Job</a></td>
-                <td><a href="../{{ molecule }}/report/">Report</a></td>
-            {% else %}
-                <td colspan='4'>{{ error }}</td>
-                <td><a href="../{{ molecule }}/report/">Report</a></td>
-            {% endif %}
-        </tr>
-    {% endfor %}
     </table>
     <div class="hide-container">
     <div class="hide-title">
