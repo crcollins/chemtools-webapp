@@ -459,9 +459,15 @@ All of the fragments used in generating the molecules can be found here:
 
 They use a slightly altered XYZ file format in the form of:
 
-    Element x y z
+    Element0 x0 y0 z0
+    Element1 x1 y1 z1
+    ...
+    ElementN xN yN zN
 
-    Atom1 Atom2 Connection
+    Atom0 Atom1 Connection0
+    Atom1 Atom2 Connection1
+    ...
+    AtomN-1 AtomN ConnectionN
 
 Where x, y, and z are all floats. Element is a String from the set of all the elements plus the addition of a few special characters to signify where to bond to. Atom1 and Atom2 are both Integers corresponding to the location of the atom in the coordinate list. The connection is a string in the set `["1", "2", "3", "Ar"]`, where 1, 2, and 3 are single, double and triple bonds, respectively. Ar is an Aromatic (1.5 bond).
 
