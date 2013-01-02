@@ -68,7 +68,7 @@ $(function() {
             else if (warning) message = 'id="warning"';
 
             text += '<tr ' + message + '>'
-            text += '<td>' + name + '</td>';
+            text += '<td><a href="../' + name + '/">' + name + '</a></td>';
 
             if (!(error)) {
                 text += '<td><a href="../' + name + '.gjf{{ encoded_basis }}">gjf</a></td>';
