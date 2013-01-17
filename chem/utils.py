@@ -20,17 +20,17 @@ def postprocess_toc(text, base):
     k = 0
     while True:
         try:
-            i = text.index(base+"toc_", k)
-            finaltext += text[k:i+len(base)]
+            i = text.index(base + "toc_", k)
+            finaltext += text[k:i + len(base)]
             j = text.index(">", i)
-            k = text.index("<", j+1)
-            name = text[j+1:k]
+            k = text.index("<", j + 1)
+            name = text[j + 1:k]
             if name.lower() in usednames:
                 newname = name + str(usednames[name.lower()])
             else:
                 newname = name
                 usednames[name.lower()] = 0
-            finaltext += slugify(newname) + text[j-1:j+1] + name
+            finaltext += slugify(newname) + text[j - 1:j + 1] + name
             usednames[name.lower()] += 1
         except ValueError:
             break
@@ -42,10 +42,10 @@ def parse_file_list(files):
         if f.name.endswith(".zip"):
             with zipfile.ZipFile(f, "r") as zfile:
                 for name in [x for x in zfile.namelist() if not x.endswith("/")]:
-                     yield zfile.open(name)
+                    yield zfile.open(name)
         elif f.name.endswith(".tar.bz2") or f.name.endswith(".tar.gz"):
             end = f.name.split(".")[-1]
-            with tarfile.open(fileobj=f, mode='r:'+end) as tfile:
+            with tarfile.open(fileobj=f, mode='r:' + end) as tfile:
                 for name in tfile.getnames():
                     if tfile.getmember(name).isfile():
                         yield tfile.extractfile(name)
@@ -56,11 +56,11 @@ def write_job(**kwargs):
     if "cluster" in kwargs and kwargs["cluster"] in "bcgbht":
         template = "chem/jobs/%sjob.txt" % kwargs["cluster"]
         c = Context({
-            "name" : kwargs["name"],
+            "name": kwargs["name"],
             "email": kwargs["email"],
             "nodes": kwargs["nodes"],
             "ncpus": int(kwargs["nodes"]) * 16,
-            "time" : "%s:00:00" % kwargs["walltime"],
+            "time": "%s:00:00" % kwargs["walltime"],
             "internal": kwargs.get("internal", ''),
             })
         return loader.render_to_string(template, c)
@@ -199,7 +199,7 @@ def get_connections(server, user):
         username = "ccollins"
         key = open(os.path.expanduser("~/.ssh/id_rsa"), 'r')
     sftp = get_sftp_connection(server, username, key)
-    key.seek(0) # reset to start of key file
+    key.seek(0)  # reset to start of key file
     ssh = get_ssh_connection(server, username, key)
     return ssh, sftp
 
@@ -272,7 +272,7 @@ def get_all_jobs(user):
 
     with ssh:
         _, stdout, stderr = ssh.exec_command(". ~/.bash_profile; qstat -u ccollins")
-        stderr.readlines() # seems to need this slight delay to display the jobs
+        stderr.readlines()  # seems to need this slight delay to display the jobs
 
     jobs = []
     for job in stdout.readlines()[5:]:
@@ -326,8 +326,8 @@ def recover_output(user, name):
             return err
 
         for fname in files:
-            if fname.endswith(".log"): # only download log files for now
-                path = os.path.join("done/",fname)
+            if fname.endswith(".log"):  # only download log files for now
+                path = os.path.join("done/", fname)
                 f, err, zippath = get_compressed_file(ssh, sftp, path)
                 with open(fname, "w") as f2, f:
                     for line in f:

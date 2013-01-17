@@ -3,7 +3,7 @@ import hashlib
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
-from django.template import Context, RequestContext
+from django.template import Context
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.utils import simplejson
@@ -61,8 +61,6 @@ def register_user(request):
         form = RegistrationForm(request.POST)
         if form.is_valid():
             d = dict(form.cleaned_data)
-            username = d["username"]
-            password = d["password1"]
 
             new_user = User.objects.create_user(d["username"], d["email"], d["password1"])
             new_user.is_active = False
@@ -78,16 +76,16 @@ def register_user(request):
 
             new_user.save()
             new_user.get_profile().save()
-            c =  Context({
+            c = Context({
                 "key": activation_key,
                 })
             return render(request, "account/post_register.html", c)
         else:
-            state ="Failure."
+            state = "Failure."
     else:
         form = RegistrationForm()
 
-    c =  Context({
+    c = Context({
         "state": state,
         "form": form,
         })
@@ -160,7 +158,7 @@ def get_public_key(request, username):
     try:
         user = User.objects.filter(username=username)
         user_profile, _ = UserProfile.objects.get_or_create(user=user)
-        pubkey = user_profile.public_key+"\n"
+        pubkey = user_profile.public_key + "\n"
     except:
         pass
     return HttpResponse(pubkey, content_type="text/plain")

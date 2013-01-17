@@ -37,7 +37,7 @@ class Parser(object):
     def format_output(self, errors=True):
         a = self.output
         if errors:
-            a += ["\n---- Errors (%i) ----" % len(self.errors)]+self.errors
+            a += ["\n---- Errors (%i) ----" % len(self.errors)] + self.errors
         return '\n'.join(a) + "\n"
 
     @catch
@@ -64,7 +64,7 @@ class DataParser(Parser):
     @catch
     def parse_file(self, f):
         def homofunc(x, a, b):
-            return a * np.sqrt(1-b*np.cos(math.pi/(x+1)))
+            return a * np.sqrt(1 - b * np.cos(math.pi / (x + 1)))
 
         datax, datahomo, datalumo, datagap = self.extract_data(f)
 
@@ -80,7 +80,7 @@ class DataParser(Parser):
         self.write("limit: %f" % homofunc(0, homoa, homob))
         self.write("")
 
-        lumofunc = lambda x,a,b: homofunc(x,a,b) + homofunc(x, homoa, homob)
+        lumofunc = lambda x, a, b: homofunc(x, a, b) + homofunc(x, homoa, homob)
         lumoy = np.array(datalumo)
         (lumoa, lumob), var_matrix = curve_fit(lumofunc, x, lumoy, p0=[5, -.8])
         self.write("Lumo")
@@ -88,18 +88,17 @@ class DataParser(Parser):
         self.write("limit: %f" % lumofunc(0, lumoa, lumob))
         self.write("")
 
-        gapfunc = lambda x,a,b: homofunc(x,a,b) + lumofunc(x, lumoa, lumob)
+        gapfunc = lambda x, a, b: homofunc(x, a, b) + lumofunc(x, lumoa, lumob)
         gapy = np.array(datagap)
         (gapa, gapb), var_matrix = curve_fit(gapfunc, x, gapy, p0=[11, -.8])
         self.write("Gap")
         self.write("A: %f, B: %f" % (gapa, gapb))
         self.write("limit: %f" % gapfunc(0, gapa, gapb))
 
-
         plot.plot(x, homoy, 'ro')
-        plot.plot(np.linspace(0,maxx,20),homofunc(np.linspace(0,maxx,20), homoa, homob),'r')
+        plot.plot(np.linspace(0, maxx, 20), homofunc(np.linspace(0, maxx, 20), homoa, homob), 'r')
         plot.plot(x, lumoy, 'ro')
-        plot.plot(np.linspace(0,maxx,20),lumofunc(np.linspace(0,maxx,20), lumoa, lumob),'g')
+        plot.plot(np.linspace(0, maxx, 20), lumofunc(np.linspace(0, maxx, 20), lumoa, lumob), 'g')
 
         plot.ylabel("Eg in eV")
         plot.xlabel("1/N")
@@ -107,7 +106,7 @@ class DataParser(Parser):
 
         plot.clf()
         plot.plot(x, gapy, 'ro')
-        plot.plot(np.linspace(0,maxx,20),gapfunc(np.linspace(0,maxx,20), gapa, gapb),'r')
+        plot.plot(np.linspace(0, maxx, 20), gapfunc(np.linspace(0, maxx, 20), gapa, gapb), 'r')
         plot.ylabel("Eg in eV")
         plot.xlabel("1/N")
         plot.savefig(self.plots[1], format="eps")
@@ -120,7 +119,7 @@ class LogParser(Parser):
 
     def find_lines(self, f):
         flines = f.readlines()
-        occline, virtualline, excitedline, timeline = ['']*4
+        occline, virtualline, excitedline, timeline = [''] * 4
         try:
             if "Entering Gaussian System" not in flines[0]:
                 return occline, virtualline, excitedline, timeline
@@ -139,14 +138,14 @@ class LogParser(Parser):
                 occbool = True
             elif "virt. eigenvalues" in line and occbool:
                 virtualline = line
-                occline = flines[(i-1+skip)%L]
+                occline = flines[(i - 1 + skip) % L]
                 occbool = False
             else:
                 occbool = False
         for line in flines[::-1]:
             if 'Job cpu time' in line:
-               timeline=line
-               break
+                timeline = line
+                break
         return occline, virtualline, excitedline, timeline
 
     def clean_lines(self, (occline, virtualline, excitedline, timeline)):
@@ -166,15 +165,15 @@ class LogParser(Parser):
         return occ, virtual, excited, time
 
     def convert_time(self, time):
-        con = (24., 1., 1/60., 1/3600)
-        return str(sum(float(x)*con[i] for i, x in enumerate(time)))
+        con = (24., 1., 1 / 60., 1 / 3600)
+        return str(sum(float(x) * con[i] for i, x in enumerate(time)))
 
     def convert_values(self, values):
         con = (27.2117, 27.2117)
         temp = []
         for i, x in enumerate(values):
             if x != "---":
-                temp.append(str(float(x)*con[i]))
+                temp.append(str(float(x) * con[i]))
             else:
                 temp.append("---")
         return temp
@@ -209,7 +208,7 @@ class LogReset(Parser):
         end = False
         positions = ''
         for line in f.readlines()[-1000:]:
-            if  "\\" in line:
+            if "\\" in line:
                 start = True
             if "\\@" in line and start:
                 end = True

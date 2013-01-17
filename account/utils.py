@@ -1,5 +1,3 @@
-import os
-
 from Crypto.PublicKey import RSA
 from Crypto import Random
 
@@ -14,8 +12,8 @@ def generate_key_pair(username=None):
     else:
         end = username + "@chemtools-webapp"
     a = {
-        "public"  : " ".join([key.publickey().exportKey("OpenSSH"), end]),
-        "private" : key.exportKey('PEM'),
+        "public": " ".join([key.publickey().exportKey("OpenSSH"), end]),
+        "private": key.exportKey('PEM'),
     }
     return a
 

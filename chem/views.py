@@ -1,19 +1,17 @@
 from cStringIO import StringIO
 import zipfile
-import tarfile
 import os
 import urllib
 import re
 import time
 
 from django.shortcuts import render, redirect
-from django.template import Context, RequestContext
+from django.template import Context
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.servers.basehttp import FileWrapper
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.utils import simplejson
-import paramiko
 import misaka
 
 from models import ErrorReport, ErrorReportForm, JobForm, LogForm, Job
@@ -28,7 +26,7 @@ def index(request):
         if set(",{}$") & set(request.GET.get("molecule")):
             func = gen_multi_detail
 
-        a = {"basis" : request.GET.get("basis")}
+        a = {"basis": request.GET.get("basis")}
         if a["basis"] != "B3LYP/6-31g(d)":
             b = "%s?%s" % (reverse(func, args=(request.GET.get("molecule"), )),
                 urllib.urlencode(a))
@@ -40,7 +38,7 @@ def index(request):
 def docs(request):
     a = "".join(open("README.md", "r").readlines())
     headerend = a.index("Build")
-    bodystart = a.index("_"*71 + "\nNaming")
+    bodystart = a.index("_" * 71 + "\nNaming")
     tree = misaka.html(a[bodystart:], render_flags=misaka.HTML_TOC_TREE)
     body = misaka.html(a[bodystart:], render_flags=misaka.HTML_TOC)
     c = Context({
@@ -52,8 +50,8 @@ def docs(request):
 
 def frag_index(request):
     data = (
-        ["Cores" , ("CON", "TON", "TSN", "CSN", "TNN", "CNN", "CCC", "TCC")],
-        ["X Groups" , (["A", "H"], ["B", "Cl"], ["C", "Br"], ["D"," CN"], ["E"," CCH"],
+        ["Cores", ("CON", "TON", "TSN", "CSN", "TNN", "CNN", "CCC", "TCC")],
+        ["X Groups", (["A", "H"], ["B", "Cl"], ["C", "Br"], ["D"," CN"], ["E"," CCH"],
             ["F", "OH"], ["G", "SH"], ["H", "NH_2"], ["I", "CH_3"], ["J", "phenyl"], ["K", "TMS"],
              ["L", "OCH_3"])],
         ["Aryl Groups" , (["2", "double"], ["3", "triple"], ["4", "phenyl"], ["5", "thiophene"],
@@ -66,7 +64,7 @@ def frag_index(request):
     return render(request, "chem/frag_index.html", c)
 
 def get_frag(request, frag):
-    f = open("chem/data/"+frag, "r")
+    f = open("chem/data/" + frag, "r")
     response = HttpResponse(FileWrapper(f), content_type="text/plain")
     return response
 
@@ -136,7 +134,7 @@ def gen_detail(request, molecule):
             return response
         elif request.method == "POST":
             if not request.user.is_staff:
-                a = {"error" : "You must be a staff user to submit a job."}
+                a = {"error": "You must be a staff user to submit a job."}
                 return HttpResponse(simplejson.dumps(a), mimetype="application/json")
             d["basis"] = basis
             d["internal"] = True
@@ -155,7 +153,7 @@ def gen_detail(request, molecule):
         "form": form,
         "known_errors": warnings[0],
         "error_message": errors[0],
-        "encoded_basis": '?' + urllib.urlencode({"basis" : basis}) if basis else '',
+        "encoded_basis": '?' + urllib.urlencode({"basis": basis}) if basis else '',
         "basis": basis,
         })
     return render(request, "chem/molecule_detail.html", c)
@@ -200,7 +198,7 @@ def gen_multi_detail(request, string):
         "pagename": string,
         "form": form,
         "gjf": "checked",
-        "encoded_basis": '?' + urllib.urlencode({"basis" : basis}) if basis else '',
+        "encoded_basis": '?' + urllib.urlencode({"basis": basis}) if basis else '',
         "basis": basis,
         })
     return render(request, "chem/multi_molecule.html", c)
@@ -235,7 +233,7 @@ def gen_multi_detail_zip(request, string):
                 "mol2": f("mol2"),
                 "image": f("image"),
                 "job": f("job"),
-                "basis": '?' + urllib.urlencode({"basis" : basis}) if basis else '',
+                "basis": '?' + urllib.urlencode({"basis": basis}) if basis else '',
                 })
             return render(request, "chem/multi_molecule.html", c)
 
@@ -248,19 +246,19 @@ def gen_multi_detail_zip(request, string):
             if request.GET.get("image"):
                 f = StringIO()
                 out.molecule.draw(10).save(f, "PNG")
-                zfile.writestr(out.name+".png", f.getvalue())
+                zfile.writestr(out.name + ".png", f.getvalue())
                 others = True
             if request.GET.get("mol2"):
-                zfile.writestr(name+".mol2", out.write_file(False))
+                zfile.writestr(name + ".mol2", out.write_file(False))
                 others = True
             if request.GET.get("job"):
                 dnew = d.copy()
                 dnew["name"] = re.sub(r"{{\s*name\s*}}", name, dnew["name"])
-                zfile.writestr(name+".job", utils.write_job(**dnew))
+                zfile.writestr(name + ".job", utils.write_job(**dnew))
                 others = True
 
             if request.GET.get("gjf") or not others:
-                zfile.writestr(name+".gjf", out.write_file())
+                zfile.writestr(name + ".gjf", out.write_file())
 
         except Exception as e:
             generrors.append("%s - %s" % (name,  e))
@@ -278,7 +276,6 @@ def gen_multi_detail_zip(request, string):
     return response
 
 def write_gjf(request, molecule):
-    filename = molecule + ".gjf"
     basis = request.GET.get("basis")
     add = "" if request.GET.get("view") else "attachment; "
 
@@ -289,7 +286,6 @@ def write_gjf(request, molecule):
     return response
 
 def write_mol2(request, molecule):
-    filename = molecule + ".mol2"
     add = "" if request.GET.get("view") else "attachment; "
 
     out = gjfwriter.Output(molecule, '')
@@ -299,7 +295,6 @@ def write_mol2(request, molecule):
     return response
 
 def write_png(request, molecule):
-    filename = molecule + ".png"
     scale = request.GET.get("scale", 10)
 
     out = gjfwriter.Output(molecule, '')
@@ -318,7 +313,7 @@ def report(request, molecule):
         report = ErrorReport(molecule=molecule)
         form = ErrorReportForm(request.POST,
             instance=report,
-            initial={"email" : email})
+            initial={"email": email})
         if form.is_valid():
             form.save()
             return redirect(gen_detail, molecule)
@@ -383,10 +378,10 @@ def parse_data(request):
         homolumo, gap = parser.get_graphs()
 
         name, _ = os.path.splitext(f.name)
-        if n > 1:
-            zfile.writestr(name+"/output.txt", parser.format_output())
-            zfile.writestr(name+"/homolumo.eps", homolumo.getvalue())
-            zfile.writestr(name+"/gap.eps", gap.getvalue())
+        if i > 1:
+            zfile.writestr(name + "/output.txt", parser.format_output())
+            zfile.writestr(name + "/homolumo.eps", homolumo.getvalue())
+            zfile.writestr(name + "/gap.eps", gap.getvalue())
         else:
             zfile.writestr("output.txt", parser.format_output())
             zfile.writestr("homolumo.eps", homolumo.getvalue())
@@ -459,7 +454,7 @@ def job_detail(request, jobid):
         job = None
         e = "That job number is not running."
     c = Context({
-        "job":job,
+        "job": job,
         "error_message": e,
         })
     return render(request, "chem/job_detail.html", c)

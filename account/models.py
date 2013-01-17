@@ -5,8 +5,6 @@ from django.db import models
 
 from Crypto.PublicKey import RSA
 
-import utils
-
 attributes = {"class": "required"}
 
 class RegistrationForm(forms.Form):

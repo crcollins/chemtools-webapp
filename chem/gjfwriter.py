@@ -3,7 +3,6 @@
 import math
 import os
 import copy
-import sys
 
 import Image
 import ImageDraw
@@ -19,7 +18,7 @@ class Atom(object):
     def __init__(self, x, y, z, element, parent=None):
         self.parent = parent
         self.element = element
-        self.x, self.y, self.z = float(x),float(y),float(z)
+        self.x, self.y, self.z = float(x), float(y), float(z)
         self.bonds = []
 
     def remove(self):
@@ -31,7 +30,7 @@ class Atom(object):
 
     @property
     def id(self):
-        return self.parent.index(self)+1
+        return self.parent.index(self) + 1
 
     @property
     def mol2(self):
@@ -39,7 +38,7 @@ class Atom(object):
 
     @property
     def gjf(self):
-        return self.element + " %f %f %f" %(self.xyz)
+        return self.element + " %f %f %f" % (self.xyz)
 
     @property
     def gjfbonds(self):
@@ -51,7 +50,7 @@ class Atom(object):
         return s
 
     def __str__(self):
-        return self.element + " %f %f %f" %(self.xyz)
+        return self.element + " %f %f %f" % (self.xyz)
 
 
 class Bond(object):
@@ -93,11 +92,11 @@ class Bond(object):
     @property
     def id(self):
         '''Returns the id of the current bond. '''
-        return self.parent.index(self)+1
+        return self.parent.index(self) + 1
 
     @property
     def mol2(self):
-        return "%d %d %d %s" %(self.id, self.atoms[0].id, self.atoms[1].id, self.type)
+        return "%d %d %d %s" % (self.id, self.atoms[0].id, self.atoms[1].id, self.type)
 
 
 class Molecule(object):
@@ -182,7 +181,7 @@ class Molecule(object):
             #check the second bond type
             for x in conn:
                 for bond in bonds:
-                    if x in [atom.element[1] for atom in bond.atoms if len(atom.element)>1]:
+                    if x in [atom.element[1] for atom in bond.atoms if len(atom.element) > 1]:
                         return bond
         except:
             pass
@@ -196,7 +195,7 @@ class Molecule(object):
     def draw(self, scale):
         '''Draws a basic image of the molecule.'''
         colors = {
-            '1': (255,255,255),
+            '1': (255, 255, 255),
             'Ar': (255, 0, 0),
             '2': (0, 255, 0),
             '3': (0, 0, 255),
@@ -219,12 +218,12 @@ class Molecule(object):
         s = int(scale * .25)
         for bond in self.bonds:
             pts = sum([x.xyz[:2] for x in bond.atoms], tuple())
-            pts = [(coord-bounds[0][i%2])*scale+s for i,coord in enumerate(pts)]
+            pts = [(coord - bounds[0][i % 2]) * scale + s for i, coord in enumerate(pts)]
 
-            draw.line(pts,fill=colors[bond.type], width=scale/10)
+            draw.line(pts, fill=colors[bond.type], width=scale / 10)
             for x in xrange(2):
                 if bond.atoms[x].element not in "C":
-                    circle = (pts[x*2] - s,pts[x*2+1] - s, pts[x*2] + s, pts[x*2+1] + s)
+                    circle = (pts[x * 2] - s, pts[x * 2 + 1] - s, pts[x * 2] + s, pts[x * 2 + 1] + s)
                     draw.ellipse(circle, fill=colors[bond.atoms[x].element])
         #rotate to standard view
         return img.rotate(-90)
@@ -239,7 +238,7 @@ class Molecule(object):
     @property
     def mol2(self):
         '''Returns a string with the in the proper .mol2 format.'''
-        string = """@<TRIPOS>MOLECULE\nMolecule Name\n%d %d\nSMALL\nNO_CHARGES\n\n@<TRIPOS>ATOM\n""" %(len(self.atoms), len(self.bonds))
+        string = """@<TRIPOS>MOLECULE\nMolecule Name\n%d %d\nSMALL\nNO_CHARGES\n\n@<TRIPOS>ATOM\n""" % (len(self.atoms), len(self.bonds))
         string += "\n".join([x.mol2 for x in self.atoms] +
                         ["@<TRIPOS>BOND", ] +
                         [x.mol2 for x in self.bonds])
@@ -272,12 +271,12 @@ class Molecule(object):
         #saved to prevent overwriting them
         R2x, R2y, R2z = R2.x, R2.y, R2.z
         C1x, C1y, C1z = C1.x, C1.y, C1.z
-        radius1 = math.sqrt((C1.x-R1.x) ** 2 + (C1.y-R1.y) ** 2 + (C1.z-R1.z) ** 2)
-        radius2 = math.sqrt((C2.x-R2.x) ** 2 + (C2.y-R2.y) ** 2 + (C2.z-R2.z) ** 2)
+        radius1 = math.sqrt((C1.x - R1.x) ** 2 + (C1.y - R1.y) ** 2 + (C1.z - R1.z) ** 2)
+        radius2 = math.sqrt((C2.x - R2.x) ** 2 + (C2.y - R2.y) ** 2 + (C2.z - R2.z) ** 2)
 
         #angle of 1 - angle of 2 = angle to rotate
-        theta = math.acos((R1.z-C1.z) / radius1) - math.acos((C2.z-R2.z) / radius2)
-        psi = math.atan2(R1.y-C1.y, R1.x-C1.x) - math.atan2(C2.y-R2.y, C2.x-R2.x)
+        theta = math.acos((R1.z - C1.z) / radius1) - math.acos((C2.z - R2.z) / radius2)
+        psi = math.atan2(R1.y - C1.y, R1.x - C1.x) - math.atan2(C2.y - R2.y, C2.x - R2.x)
         phi = 0
         frag.rotate_3d(theta, phi, psi, (R2x, R2y, R2z), (C1x, C1y, C1z))
 
@@ -293,13 +292,13 @@ class Molecule(object):
         frags = [copy.deepcopy(self)]
         lidx, ridx = self.bonds.index(left), self.bonds.index(right)
         # n=1 already in frags
-        for i in xrange(n-1):
+        for i in xrange(n - 1):
             a = copy.deepcopy(self)
             if i == 0:
                 frags[i].merge(frags[i].bonds[ridx], a.bonds[lidx], a)
             else:
                 #accounts for deleted bond
-                frags[i].merge(frags[i].bonds[ridx-1], a.bonds[lidx], a)
+                frags[i].merge(frags[i].bonds[ridx - 1], a.bonds[lidx], a)
             frags.append(a)
         return Molecule(frags)
 
@@ -307,15 +306,15 @@ class Molecule(object):
         '''Returns a molecule with x,y,z stacking.'''
         frags = [self]
         bb = self.bounding_box()
-        size = tuple(maxv-minv for minv, maxv in zip(bb[0], bb[1]))
-        for i,axis in enumerate((x,y,z)):
+        size = tuple(maxv - minv for minv, maxv in zip(bb[0], bb[1]))
+        for i, axis in enumerate((x, y, z)):
             #means there is nothing to stack
             if axis <= 1:
                 continue
             axisfrags = copy.deepcopy(frags)
-            for num in xrange(1,axis):
-                use = [0,0,0]
-                use[i] = num*(2+size[i])
+            for num in xrange(1, axis):
+                use = [0, 0, 0]
+                use[i] = num * (2 + size[i])
                 for f in axisfrags:
                     a = copy.deepcopy(f)
                     a.displace(*use)
@@ -328,12 +327,12 @@ def read_data(filename):
     '''Reads basic data files.'''
     #try to load file with lowercase name then upper
     try:
-        f = open(os.path.join(DATAPATH,filename), "r")
+        f = open(os.path.join(DATAPATH, filename), "r")
     except:
         try:
-            f = open(os.path.join(DATAPATH,filename.lower()), "r")
+            f = open(os.path.join(DATAPATH, filename.lower()), "r")
         except:
-            raise Exception(3, "Bad Substituent Name: %s" %filename)
+            raise Exception(3, "Bad Substituent Name: %s" % filename)
     atoms = []
     bonds = []
     state = 0
@@ -341,11 +340,11 @@ def read_data(filename):
         if line == "\n":
             state = 1
         elif state == 0:
-            e,x,y,z = line.split()[-4:]
-            atoms.append(Atom(x,y,z,e, atoms))
+            e, x, y, z = line.split()[-4:]
+            atoms.append(Atom(x, y, z, e, atoms))
         elif state == 1:
             a1, a2, t = line.split()
-            bonds.append(Bond((atoms[int(a1)-1], atoms[int(a2)-1]), t, bonds))
+            bonds.append(Bond((atoms[int(a1) - 1], atoms[int(a2) - 1]), t, bonds))
     f.close()
     return atoms, bonds
 
@@ -360,7 +359,7 @@ class Output(object):
     def write_file(self, gjf=True):
         starter = [
                     "%mem=59GB",
-                    "%%chk=%s.chk" %self.name,
+                    "%%chk=%s.chk" % self.name,
                     "# %s geom=connectivity" % self.basis,
                     "",
                     self.name,
@@ -386,7 +385,7 @@ class Output(object):
             this = []
             if side is not None:
                 for (char, parentid) in side:
-                    parentid += 1 # offset for core
+                    parentid += 1  # offset for core
                     this.append((Molecule(read_data(char)), char, parentid))
             else:
                 this.append(None)
@@ -396,7 +395,7 @@ class Output(object):
         #bond all of the fragments together
         cends = core[0].open_ends()
         for j, side in enumerate(fragments):
-            this = [core]+side
+            this = [core] + side
 
             if side[0] is not None:
                 for (part, char, parentid) in side:
@@ -471,7 +470,7 @@ def parse_name(name):
 
     i = parts.index(core)
     left = parts[:i][0] if parts[:i] else None
-    right = parts[i+1:]
+    right = parts[i + 1:]
 
     if len(right) > 1:
         middle = right[0]
@@ -539,7 +538,7 @@ def parse_end_name(name):
             else:
                 if r == 0:
                     try:
-                        if name[i+1] in rgroup:
+                        if name[i + 1] in rgroup:
                             parts.append((char, lastconnect))
                             r += 1
                         else:

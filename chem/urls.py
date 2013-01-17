@@ -1,4 +1,4 @@
-from django.conf.urls import patterns, include, url
+from django.conf.urls import patterns, url
 
 from django.contrib import admin
 admin.autodiscover()
@@ -28,4 +28,3 @@ urlpatterns = patterns('chem.views',
 
     url(r"^(?P<string>[A-Za-z0-9_,\{\}\$]*)/check/$", "molecule_check"),
 )
-
