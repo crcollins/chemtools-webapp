@@ -198,6 +198,18 @@ class Header(Parser):
             elif line.startswith("-"):
                 self.done = True
 
+class Dipole(Parser):
+    def __init__(self):
+        super(Dipole, self).__init__()
+        self.range = (-300, -1)
+
+    @is_done
+    def parse(self, line):
+        line = line.strip()
+        if line.startswith("X="):
+            self.value = line.split()[-1]
+            self.done = True
+
 ##############################################################################
 ##############################################################################
 
@@ -214,10 +226,11 @@ class Log(object):
             "Time": Time(),
             "Occupied": Occupied(),
             "Virtual": Virtual(),
+            "Dipole": Dipole(),
             "Geometry": Geometry(),
             "Header": Header(),
             }
-        self.order = ["Occupied", "Virtual", "HomoOrbital", "Energy", "Time"]
+        self.order = ["Occupied", "Virtual", "HomoOrbital", "Dipole", "Energy", "Time"]
         if self.name.lower().endswith("td") or self.name.lower().endswith("tddft"):
             self.parsers["Excited"] = Excited()
             self.order.append("Excited")
