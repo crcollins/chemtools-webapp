@@ -1,6 +1,7 @@
 #!/bin/python
 import os
 import math
+import re
 from cStringIO import StringIO
 
 import numpy as np
@@ -9,6 +10,280 @@ import matplotlib
 matplotlib.use('Cairo')
 import matplotlib.pyplot as plot
 np.seterr(all="ignore")
+
+##############################################################################
+# Parsers
+##############################################################################
+
+
+def is_done(fn):
+    def wrapper(self, *args, **kwargs):
+        if not self.done:
+            return fn(self, *args, **kwargs)
+        else:
+            return self.value
+    return wrapper
+
+class Parser(object):
+    def __init__(self):
+        self.done = False
+        self.value = None
+        self.range = (0, 0)
+        self.newfile = False
+    def parse(self, line):
+        raise NotImplementedError
+    def __str__(self):
+        return str(self.value)
+    # def header(self):
+    #     return " ".join(re.split("([A-Z][^A-Z]*)", self.__class__.__name__)[1::2])
+
+##############################################################################
+# Parsers
+##############################################################################
+
+class HomoOrbital(Parser):
+    def __init__(self):
+        super(HomoOrbital, self).__init__()
+        self.value = 0
+        self.range = (-1000, -1)
+
+    @is_done
+    def parse(self, line):
+        # " Alpha  occ. eigenvalues --  -88.90267 -19.16896 -19.16575 -19.15705 -19.15234"
+        # " Alpha  occ. eigenvalues --  -10.23876 -10.23843 -10.23775 -10.23715 -10.23374"
+        # ...
+        # " Alpha virt. eigenvalues --   -0.00138   0.03643   0.07104   0.08148   0.08460"
+        if "Alpha  occ. eigenvalues" in line:
+            self.value += len(line.split()[4:])
+        elif self.value:
+            self.value = str(self.value)
+            self.done = True
+
+
+class Energy(Parser):
+    def __init__(self):
+        super(Energy, self).__init__()
+        self.start = False
+        self.range = (-30, -1)
+
+    @is_done
+    def parse(self, line):
+        # " 36\\Version=EM64L-G09RevC.01\State=1-A\HF=-1127.8085512\RMSD=3.531e-09"
+        if "HF=" in line:
+            idx = line.index("HF=") + 3
+            self.value = line[idx:].split("\\")[0].strip()
+            self.start = True
+            if "\\" in line[idx:]:
+                self.done = True
+        elif self.start:
+            self.value += line.split("\\")[0].strip()
+            if "\\" in line:
+                self.done = True
+
+
+class Time(Parser):
+    def __init__(self):
+        super(Time, self).__init__()
+        self.range = (-10, -1)
+
+    @is_done
+    def parse(self, line):
+        if 'Job cpu time' in line:
+            # " Job cpu time:  0 days  1 hours 24 minutes  3.8 seconds."
+            t = line.split()[3:][0::2]
+            con = (24., 1., 1 / 60., 1 / 3600)
+            self.value = str(sum(float(x) * con[i] for i, x in enumerate(t)))
+            self.done = True
+
+
+class Excited(Parser):
+    def __init__(self):
+        super(Excited, self).__init__()
+        self.range = (300, 3000)
+
+    @is_done
+    def parse(self, line):
+        # " Excited State   1:      Singlet-A      2.9126 eV  425.67 nm  f=0.7964  <S**2>=0.000"
+        if "Excited State   1:" in line:
+            self.value = line.split()[4]
+            self.done = True
+
+
+class Occupied(Parser):
+    def __init__(self):
+        super(Occupied, self).__init__()
+        self.prevline = ''
+        self.range = (-1000, -1)
+
+    @is_done
+    def parse(self, line):
+         # " Alpha  occ. eigenvalues --   -0.27354  -0.26346  -0.25649  -0.21987  -0.21885"
+         # " Alpha virt. eigenvalues --   -0.00138   0.03643   0.07104   0.08148   0.08460"
+        if "occ. eigenvalues" in line:
+            self.prevline = line
+        elif "virt. eigenvalues" in line and self.prevline:
+            self.value = str(float(self.prevline.split()[-1]) * 27.2117)
+            self.done = True
+
+
+class Virtual(Parser):
+    def __init__(self):
+        super(Virtual, self).__init__()
+        self.prevline = ''
+        self.range = (-1000, -1)
+
+    @is_done
+    def parse(self, line):
+         # " Alpha  occ. eigenvalues --   -0.27354  -0.26346  -0.25649  -0.21987  -0.21885"
+         # " Alpha virt. eigenvalues --   -0.00138   0.03643   0.07104   0.08148   0.08460"
+        if "occ. eigenvalues" in line:
+            self.prevline = line
+        elif "virt. eigenvalues" in line and self.prevline:
+            self.value = str(float(line.split()[4]) * 27.2117)
+            self.done = True
+
+
+class Geometry(Parser):
+    def __init__(self):
+        super(Geometry, self).__init__()
+        self.value = ''
+        self.start = False
+        self.range = (-300, -1)
+        self.newfile = True
+
+    @is_done
+    def parse(self, line):
+        # " -2012\0\\# opt b3lyp/6-31g(d) geom=connectivity iop(9/40=2)\\Title Car"
+        # " d Required\\0,1\C,-0.0013854631,-0.0120529361,-0.0064958728\C,-0.00021"
+        # ...
+        # " 4,1.2501547542\H,22.6120510229,1.0505502972,0.1022974384\H,2.283441615"
+        # " 6,-0.8632316482,20.4346296726\\Version=EM64L-G09RevC.01\State=1-A\HF=-"
+        if "\\" in line:
+            self.start = True
+        if self.start:
+            if r"\\@" in line:
+                start = self.value.index("#")
+                end =  self.value.index(r"\Version", start)
+
+                d = {",": " ", "\n ": "", "\\": "\n",
+                    "geom=connectivity": "",
+                }
+                value = self.value[start:end]
+                for i, j in d.iteritems():
+                    value = value.replace(i, j)
+                self.value = value
+                self.done = True
+            if not self.done:
+                self.value += line
+
+
+class Header(Parser):
+    def __init__(self):
+        super(Header, self).__init__()
+        self.value = ''
+        self.range = (70, 150)
+        self.start = False
+
+    @is_done
+    def parse(self, line):
+        # " %mem=59GB"
+        # " %chk=2_4g_TON_4g_4g_n4.chk"
+        # " --------------------------------------------------"
+        line = line.strip()
+        if "%mem" in line:
+            self.start = 1
+        if self.start and not self.done:
+            if line.startswith("%"):
+                self.value += line + "\n"
+            elif line.startswith("-"):
+                self.done = True
+
+##############################################################################
+##############################################################################
+
+class Log(object):
+    def __init__(self, f, fname=None):
+        self.f = f
+        self.fname = fname if fname else f.name
+        self.name, _ = os.path.splitext(self.fname)
+        self.td = False
+
+        self.parsers = {
+            "HomoOrbital": HomoOrbital(),
+            "Energy": Energy(),
+            "Time": Time(),
+            "Occupied": Occupied(),
+            "Virtual": Virtual(),
+            "Geometry": Geometry(),
+            "Header": Header(),
+            }
+        self.order = ["Occupied", "Virtual", "HomoOrbital", "Energy", "Time"]
+        if self.name.lower().endswith("td") or self.name.lower().endswith("tddft"):
+            self.parsers["Excited"] = Excited()
+            self.order.append("Excited")
+            self.td = True
+
+        possible = self.in_range()
+        if possible is not None:
+            for i, line in enumerate(f):
+                if i in possible:
+                    for k, parser in self.parsers.items():
+                        parser.parse(line)
+        else:
+            for i, line in enumerate(f):
+                for k, parser in self.parsers.items():
+                    parser.parse(line)
+
+    def in_range(self):
+        '''Builds a set of line numbers based on parser params to optimally skip lines.'''
+        try:
+            self.f.seek(0)
+            lines = max(i for i, x in enumerate(self.f)) + 1
+            self.f.seek(0)
+        except:
+            return None
+
+        ranges = []
+        for k, parser in self.parsers.items():
+            parts = []
+            for x in parser.range:
+                if x < 0:
+                    x += lines
+                elif x is None:
+                    x = lines
+                parts.append(x)
+            parts = tuple(parts)
+
+            if parts[0] > parts[1]:
+                ranges.append((parts[0], lines))
+                ranges.append((0, parts[1]))
+            else:
+                ranges.append(parts)
+
+        a = set()
+        for x in ranges:
+            a |= set(xrange(*x))
+        return a
+
+    def format_gjf(self):
+        s  = self.parsers["Header"].value
+        s += self.parsers["Geometry"].value
+        return s
+
+    def format_data(self):
+        values = []
+        for key in self.order:
+            v = self.parsers[key]
+            values.append(v.value if v.done else "---")
+        return ', '.join([self.fname] + values)
+
+    def format_header(self):
+        return ', '.join(["Name"] + self.order)
+
+
+##############################################################################
+# Sets
+##############################################################################
 
 
 def catch(fn):
@@ -20,22 +295,23 @@ def catch(fn):
             self.errors.append(repr(e))
     return wrapper
 
-class Parser(object):
+
+class Output(object):
     def __init__(self):
         self.errors = []
         self.output = []
 
-    def write(self, line, append=False):
+    def write(self, line, newline=True):
         try:
-            if append:
-                self.output[-1] += line
-            else:
+            if newline:
                 self.output.append(line)
+            else:
+                self.output[-1] += line
         except IndexError:
             self.output.append(line)
 
     def format_output(self, errors=True):
-        a = self.output
+        a = self.output[:]
         if errors:
             a += ["\n---- Errors (%i) ----" % len(self.errors)] + self.errors
         return '\n'.join(a) + "\n"
@@ -45,7 +321,28 @@ class Parser(object):
         raise NotImplementedError
 
 
-class DataParser(Parser):
+class LogSet(Output):
+    def __init__(self):
+        super(LogSet, self).__init__()
+        self.logs = []
+        self.header = ''
+
+    @catch
+    def parse_file(self, f):
+        x = Log(f)
+        self.logs.append(x)
+        new = x.format_header()
+        if len(new) > len(self.header):
+            self.header = new
+        self.write(x.format_data())
+
+    def format_output(self, errors=True):
+        s = self.header + "\n"
+        s += super(LogSet, self).format_output(errors)
+        return s
+
+
+class DataParser(Output):
     def __init__(self, f):
         super(DataParser, self).__init__()
         self.plots = (StringIO(), StringIO())
@@ -76,7 +373,7 @@ class DataParser(Parser):
         homoy = np.array(datahomo)
         (homoa, homob), var_matrix = curve_fit(homofunc, x, homoy, p0=[-8, -.8])
         self.write("Homo")
-        self.write("A: %f, B: %f\n" % (homoa, homob))
+        self.write("A: %f, B: %f" % (homoa, homob))
         self.write("limit: %f" % homofunc(0, homoa, homob))
         self.write("")
 
@@ -110,138 +407,3 @@ class DataParser(Parser):
         plot.ylabel("Eg in eV")
         plot.xlabel("1/N")
         plot.savefig(self.plots[1], format="eps")
-
-
-class LogParser(Parser):
-    def __init__(self):
-        super(LogParser, self).__init__()
-        self.write("Filename, Occ, Virtual, Excited, Time")
-
-    def find_lines(self, f):
-        flines = f.readlines()
-        occline, virtualline, excitedline, timeline = [''] * 4
-        try:
-            if "Entering Gaussian System" not in flines[0]:
-                return occline, virtualline, excitedline, timeline
-        except IndexError:
-            return occline, virtualline, excitedline, timeline
-
-        occbool = False
-        skip = 300
-        L = len(flines)
-        for i, line in enumerate(flines[skip:]):
-            if occline and virtualline and excitedline:
-                break
-            elif "1:" in line:
-                excitedline = line
-            elif "occ. eigenvalues" in line:
-                occbool = True
-            elif "virt. eigenvalues" in line and occbool:
-                virtualline = line
-                occline = flines[(i - 1 + skip) % L]
-                occbool = False
-            else:
-                occbool = False
-        for line in flines[::-1]:
-            if 'Job cpu time' in line:
-                timeline = line
-                break
-        return occline, virtualline, excitedline, timeline
-
-    def clean_lines(self, (occline, virtualline, excitedline, timeline)):
-        occ = occline.strip().split()[-1]
-        try:
-            virtual = virtualline.strip().split()[4]
-        except:
-            virtual = "---"
-        try:
-            excited = excitedline.strip().split()[4]
-            float(excited)
-            assert excited != "09"
-        except:
-            excited = "---"
-        time = self.convert_time(timeline.strip().split()[3:-1][0::2])
-        occ, virtual = self.convert_values((occ, virtual))
-        return occ, virtual, excited, time
-
-    def convert_time(self, time):
-        con = (24., 1., 1 / 60., 1 / 3600)
-        return str(sum(float(x) * con[i] for i, x in enumerate(time)))
-
-    def convert_values(self, values):
-        con = (27.2117, 27.2117)
-        temp = []
-        for i, x in enumerate(values):
-            if x != "---":
-                temp.append(str(float(x) * con[i]))
-            else:
-                temp.append("---")
-        return temp
-
-    @catch
-    def parse_file(self, f):
-        lines = self.find_lines(f)
-        if any(lines):
-            if all(lines) or all(lines[:2] + tuple(lines[3])):
-                ovft = self.clean_lines(lines)
-            elif any(lines):
-                lines = [x if x else "---" for x in lines]
-                ovft = self.clean_lines(lines)
-            self.write(', '.join([x for x in (f.name,) + ovft if x]))
-        else:
-            self.errors.append("Invalid file type:  '%s'" % f.name)
-
-
-class LogReset(Parser):
-    def __init__(self, f, fname=None):
-        super(LogReset, self).__init__()
-        self.write("%mem=59GB")
-        if fname is None:
-            fname = f.name
-        name, _ = os.path.splitext(fname)
-        name = os.path.basename(name)
-        self.write("%%chk=%s.chk" % name)
-        self.parse_file(f)
-
-    def find_lines(self, f):
-        start = False
-        end = False
-        positions = ''
-        for line in f.readlines()[-1000:]:
-            if "\\" in line:
-                start = True
-            if "\\@" in line and start:
-                end = True
-            if start and not end:
-                positions += line
-        return positions
-
-    @catch
-    def parse_file(self, f):
-        positions = self.find_lines(f)
-        start = False
-        blanklines = 0
-        end = False
-        for x in positions.replace(",", " ").replace("\n ", '').split("\\"):
-            x = x.replace("geom=connectivity", "")
-            if x.startswith("#"):
-                start = True
-            if start and not x:
-                blanklines += 1
-            if blanklines > 2:
-                end = True
-            if start and not end:
-                self.write(x)
-        # gjf requires blank line at end
-        self.write('')
-        if not start or not end:
-            raise ValueError
-
-def get_homo_orbital(f):
-    homocount = 0
-    for line in f:
-        if "Alpha  occ. eigenvalues" in line:
-            homocount += len(line.split()[4:])
-        elif homocount:
-            break
-    return homocount

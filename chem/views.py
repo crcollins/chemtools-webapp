@@ -342,26 +342,14 @@ def upload_data(request):
             return parse_data(request)
         elif request.POST["option"] == "gjfreset":
             return reset_gjf(request)
-        elif request.POST["option"] == "homoorbital":
-            return get_homo_orbital(request)
     form = LogForm()
     c = Context({
         "form": form,
         })
     return render(request, "chem/upload_log.html", c)
 
-def get_homo_orbital(request):
-    string = ''
-    for f in utils.parse_file_list(request.FILES.getlist('myfiles')):
-        string += f.name + ", " + str(fileparser.get_homo_orbital(f)) + "\n"
-
-    f = StringIO(string)
-    response = HttpResponse(FileWrapper(f), content_type="text/plain")
-    return response
-
-
 def parse_log(request):
-    parser = fileparser.LogParser()
+    parser = fileparser.LogSet()
     for f in utils.parse_file_list(request.FILES.getlist('myfiles')):
         parser.parse_file(f)
 
@@ -404,10 +392,10 @@ def reset_gjf(request):
     zfile = zipfile.ZipFile(buff, 'w', zipfile.ZIP_DEFLATED)
 
     for f in utils.parse_file_list(request.FILES.getlist('myfiles')):
-        parser = fileparser.LogReset(f)
+        parser = fileparser.Log(f)
 
         name, _ = os.path.splitext(f.name)
-        zfile.writestr("%s.gjf" % name, parser.format_output(errors=False))
+        zfile.writestr("%s.gjf" % name, parser.format_gjf())
 
     zfile.close()
     buff.flush()
