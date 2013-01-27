@@ -251,7 +251,7 @@ class Geometry(Parser):
                 start = self.value.index("#")
                 end =  self.value.index(r"\Version", start)
 
-                d = {",": " ", "\n ": "", "\\": "\n",
+                d = {",": " ", "\\": "\n",
                     "geom=connectivity": "",
                 }
                 value = self.value[start:end]
@@ -260,7 +260,7 @@ class Geometry(Parser):
                 self.value = value
                 self.done = True
             if not self.done:
-                self.value += line
+                self.value += line.strip()
 
 
 @Log.add_parser
