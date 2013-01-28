@@ -146,20 +146,24 @@ class Energy(Parser):
         super(Energy, self).__init__()
         self.start = False
         self.range = (-30, -1)
+        self.prevline = ''
 
     @is_done
     def parse(self, line):
         # " 36\\Version=EM64L-G09RevC.01\State=1-A\HF=-1127.8085512\RMSD=3.531e-09"
-        if "HF=" in line:
-            idx = line.index("HF=") + 3
-            self.value = line[idx:].split("\\")[0].strip()
+        modline = self.prevline + line.strip()
+        if "HF=" in modline:
+            idx = modline.index("HF=") + 3
+            self.value = modline[idx:].split("\\")[0].strip()
             self.start = True
-            if "\\" in line[idx:]:
+            if "\\" in modline[idx:]:
                 self.done = True
         elif self.start:
             self.value += line.split("\\")[0].strip()
             if "\\" in line:
                 self.done = True
+        else:
+            self.prevline = line.strip()
 
 
 @Log.add_parser
