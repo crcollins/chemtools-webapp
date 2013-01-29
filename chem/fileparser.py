@@ -12,7 +12,7 @@ import matplotlib.pyplot as plot
 np.seterr(all="ignore")
 
 ##############################################################################
-# Parsers
+# LineParsers
 ##############################################################################
 
 class Log(object):
@@ -90,7 +90,7 @@ class Log(object):
 
 
 ##############################################################################
-# Parsers
+# LineParsers
 ##############################################################################
 
 def is_done(fn):
@@ -102,7 +102,7 @@ def is_done(fn):
     return wrapper
 
 
-class Parser(object):
+class LineParser(object):
     def __init__(self):
         self.done = False
         self.value = None
@@ -119,7 +119,7 @@ class Parser(object):
 ##############################################################################
 
 @Log.add_parser
-class HomoOrbital(Parser):
+class HomoOrbital(LineParser):
     def __init__(self):
         super(HomoOrbital, self).__init__()
         self.value = 0
@@ -139,7 +139,7 @@ class HomoOrbital(Parser):
 
 
 @Log.add_parser
-class Energy(Parser):
+class Energy(LineParser):
     def __init__(self):
         super(Energy, self).__init__()
         self.start = False
@@ -165,7 +165,7 @@ class Energy(Parser):
 
 
 @Log.add_parser
-class Time(Parser):
+class Time(LineParser):
     def __init__(self):
         super(Time, self).__init__()
         self.range = (-10, -1)
@@ -181,7 +181,7 @@ class Time(Parser):
 
 
 @Log.add_parser
-class Excited(Parser):
+class Excited(LineParser):
     def __init__(self):
         super(Excited, self).__init__()
         self.range = (300, 3000)
@@ -195,7 +195,7 @@ class Excited(Parser):
 
 
 @Log.add_parser
-class Occupied(Parser):
+class Occupied(LineParser):
     def __init__(self):
         super(Occupied, self).__init__()
         self.prevline = ''
@@ -213,7 +213,7 @@ class Occupied(Parser):
 
 
 @Log.add_parser
-class Virtual(Parser):
+class Virtual(LineParser):
     def __init__(self):
         super(Virtual, self).__init__()
         self.prevline = ''
@@ -231,7 +231,7 @@ class Virtual(Parser):
 
 
 @Log.add_parser
-class Geometry(Parser):
+class Geometry(LineParser):
     def __init__(self):
         super(Geometry, self).__init__()
         self.value = ''
@@ -266,7 +266,7 @@ class Geometry(Parser):
 
 
 @Log.add_parser
-class Header(Parser):
+class Header(LineParser):
     def __init__(self):
         super(Header, self).__init__()
         self.value = ''
@@ -288,7 +288,7 @@ class Header(Parser):
                 self.done = True
 
 @Log.add_parser
-class Dipole(Parser):
+class Dipole(LineParser):
     def __init__(self):
         super(Dipole, self).__init__()
         self.range = (-300, -1)
