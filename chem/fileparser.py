@@ -21,17 +21,12 @@ class Log(object):
         self.f = f
         self.fname = fname if fname else f.name
         self.name, _ = os.path.splitext(self.fname)
-        self.td = False
 
         self.parsers = dict()
         for k, v in Log.PARSERS.items():
             self.parsers[k] = v()
 
-        self.order = ["Occupied", "Virtual", "HomoOrbital", "Dipole", "Energy", "Time"]
-        if self.name.lower().endswith("td") or self.name.lower().endswith("tddft"):
-            self.parsers["Excited"] = Excited()
-            self.order.append("Excited")
-            self.td = True
+        self.order = ["Occupied", "Virtual", "HomoOrbital", "Dipole", "Energy", "Excited", "Time"]
 
         possible = self.in_range()
         for i, line in enumerate(f):
