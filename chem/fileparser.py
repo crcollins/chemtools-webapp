@@ -32,7 +32,8 @@ class Log(object):
         for i, line in enumerate(f):
             if possible is None or i in possible:
                 for k, parser in self.parsers.items():
-                    parser.parse(line)
+                    if i in parser.possible:
+                        parser.parse(line)
 
     @classmethod
     def add_parser(cls, parser):
@@ -62,8 +63,10 @@ class Log(object):
             if parts[0] > parts[1]:
                 ranges.append((parts[0], lines))
                 ranges.append((0, parts[1]))
+                parser.possible = set(xrange(*ranges[-1])) | set(xrange(*ranges[-2]))
             else:
                 ranges.append(parts)
+                parser.possible = set(xrange(*ranges[-1]))
 
         a = set()
         for x in ranges:
