@@ -337,20 +337,26 @@ def report(request, molecule):
 
 
 def upload_data(request):
+    switch = {
+        "logparse": parse_log,
+        "dataparse": parse_data,
+        "gjfreset": reset_gjf,
+        "jobs": upload_gjf,
+    }
+    form = _get_job_form(request, "{{ name }}")
+    error = None
     if request.method == "POST":
-        if request.POST["option"] == "logparse":
-            return parse_log(request)
-        elif request.POST["option"] == "dataparse":
-            return parse_data(request)
-        elif request.POST["option"] == "gjfreset":
-            return reset_gjf(request)
-    form = LogForm()
+        if request.FILES.getlist('myfiles'):
+            return switch[request.POST["option"]](request, form)
+        else:
+            error = "Please add some files."
     c = Context({
         "form": form,
+        "error_message": error
         })
     return render(request, "chem/upload_log.html", c)
 
-def parse_log(request):
+def parse_log(request, form):
     parser = fileparser.LogSet()
     for f in utils.parse_file_list(request.FILES.getlist('myfiles')):
         parser.parse_file(f)
@@ -359,7 +365,7 @@ def parse_log(request):
     response = HttpResponse(FileWrapper(f), content_type="text/plain")
     return response
 
-def parse_data(request):
+def parse_data(request, form):
     buff = StringIO()
     zfile = zipfile.ZipFile(buff, 'w', zipfile.ZIP_DEFLATED)
 
@@ -389,7 +395,7 @@ def parse_data(request):
     response["Content-Disposition"] = "attachment; filename=%s.zip" % name
     return response
 
-def reset_gjf(request):
+def reset_gjf(request, form):
     buff = StringIO()
     zfile = zipfile.ZipFile(buff, 'w', zipfile.ZIP_DEFLATED)
 
@@ -408,6 +414,48 @@ def reset_gjf(request):
     response = HttpResponse(ret_zip, mimetype="application/zip")
     response["Content-Disposition"] = "attachment; filename=output.zip"
     return response
+
+def upload_gjf(request, form):
+    if not form.is_valid():
+        c = Context({
+            "form": form,
+            })
+        return render(request, "chem/upload_log.html", c)
+
+    if not request.user.is_staff and "postjob":
+        a["error"] = "You must be a staff user to submit a job."
+        return HttpResponse(simplejson.dumps(a), mimetype="application/json")
+
+    if not request.POST.get("postjob"):
+        buff = StringIO()
+        zfile = zipfile.ZipFile(buff, 'w', zipfile.ZIP_DEFLATED)
+
+    d = dict(form.cleaned_data)
+    for f in utils.parse_file_list(request.FILES.getlist('myfiles')):
+        dnew = d.copy()
+        name, _ = os.path.splitext(f.name)
+        dnew["name"] = re.sub(r"{{\s*name\s*}}", name, dnew["name"])
+        print dnew["name"], name
+
+        if request.POST.get("postjob"):
+            pass
+            jobid, e = utils.run_job(request.user, name, dnew.get("cluster"), internal=True, **dnew)
+        else:
+            zfile.writestr("%s.%sjob" % (dnew["name"], dnew.get("cluster")), utils.write_job(**dnew))
+
+    if request.POST.get("postjob"):
+        return HttpResponse(simplejson.dumps(a), mimetype="application/json")
+
+    else:
+        zfile.close()
+        buff.flush()
+
+        ret_zip = buff.getvalue()
+        buff.close()
+
+        response = HttpResponse(ret_zip, mimetype="application/zip")
+        response["Content-Disposition"] = "attachment; filename=output.zip"
+        return response
 
 
 ###########################################################
