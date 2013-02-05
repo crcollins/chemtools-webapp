@@ -30,10 +30,8 @@ class Log(object):
 
         possible = self.in_range()
         for i, line in enumerate(f):
-            if possible is None or i in possible:
-                for k, parser in self.parsers.items():
-                    if i in parser.possible:
-                        parser.parse(line)
+            for k, parser in self.parsers.items():
+                parser.parse(line)
 
     @classmethod
     def add_parser(cls, parser):
@@ -82,7 +80,7 @@ class Log(object):
         values = []
         for key in self.order:
             v = self.parsers[key]
-            values.append(v.value if v.done else "---")
+            values.append(v.value if v.done or v.value else "---")
         return ', '.join([self.fname] + values)
 
     def format_header(self):
@@ -123,7 +121,7 @@ class HomoOrbital(LineParser):
     def __init__(self):
         super(HomoOrbital, self).__init__()
         self.value = 0
-        self.range = (-1000, -1)
+        self.range = (3000, -1000)
 
     @is_done
     def parse(self, line):
@@ -199,7 +197,7 @@ class Occupied(LineParser):
     def __init__(self):
         super(Occupied, self).__init__()
         self.prevline = ''
-        self.range = (-1000, -1)
+        self.range = (3000, -1000)
 
     @is_done
     def parse(self, line):
@@ -209,7 +207,7 @@ class Occupied(LineParser):
             self.prevline = line
         elif "virt. eigenvalues" in line and self.prevline:
             self.value = str(float(self.prevline.split()[-1]) * 27.2117)
-            self.done = True
+            self.prevline = ''
 
 
 @Log.add_parser
@@ -217,7 +215,7 @@ class Virtual(LineParser):
     def __init__(self):
         super(Virtual, self).__init__()
         self.prevline = ''
-        self.range = (-1000, -1)
+        self.range = (3000, -1000)
 
     @is_done
     def parse(self, line):
@@ -227,7 +225,7 @@ class Virtual(LineParser):
             self.prevline = line
         elif "virt. eigenvalues" in line and self.prevline:
             self.value = str(float(line.split()[4]) * 27.2117)
-            self.done = True
+            self.prevline = ''
 
 
 @Log.add_parser
