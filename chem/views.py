@@ -138,7 +138,7 @@ def gen_detail(request, molecule):
                 return HttpResponse(simplejson.dumps(a), mimetype="application/json")
             d["basis"] = basis
             d["internal"] = True
-            jobid, e = utils.start_run_molecule(request.user, molecule, **d)
+            jobid, e = utils.run_standard_job(request.user, molecule, **d)
             a = {
                 "jobid": jobid,
                 "error": e,
@@ -185,7 +185,9 @@ def gen_multi_detail(request, string):
             for mol in utils.name_expansion(string):
                 dnew = d.copy()
                 dnew["name"] = re.sub(r"{{\s*name\s*}}", mol, dnew["name"])
-                jobid, e = utils.start_run_molecule(request.user, mol, basis=basis, internal=True, **dnew)
+                dnew["basis"] = basis
+                dnew["internal"] = True
+                jobid, e = utils.run_standard_job(request.user, mol, **dnew)
                 if e is None:
                     job = Job(molecule=mol, jobid=jobid, **dnew)
                     job.save()

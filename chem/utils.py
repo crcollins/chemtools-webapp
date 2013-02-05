@@ -213,11 +213,15 @@ def make_folders(ssh):
                 return testerr2[0]
     return None
 
-def start_run_molecule(user, molecule, **kwargs):
-    try:
-        out = gjfwriter.Output(molecule, kwargs["basis"])
-    except Exception as e:
-        return None, e
+import random
+def run_job(user, gjfstring, jobstring=None, **kwargs):
+    if random.random() > .5:
+        jobid = None
+        e = "There was an error"
+    else:
+        jobid = random.randint(0, 10000)
+        e = None
+    return jobid, e
 
     ssh, sftp = get_connections("gordon.sdsc.edu", user)
     with ssh, sftp:
@@ -225,28 +229,40 @@ def start_run_molecule(user, molecule, **kwargs):
         if error:
             return None, error
 
-        name = kwargs.get("name", molecule)
+        name = kwargs["name"]
+        custer = kwargs.get("cluster", 'g')
 
         f = sftp.open("chemtools/%s.gjf" % name, 'w')
-        f.write(out.write_file())
+        f.write(gjfstring)
         f.close()
 
-        f2 = sftp.open("chemtools/%s.gjob" % name, 'w')
-        kwargs["cluster"] = "g"
-        f2.write(write_job(**kwargs))
+
+        if jobstring is None:
+            jobstring = write_job(**kwargs)
+        f2 = sftp.open("chemtools/%s.%sjob" % (name, cluster))
+        f2.write(jobstring)
         f2.close()
 
-        s = ". ~/.bash_profile; qsub chemtools/%s.gjob" % name
+        s = ". ~/.bash_profile; qsub chemtools/%s.%sjob" % (name, cluster)
         _, stdout, stderr = ssh.exec_command(s)
         stderr = stderr.readlines()
         if stderr:
             return None, stderr[0]
         try:
-            jobid = int(stdout.readlines()[0].split(".")[0])
+            jobid = stdout.readlines()[0].split(".")[0]
         except Exception as e:
             return None, e
-
         return jobid, None
+
+def run_standard_job(user, molecule, **kwargs):
+    try:
+        out = gjfwriter.Output(molecule, kwargs.get("basis", "b3lyp/6-31g(d)"))
+    except Exception as e:
+        return None, e
+
+    gjf = out.write_file()
+    name = kwargs.get("name", molecule)
+    return run_job(user, name, kwargs.get("cluster"), gjf, **kwargs)
 
 def kill_job(user, jobid):
     ssh, _ = get_connections("gordon.sdsc.edu", user)
