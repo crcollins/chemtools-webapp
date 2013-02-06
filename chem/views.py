@@ -87,7 +87,7 @@ def _get_job_form(request, molecule):
             email = request.user.email
         else:
             email = ""
-        form = JobForm(initial={"name": molecule, "email": email})
+        form = JobForm(initial={"name": molecule, "email": email, "cluster": "g"})
     return form
 
 def _get_molecules_info(string):
