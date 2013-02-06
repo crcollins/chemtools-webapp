@@ -163,7 +163,7 @@ If you are logged in, and have set up your ssh keys, then under the Jobs page yo
 ### Upload ###
 #### Log Parse ####
 
-This takes normal Gaussian log files and will output a text file comma delimited with the values needed from the file (filename, homo, lumo, gap, time taken).
+This takes normal Gaussian log files and will output a text file comma delimited with various useful values from the log file (Name, Occupied, Virtual, HomoOrbital, Dipole, Energy, Excited, Time).
 
 
 #### Data Parse ####
@@ -187,9 +187,9 @@ Where lines starting with "#" are comments. The n values can be given as either 
 This takes a log file (assumed to be correct) and returns a gjf file with the extracted geometry. This is intended to be used to extract the optimized geometry from the DFT log files to then use as the TDDFT gjf file. _WARNING: this will not work in some cases where the job stopped part way through writing._
 
 
-#### Homo Orbital ####
+#### Get Jobs ####
 
-This takes multiple log files and returns a page with a list of filenames and the respective Highest occupied molecular orbital number for use in generating HOMO and LUMO cube files. The LUMO will be the value given plus one.
+This allows the creation of job files just based on file names. Along with just being able to make jobs, it can also take the files submited and post them to the supercomputers and run the calculation with the new job file.
 
 
 ### Users ###
