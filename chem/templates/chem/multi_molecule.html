@@ -24,19 +24,19 @@ $(function() {
                 for (var i = 0; i < data["worked"].length; i++) {
                     var name = data["worked"][i][0];
                     var id = data["worked"][i][1];
-                    text += "<li>" + name + " -- <a href='/chem/jobs/" + id + "'>" + id + "</a></li>";
+                    text += "<li>{0} -- <a href='/chem/jobs/{1}'>{1}</a></li>".format(name, id);
                 }
                 text += "</ul>";
                 if (data["failed"].length > 0) {
                     text += "<ul>Failed:";
                     for (var i = 0; i < data["failed"].length; i++) {
-                        text += "<li>" + data["failed"][i][0] + " -- " + data["failed"][i][1] + "</li>";
+                        text += "<li>{0} -- {1}</li>".format(data["failed"][i][0], data["failed"][i][1]);
                     }
                     text += "</ul>"
                 }
             }
 
-            var newdialog = $('<div id="id_results">' + text + '</div>');
+            var newdialog = $('<div id="id_results">{0}</div>'.format(text));
             newdialog.dialog({
                 modal: true,
                 title: "Results",
@@ -53,7 +53,7 @@ $(function() {
         if ($('#id_job').val() === 'on'){
             a += '&' + $('#newform').serialize()
         }
-        window.location = "/chem/{{ pagename }}.zip?" + a;
+        window.location = "/chem/{{ pagename }}.zip?{0}".format(a);
     })
 
     $.getJSON('check/', function(data) {
@@ -63,29 +63,30 @@ $(function() {
             var name = data.molecules[i][0];
             var warning = data.molecules[i][1];
             var error = data.molecules[i][2];
-            var message = ''
+            var message = '';
             if (error) message = 'id="error"';
             else if (warning) message = 'id="warning"';
 
-            text += '<tr ' + message + '>'
-            text += '<td><a href="../' + name + '/">' + name + '</a></td>';
+            text += '<tr {0}>'.format(message);
+            text += '<td><a href="../{0}/">{0}</a></td>'.format(name);
 
             if (!(error)) {
-                text += '<td><a href="../' + name + '.gjf{{ encoded_basis }}">gjf</a></td>';
-                text += '<td><a href="../' + name + '.mol2{{ encoded_basis }}">mol2</a></td>';
-                text += '<td><a href="../' + name + '.png{{ encoded_basis }}">Image</a></td>';
-                text += '<td><a href="#"" onClick="submitForm("' + name + '")">Job</a></td>';
+                text += '<td><a href="../{0}.gjf{{ encoded_basis }}">gjf</a></td>'.format(name);
+                text += '<td><a href="../{0}.mol2{{ encoded_basis }}">mol2</a></td>'.format(name);
+                text += '<td><a href="../{0}.png{{ encoded_basis }}">Image</a></td>'.format(name);
+                text += '<td><a href="#" onClick="submitForm(\'{0}\')">Job</a></td>'.format(name);
             }
             else {
-                text += '<td colspan="4">' + error + '</td>';
+                text += '<td colspan="4">{0}</td>'.format(error);
             }
-            text += '<td><a href="../' + name + '/report/">Report</a></td>';
+            text += '<td><a href="../{0}/report/">Report</a></td>'.format(name);
             text += '</tr>';
         }
         table.append(text);
     })
-
 });
+
+
 {% endautoescape %}
 </script>
 {% endblock %}

@@ -14,9 +14,9 @@ $(function() {
             for (j = 0; j < data.jobs[i].length; j++ ) {
                 var cell = data.jobs[i][j];
                 if (j == 0) {
-                    output += "<td><a href=\'" + cell + "\'>" + cell + "</td>";
+                    output += "<td><a href=\'{0}\'>{0}</td>".format(cell);
                 } else {
-                    output += "<td>" + cell + "</td>";
+                    output += "<td>{0}</td>".format(cell);
                 }
             }
             if (data.is_authenticated && data.jobs[i][6] != "C") {

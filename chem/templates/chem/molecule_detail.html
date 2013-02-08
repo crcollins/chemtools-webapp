@@ -17,9 +17,9 @@ $(function() {
             if (data["error"] !== null ) {
                 text = data["error"];
             } else {
-                text = "Your job id is <a href='/chem/jobs/" +  data["jobid"] + "/'>" +  data["jobid"] + ".</a>";
+                text = "Your job id is <a href='/chem/jobs/{0}/'>{0}.</a>".format(data["jobid"]);
             }
-            var newdialog = $('<div id="id_results">' + text + '</div>');
+            var newdialog = $('<div id="id_results">{0}</div>'.format(text));
             newdialog.dialog({
                 title: "Results",
                 modal: true,
