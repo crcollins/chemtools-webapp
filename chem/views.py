@@ -185,9 +185,7 @@ def gen_multi_detail(request, string):
             for mol in utils.name_expansion(string):
                 dnew = d.copy()
                 dnew["name"] = re.sub(r"{{\s*name\s*}}", mol, dnew["name"])
-                dnew["basis"] = basis
-                dnew["internal"] = True
-                jobid, e = utils.run_standard_job(request.user, mol, **dnew)
+                jobid, e = utils.run_standard_job(request.user, mol, basis=basis, internal=True, **dnew)
                 if e is None:
                     job = Job(molecule=mol, jobid=jobid, **dnew)
                     job.save()
