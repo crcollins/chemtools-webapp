@@ -262,7 +262,7 @@ def run_standard_job(user, molecule, **kwargs):
 
     gjf = out.write_file()
     name = kwargs.get("name", molecule)
-    return run_job(user, name, kwargs.get("cluster"), gjf, **kwargs)
+    return run_job(user, gjf, **kwargs)
 
 def kill_job(user, jobid):
     ssh, _ = get_connections("gordon.sdsc.edu", user)
