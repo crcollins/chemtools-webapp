@@ -433,7 +433,6 @@ def upload_gjf(request, form):
         dnew = d.copy()
         name, _ = os.path.splitext(f.name)
         dnew["name"] = re.sub(r"{{\s*name\s*}}", name, dnew["name"])
-        print dnew["name"], name
 
         if request.POST.get("postjob"):
             pass
