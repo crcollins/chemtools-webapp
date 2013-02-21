@@ -420,7 +420,7 @@ def upload_gjf(request, form):
             })
         return render(request, "chem/upload_log.html", c)
 
-    if not request.user.is_staff and "postjob":
+    if not request.user.is_staff and request.POST.get("postjob"):
         a["error"] = "You must be a staff user to submit a job."
         return HttpResponse(simplejson.dumps(a), mimetype="application/json")
 
