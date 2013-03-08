@@ -10,10 +10,10 @@
 
 name={{ name }}
 base=$HOME{% if internal %}/chemtools/{% endif %}
-temp=/oasis/scratch/$USER/temp_project/
+temp=/scratch/$USER/$PBS_JOBID
 
 cp $base/$name.gjf $temp
-export GAUSS_SCRDIR=/oasis/scratch/$USER/temp_project/
+export GAUSS_SCRDIR=/scratch/$USER/$PBS_JOBID
 . /etc/profile.d/modules.sh
 module load gaussian
 exe=`which g09`
