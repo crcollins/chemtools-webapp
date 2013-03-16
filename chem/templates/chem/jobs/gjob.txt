@@ -13,7 +13,7 @@ base=$HOME{% if internal %}/chemtools/{% endif %}
 temp=/scratch/$USER/$PBS_JOBID
 
 cp $base/$name.gjf $temp
-export GAUSS_SCRDIR=/scratch/$USER/$PBS_JOBID
+export GAUSS_SCRDIR=$temp
 . /etc/profile.d/modules.sh
 module load gaussian
 exe=`which g09`
