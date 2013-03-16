@@ -431,14 +431,15 @@ def upload_gjf(request, form):
     d = dict(form.cleaned_data)
     for f in utils.parse_file_list(request.FILES.getlist('myfiles')):
         dnew = d.copy()
-        name, _ = os.path.splitext(f.name)
+        pathname, _ = os.path.splitext(f.name)
+        name = os.path.basename(pathname)
         dnew["name"] = re.sub(r"{{\s*name\s*}}", name, dnew["name"])
 
         if request.POST.get("postjob"):
             pass
             jobid, e = utils.run_job(request.user, name, dnew.get("cluster"), internal=True, **dnew)
         else:
-            zfile.writestr("%s.%sjob" % (dnew["name"], dnew.get("cluster")), utils.write_job(**dnew))
+            zfile.writestr("%s.%sjob" % (pathname, dnew.get("cluster")), utils.write_job(**dnew))
 
     if request.POST.get("postjob"):
         return HttpResponse(simplejson.dumps(a), mimetype="application/json")
