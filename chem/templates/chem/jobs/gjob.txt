@@ -5,19 +5,19 @@
 #PBS -e {{ name }}.err
 #PBS -m bea
 #PBS -M {{ email }}
-#PBS -A TG-CHE120020
+#PBS -A TG-CHE120081
 #PBS -V
 
 name={{ name }}
 base=$HOME{% if internal %}/chemtools/{% endif %}
 temp=/scratch/$USER/$PBS_JOBID
 
-cp $base/$name.gjf $temp
+#cp $base/$name.gjf $temp
 export GAUSS_SCRDIR=$temp
 . /etc/profile.d/modules.sh
 module load gaussian
 exe=`which g09`
-/usr/bin/time $exe < $temp/$name.gjf > $temp/$name.log
+/usr/bin/time $exe < $name.gjf > $name.log
 
-mv $temp/$name.* $base/done/
+mv $name.* $base/done/
 
