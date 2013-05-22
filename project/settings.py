@@ -9,9 +9,9 @@ try:
     from secret_key import SECRET_KEY
 except ImportError:
     path = os.path.join(ROOT_PATH, "project/secret_key.py")
-    key = ''.join([random.choice("abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)") for i in xrange(50)])
-    with open("secret_key.py", "w") as f:
-        f.write("SECRET_KEY = %s" % key)
+    key = ''.join([random.choice("abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)") for i in xrange(64)])
+    with open(path, "w") as f:
+        f.write("SECRET_KEY = '%s'" % key)
     from secret_key import SECRET_KEY
 
 DEBUG = True
