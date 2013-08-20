@@ -154,6 +154,7 @@ INSTALLED_APPS = (
     'chem',
     'account',
     'docs',
+    'parse',
  )
 
 # A sample logging configuration. The only tangible logging
