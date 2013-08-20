@@ -80,7 +80,7 @@ LOGIN_URL = "/login/"
 LOGIN_REDIRECT_URL = "/chem/"
 LOGOUT_URL = "/logout/"
 HOME_URL = "/chem/"
-
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 AUTH_PROFILE_MODULE = 'account.UserProfile'
 
 # Additional locations of static files

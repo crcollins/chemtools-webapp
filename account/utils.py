@@ -1,5 +1,7 @@
 from Crypto.PublicKey import RSA
 from Crypto import Random
+import random
+import hashlib
 
 from chem.utils import get_ssh_connection, StringIO
 
@@ -26,3 +28,7 @@ def update_all_ssh_keys(username, old_private, new_public):
             rm ~/.ssh/authorized_keys.bak
             """ % new_public
             ssh.exec_command(s)
+
+def generate_key(text):
+    salt = hashlib.sha1(str(random.random())).hexdigest()[:10]
+    return hashlib.sha1(salt + text).hexdigest()

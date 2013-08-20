@@ -7,6 +7,8 @@ from Crypto.PublicKey import RSA
 
 attributes = {"class": "required"}
 
+
+
 class RegistrationForm(forms.Form):
     username = forms.RegexField(regex=r'^[\w.@+-]+$',
                                 max_length=30,
@@ -15,12 +17,6 @@ class RegistrationForm(forms.Form):
                                 error_message={'invalid': "This value may contain only letters, numbers and @.+- characters."}
                                 )
     email = forms.EmailField()
-    password1 = forms.CharField(widget=forms.PasswordInput(attrs=attributes,
-                                render_value=False),
-                                label="Password")
-    password2 = forms.CharField(widget=forms.PasswordInput(attrs=attributes,
-                                render_value=False),
-                                label="Password (again)")
 
     def clean_username(self):
         username = self.cleaned_data["username"]
@@ -32,22 +28,9 @@ class RegistrationForm(forms.Form):
         else:
             return self.cleaned_data["username"]
 
-    def clean(self):
-        if "password1" in self.cleaned_data and "password2" in self.cleaned_data:
-            if self.cleaned_data["password1"] != self.cleaned_data["password2"]:
-                raise forms.ValidationError("The two password fields did not match.")
-        return self.cleaned_data
 
 class SettingsForm(forms.Form):
     email = forms.EmailField()
-    password1 = forms.CharField(widget=forms.PasswordInput(attrs=attributes,
-                                render_value=False),
-                                label="Password",
-                                required=False)
-    password2 = forms.CharField(widget=forms.PasswordInput(attrs=attributes,
-                                render_value=False),
-                                label="Password (again)",
-                                required=False)
     xsede_username = forms.CharField(max_length=50,
                                 required=False,
                                 label="XSEDE Username")
@@ -83,13 +66,17 @@ class UserProfile(models.Model):
     public_key = models.CharField(max_length=512)
 
     activation_key = models.CharField(max_length=40)
+    password_reset_key = models.CharField(max_length=40)
+    reset_expires = models.DateTimeField(null=True, blank=True)
+
 
 class UserProfileForm(forms.ModelForm):
     private_key = forms.CharField(widget=forms.Textarea)
     public_key = forms.CharField(widget=forms.Textarea)
     class Meta:
         model = UserProfile
-        fields = ("xsede_username", "private_key", "public_key", "activation_key")
+        fields = ("xsede_username", "private_key", "public_key", "activation_key", "password_reset_key", "reset_expires")
+
 
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
