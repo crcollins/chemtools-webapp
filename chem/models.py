@@ -4,7 +4,7 @@ from django import forms
 CLUSTERS = (
     ("b", "Blacklight"),
     ("t", "Trestles"),
-    ("g", "Grodon"),
+    ("g", "Gordon"),
     ("c", "Carver"),
     ("h", "Hooper"),
     )
