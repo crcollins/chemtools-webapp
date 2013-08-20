@@ -50,10 +50,12 @@ def frag_index(request):
     return render(request, "chem/frag_index.html", c)
 
 def get_frag(request, frag):
-    f = open("chem/data/" + frag, "r")
-    response = HttpResponse(FileWrapper(f), content_type="text/plain")
-    return response
-
+    if frag in os.listdir("chem/data/"):
+        f = open("chem/data/" + frag, "r")
+        response = HttpResponse(FileWrapper(f), content_type="text/plain")
+        return response
+    else:
+        return redirect(frag)
 
 ###########################################################
 ###########################################################
