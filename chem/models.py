@@ -36,9 +36,6 @@ class JobForm(forms.Form):
     nodes = forms.IntegerField()
     walltime = forms.IntegerField()
 
-class LogForm(forms.Form):
-    file = forms.FileField()
-
 class Job(models.Model):
     molecule = models.CharField(max_length=400)
     name = models.CharField(max_length=400)
