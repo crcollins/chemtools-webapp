@@ -62,7 +62,14 @@ def change_settings(request, username):
 
     changed = False
 
-    settings_form = SettingsForm(request.POST or None, initial={"email": request.user.email})
+    initial = {
+                "email": request.user.email,
+                "public_key": user_profile.public_key,
+                "private_key": user_profile.private_key,
+                "xsede_username": user_profile.xsede_username,
+                }
+
+    settings_form = SettingsForm(request.POST or None, initial=initial)
     if settings_form.is_valid():
         d = dict(settings_form.cleaned_data)
         if request.user.email != d.get("email"):
