@@ -1,7 +1,8 @@
-from Crypto.PublicKey import RSA
-from Crypto import Random
 import random
 import hashlib
+
+from Crypto.PublicKey import RSA
+from Crypto import Random
 
 from chem.utils import get_ssh_connection, StringIO
 
