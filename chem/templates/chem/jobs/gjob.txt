@@ -16,8 +16,10 @@ temp=/scratch/$USER/$PBS_JOBID
 export GAUSS_SCRDIR=$temp
 . /etc/profile.d/modules.sh
 module load gaussian
-exe=`which g09`
-/usr/bin/time $exe < $name.gjf > $name.log
+gaussian=`which g09`
+formchk=`which formchk`
+/usr/bin/time $gaussian < $name.gjf > $name.log
+$formchk $name.chk $name.fchk
 
 mv $name.* $base/done/
 

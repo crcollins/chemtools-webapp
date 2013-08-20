@@ -1,17 +1,24 @@
 #!/bin/bash
 #PBS -l nodes={{ nodes }}
-#PBS -l walltime={{ time}}
+#PBS -l walltime={{ time }}
 #PBS -o {{ name }}.out
 #PBS -e {{ name }}.err
 #PBS -m bea
 #PBS -M {{ email }}
-#PBS -A TG-CHE120020
+#PBS -A TG-CHE120081
 #PBS -V
-cd $PBS_O_WORKDIR
-export GAUSS_SCRDIR=/state/partition1/${% templatetag openvariable %}USER{% templatetag closevariable %}/${% templatetag openvariable %}PBS_JOBID{% templatetag closevariable %}
+
+name={{ name }}
+base=$HOME{% if internal %}/chemtools/{% endif %}
+temp=/scratch/$USER/$PBS_JOBID
+
+#cp $base/$name.gjf $temp
+export GAUSS_SCRDIR=$temp
 . /etc/profile.d/modules.sh
 module load gaussian
-exe=`which g09`
-/usr/bin/time $exe < {{ name }}.gjf> {{ name }}.log
+gaussian=`which g09`
+formchk=`which formchk`
+/usr/bin/time $gaussian < $name.gjf > $name.log
+$formchk $name.chk $name.fchk
 
-mv {{ name }}.* $HOME/done/
+mv $name.* $base/done/
