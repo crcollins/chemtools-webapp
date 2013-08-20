@@ -12,7 +12,6 @@ from django.core.servers.basehttp import FileWrapper
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.utils import simplejson
-import misaka
 
 from models import ErrorReport, ErrorReportForm, JobForm, LogForm, Job
 import gjfwriter
@@ -34,19 +33,6 @@ def index(request):
         else:
             return redirect(func, request.GET.get("molecule"))
     return render(request, "chem/index.html")
-
-def docs(request):
-    a = "".join(open("README.md", "r").readlines())
-    headerend = a.index("Build")
-    bodystart = a.index("_" * 71 + "\nNaming")
-    tree = misaka.html(a[bodystart:], render_flags=misaka.HTML_TOC_TREE)
-    body = misaka.html(a[bodystart:], render_flags=misaka.HTML_TOC)
-    c = Context({
-        "header": misaka.html(a[:headerend]),
-        "toc": utils.postprocess_toc(tree, "#"),
-        "docs": utils.postprocess_toc(body, 'id="'),
-        })
-    return render(request, "chem/docs.html", c)
 
 def frag_index(request):
     data = (
