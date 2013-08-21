@@ -350,7 +350,7 @@ def read_data(filename):
 
 ##############################################################################
 
-class Output(object):
+class GJFWriter(object):
     def __init__(self, name, basis):
         self.name = name
         self.basis = basis if basis else "B3LYP/6-31g(d)"

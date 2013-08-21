@@ -229,7 +229,7 @@ def gen_multi_detail_zip(request, string):
     generrors = []
     for name in molecules:
         try:
-            out = gjfwriter.Output(name, basis)
+            out = gjfwriter.GJFWriter(name, basis)
             others = False
 
             if request.GET.get("image"):
@@ -268,7 +268,7 @@ def write_gjf(request, molecule):
     basis = request.GET.get("basis")
     add = "" if request.GET.get("view") else "attachment; "
 
-    out = gjfwriter.Output(molecule, basis)
+    out = gjfwriter.GJFWriter(molecule, basis)
     f = StringIO(out.write_file())
     response = HttpResponse(FileWrapper(f), content_type="text/plain")
     response['Content-Disposition'] = add + 'filename=%s.gjf' % molecule
@@ -277,7 +277,7 @@ def write_gjf(request, molecule):
 def write_mol2(request, molecule):
     add = "" if request.GET.get("view") else "attachment; "
 
-    out = gjfwriter.Output(molecule, '')
+    out = gjfwriter.GJFWriter(molecule, '')
     f = StringIO(out.write_file(False))
     response = HttpResponse(FileWrapper(f), content_type="text/plain")
     response['Content-Disposition'] = add + 'filename=%s.mol2' % molecule
@@ -286,7 +286,7 @@ def write_mol2(request, molecule):
 def write_png(request, molecule):
     scale = request.GET.get("scale", 10)
 
-    out = gjfwriter.Output(molecule, '')
+    out = gjfwriter.GJFWriter(molecule, '')
     response = HttpResponse(content_type="image/png")
     out.molecule.draw(int(scale)).save(response, "PNG")
     response['Content-Disposition'] = 'filename=%s.png' % molecule

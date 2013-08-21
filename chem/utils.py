@@ -124,7 +124,7 @@ def run_job(user, gjfstring, jobstring=None, **kwargs):
 
 def run_standard_job(user, molecule, **kwargs):
     try:
-        out = gjfwriter.Output(molecule, kwargs.get("basis", "b3lyp/6-31g(d)"))
+        out = gjfwriter.GJFWriter(molecule, kwargs.get("basis", "b3lyp/6-31g(d)"))
     except Exception as e:
         return None, e
 
