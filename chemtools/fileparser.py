@@ -4,9 +4,6 @@ from cStringIO import StringIO
 
 from utils import Output, catch
 
-##############################################################################
-# LineParsers
-##############################################################################
 
 class Log(object):
     PARSERS = dict()
@@ -78,6 +75,27 @@ class Log(object):
 
     def format_header(self):
         return ', '.join(["Name"] + self.order)
+
+
+class LogSet(Output):
+    def __init__(self):
+        super(LogSet, self).__init__()
+        self.logs = []
+        self.header = ''
+
+    @catch
+    def parse_file(self, f):
+        x = Log(f)
+        self.logs.append(x)
+        new = x.format_header()
+        if len(new) > len(self.header):
+            self.header = new
+        self.write(x.format_data())
+
+    def format_output(self, errors=True):
+        s = self.header + "\n"
+        s += super(LogSet, self).format_output(errors)
+        return s
 
 
 ##############################################################################
@@ -290,29 +308,3 @@ class Dipole(LineParser):
         if line.startswith("X="):
             self.value = line.split()[-1]
             self.done = True
-
-
-##############################################################################
-# Sets
-##############################################################################
-
-
-class LogSet(Output):
-    def __init__(self):
-        super(LogSet, self).__init__()
-        self.logs = []
-        self.header = ''
-
-    @catch
-    def parse_file(self, f):
-        x = Log(f)
-        self.logs.append(x)
-        new = x.format_header()
-        if len(new) > len(self.header):
-            self.header = new
-        self.write(x.format_data())
-
-    def format_output(self, errors=True):
-        s = self.header + "\n"
-        s += super(LogSet, self).format_output(errors)
-        return s
