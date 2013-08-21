@@ -7,7 +7,7 @@ from django.template import Context
 from django.http import HttpResponse
 from django.core.servers.basehttp import FileWrapper
 
-from chemtools import fileparser
+from chemtools import fileparser, dataparser
 import utils
 
 def upload_data(request):
@@ -41,7 +41,7 @@ def parse_data(request):
     zfile = zipfile.ZipFile(buff, 'w', zipfile.ZIP_DEFLATED)
 
     for i, f in enumerate(utils.parse_file_list(request.FILES.getlist('myfiles'))):
-        parser = fileparser.DataParser(f)
+        parser = dataparser.DataParser(f)
         homolumo, gap = parser.get_graphs()
 
         name, _ = os.path.splitext(f.name)
