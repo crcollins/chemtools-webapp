@@ -7,7 +7,7 @@ import copy
 import Image
 import ImageDraw
 
-DATAPATH = "chem/data"
+DATAPATH = "chemtools/data"
 DB = [x for x in os.listdir(DATAPATH)]
 CORES = [x for x in DB if len(x) == 3]
 OTHERS = [x for x in DB if len(x) == 1]

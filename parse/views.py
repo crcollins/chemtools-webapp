@@ -7,7 +7,7 @@ from django.template import Context
 from django.http import HttpResponse
 from django.core.servers.basehttp import FileWrapper
 
-from chem import fileparser # hack for now
+from chemtools import fileparser
 import utils
 
 def upload_data(request):

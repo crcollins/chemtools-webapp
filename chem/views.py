@@ -14,8 +14,10 @@ from django.core.urlresolvers import reverse
 from django.utils import simplejson
 
 from models import ErrorReport, ErrorReportForm, JobForm, Job
-import gjfwriter
 import utils
+
+from chemtools import gjfwriter
+from chemtools.utils import name_expansion, write_job
 
 def index(request):
     if request.GET.get("molecule"):
@@ -80,7 +82,7 @@ def _get_job_form(request, molecule):
 def _get_molecules_info(string):
     errors = []
     warnings = []
-    molecules = utils.name_expansion(string)
+    molecules = name_expansion(string)
     start = time.time()
     for mol in molecules:
         if time.time() - start > 1:
@@ -97,7 +99,7 @@ def _get_molecules_info(string):
 def molecule_check(request, string):
     a = {
         "error": None,
-        "molecules": [[x] for x in utils.name_expansion(string)]
+        "molecules": [[x] for x in name_expansion(string)]
     }
     try:
         molecules, warnings, errors = _get_molecules_info(string)
@@ -116,7 +118,7 @@ def gen_detail(request, molecule):
     if form.is_valid():
         d = dict(form.cleaned_data)
         if request.method == "GET":
-            response = HttpResponse(utils.write_job(**d), content_type="text/plain")
+            response = HttpResponse(write_job(**d), content_type="text/plain")
             response['Content-Disposition'] = add + 'filename=%s.job' % molecule
             return response
         elif request.method == "POST":
@@ -155,7 +157,7 @@ def gen_multi_detail(request, string):
         if request.method == "GET":
             molecule = request.REQUEST.get("molname","")
             d["name"] = re.sub(r"{{\s*name\s*}}", molecule, d["name"])
-            response = HttpResponse(utils.write_job(**d), content_type="text/plain")
+            response = HttpResponse(write_job(**d), content_type="text/plain")
             response['Content-Disposition'] = add + 'filename=%s.job' % molecule
             return response
 
@@ -169,7 +171,7 @@ def gen_multi_detail(request, string):
                 a["error"] = "You must be a staff user to submit a job."
                 return HttpResponse(simplejson.dumps(a), mimetype="application/json")
 
-            for mol in utils.name_expansion(string):
+            for mol in name_expansion(string):
                 dnew = d.copy()
                 dnew["name"] = re.sub(r"{{\s*name\s*}}", mol, dnew["name"])
                 jobid, e = utils.run_standard_job(request.user, mol, basis=basis, internal=True, **dnew)
@@ -241,7 +243,7 @@ def gen_multi_detail_zip(request, string):
             if request.GET.get("job"):
                 dnew = d.copy()
                 dnew["name"] = re.sub(r"{{\s*name\s*}}", name, dnew["name"])
-                zfile.writestr(name + ".job", utils.write_job(**dnew))
+                zfile.writestr(name + ".job", write_job(**dnew))
                 others = True
 
             if request.GET.get("gjf") or not others:
@@ -339,7 +341,7 @@ def upload_gjf(request, form):
             pass
             jobid, e = utils.run_job(request.user, name, dnew.get("cluster"), internal=True, **dnew)
         else:
-            zfile.writestr("%s.%sjob" % (pathname, dnew.get("cluster")), utils.write_job(**dnew))
+            zfile.writestr("%s.%sjob" % (pathname, dnew.get("cluster")), write_job(**dnew))
 
     if request.POST.get("postjob"):
         return HttpResponse(simplejson.dumps(a), mimetype="application/json")
