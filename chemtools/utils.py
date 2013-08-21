@@ -3,6 +3,13 @@ import itertools
 
 from django.template import loader, Context
 
+CORES = ["CON","TON","CSN","TSN","CNN","TNN","CCC","TCC"]
+XGROUPS = ["A","B","C","D","E","F","G","H","I","J","K","L"]
+RGROUPS = ["a","b","c","d","e","f","g","h","i","j","k","l"]
+ARYL0 = ["2","3","8","9"]
+ARYL2 = ["4","5","6","7"]
+ARYL = ARYL0 + ARYL2
+
 def catch(fn):
     '''Decorator to catch all exceptions and log them.'''
     def wrapper(self, *args, **kwargs):
@@ -58,12 +65,12 @@ def name_expansion(string):
     varparse = re.compile(r"\$\w*")
 
     variables = {
-        "CORES": "CON,TON,CSN,TSN,CNN,TNN,CCC,TCC",
-        "RGROUPS": "a,b,c,d,e,f,g,h,i,j,k,l",
-        "XGROUPS": "A,B,C,D,E,F,G,H,I,J,K,L",
-        "ARYL": "2,3,4,5,6,7,8,9",
-        "ARYL0": "2,3,8,9",
-        "ARYL2": "4,5,6,7",
+        "CORES":    ','.join(CORES),
+        "RGROUPS":  ','.join(RGROUPS),
+        "XGROUPS":  ','.join(XGROUPS),
+        "ARYL":     ','.join(ARYL),
+        "ARYL0":    ','.join(ARYL0),
+        "ARYL2":    ','.join(ARYL2),
     }
 
     def get_var(name):

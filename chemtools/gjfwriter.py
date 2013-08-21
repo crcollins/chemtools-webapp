@@ -7,10 +7,10 @@ import copy
 import Image
 import ImageDraw
 
+from utils import CORES, XGROUPS, RGROUPS, ARYL0, ARYL2, ARYL
+
 DATAPATH = "chemtools/data"
-DB = [x for x in os.listdir(DATAPATH)]
-CORES = [x for x in DB if len(x) == 3]
-OTHERS = [x for x in DB if len(x) == 1]
+ALL = CORES + XGROUPS + RGROUPS + ARYL
 
 ##############################################################################
 
@@ -478,7 +478,7 @@ def parse_name(name):
     else:
         try:
             letter = right[0][0]
-            if letter.lower() in DB and letter.lower() != letter:
+            if letter.lower() in ALL and letter.lower() != letter:
                 middle = letter
                 right = right[0][1:]
             else:
@@ -494,10 +494,10 @@ def parse_name(name):
     return core, parsedsides, nm, xyz
 
 def parse_end_name(name):
-    xgroup = "ABCDEFGHIJKL"
-    rgroup = "abcdefghijkl"
-    aryl0 = "2389"
-    aryl2 = "4567"
+    xgroup = ''.join(XGROUPS)
+    rgroup = ''.join(RGROUPS)
+    aryl0 = ''.join(ARYL0)
+    aryl2 = ''.join(ARYL2)
 
     parts = []
     r = 0
