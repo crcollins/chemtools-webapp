@@ -26,8 +26,8 @@ def index(request):
         if set(",{}$") & set(request.GET.get("molecule")):
             func = gen_multi_detail
 
-        a = {"basis": request.GET.get("basis")}
-        if a["basis"] != "B3LYP/6-31g(d)":
+        a = {"keywords": request.GET.get("keywords")}
+        if a["keywords"] != "B3LYP/6-31g(d)":
             b = "%s?%s" % (reverse(func, args=(request.GET.get("molecule"), )),
                 urllib.urlencode(a))
             return HttpResponseRedirect(b)
@@ -69,7 +69,7 @@ def _get_job_form(request, molecule):
     req = request.REQUEST
     a = dict(req)
 
-    if a and a.keys() != ["basis"]:
+    if a and a.keys() != ["keywords"]:
         form = JobForm(req, initial=a)
     else:
         if request.user.is_authenticated():
@@ -112,7 +112,7 @@ def molecule_check(request, string):
 def gen_detail(request, molecule):
     _, warnings, errors = _get_molecules_info(molecule)
     form = _get_job_form(request, molecule)
-    basis = request.REQUEST.get("basis")
+    keywords = request.REQUEST.get("keywords")
     add = "" if request.GET.get("view") else "attachment; "
 
     if form.is_valid():
@@ -125,7 +125,7 @@ def gen_detail(request, molecule):
             if not request.user.is_staff:
                 a = {"error": "You must be a staff user to submit a job."}
                 return HttpResponse(simplejson.dumps(a), mimetype="application/json")
-            d["basis"] = basis
+            d["keywords"] = keywords
             d["internal"] = True
             jobid, e = utils.run_standard_job(request.user, molecule, **d)
             a = {
@@ -142,14 +142,14 @@ def gen_detail(request, molecule):
         "form": form,
         "known_errors": warnings[0],
         "error_message": errors[0],
-        "encoded_basis": '?' + urllib.urlencode({"basis": basis}) if basis else '',
-        "basis": basis,
+        "encoded_keywords": '?' + urllib.urlencode({"keywords": keywords}) if keywords else '',
+        "keywords": keywords,
         })
     return render(request, "chem/molecule_detail.html", c)
 
 def gen_multi_detail(request, string):
     form = _get_job_form(request, "{{ name }}")
-    basis = request.REQUEST.get("basis", "")
+    keywords = request.REQUEST.get("keywords", "")
     add = "" if request.GET.get("view") else "attachment; "
 
     if form.is_valid():
@@ -174,7 +174,7 @@ def gen_multi_detail(request, string):
             for mol in name_expansion(string):
                 dnew = d.copy()
                 dnew["name"] = re.sub(r"{{\s*name\s*}}", mol, dnew["name"])
-                jobid, e = utils.run_standard_job(request.user, mol, basis=basis, internal=True, **dnew)
+                jobid, e = utils.run_standard_job(request.user, mol, keywords=keywords, internal=True, **dnew)
                 if e is None:
                     job = Job(molecule=mol, jobid=jobid, **dnew)
                     job.save()
@@ -187,13 +187,13 @@ def gen_multi_detail(request, string):
         "pagename": string,
         "form": form,
         "gjf": "checked",
-        "encoded_basis": '?' + urllib.urlencode({"basis": basis}) if basis else '',
-        "basis": basis,
+        "encoded_keywords": '?' + urllib.urlencode({"keywords": keywords}) if keywords else '',
+        "keywords": keywords,
         })
     return render(request, "chem/multi_molecule.html", c)
 
 def gen_multi_detail_zip(request, string):
-    basis = request.GET.get("basis")
+    keywords = request.GET.get("keywords")
 
     buff = StringIO()
     zfile = zipfile.ZipFile(buff, "w", zipfile.ZIP_DEFLATED)
@@ -211,7 +211,7 @@ def gen_multi_detail_zip(request, string):
         if form.is_valid():
             d = dict(form.cleaned_data)
         else:
-            basis = request.GET.get("basis")
+            keywords = request.GET.get("keywords")
             f = lambda x: 'checked' if request.GET.get(x) else ''
 
             c = Context({
@@ -222,14 +222,14 @@ def gen_multi_detail_zip(request, string):
                 "mol2": f("mol2"),
                 "image": f("image"),
                 "job": f("job"),
-                "basis": '?' + urllib.urlencode({"basis": basis}) if basis else '',
+                "keywords": '?' + urllib.urlencode({"keywords": keywords}) if keywords else '',
                 })
             return render(request, "chem/multi_molecule.html", c)
 
     generrors = []
     for name in molecules:
         try:
-            out = gjfwriter.GJFWriter(name, basis)
+            out = gjfwriter.GJFWriter(name, keywords)
             others = False
 
             if request.GET.get("image"):
@@ -265,10 +265,10 @@ def gen_multi_detail_zip(request, string):
     return response
 
 def write_gjf(request, molecule):
-    basis = request.GET.get("basis")
+    keywords = request.GET.get("keywords")
     add = "" if request.GET.get("view") else "attachment; "
 
-    out = gjfwriter.GJFWriter(molecule, basis)
+    out = gjfwriter.GJFWriter(molecule, keywords)
     f = StringIO(out.write_file())
     response = HttpResponse(FileWrapper(f), content_type="text/plain")
     response['Content-Disposition'] = add + 'filename=%s.gjf' % molecule

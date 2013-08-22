@@ -351,16 +351,16 @@ def read_data(filename):
 ##############################################################################
 
 class GJFWriter(object):
-    def __init__(self, name, basis):
+    def __init__(self, name, keywords):
         self.name = name
-        self.basis = basis if basis else "B3LYP/6-31g(d)"
+        self.keywords = keywords if keywords else "B3LYP/6-31g(d)"
         self.molecule = self.build(name)
 
     def write_file(self, gjf=True):
         starter = [
                     "%mem=59GB",
                     "%%chk=%s.chk" % self.name,
-                    "# %s geom=connectivity" % self.basis,
+                    "# %s geom=connectivity" % self.keywords,
                     "",
                     self.name,
                     "",

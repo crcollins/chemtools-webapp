@@ -46,8 +46,8 @@ $(function() {
     {% else %}
         <img src="../{{ molecule }}.png"></img>
         <ul>
-            <li><a href="../{{ molecule }}.gjf{{ encoded_basis }}">gjf File</a></li>
-            <li><a href="../{{ molecule }}.mol2{{ encoded_basis }}">mol2 File</a></li>
+            <li><a href="../{{ molecule }}.gjf{{ encoded_keywords }}">gjf File</a></li>
+            <li><a href="../{{ molecule }}.mol2{{ encoded_keywords }}">mol2 File</a></li>
         </ul>
     <div class="hide-container">
     <div class="hide-title">
@@ -58,7 +58,7 @@ $(function() {
             <table>
                 {{ form.as_table }}
             </table>
-            {% if basis %}<input type="hidden" name="basis" value="{{ basis }}">{% endif %}
+            {% if keywords %}<input type="hidden" name="keywords" value="{{ keywords }}">{% endif %}
             <table>
                 <tr><th>
                     {% if user.is_authenticated %}
