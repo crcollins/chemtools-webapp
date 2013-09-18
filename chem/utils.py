@@ -38,6 +38,7 @@ def write_job(**kwargs):
             "ncpus": int(kwargs["nodes"]) * 16,
             "time": "%s:00:00" % kwargs["walltime"],
             "internal": kwargs.get("internal", ''),
+            "allocation": kwargs["allocation"],
             })
         return loader.render_to_string(template, c)
     else:

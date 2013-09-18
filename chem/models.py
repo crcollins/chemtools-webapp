@@ -35,6 +35,7 @@ class JobForm(forms.Form):
     cluster = forms.ChoiceField(choices=CLUSTERS)
     nodes = forms.IntegerField()
     walltime = forms.IntegerField()
+    allocation = forms.CharField(max_length=12)
 
 class LogForm(forms.Form):
     file = forms.FileField()

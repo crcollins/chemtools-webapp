@@ -5,7 +5,7 @@
 #PBS -e {{ name }}.err
 #PBS -m bea
 #PBS -M {{ email }}
-#PBS -A TG-CHE120081
+#PBS -A {{ allocation }}
 #PBS -V
 
 name={{ name }}
