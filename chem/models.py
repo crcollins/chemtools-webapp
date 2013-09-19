@@ -1,13 +1,7 @@
 from django.db import models
 from django import forms
 
-CLUSTERS = (
-    ("b", "Blacklight"),
-    ("t", "Trestles"),
-    ("g", "Gordon"),
-    ("c", "Carver"),
-    ("h", "Hooper"),
-    )
+from chemtools.utils import CLUSTER_TUPLES
 
 JOBSTATE = (
     (0, "Submitted"),
@@ -34,14 +28,14 @@ class JobForm(forms.Form):
     email = forms.EmailField()
     nodes = forms.IntegerField()
     walltime = forms.IntegerField()
-    cluster = forms.ChoiceField(choices=CLUSTERS)
+    cluster = forms.ChoiceField(choices=CLUSTER_TUPLES)
     template = forms.CharField(widget=forms.Textarea(attrs={'cols': 50, 'rows': 26}))
 
 class Job(models.Model):
     molecule = models.CharField(max_length=400)
     name = models.CharField(max_length=400)
     email = models.EmailField()
-    cluster = models.CharField(max_length=1, choices=CLUSTERS)
+    cluster = models.CharField(max_length=1, choices=CLUSTER_TUPLES)
     nodes = models.IntegerField()
     walltime = models.IntegerField()
     jobid = models.CharField(max_length=400)

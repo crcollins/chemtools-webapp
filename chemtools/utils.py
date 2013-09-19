@@ -9,6 +9,14 @@ RGROUPS = ["a","b","c","d","e","f","g","h","i","j","k","l"]
 ARYL0 = ["2","3","8","9"]
 ARYL2 = ["4","5","6","7"]
 ARYL = ARYL0 + ARYL2
+CLUSTERS = {
+    "b": "Blacklight",
+    "t": "Trestles",
+    "g": "Gordon",
+    "c": "Carver",
+    "h": "Hooper",
+}
+CLUSTER_TUPLES = [(x, CLUSTERS[x]) for x in CLUSTERS.keys()]
 
 def catch(fn):
     '''Decorator to catch all exceptions and log them.'''
@@ -46,7 +54,7 @@ class Output(object):
 
 
 def write_job(**kwargs):
-    if "cluster" in kwargs and kwargs["cluster"] in "bcgbht":
+    if "cluster" in kwargs and kwargs["cluster"] in CLUSTERS.keys():
         template = Template(kwargs.get("template", ''))
         c = Context({
             "name": kwargs["name"],

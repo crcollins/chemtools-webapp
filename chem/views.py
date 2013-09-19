@@ -13,11 +13,11 @@ from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.utils import simplejson
 
-from models import ErrorReport, ErrorReportForm, JobForm, Job, CLUSTERS
+from models import ErrorReport, ErrorReportForm, JobForm, Job
 import utils
 
 from chemtools import gjfwriter
-from chemtools.utils import name_expansion, write_job
+from chemtools.utils import name_expansion, write_job, CLUSTERS, CLUSTER_TUPLES
 
 def index(request):
     if request.GET.get("molecule"):
@@ -59,13 +59,13 @@ def get_frag(request, frag):
         return redirect(frag)
 
 def template_index(request):
-    data = [x[1] for x in CLUSTERS]
+    data = [CLUSTERS[x] for x in CLUSTERS.keys()]
     c = Context({"templates": data})
     return render(request, "chem/template_index.html", c)
 
 def get_template(request, template):
     template = template.lower()
-    if template in [x.lower() for x in sum(CLUSTERS, ())]:
+    if template in [x.lower() for x in sum(CLUSTER_TUPLES, ())]:
         letter = template[0]
         f = open("chemtools/templates/chemtools/%sjob.txt" % letter)
         response = HttpResponse(FileWrapper(f), content_type="text/plain")
