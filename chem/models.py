@@ -32,9 +32,10 @@ class ErrorReportForm(forms.ModelForm):
 class JobForm(forms.Form):
     name = forms.CharField(max_length=400)
     email = forms.EmailField()
-    cluster = forms.ChoiceField(choices=CLUSTERS)
     nodes = forms.IntegerField()
     walltime = forms.IntegerField()
+    cluster = forms.ChoiceField(choices=CLUSTERS)
+    template = forms.CharField(widget=forms.Textarea(attrs={'cols': 50, 'rows': 26}))
 
 class Job(models.Model):
     molecule = models.CharField(max_length=400)

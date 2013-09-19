@@ -1,7 +1,7 @@
 import re
 import itertools
 
-from django.template import loader, Context
+from django.template import Template, Context
 
 CORES = ["CON","TON","CSN","TSN","CNN","TNN","CCC","TCC"]
 XGROUPS = ["A","B","C","D","E","F","G","H","I","J","K","L"]
@@ -47,7 +47,7 @@ class Output(object):
 
 def write_job(**kwargs):
     if "cluster" in kwargs and kwargs["cluster"] in "bcgbht":
-        template = "chem/jobs/%sjob.txt" % kwargs["cluster"]
+        template = Template(kwargs.get("template", ''))
         c = Context({
             "name": kwargs["name"],
             "email": kwargs["email"],
@@ -56,7 +56,8 @@ def write_job(**kwargs):
             "time": "%s:00:00" % kwargs["walltime"],
             "internal": kwargs.get("internal", ''),
             })
-        return loader.render_to_string(template, c)
+
+        return template.render(c)
     else:
         return ''
 
