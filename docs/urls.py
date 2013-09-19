@@ -4,5 +4,5 @@ from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns('docs.views',
-    url(r'^$', "index")
+    url(r'^$', "index", name="docs")
 )

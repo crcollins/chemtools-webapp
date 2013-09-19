@@ -9,13 +9,13 @@
     <div class="welcome">
         <ul>
             <li>To make a molecule or set a molecules, enter their name(s) in the form below.</li>
-            <li>To extract data from log files or to do other file operations click <a href="upload">Upload</a>.</li>
+            <li>To extract data from log files or to do other file operations click <a href="{% url upload %}">Upload</a>.</li>
             {% if user.is_authenticated %}
-                <li><a href="/u/{{ user }}">Click here</a> to change your account information.</li>
+                <li><a href="{% url user_settings user %}">Click here</a> to change your account information.</li>
             {% else %}
-                <li><a href="/register">Register an account.</a></li>
+                <li><a href="{% url register %}">Register an account.</a></li>
             {% endif %}
-            <li>For more information refer to the <a href="/docs/">Docs</a>.</li>
+            <li>For more information refer to the <a href="{% url docs %}">Docs</a>.</li>
         </ul>
     </div>
     <table class="left-min">
@@ -28,7 +28,7 @@
             </th>
             <th></th>
         </tr>
-        <form enctype="multipart/form-data" action="/chem" method="get">
+        <form enctype="multipart/form-data" action="{% url chem_index %}" method="get">
         <tr>
             <td>
                 <input size=35 type="text" name="molecule">
