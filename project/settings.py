@@ -155,6 +155,7 @@ INSTALLED_APPS = (
     'account',
     'docs',
     'parse',
+    'data',
  )
 
 # A sample logging configuration. The only tangible logging

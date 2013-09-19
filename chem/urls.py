@@ -5,10 +5,6 @@ admin.autodiscover()
 
 urlpatterns = patterns('chem.views',
     url(r'^$', "index"),
-    url(r"^frag/$", "frag_index"),
-    url(r"^frag/(?P<frag>[A-Za-z0-9]*)/$", "get_frag"),
-    url(r"^template/$", "template_index"),
-    url(r"^template/(?P<template>[A-Za-z0-9]*)/$", "get_template"),
 
     url(r"^jobs/$", "job_index"),
     url(r"^jobs.json$", "get_job_list"),
