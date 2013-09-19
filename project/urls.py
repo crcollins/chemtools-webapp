@@ -4,6 +4,7 @@ from settings import HOME_URL
 admin.autodiscover()
 
 urlpatterns = patterns('',
+    url(r'^$', "chem.views.index"),
     url(r'^u/', include("account.urls")),
     url(r'^docs/', include("docs.urls")),
     url(r'^chem/', include("chem.urls")),
