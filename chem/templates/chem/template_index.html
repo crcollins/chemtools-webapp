@@ -1,0 +1,11 @@
+{% extends "chem/base.html" %}
+
+{% block title %}Templates{% endblock %}
+
+{% block content %}
+    <ul>
+    {% for template in templates %}
+        <li><a href="{{ template }}">{{ template }}</a></li>
+    {% endfor %}
+    </ul>
+{% endblock %}

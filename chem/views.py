@@ -13,7 +13,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.utils import simplejson
 
-from models import ErrorReport, ErrorReportForm, JobForm, Job
+from models import ErrorReport, ErrorReportForm, JobForm, Job, CLUSTERS
 import utils
 
 from chemtools import gjfwriter
@@ -57,6 +57,21 @@ def get_frag(request, frag):
         return response
     else:
         return redirect(frag)
+
+def template_index(request):
+    data = [x[1] for x in CLUSTERS]
+    c = Context({"templates": data})
+    return render(request, "chem/template_index.html", c)
+
+def get_template(request, template):
+    template = template.lower()
+    if template in [x.lower() for x in sum(CLUSTERS, ())]:
+        letter = template[0]
+        f = open("chemtools/templates/chemtools/%sjob.txt" % letter)
+        response = HttpResponse(FileWrapper(f), content_type="text/plain")
+    else:
+        response = HttpResponse('', content_type="text/plain")
+    return response
 
 ###########################################################
 ###########################################################

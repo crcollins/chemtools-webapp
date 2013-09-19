@@ -487,6 +487,17 @@ Here is an example of the Triple Bond.
 There are 3 added symbols in the character set for the element names and those are "~", "*", and "+". These are used to signify the type of things the element can bond to. After the set of possible things to bond to is a number that indicates the order that the bonds get used. So, in the case of the cores, the correct parts of the molecule are built in the correct order.
 
 
+### Job Templates ###
+
+Just like with the fragments, the standard job files can be found here:
+
+    /chem/template/$NAME/
+
+Most of the job files are just standard shell scripts with the headers required for the various supercomputers. The job files can be accessed by either the first letter of the supercomputer, or the full name (case insensitive).
+
+[/chem/template/Gordon/](/chem/template/Gordon)
+
+
 ### Generate SSH Key Pair ###
 This will return json with with two values. The public key is in the OpenSSH format.
 
