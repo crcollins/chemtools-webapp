@@ -42,7 +42,6 @@ def index(request):
 ###########################################################
 ###########################################################
 
-
 def _get_job_form(request, molecule):
     req = request.REQUEST
     a = dict(req)
@@ -81,6 +80,40 @@ def _get_molecules_info(string):
         warn = ErrorReport.objects.filter(molecule=mol)
         warnings.append(True if warn else None)
     return molecules, warnings, errors
+
+def multi_job(request):
+    form = _get_job_form(request, "{{ name }}")
+
+    if not form.is_valid():
+        c = Context({
+            "form": form,
+            })
+        return render(request, "chem/multi_job.html", c)
+
+    buff = StringIO()
+    zfile = zipfile.ZipFile(buff, 'w', zipfile.ZIP_DEFLATED)
+    d = dict(form.cleaned_data)
+
+    lines = request.REQUEST.get('filenames', '').replace(',', '\n')
+    for line in lines.split():
+        print line
+        for name in name_expansion(line):
+            if not name:
+                continue
+            dnew = d.copy()
+            name, _ = os.path.splitext(name)
+            dnew["name"] = re.sub(r"{{\s*name\s*}}", name, dnew["name"])
+            zfile.writestr("%s.%sjob" % (name, dnew.get("cluster")), write_job(**dnew))
+
+    zfile.close()
+    buff.flush()
+
+    ret_zip = buff.getvalue()
+    buff.close()
+
+    response = HttpResponse(ret_zip, mimetype="application/zip")
+    response["Content-Disposition"] = "attachment; filename=output.zip"
+    return response
 
 def molecule_check(request, string):
     a = {
@@ -300,48 +333,6 @@ def report(request, molecule):
         "molecule": molecule
         })
     return render(request, "chem/report.html", c)
-
-def upload_gjf(request, form):
-    if not form.is_valid():
-        c = Context({
-            "form": form,
-            })
-        return render(request, "chem/upload_log.html", c)
-
-    if not request.user.is_staff and request.POST.get("postjob"):
-        a["error"] = "You must be a staff user to submit a job."
-        return HttpResponse(simplejson.dumps(a), mimetype="application/json")
-
-    if not request.POST.get("postjob"):
-        buff = StringIO()
-        zfile = zipfile.ZipFile(buff, 'w', zipfile.ZIP_DEFLATED)
-
-    d = dict(form.cleaned_data)
-    for f in utils.parse_file_list(request.FILES.getlist('myfiles')):
-        dnew = d.copy()
-        pathname, _ = os.path.splitext(f.name)
-        name = os.path.basename(pathname)
-        dnew["name"] = re.sub(r"{{\s*name\s*}}", name, dnew["name"])
-
-        if request.POST.get("postjob"):
-            pass
-            jobid, e = utils.run_job(request.user, name, dnew.get("cluster"), internal=True, **dnew)
-        else:
-            zfile.writestr("%s.%sjob" % (pathname, dnew.get("cluster")), write_job(**dnew))
-
-    if request.POST.get("postjob"):
-        return HttpResponse(simplejson.dumps(a), mimetype="application/json")
-
-    else:
-        zfile.close()
-        buff.flush()
-
-        ret_zip = buff.getvalue()
-        buff.close()
-
-        response = HttpResponse(ret_zip, mimetype="application/zip")
-        response["Content-Disposition"] = "attachment; filename=output.zip"
-        return response
 
 ###########################################################
 ###########################################################

@@ -154,6 +154,7 @@ Job files can be made on the respective molecule pages using the Job Form. The j
 
 Added with just being able to view the job file there is Alpha functionality to be able to directly upload both jobs and molecules to a supercomputer (just Gordon for now) and run the respective job.
 
+Jobs can also be made in bulk using the [Make Jobs](/chem/multi_job/) page.
 
 #### Show Running Jobs ####
 
@@ -185,11 +186,6 @@ Where lines starting with "#" are comments. The n values can be given as either 
 #### Gjf Reset ####
 
 This takes a log file (assumed to be correct) and returns a gjf file with the extracted geometry. This is intended to be used to extract the optimized geometry from the DFT log files to then use as the TDDFT gjf file. _WARNING: this will not work in some cases where the job stopped part way through writing._
-
-
-#### Get Jobs ####
-
-This allows the creation of job files just based on file names. Along with just being able to make jobs, it can also take the files submited and post them to the supercomputers and run the calculation with the new job file.
 
 
 ### Users ###

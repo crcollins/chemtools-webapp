@@ -5,6 +5,7 @@ admin.autodiscover()
 
 urlpatterns = patterns('chem.views',
     url(r'^$', "index", name="chem_index"),
+    url(r'^multi_job/$', "multi_job"),
 
     url(r"^jobs/$", "job_index"),
     url(r"^jobs.json$", "get_job_list"),
