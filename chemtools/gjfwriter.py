@@ -7,10 +7,10 @@ import copy
 import Image
 import ImageDraw
 
-DATAPATH = "chem/data"
-DB = [x for x in os.listdir(DATAPATH)]
-CORES = [x for x in DB if len(x) == 3]
-OTHERS = [x for x in DB if len(x) == 1]
+from utils import CORES, XGROUPS, RGROUPS, ARYL0, ARYL2, ARYL
+
+DATAPATH = "chemtools/data"
+ALL = CORES + XGROUPS + RGROUPS + ARYL
 
 ##############################################################################
 
@@ -350,17 +350,17 @@ def read_data(filename):
 
 ##############################################################################
 
-class Output(object):
-    def __init__(self, name, basis):
+class GJFWriter(object):
+    def __init__(self, name, keywords):
         self.name = name
-        self.basis = basis if basis else "B3LYP/6-31g(d)"
+        self.keywords = keywords if keywords else "B3LYP/6-31g(d)"
         self.molecule = self.build(name)
 
     def write_file(self, gjf=True):
         starter = [
                     "%mem=59GB",
                     "%%chk=%s.chk" % self.name,
-                    "# %s geom=connectivity" % self.basis,
+                    "# %s geom=connectivity" % self.keywords,
                     "",
                     self.name,
                     "",
@@ -478,7 +478,7 @@ def parse_name(name):
     else:
         try:
             letter = right[0][0]
-            if letter.lower() in DB and letter.lower() != letter:
+            if letter.lower() in ALL and letter.lower() != letter:
                 middle = letter
                 right = right[0][1:]
             else:
@@ -494,10 +494,10 @@ def parse_name(name):
     return core, parsedsides, nm, xyz
 
 def parse_end_name(name):
-    xgroup = "ABCDEFGHIJKL"
-    rgroup = "abcdefghijkl"
-    aryl0 = "2389"
-    aryl2 = "4567"
+    xgroup = ''.join(XGROUPS)
+    rgroup = ''.join(RGROUPS)
+    aryl0 = ''.join(ARYL0)
+    aryl2 = ''.join(ARYL2)
 
     parts = []
     r = 0

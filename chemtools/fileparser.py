@@ -1,19 +1,9 @@
-#!/bin/python
 import os
-import math
 import re
 from cStringIO import StringIO
 
-import numpy as np
-from scipy.optimize import curve_fit
-import matplotlib
-matplotlib.use('Cairo')
-import matplotlib.pyplot as plot
-np.seterr(all="ignore")
+from utils import Output, catch
 
-##############################################################################
-# LineParsers
-##############################################################################
 
 class Log(object):
     PARSERS = dict()
@@ -85,6 +75,27 @@ class Log(object):
 
     def format_header(self):
         return ', '.join(["Name"] + self.order)
+
+
+class LogSet(Output):
+    def __init__(self):
+        super(LogSet, self).__init__()
+        self.logs = []
+        self.header = ''
+
+    @catch
+    def parse_file(self, f):
+        x = Log(f)
+        self.logs.append(x)
+        new = x.format_header()
+        if len(new) > len(self.header):
+            self.header = new
+        self.write(x.format_data())
+
+    def format_output(self, errors=True):
+        s = self.header + "\n"
+        s += super(LogSet, self).format_output(errors)
+        return s
 
 
 ##############################################################################
@@ -297,131 +308,3 @@ class Dipole(LineParser):
         if line.startswith("X="):
             self.value = line.split()[-1]
             self.done = True
-
-
-##############################################################################
-# Sets
-##############################################################################
-
-
-def catch(fn):
-    '''Decorator to catch all exceptions and log them.'''
-    def wrapper(self, *args, **kwargs):
-        try:
-            return fn(self, *args, **kwargs)
-        except Exception as e:
-            self.errors.append(repr(e))
-    return wrapper
-
-
-class Output(object):
-    def __init__(self):
-        self.errors = []
-        self.output = []
-
-    def write(self, line, newline=True):
-        try:
-            if newline:
-                self.output.append(line)
-            else:
-                self.output[-1] += line
-        except IndexError:
-            self.output.append(line)
-
-    def format_output(self, errors=True):
-        a = self.output[:]
-        if errors:
-            a += ["\n---- Errors (%i) ----" % len(self.errors)] + self.errors
-        return '\n'.join(a) + "\n"
-
-    @catch
-    def parse_file(self, f):
-        raise NotImplementedError
-
-
-class LogSet(Output):
-    def __init__(self):
-        super(LogSet, self).__init__()
-        self.logs = []
-        self.header = ''
-
-    @catch
-    def parse_file(self, f):
-        x = Log(f)
-        self.logs.append(x)
-        new = x.format_header()
-        if len(new) > len(self.header):
-            self.header = new
-        self.write(x.format_data())
-
-    def format_output(self, errors=True):
-        s = self.header + "\n"
-        s += super(LogSet, self).format_output(errors)
-        return s
-
-
-class DataParser(Output):
-    def __init__(self, f):
-        super(DataParser, self).__init__()
-        self.plots = (StringIO(), StringIO())
-        self.parse_file(f)
-
-    def get_graphs(self):
-        return self.plots
-
-    def extract_data(self, f):
-        out = []
-        for line in f:
-            if not line.startswith("#") and line.strip():
-                out.append([float(x.strip()) for x in line.replace(' ', '').split(',') if x])
-        return out
-
-    @catch
-    def parse_file(self, f):
-        def homofunc(x, a, b):
-            return a * np.sqrt(1 - b * np.cos(math.pi / (x + 1)))
-
-        datax, datahomo, datalumo, datagap = self.extract_data(f)
-
-        x = np.array(datax)
-        maxx = max(datax)
-        if maxx > 1:
-            x = 1. / x
-
-        homoy = np.array(datahomo)
-        (homoa, homob), var_matrix = curve_fit(homofunc, x, homoy, p0=[-8, -.8])
-        self.write("Homo")
-        self.write("A: %f, B: %f" % (homoa, homob))
-        self.write("limit: %f" % homofunc(0, homoa, homob))
-        self.write("")
-
-        lumofunc = lambda x, a, b: homofunc(x, a, b) + homofunc(x, homoa, homob)
-        lumoy = np.array(datalumo)
-        (lumoa, lumob), var_matrix = curve_fit(lumofunc, x, lumoy, p0=[5, -.8])
-        self.write("Lumo")
-        self.write("A: %f, B: %f" % (lumoa, lumob))
-        self.write("limit: %f" % lumofunc(0, lumoa, lumob))
-        self.write("")
-
-        gapfunc = lambda x, a, b: homofunc(x, a, b) + lumofunc(x, lumoa, lumob)
-        gapy = np.array(datagap)
-        (gapa, gapb), var_matrix = curve_fit(gapfunc, x, gapy, p0=[11, -.8])
-        self.write("Gap")
-        self.write("A: %f, B: %f" % (gapa, gapb))
-        self.write("limit: %f" % gapfunc(0, gapa, gapb))
-
-        plot.plot(x, homoy, 'ro')
-        plot.plot(np.linspace(0, maxx, 20), homofunc(np.linspace(0, maxx, 20), homoa, homob), 'r')
-        plot.plot(x, lumoy, 'ro')
-        plot.plot(np.linspace(0, maxx, 20), lumofunc(np.linspace(0, maxx, 20), lumoa, lumob), 'g')
-
-        plot.ylabel("Eg in eV")
-        plot.xlabel("1/N")
-        plot.savefig(self.plots[0], format="eps")
-
-        plot.clf()
-        plot.plot(x, gapy, 'ro')
-        plot.plot(np.linspace(0, maxx, 20), gapfunc(np.linspace(0, maxx, 20), gapa, gapb), 'r')
-        plot.ylabel("Eg in eV")
-        plot.xlabel("1/N")
-        plot.savefig(self.plots[1], format="eps")

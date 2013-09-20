@@ -13,10 +13,11 @@ from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.utils import simplejson
 
-from models import ErrorReport, ErrorReportForm, JobForm, LogForm, Job
-import gjfwriter
-import fileparser
+from models import ErrorReport, ErrorReportForm, JobForm, Job
 import utils
+
+from chemtools import gjfwriter
+from chemtools.utils import name_expansion, write_job
 
 def index(request):
     if request.GET.get("molecule"):
@@ -25,8 +26,8 @@ def index(request):
         if set(",{}$") & set(request.GET.get("molecule")):
             func = gen_multi_detail
 
-        a = {"basis": request.GET.get("basis")}
-        if a["basis"] != "B3LYP/6-31g(d)":
+        a = {"keywords": request.GET.get("keywords")}
+        if a["keywords"] != "B3LYP/6-31g(d)":
             b = "%s?%s" % (reverse(func, args=(request.GET.get("molecule"), )),
                 urllib.urlencode(a))
             return HttpResponseRedirect(b)
@@ -34,28 +35,6 @@ def index(request):
             return redirect(func, request.GET.get("molecule"))
     return render(request, "chem/index.html")
 
-def frag_index(request):
-    data = (
-        ["Cores", ("CON", "TON", "TSN", "CSN", "TNN", "CNN", "CCC", "TCC")],
-        ["X Groups", (["A", "H"], ["B", "Cl"], ["C", "Br"], ["D"," CN"], ["E"," CCH"],
-            ["F", "OH"], ["G", "SH"], ["H", "NH_2"], ["I", "CH_3"], ["J", "phenyl"], ["K", "TMS"],
-             ["L", "OCH_3"])],
-        ["Aryl Groups" , (["2", "double"], ["3", "triple"], ["4", "phenyl"], ["5", "thiophene"],
-            ["6", "pyridine"], ["7", "carbazole"], ["8", "TZ"], ["9", "EDOT"])],
-        ["R Groups" , (["a", "H"], ["b", "Cl"], ["c", "Br"], ["d"," CN"], ["e"," CCH"],
-            ["f", "OH"], ["g", "SH"], ["h", "NH_2"], ["i", "CH_3"], ["j", "phenyl"], ["k", "TMS"],
-             ["l", "OCH_3"])],
-    )
-    c = Context({"usable_parts": data})
-    return render(request, "chem/frag_index.html", c)
-
-def get_frag(request, frag):
-    if frag in os.listdir("chem/data/"):
-        f = open("chem/data/" + frag, "r")
-        response = HttpResponse(FileWrapper(f), content_type="text/plain")
-        return response
-    else:
-        return redirect(frag)
 
 ###########################################################
 ###########################################################
@@ -68,20 +47,28 @@ def _get_job_form(request, molecule):
     req = request.REQUEST
     a = dict(req)
 
-    if a and a.keys() != ["basis"]:
+    if a and a.keys() != ["keywords"]:
         form = JobForm(req, initial=a)
     else:
         if request.user.is_authenticated():
             email = request.user.email
         else:
             email = ""
-        form = JobForm(initial={"name": molecule, "email": email, "cluster": "g", "allocation": "TG-CHE120081"})
+        with open("chemtools/templates/chemtools/gjob.txt" , "r") as f:
+            text = f.read()
+        form = JobForm(initial={
+            "name": molecule,
+            "email": email,
+            "cluster": 'g',
+            "allocation": "TG-CHE120081",
+            "template":text,
+            })
     return form
 
 def _get_molecules_info(string):
     errors = []
     warnings = []
-    molecules = utils.name_expansion(string)
+    molecules = name_expansion(string)
     start = time.time()
     for mol in molecules:
         if time.time() - start > 1:
@@ -98,7 +85,7 @@ def _get_molecules_info(string):
 def molecule_check(request, string):
     a = {
         "error": None,
-        "molecules": [[x] for x in utils.name_expansion(string)]
+        "molecules": [[x] for x in name_expansion(string)]
     }
     try:
         molecules, warnings, errors = _get_molecules_info(string)
@@ -111,20 +98,20 @@ def molecule_check(request, string):
 def gen_detail(request, molecule):
     _, warnings, errors = _get_molecules_info(molecule)
     form = _get_job_form(request, molecule)
-    basis = request.REQUEST.get("basis")
+    keywords = request.REQUEST.get("keywords")
     add = "" if request.GET.get("view") else "attachment; "
 
     if form.is_valid():
         d = dict(form.cleaned_data)
         if request.method == "GET":
-            response = HttpResponse(utils.write_job(**d), content_type="text/plain")
+            response = HttpResponse(write_job(**d), content_type="text/plain")
             response['Content-Disposition'] = add + 'filename=%s.job' % molecule
             return response
         elif request.method == "POST":
             if not request.user.is_staff:
                 a = {"error": "You must be a staff user to submit a job."}
                 return HttpResponse(simplejson.dumps(a), mimetype="application/json")
-            d["basis"] = basis
+            d["keywords"] = keywords
             d["internal"] = True
             jobid, e = utils.run_standard_job(request.user, molecule, **d)
             a = {
@@ -141,14 +128,14 @@ def gen_detail(request, molecule):
         "form": form,
         "known_errors": warnings[0],
         "error_message": errors[0],
-        "encoded_basis": '?' + urllib.urlencode({"basis": basis}) if basis else '',
-        "basis": basis,
+        "encoded_keywords": '?' + urllib.urlencode({"keywords": keywords}) if keywords else '',
+        "keywords": keywords,
         })
     return render(request, "chem/molecule_detail.html", c)
 
 def gen_multi_detail(request, string):
     form = _get_job_form(request, "{{ name }}")
-    basis = request.REQUEST.get("basis", "")
+    keywords = request.REQUEST.get("keywords", "")
     add = "" if request.GET.get("view") else "attachment; "
 
     if form.is_valid():
@@ -156,7 +143,7 @@ def gen_multi_detail(request, string):
         if request.method == "GET":
             molecule = request.REQUEST.get("molname","")
             d["name"] = re.sub(r"{{\s*name\s*}}", molecule, d["name"])
-            response = HttpResponse(utils.write_job(**d), content_type="text/plain")
+            response = HttpResponse(write_job(**d), content_type="text/plain")
             response['Content-Disposition'] = add + 'filename=%s.job' % molecule
             return response
 
@@ -170,10 +157,10 @@ def gen_multi_detail(request, string):
                 a["error"] = "You must be a staff user to submit a job."
                 return HttpResponse(simplejson.dumps(a), mimetype="application/json")
 
-            for mol in utils.name_expansion(string):
+            for mol in name_expansion(string):
                 dnew = d.copy()
                 dnew["name"] = re.sub(r"{{\s*name\s*}}", mol, dnew["name"])
-                jobid, e = utils.run_standard_job(request.user, mol, basis=basis, internal=True, **dnew)
+                jobid, e = utils.run_standard_job(request.user, mol, keywords=keywords, internal=True, **dnew)
                 if e is None:
                     job = Job(molecule=mol, jobid=jobid, **dnew)
                     job.save()
@@ -186,13 +173,13 @@ def gen_multi_detail(request, string):
         "pagename": string,
         "form": form,
         "gjf": "checked",
-        "encoded_basis": '?' + urllib.urlencode({"basis": basis}) if basis else '',
-        "basis": basis,
+        "encoded_keywords": '?' + urllib.urlencode({"keywords": keywords}) if keywords else '',
+        "keywords": keywords,
         })
     return render(request, "chem/multi_molecule.html", c)
 
 def gen_multi_detail_zip(request, string):
-    basis = request.GET.get("basis")
+    keywords = request.GET.get("keywords")
 
     buff = StringIO()
     zfile = zipfile.ZipFile(buff, "w", zipfile.ZIP_DEFLATED)
@@ -210,7 +197,7 @@ def gen_multi_detail_zip(request, string):
         if form.is_valid():
             d = dict(form.cleaned_data)
         else:
-            basis = request.GET.get("basis")
+            keywords = request.GET.get("keywords")
             f = lambda x: 'checked' if request.GET.get(x) else ''
 
             c = Context({
@@ -221,14 +208,14 @@ def gen_multi_detail_zip(request, string):
                 "mol2": f("mol2"),
                 "image": f("image"),
                 "job": f("job"),
-                "basis": '?' + urllib.urlencode({"basis": basis}) if basis else '',
+                "keywords": '?' + urllib.urlencode({"keywords": keywords}) if keywords else '',
                 })
             return render(request, "chem/multi_molecule.html", c)
 
     generrors = []
     for name in molecules:
         try:
-            out = gjfwriter.Output(name, basis)
+            out = gjfwriter.GJFWriter(name, keywords)
             others = False
 
             if request.GET.get("image"):
@@ -242,7 +229,7 @@ def gen_multi_detail_zip(request, string):
             if request.GET.get("job"):
                 dnew = d.copy()
                 dnew["name"] = re.sub(r"{{\s*name\s*}}", name, dnew["name"])
-                zfile.writestr(name + ".job", utils.write_job(**dnew))
+                zfile.writestr(name + ".job", write_job(**dnew))
                 others = True
 
             if request.GET.get("gjf") or not others:
@@ -264,10 +251,10 @@ def gen_multi_detail_zip(request, string):
     return response
 
 def write_gjf(request, molecule):
-    basis = request.GET.get("basis")
+    keywords = request.GET.get("keywords")
     add = "" if request.GET.get("view") else "attachment; "
 
-    out = gjfwriter.Output(molecule, basis)
+    out = gjfwriter.GJFWriter(molecule, keywords)
     f = StringIO(out.write_file())
     response = HttpResponse(FileWrapper(f), content_type="text/plain")
     response['Content-Disposition'] = add + 'filename=%s.gjf' % molecule
@@ -276,7 +263,7 @@ def write_gjf(request, molecule):
 def write_mol2(request, molecule):
     add = "" if request.GET.get("view") else "attachment; "
 
-    out = gjfwriter.Output(molecule, '')
+    out = gjfwriter.GJFWriter(molecule, '')
     f = StringIO(out.write_file(False))
     response = HttpResponse(FileWrapper(f), content_type="text/plain")
     response['Content-Disposition'] = add + 'filename=%s.mol2' % molecule
@@ -285,7 +272,7 @@ def write_mol2(request, molecule):
 def write_png(request, molecule):
     scale = request.GET.get("scale", 10)
 
-    out = gjfwriter.Output(molecule, '')
+    out = gjfwriter.GJFWriter(molecule, '')
     response = HttpResponse(content_type="image/png")
     out.molecule.draw(int(scale)).save(response, "PNG")
     response['Content-Disposition'] = 'filename=%s.png' % molecule
@@ -314,93 +301,6 @@ def report(request, molecule):
         })
     return render(request, "chem/report.html", c)
 
-
-###########################################################
-###########################################################
-# Upload Stuff
-###########################################################
-###########################################################
-
-
-def upload_data(request):
-    switch = {
-        "logparse": parse_log,
-        "dataparse": parse_data,
-        "gjfreset": reset_gjf,
-        "jobs": upload_gjf,
-    }
-    form = _get_job_form(request, "{{ name }}")
-    error = None
-    if request.method == "POST":
-        if request.FILES.getlist('myfiles'):
-            return switch[request.POST["option"]](request, form)
-        else:
-            error = "Please add some files."
-    c = Context({
-        "form": form,
-        "error_message": error
-        })
-    return render(request, "chem/upload_log.html", c)
-
-def parse_log(request, form):
-    parser = fileparser.LogSet()
-    for f in utils.parse_file_list(request.FILES.getlist('myfiles')):
-        parser.parse_file(f)
-
-    f = StringIO(parser.format_output())
-    response = HttpResponse(FileWrapper(f), content_type="text/plain")
-    return response
-
-def parse_data(request, form):
-    buff = StringIO()
-    zfile = zipfile.ZipFile(buff, 'w', zipfile.ZIP_DEFLATED)
-
-    for i, f in enumerate(utils.parse_file_list(request.FILES.getlist('myfiles'))):
-        parser = fileparser.DataParser(f)
-        homolumo, gap = parser.get_graphs()
-
-        name, _ = os.path.splitext(f.name)
-        if i > 1:
-            zfile.writestr(name + "/output.txt", parser.format_output())
-            zfile.writestr(name + "/homolumo.eps", homolumo.getvalue())
-            zfile.writestr(name + "/gap.eps", gap.getvalue())
-        else:
-            zfile.writestr("output.txt", parser.format_output())
-            zfile.writestr("homolumo.eps", homolumo.getvalue())
-            zfile.writestr("gap.eps", gap.getvalue())
-
-    if i > 1:
-        name = "output"
-    zfile.close()
-    buff.flush()
-
-    ret_zip = buff.getvalue()
-    buff.close()
-
-    response = HttpResponse(ret_zip, mimetype="application/zip")
-    response["Content-Disposition"] = "attachment; filename=%s.zip" % name
-    return response
-
-def reset_gjf(request, form):
-    buff = StringIO()
-    zfile = zipfile.ZipFile(buff, 'w', zipfile.ZIP_DEFLATED)
-
-    for f in utils.parse_file_list(request.FILES.getlist('myfiles')):
-        parser = fileparser.Log(f)
-
-        name, _ = os.path.splitext(f.name)
-        zfile.writestr("%s.gjf" % name, parser.format_gjf())
-
-    zfile.close()
-    buff.flush()
-
-    ret_zip = buff.getvalue()
-    buff.close()
-
-    response = HttpResponse(ret_zip, mimetype="application/zip")
-    response["Content-Disposition"] = "attachment; filename=output.zip"
-    return response
-
 def upload_gjf(request, form):
     if not form.is_valid():
         c = Context({
@@ -427,7 +327,7 @@ def upload_gjf(request, form):
             pass
             jobid, e = utils.run_job(request.user, name, dnew.get("cluster"), internal=True, **dnew)
         else:
-            zfile.writestr("%s.%sjob" % (pathname, dnew.get("cluster")), utils.write_job(**dnew))
+            zfile.writestr("%s.%sjob" % (pathname, dnew.get("cluster")), write_job(**dnew))
 
     if request.POST.get("postjob"):
         return HttpResponse(simplejson.dumps(a), mimetype="application/json")
@@ -442,7 +342,6 @@ def upload_gjf(request, form):
         response = HttpResponse(ret_zip, mimetype="application/zip")
         response["Content-Disposition"] = "attachment; filename=output.zip"
         return response
-
 
 ###########################################################
 ###########################################################

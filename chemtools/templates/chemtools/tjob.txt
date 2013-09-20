@@ -1,5 +1,5 @@
 #!/bin/bash
-#PBS -l nodes={{ nodes }}:ppm=16
+#PBS -l nodes={{ nodes }}:ppn=16
 #PBS -l walltime={{ time }}
 #PBS -o {{ name }}.out
 #PBS -e {{ name }}.err

@@ -71,9 +71,9 @@ $(function() {
             text += '<td><a href="../{0}/">{0}</a></td>'.format(name);
 
             if (!(error)) {
-                text += '<td><a href="../{0}.gjf{{ encoded_basis }}">gjf</a></td>'.format(name);
-                text += '<td><a href="../{0}.mol2{{ encoded_basis }}">mol2</a></td>'.format(name);
-                text += '<td><a href="../{0}.png{{ encoded_basis }}">Image</a></td>'.format(name);
+                text += '<td><a href="../{0}.gjf{{ encoded_keywords }}">gjf</a></td>'.format(name);
+                text += '<td><a href="../{0}.mol2{{ encoded_keywords }}">mol2</a></td>'.format(name);
+                text += '<td><a href="../{0}.png{{ encoded_keywords }}">Image</a></td>'.format(name);
                 text += '<td><a href="#" onClick="submitForm(\'{0}\')">Job</a></td>'.format(name);
             }
             else {
@@ -128,7 +128,7 @@ $(function() {
             <table>
                 {{ form.as_table }}
             </table>
-            {% if basis %}<input type="hidden" name="basis" value="{{ basis }}">{% endif %}
+            {% if keywords %}<input type="hidden" name="keywords" value="{{ keywords }}">{% endif %}
             <input type="hidden" id="id_molname" name="molname" value="">
             <table>
                 <tr><th>

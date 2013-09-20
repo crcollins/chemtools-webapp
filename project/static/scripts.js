@@ -16,6 +16,13 @@ $(document).ready(function() {
             $(this).removeClass("loading");
         }
     });
+    $("select#id_cluster").change( function () {
+        var val = $(this).val();
+        $.get("/chem/template/"+val, function (data) {
+            $("textarea#id_template").val(data);
+        });
+    });
+
 });
 
 String.prototype.format = function () {

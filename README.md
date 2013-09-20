@@ -249,10 +249,10 @@ For generating the molecules, there is a very rough FSM that parses through the 
 
 ### Molecule Specific ###
 
-For all of the molecules there is a basic API access to allow getting the different types of outputs. The first, and most common, being the gjf output. This is the standard Gaussian file type and is what should be used for running the calculations. There is also an added possible parameter called "basis" that can be added to add/change the basis/settings of the molecule. If none is given, then `B3LYP/6-31g(d)` is assumed. Another possible parameter is "view". If this is enabled the output will be browser viewable rather than a download.
+For all of the molecules there is a basic API access to allow getting the different types of outputs. The first, and most common, being the gjf output. This is the standard Gaussian file type and is what should be used for running the calculations. There is also an added possible parameter called "keywords" that can be added to add/change the keywords/settings of the molecule. If none is given, then `B3LYP/6-31g(d)` is assumed. Another possible parameter is "view". If this is enabled the output will be browser viewable rather than a download.
 
     /chem/$NAME.gjf
-    /chem/$NAME.gjf?basis=B3LYP/6-31g(d)
+    /chem/$NAME.gjf?keywords=B3LYP/6-31g(d)
     /chem/$NAME.gjf?view=true
 
 The next form of output is the mol2 format. This is added because it is a fairly simple interchange format for different software packages.
@@ -316,9 +316,9 @@ This method makes it simple to make a few nonrelated molecules quickly.
 
 [/chem/24a\_TON,35b\_TNN,4g\_CCC\_4g/](/chem/24a_TON,35b_TNN,4g_CCC_4g/)
 
-Just like with single molecules, it is possible to set the basis to be something other than `B3LYP/6-31g(d)`.
+Just like with single molecules, it is possible to set the keywords to be something other than `B3LYP/6-31g(d)`.
 
-    /chem/$NAME1,$NAME2,$NAME3/?basis=HF/3-21G
+    /chem/$NAME1,$NAME2,$NAME3/?keywords=HF/3-21G
 
 
 #### Brace Expansion ####
@@ -485,6 +485,17 @@ Here is an example of the Triple Bond.
     2 3 Ar
 
 There are 3 added symbols in the character set for the element names and those are "~", "*", and "+". These are used to signify the type of things the element can bond to. After the set of possible things to bond to is a number that indicates the order that the bonds get used. So, in the case of the cores, the correct parts of the molecule are built in the correct order.
+
+
+### Job Templates ###
+
+Just like with the fragments, the standard job files can be found here:
+
+    /chem/template/$NAME/
+
+Most of the job files are just standard shell scripts with the headers required for the various supercomputers. The job files can be accessed by either the first letter of the supercomputer, or the full name (case insensitive).
+
+[/chem/template/Gordon/](/chem/template/Gordon)
 
 
 ### Generate SSH Key Pair ###

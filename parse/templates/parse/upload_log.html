@@ -1,0 +1,32 @@
+{% extends "parse/base.html" %}
+
+{% block title %}Upload{% endblock %}
+
+{% block content %}
+    {% if error_message %}
+        <p><strong>{{ error_message }}</strong></p>
+    {% endif %}
+    <form enctype="multipart/form-data" action="." method="post">
+        {% csrf_token %}
+        <input type="file" name="myfiles" multiple />
+        <ul>
+            <li>
+                <input type="radio" name="option" id="id_log" value="logparse" />
+                <label for="id_log">Log Parse</label>
+            </li>
+            <li>
+                <input type="radio" name="option" id="id_gjf_reset" value="gjfreset" />
+                <label for="id_gjf_reset">Gjf Reset</label>
+            </li>
+            <li>
+                <input type="radio" name="option" id="id_data" value="dataparse" />
+                <label for="id_data">Data Parse</label>
+            </li>
+        </ul>
+        <input type="submit" value="Submit" />
+        <input type="reset" value="Reset" />
+    </form>
+    <p>
+        Files may be uploaded in zipped format (.zip, .tar.gz, .tar.bz2) or individually.
+    </p>
+{% endblock %}
