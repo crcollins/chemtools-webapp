@@ -96,16 +96,14 @@ def multi_job(request):
     zfile = zipfile.ZipFile(buff, 'w', zipfile.ZIP_DEFLATED)
     d = dict(form.cleaned_data)
 
-    lines = request.REQUEST.get('filenames', '').replace(',', '\n')
-    for line in lines.split():
-        print line
-        for name in name_expansion(line):
-            if not name:
-                continue
-            dnew = d.copy()
-            name, _ = os.path.splitext(name)
-            dnew["name"] = re.sub(r"{{\s*name\s*}}", name, dnew["name"])
-            zfile.writestr("%s.%sjob" % (name, dnew.get("cluster")), write_job(**dnew))
+    string = request.REQUEST.get('filenames', '').replace('\n', ',')
+    for name in name_expansion(string):
+        if not name:
+            continue
+        dnew = d.copy()
+        name, _ = os.path.splitext(name)
+        dnew["name"] = re.sub(r"{{\s*name\s*}}", name, dnew["name"])
+        zfile.writestr("%s.%sjob" % (name, dnew.get("cluster")), write_job(**dnew))
 
     zfile.close()
     buff.flush()
