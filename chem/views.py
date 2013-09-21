@@ -61,6 +61,8 @@ def _get_job_form(request, molecule):
             "cluster": 'g',
             "allocation": "TG-CHE120081",
             "template":text,
+            "walltime":48,
+            "nodes":1,
             })
     return form
 
