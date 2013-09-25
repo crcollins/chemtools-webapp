@@ -39,13 +39,14 @@ def parse_log(request):
 def parse_data(request):
     buff = StringIO()
     zfile = zipfile.ZipFile(buff, 'w', zipfile.ZIP_DEFLATED)
-
-    for i, f in enumerate(utils.parse_file_list(request.FILES.getlist('myfiles'))):
+    files = list(utils.parse_file_list(request.FILES.getlist('myfiles')))
+    num = len(files)
+    for f in files:
         parser = dataparser.DataParser(f)
         homolumo, gap = parser.get_graphs()
 
         name, _ = os.path.splitext(f.name)
-        if i > 1:
+        if num > 1:
             zfile.writestr(name + "/output.txt", parser.format_output())
             zfile.writestr(name + "/homolumo.eps", homolumo.getvalue())
             zfile.writestr(name + "/gap.eps", gap.getvalue())
@@ -54,7 +55,7 @@ def parse_data(request):
             zfile.writestr("homolumo.eps", homolumo.getvalue())
             zfile.writestr("gap.eps", gap.getvalue())
 
-    if i > 1:
+    if num > 1:
         name = "output"
     zfile.close()
     buff.flush()
