@@ -68,10 +68,11 @@ class DataParser(Output):
         plot.ylabel("Eg in eV")
         plot.xlabel("1/N")
         plot.savefig(self.plots[0], format="eps")
-
         plot.clf()
+        
         plot.plot(x, gapy, 'ro')
         plot.plot(np.linspace(0, maxx, 20), gapfunc(np.linspace(0, maxx, 20), gapa, gapb), 'r')
         plot.ylabel("Eg in eV")
         plot.xlabel("1/N")
         plot.savefig(self.plots[1], format="eps")
+        plot.clf()
