@@ -28,6 +28,9 @@ class Log(object):
         cls.PARSERS[parser.__name__] = parser
         return parser
 
+    def __getitem__(self, name):
+        return self.parsers[name].value
+
     def in_range(self):
         '''Builds a set of line numbers based on parser params to optimally skip lines.'''
         try:
@@ -62,8 +65,8 @@ class Log(object):
         return a
 
     def format_gjf(self):
-        s  = self.parsers["Header"].value
-        s += self.parsers["Geometry"].value
+        s  = self["Header"]
+        s += self["Geometry"]
         return s
 
     def format_data(self):
