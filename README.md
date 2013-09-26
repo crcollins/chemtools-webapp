@@ -182,6 +182,8 @@ This takes a file formated like this:
 
 Where lines starting with "#" are comments. The n values can be given as either n or 1/n. This will return a zipped file with a text file listing the fit parameters as well as two graphs plotting the HOMO/LUMO and the Gap values.
 
+Data parsing can also be done now using just the log files. If you upload a set of log files with `n1, n2, ... nN` somewhere in the filename these logs will be put together. Once together they will be parsed for the relevant data parse data. This simplifies the process by not requiring the creation of a separate file just for the data.
+
 
 #### Gjf Reset ####
 

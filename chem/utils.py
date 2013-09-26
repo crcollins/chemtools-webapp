@@ -28,8 +28,9 @@ class SFTPClient(paramiko.SFTPClient):
         self.close()
 
 class StringIO(object):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, name=None, *args, **kwargs):
         self.s = cStringIO.StringIO(*args, **kwargs)
+        self.name = name if name else ''
     def __getattr__(self, key):
         return getattr(self.s, key)
     def __iter__(self):
