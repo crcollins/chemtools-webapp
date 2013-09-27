@@ -187,6 +187,8 @@ def parse_end_name(name):
     rgroup = ''.join(RGROUPS)
     aryl0 = ''.join(ARYL0)
     aryl2 = ''.join(ARYL2)
+    block = xgroup + aryl0 + aryl2
+    substituent = block + rgroup
 
     parts = []
     r = 0
@@ -194,12 +196,12 @@ def parse_end_name(name):
     lastconnect = -1
     state = "start"
     for char in name:
-        if char not in xgroup + aryl0 + aryl2 + rgroup:
+        if char not in substituent:
             raise ValueError("Bad Substituent Name: %s" % char)
 
     for i, char in enumerate(name):
         if state == "aryl0":
-            if char not in xgroup + aryl0 + aryl2:
+            if char not in block:
                 raise ValueError("no rgroups allowed")
             else:
                 parts.append((char, lastconnect))
@@ -247,7 +249,7 @@ def parse_end_name(name):
                 else:
                     raise ValueError("too many rgroup")
         elif state == "start":
-            if char not in xgroup + aryl0 + aryl2:
+            if char not in block:
                 raise ValueError("no rgroups allowed")
             else:
                 parts.append((char, lastconnect))
