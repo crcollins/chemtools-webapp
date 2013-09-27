@@ -130,6 +130,19 @@ class GJFWriter(object):
         a.close_ends()
         return a
 
+def parse_options(parts):
+    newparts = []
+    varset = {'n': 1, 'm': 1, 'x': 1, 'y': 1, 'z': 1}
+    for part in parts[:]:
+        if part[:1] in varset:
+            varset[name] = int(part[1:])
+        else:
+            newparts.append(part)
+    if varset['n'] > 1 and varset['m'] > 1:
+        raise Exception(7, "can not do N and M expansion")
+    nm = (varset['n'], varset['m'])
+    xyz = (varset['x'], varset['y'], varset['z'])
+    return newparts, nm, xyz
 
 def parse_name(name):
     '''Parses a molecule name and returns the edge part names.
@@ -141,14 +154,7 @@ def parse_name(name):
     parts = name.split("_")
     core = None
 
-    varset = {'n': 1, 'm': 1, 'x': 1, 'y': 1, 'z': 1}
-    for part in parts[:]:
-        for name in varset:
-            if part.startswith(name):
-                varset[name] = int(part[1:])
-                parts.remove(part)
-    if varset['n'] > 1 and varset['m'] > 1:
-        raise Exception(7, "can not do N and M expansion")
+    parts, nm, xyz = parse_options(parts)
 
     for part in parts:
         if part.upper() in CORES:
@@ -177,8 +183,6 @@ def parse_name(name):
             middle = None
 
     parsedsides = tuple(parse_end_name(x) if x else None for x in (left, middle, right))
-    nm = (varset['n'], varset['m'])
-    xyz = (varset['x'], varset['y'], varset['z'])
 
     return core, parsedsides, nm, xyz
 
