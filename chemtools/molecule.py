@@ -282,13 +282,14 @@ class Molecule(object):
         '''Returns an n length chain of the molecule.'''
         frags = [copy.deepcopy(self)]
         lidx, ridx = self.bonds.index(left), self.bonds.index(right)
+
         # n=1 already in frags
         for i in xrange(n - 1):
             a = copy.deepcopy(self)
-            if i == 0:
+            try:
                 frags[i].merge(frags[i].bonds[ridx], a.bonds[lidx], a)
-            else:
-                #accounts for deleted bond
+            except:
+                #accounts for deleted bond (only happens for single core?)
                 frags[i].merge(frags[i].bonds[ridx - 1], a.bonds[lidx], a)
             frags.append(a)
         return Molecule(frags)
