@@ -294,6 +294,8 @@ def parse_end_name(name):
             elif char in aryl2:
                 state = "aryl2"
             lastconnect = len(parts) - 1
+        elif state == "end":
+            raise ValueError("can not attach to end")
     if state == "aryl0":
         pass
     elif state != "end" and state != "start":
