@@ -89,40 +89,39 @@ class GJFWriter(object):
             core, fragments = self.load_fragments(coreset)
 
             ends = []
-            #bond all of the fragments together
             cends = core[0].open_ends()
-
+            #bond all of the fragments together
             for j, side in enumerate(fragments):
-                this = [core] + side
-
-                if side[0] is not None:
-                    for (part, char, parentid) in side:
-                        bondb = part.next_open()
-                        if not parentid:
-                            bonda = cends[j]
-                        else:
-                            c = bondb.connection()
-                            #enforces lowercase to be r-group
-                            if char.islower():
-                                c = "+"
-                            elif char.isupper():
-                                c += "~"
-                            bonda = this[parentid][0].next_open(c)
-
-                        if bonda and bondb:
-                            this[parentid][0].merge(bonda, bondb, part)
-                        else:
-                            raise Exception(6, "Part not connected")
-                    # find the furthest part and get its parent's next open
-
-                    if char in ARYL:
-                        ends.append(this[j-1][0].next_open('~'))
-                    elif char in XGROUPS:
-                        ends.append(None)
-                    else:
-                        ends.append(this[max(x[2] for x in side)][0].next_open('~'))
-                else:
+                if side[0] is None:
                     ends.append(cends[j])
+                    continue
+
+                this = [core] + side
+                for (part, char, parentid) in side:
+                    bondb = part.next_open()
+                    if not parentid:
+                        bonda = cends[j]
+                    else:
+                        c = bondb.connection()
+                        #enforces lowercase to be r-group
+                        if char.islower():
+                            c = "+"
+                        elif char.isupper():
+                            c += "~"
+                        bonda = this[parentid][0].next_open(c)
+
+                    if bonda and bondb:
+                        this[parentid][0].merge(bonda, bondb, part)
+                    else:
+                        raise Exception(6, "Part not connected")
+
+                # find the furthest part and get its parent's next open
+                if char in ARYL:
+                    ends.append(this[j-1][0].next_open('~'))
+                elif char in XGROUPS:
+                    ends.append(None)
+                else: # find R-Group parent
+                    ends.append(this[max(x[2] for x in side)][0].next_open('~'))
 
             #merge the fragments into single molecule
             out = [core[0]]
