@@ -63,24 +63,30 @@ class GJFWriter(object):
             string = self.molecule.mol2
         return string
 
+    def load_fragments(self, coreset):
+        corename, (leftparsed, middleparsed, rightparsed) = coreset
+        # molecule, name, parent
+        core = (Molecule(read_data(corename)), corename, corename)
+
+        fragments = []
+        for side in [middleparsed] * 2 + [rightparsed, leftparsed]:
+            temp = []
+            if side is not None:
+                for (char, parentid) in side:
+                    parentid += 1  # offset for core
+                    temp.append((Molecule(read_data(char)), char, parentid))
+            else:
+                temp.append(None)
+            fragments.append(temp)
+        return core, fragments
+
     def build(self, name):
         '''Returns a closed molecule based on the input of each of the edge names.'''
         coresets, nm, xyz = parse_name(name)
 
         molecules = []
-        for corename, (leftparsed, middleparsed, rightparsed) in coresets:
-            core = (Molecule(read_data(corename)), corename, corename)
-            struct = [middleparsed] * 2 + [rightparsed, leftparsed]
-            fragments = []
-            for side in struct:
-                this = []
-                if side is not None:
-                    for (char, parentid) in side:
-                        parentid += 1  # offset for core
-                        this.append((Molecule(read_data(char)), char, parentid))
-                else:
-                    this.append(None)
-                fragments.append(this)
+        for coreset in coresets:
+            core, fragments = self.load_fragments(coreset)
 
             ends = []
             #bond all of the fragments together
