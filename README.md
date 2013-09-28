@@ -242,7 +242,8 @@ For generating the molecules, there is a very rough FSM that parses through the 
     extend      = ("n" | "m"), int ;
     stack       = ("x" | "y" | "z"), int ;
 
-    molecule    = [end], core, ([end2], [end2] | ["_", xgroup, end]), ["_", extend], ["_", stack] {"_", stack}
+    main        = [end], core, ([end2], [end2] | ["_", xgroup, end])
+    molecule    = main, {main}, ["_", extend], ["_", stack] {"_", stack}
 
 
 ### Molecule Specific ###

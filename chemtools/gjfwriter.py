@@ -65,64 +65,87 @@ class GJFWriter(object):
 
     def build(self, name):
         '''Returns a closed molecule based on the input of each of the edge names.'''
-        corename, (leftparsed, middleparsed, rightparsed), nm, xyz = parse_name(name)
+        coresets, nm, xyz = parse_name(name)
 
-        core = (Molecule(read_data(corename)), corename, corename)
-        struct = [middleparsed] * 2 + [rightparsed, leftparsed]
-        fragments = []
-        for side in struct:
-            this = []
-            if side is not None:
-                for (char, parentid) in side:
-                    parentid += 1  # offset for core
-                    this.append((Molecule(read_data(char)), char, parentid))
-            else:
-                this.append(None)
-            fragments.append(this)
+        molecules = []
+        for corename, (leftparsed, middleparsed, rightparsed) in coresets:
+            core = (Molecule(read_data(corename)), corename, corename)
+            struct = [middleparsed] * 2 + [rightparsed, leftparsed]
+            fragments = []
+            for side in struct:
+                this = []
+                if side is not None:
+                    for (char, parentid) in side:
+                        parentid += 1  # offset for core
+                        this.append((Molecule(read_data(char)), char, parentid))
+                else:
+                    this.append(None)
+                fragments.append(this)
 
-        ends = []
-        #bond all of the fragments together
-        cends = core[0].open_ends()
-        for j, side in enumerate(fragments):
-            this = [core] + side
+            ends = []
+            #bond all of the fragments together
+            cends = core[0].open_ends()
 
-            if side[0] is not None:
-                for (part, char, parentid) in side:
-                    bondb = part.next_open()
-                    if not parentid:
-                        bonda = cends[j]
+            for j, side in enumerate(fragments):
+                this = [core] + side
+
+                if side[0] is not None:
+                    for (part, char, parentid) in side:
+                        bondb = part.next_open()
+                        if not parentid:
+                            bonda = cends[j]
+                        else:
+                            c = bondb.connection()
+                            #enforces lowercase to be r-group
+                            if char.islower():
+                                c = "+"
+                            elif char.isupper():
+                                c += "~"
+                            bonda = this[parentid][0].next_open(c)
+
+                        if bonda and bondb:
+                            this[parentid][0].merge(bonda, bondb, part)
+                        else:
+                            raise Exception(6, "Part not connected")
+                    # find the furthest part and get its parent's next open
+
+                    if char in ARYL:
+                        ends.append(this[j-1][0].next_open('~'))
+                    elif char in XGROUPS:
+                        ends.append(None)
                     else:
-                        c = bondb.connection()
-                        #enforces lowercase to be r-group
-                        if char.islower():
-                            c = "+"
-                        elif char.isupper():
-                            c += "~"
-                        bonda = this[parentid][0].next_open(c)
+                        ends.append(this[max(x[2] for x in side)][0].next_open('~'))
+                else:
+                    ends.append(cends[j])
 
-                    if bonda and bondb:
-                        this[parentid][0].merge(bonda, bondb, part)
-                    else:
-                        raise Exception(6, "Part not connected")
-                # find the furthest part and get its parent's next open
-                ends.append(this[max(x[2] for x in side)][0].next_open('~'))
-            else:
-                ends.append(cends[j])
-
-        #merge the fragments into single molecule
-        out = [core[0]]
-        for side in fragments:
+            #merge the fragments into single molecule
+            out = [core[0]]
+            for side in fragments:
                 for part in side:
                     if part is not None:
                         out.append(part[0])
-        a = Molecule(out)
+            molecules.append((Molecule(out), ends))
+
+        frags = [molecules[0][0]]
+        finalends = molecules[0][1]
+        for i, (mol, ends) in enumerate(molecules[1:]):
+            # use negative index because some only have 2 ends and others have 4
+            prevbond = molecules[i][1][2]
+            curbond = ends[3]
+
+            previdx = molecules[i][0].bonds.index(prevbond)
+            curidx = molecules[i+1][0].bonds.index(curbond)
+            frags[i].merge(frags[i].bonds[previdx], mol.bonds[curidx], mol)
+            frags.append(mol)
+            finalends[2] = ends[2]
+        a = Molecule(frags)
 
         #multiplication of molecule/chain
         (n, m) = nm
-        if n > 1 and all(ends[2:]):
-            a = a.chain(ends[2], ends[3], n)
-        elif m > 1 and all(ends[:2]):
-            a = a.chain(ends[0], ends[1], m)
+        if n > 1 and all(finalends[2:]):
+            a = a.chain(finalends[2], finalends[3], n)
+        elif m > 1 and all(finalends[:2]):
+            a = a.chain(finalends[0], finalends[1], m)
 
         if any(xyz):
             a = a.stack(*xyz)
@@ -144,6 +167,21 @@ def parse_options(parts):
     xyz = (varset['x'], varset['y'], varset['z'])
     return newparts, nm, xyz
 
+def parse_cores(parts):
+    output = [[None, []]]
+    i = -1
+    for part in parts:
+        if part.upper() in CORES:
+            i += 1
+            if i == 0:
+                output[i][0] = part
+            else:
+                output.append([part,[]])
+        output[i][1].append(part)
+    if output[0][0] is None:
+        raise Exception(1, "Bad Core Name")
+    return output
+
 def parse_name(name):
     '''Parses a molecule name and returns the edge part names.
 
@@ -152,39 +190,35 @@ def parse_name(name):
     (('4', -1), ('c', 0), ('c', 0))
     '''
     parts = name.split("_")
-    core = None
 
     parts, nm, xyz = parse_options(parts)
+    partsets = parse_cores(parts)
 
-    for part in parts:
-        if part.upper() in CORES:
-            core = part
-            break
-    if not core:
-        raise Exception(1, "Bad Core Name")
+    output = []
+    for core, parts in partsets:
+        i = parts.index(core)
+        left = parts[:i][0] if parts[:i] else None
+        right = parts[i + 1:]
 
-    i = parts.index(core)
-    left = parts[:i][0] if parts[:i] else None
-    right = parts[i + 1:]
-
-    if len(right) > 1:
-        middle = right[0]
-        right = right[1]
-    else:
-        try:
-            letter = right[0][0]
-            if letter.lower() in ALL and letter.lower() != letter:
-                middle = letter
-                right = right[0][1:]
-            else:
+        if len(right) > 1:
+            middle = right[0]
+            right = right[1]
+        else:
+            try:
+                letter = right[0][0]
+                if letter.lower() in ALL and letter.lower() != letter:
+                    middle = letter
+                    right = right[0][1:]
+                else:
+                    middle = None
+                    right = right[0]
+            except:
                 middle = None
-                right = right[0]
-        except:
-            middle = None
-
-    parsedsides = tuple(parse_end_name(x) if x else None for x in (left, middle, right))
-
-    return core, parsedsides, nm, xyz
+        parsedsides = tuple(parse_end_name(x) if x else None for x in (left, middle, right))
+        output.append((core, parsedsides))
+    if len(output) > 2 and nm[1] > 1:
+        raise Exception(8, "Can not do m expansion and have multiple cores")
+    return output, nm, xyz
 
 def parse_end_name(name):
     xgroup = ''.join(XGROUPS)
