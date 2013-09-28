@@ -80,6 +80,14 @@ class GJFWriter(object):
             fragments.append(temp)
         return core, fragments
 
+    def concatenate_fragments(self, core, fragments):
+        out = [core]
+        for side in fragments:
+            for part in side:
+                if part is not None:
+                    out.append(part[0])
+        return Molecule(out)
+
     def build(self, name):
         '''Returns a closed molecule based on the input of each of the edge names.'''
         coresets, nm, xyz = parse_name(name)
@@ -124,12 +132,8 @@ class GJFWriter(object):
                     ends.append(this[max(x[2] for x in side)][0].next_open('~'))
 
             #merge the fragments into single molecule
-            out = [core[0]]
-            for side in fragments:
-                for part in side:
-                    if part is not None:
-                        out.append(part[0])
-            molecules.append((Molecule(out), ends))
+            temp = self.concatenate_fragments(core[0], fragments)
+            molecules.append((temp, ends))
 
         frags = [molecules[0][0]]
         finalends = molecules[0][1]
