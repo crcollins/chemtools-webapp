@@ -278,21 +278,48 @@ class Molecule(object):
         #remove the extension parts
         [x.remove() for x in (bond2, R1, R2)]
 
-    def chain(self, left, right, n):
-        '''Returns an n length chain of the molecule.'''
-        frags = [copy.deepcopy(self)]
-        lidx, ridx = self.bonds.index(left), self.bonds.index(right)
+    def chain(self, molecules):
+        # molecules = (
+        #     (Molecule(), (Bond(), Bond(), Bond(), Bond()),
+        #     (Molecule(), (Bond(), Bond(), Bond(), Bond()),
+        #     ...
+        # )
+        frags = [molecules[0][0]]
+        finalends = molecules[0][1]
+        for i, (mol, ends) in enumerate(molecules[1:]):
+            prevbond = molecules[i][1][2]
+            curbond = ends[3]
+            previdx = molecules[i][0].bonds.index(prevbond)
+            curidx = molecules[i+1][0].bonds.index(curbond)
 
-        # n=1 already in frags
-        for i in xrange(n - 1):
-            a = copy.deepcopy(self)
-            try:
-                frags[i].merge(frags[i].bonds[ridx], a.bonds[lidx], a)
-            except:
-                #accounts for deleted bond (only happens for single core?)
-                frags[i].merge(frags[i].bonds[ridx - 1], a.bonds[lidx], a)
-            frags.append(a)
-        return Molecule(frags)
+            frags[i].merge(frags[i].bonds[previdx], mol.bonds[curidx], mol)
+            frags.append(mol)
+            finalends[2] = ends[2]
+        return Molecule(frags), finalends
+
+
+    def polymerize(self, ends, nm):
+        '''Returns an n length chain of the molecule.'''
+        num = 0
+        if nm[0] > 1 and all(ends[2:]):
+            ends = ends[2:]
+            num = nm[0]
+        elif nm[1] > 1 and all(ends[:2]):
+            ends = ends[:2]
+            num = nm[1]
+        else:
+            return self, ends
+
+        idxs = [self.bonds.index(x) for x in ends]
+
+        molecules = []
+        for i in xrange(num):
+            mol = copy.deepcopy(self)
+            newends = [mol.bonds[x] for x in idxs]
+            # newends twice to keep on single axis
+            molecules.append((mol, newends * 2))
+
+        return self.chain(molecules)
 
     def stack(self, x, y, z):
         '''Returns a molecule with x,y,z stacking.'''

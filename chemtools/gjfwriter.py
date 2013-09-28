@@ -136,26 +136,10 @@ class GJFWriter(object):
             temp = self.concatenate_fragments(core[0], fragments)
             molecules.append((temp, ends))
 
-        frags = [molecules[0][0]]
-        finalends = molecules[0][1]
-        for i, (mol, ends) in enumerate(molecules[1:]):
-            # use negative index because some only have 2 ends and others have 4
-            prevbond = molecules[i][1][2]
-            curbond = ends[3]
-
-            previdx = molecules[i][0].bonds.index(prevbond)
-            curidx = molecules[i+1][0].bonds.index(curbond)
-            frags[i].merge(frags[i].bonds[previdx], mol.bonds[curidx], mol)
-            frags.append(mol)
-            finalends[2] = ends[2]
-        a = Molecule(frags)
+        a, finalends = molecules[0][0].chain(molecules)
 
         #multiplication of molecule/chain
-        (n, m) = nm
-        if n > 1 and all(finalends[2:]):
-            a = a.chain(finalends[2], finalends[3], n)
-        elif m > 1 and all(finalends[:2]):
-            a = a.chain(finalends[0], finalends[1], m)
+        a, _ = a.polymerize(finalends, nm)
 
         if any(xyz):
             a = a.stack(*xyz)
