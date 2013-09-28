@@ -125,7 +125,7 @@ class GJFWriter(object):
 
                 # find the furthest part and get its parent's next open
                 if char in ARYL:
-                    ends.append(this[j-1][0].next_open('~'))
+                    ends.append(part.next_open('~'))
                 elif char in XGROUPS:
                     ends.append(None)
                 else: # find R-Group parent
