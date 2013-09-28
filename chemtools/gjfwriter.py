@@ -135,7 +135,7 @@ def parse_options(parts):
     varset = {'n': 1, 'm': 1, 'x': 1, 'y': 1, 'z': 1}
     for part in parts[:]:
         if part[:1] in varset:
-            varset[name] = int(part[1:])
+            varset[part[:1]] = int(part[1:])
         else:
             newparts.append(part)
     if varset['n'] > 1 and varset['m'] > 1:
