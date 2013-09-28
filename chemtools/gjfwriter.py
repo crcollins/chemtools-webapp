@@ -129,7 +129,8 @@ class GJFWriter(object):
                 elif char in XGROUPS:
                     ends.append(None)
                 else: # find R-Group parent
-                    ends.append(this[max(x[2] for x in side)][0].next_open('~'))
+                    furthest = max(x[2] for x in side)
+                    ends.append(this[furthest][0].next_open('~'))
 
             #merge the fragments into single molecule
             temp = self.concatenate_fragments(core[0], fragments)
