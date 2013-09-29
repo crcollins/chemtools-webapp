@@ -8,7 +8,7 @@ from django.http import HttpResponse
 from django.core.servers.basehttp import FileWrapper
 
 from chemtools import fileparser, dataparser
-from chem.utils import StringIO
+from project.utils import StringIO
 import utils
 
 def upload_data(request):

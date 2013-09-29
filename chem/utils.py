@@ -2,7 +2,6 @@ import os
 import bz2
 import zipfile
 import tarfile
-import cStringIO
 import time
 
 import paramiko
@@ -22,20 +21,6 @@ class SSHClient(paramiko.SSHClient):
 class SFTPClient(paramiko.SFTPClient):
     def __init__(self, *args, **kwargs):
         super(SFTPClient, self).__init__(*args, **kwargs)
-    def __enter__(self):
-        return self
-    def __exit__(self, type, value, traceback):
-        self.close()
-
-class StringIO(object):
-    def __init__(self, name=None, *args, **kwargs):
-        self.s = cStringIO.StringIO(*args, **kwargs)
-        self.name = name if name else ''
-    def __getattr__(self, key):
-        return getattr(self.s, key)
-    def __iter__(self):
-        for line in self.readlines():
-            yield line
     def __enter__(self):
         return self
     def __exit__(self, type, value, traceback):
