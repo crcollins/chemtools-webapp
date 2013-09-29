@@ -4,8 +4,7 @@ import hashlib
 from Crypto.PublicKey import RSA
 from Crypto import Random
 
-from project.utils import StringIO
-from chem.utils import get_ssh_connection
+from project.utils import StringIO, get_ssh_connection
 
 
 def generate_key_pair(username=None):
