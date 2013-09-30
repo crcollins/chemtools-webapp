@@ -279,7 +279,7 @@ def parse_end_name(name):
                     r += 1
                     state = "start"
                 else:
-                    raise ValueError("too many rgroup")
+                    raise ValueError("too many rgroups")
         elif state == "start":
             if char not in block:
                 raise ValueError("no rgroups allowed")
