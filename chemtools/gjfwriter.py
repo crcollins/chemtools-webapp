@@ -209,6 +209,11 @@ def parse_name(name):
             except:
                 middle = None
         parsedsides = tuple(parse_end_name(x) if x else None for x in (left, middle, right))
+
+        for xside, idx, name in zip(parsedsides, [0,0,1], ["left", "right", "middle"]):
+            if xside and xside[-1][0] in XGROUPS and nm[idx] > 1:
+                raise Exception(9, "can not do nm expansion with xgroup on %s" % name)
+
         output.append((core, parsedsides))
     if len(output) > 2 and nm[1] > 1:
         raise Exception(8, "Can not do m expansion and have multiple cores")
