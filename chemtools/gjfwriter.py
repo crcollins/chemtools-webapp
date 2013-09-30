@@ -40,7 +40,7 @@ def read_data(filename):
 ##############################################################################
 
 class GJFWriter(object):
-    def __init__(self, name, keywords):
+    def __init__(self, name, keywords=None):
         self.name = name
         self.keywords = keywords if keywords else "B3LYP/6-31g(d)"
         self.molecule = self.build(name)
