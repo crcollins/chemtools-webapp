@@ -214,7 +214,7 @@ def parse_name(name):
                 middle = None
         parsedsides = tuple(parse_end_name(x) if x else None for x in (left, middle, right))
 
-        for xside, idx, name in zip(parsedsides, [0,0,1], ["left", "right", "middle"]):
+        for xside, idx, name in zip(parsedsides, [0,1,0], ["left", "middle", "right"]):
             if xside and xside[-1][0] in XGROUPS and nm[idx] > 1:
                 raise Exception(9, "can not do nm expansion with xgroup on %s" % name)
 
