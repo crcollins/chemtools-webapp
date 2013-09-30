@@ -155,8 +155,12 @@ def parse_options(parts):
             varset[part[:1]] = int(part[1:])
         else:
             newparts.append(part)
+
     if varset['n'] > 1 and varset['m'] > 1:
         raise Exception(7, "can not do N and M expansion")
+    if any(value <= 0 for key, value in varset.items()):
+        raise Exception(10, "all expansion values must be greater than 0")
+
     nm = (varset['n'], varset['m'])
     xyz = (varset['x'], varset['y'], varset['z'])
     return newparts, nm, xyz
