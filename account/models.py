@@ -34,27 +34,12 @@ class SettingsForm(forms.Form):
     xsede_username = forms.CharField(max_length=50,
                                 required=False,
                                 label="XSEDE Username")
-    public_key = forms.CharField(widget=forms.Textarea, max_length=512)
-    private_key = forms.CharField(widget=forms.Textarea, max_length=2048)
+    new_ssh_keypair = forms.BooleanField(required=False)
 
     def clean(self):
         if "password1" in self.cleaned_data and "password2" in self.cleaned_data:
             if self.cleaned_data["password1"] != self.cleaned_data["password2"]:
                 raise forms.ValidationError("The two password fields did not match.")
-        if "public_key" in self.cleaned_data and "private_key" in self.cleaned_data:
-            try:
-                key = RSA.importKey(self.cleaned_data["private_key"])
-            except:
-                raise forms.ValidationError("The private key is invalid.")
-            try:
-                pubkey = RSA.importKey(self.cleaned_data["public_key"])
-            except:
-                raise forms.ValidationError("The public key is invalid.")
-
-            message = "The quick brown fox jumps over the lazy dog."
-            sig = key.sign(message, '')
-            if not pubkey.verify(message, sig):
-                raise forms.ValidationError("The key pair fields did not match.")
         return self.cleaned_data
 
 
@@ -75,7 +60,7 @@ class UserProfileForm(forms.ModelForm):
     public_key = forms.CharField(widget=forms.Textarea)
     class Meta:
         model = UserProfile
-        fields = ("xsede_username", "private_key", "public_key", "activation_key", "password_reset_key", "reset_expires")
+        fields = ("xsede_username", "public_key", "activation_key", "password_reset_key", "reset_expires")
 
 
 def create_user_profile(sender, instance, created, **kwargs):

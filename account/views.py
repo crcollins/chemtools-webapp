@@ -61,8 +61,6 @@ def change_settings(request, username):
 
     initial = {
                 "email": request.user.email,
-                "public_key": user_profile.public_key,
-                "private_key": user_profile.private_key,
                 "xsede_username": user_profile.xsede_username,
                 }
 
@@ -73,18 +71,19 @@ def change_settings(request, username):
             request.user.email = d.get("email")
             changed = True
 
-        if d.get("private_key") and d.get("public_key"):
-            if user_profile.public_key != d.get("public_key"):
-                if user_profile.public_key:
-                    try:
-                        utils.update_all_ssh_keys(user_profile.xsede_username,
-                                        user_profile.private_key,
-                                        d.get("public_key"))
-                    except:
-                        pass
-                user_profile.public_key = d.get("public_key")
-                user_profile.private_key = d.get("private_key")
-                changed = True
+        if d.get("new_ssh_keypair"):
+            if user_profile.public_key:
+                keys = utils.generate_key_pair(username)
+                try:
+                    utils.update_all_ssh_keys(user_profile.xsede_username,
+                                    user_profile.private_key,
+                                    keys["public"])
+                except Exception as e:
+                    print e
+                    pass
+            user_profile.public_key = keys["public"]
+            user_profile.private_key = keys["private"]
+            changed = True
 
         if d.get("xsede_username"):
             user_profile.xsede_username = d.get("xsede_username")
@@ -112,6 +111,7 @@ def change_settings(request, username):
         "state": state,
         "settings_form": settings_form,
         "pass_form": pass_form,
+        "public_key": user_profile.public_key,
     })
     return render(request, "account/settings.html", c)
 
@@ -123,14 +123,6 @@ def activate_user(request, activation_key):
         return render(request, "account/activate.html")
     else:
         return redirect(HOME_URL)
-
-def generate_key(request):
-    if request.user:
-        user = request.user.username
-    else:
-        user = None
-    a = utils.generate_key_pair(user)
-    return HttpResponse(simplejson.dumps(a), mimetype="application/json")
 
 def get_public_key(request, username):
     pubkey = ''

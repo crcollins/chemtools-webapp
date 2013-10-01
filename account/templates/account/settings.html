@@ -1,18 +1,5 @@
 {% extends "account/base.html" %}
 
-{% block head %}
-{{ block.super }}
-<script>
-    function fetchKeys(){
-    $.getJSON('/u/genkey/', function(data) {
-        $('#id_public_key').val(data['public']);
-        $('#id_private_key').val(data['private']);
-    });
-    }
-</script>
-{% endblock %}
-
-
 {% block header %}
     <h1>Settings</h1>
 {% endblock %}
@@ -24,12 +11,12 @@
     {% csrf_token %}
     <table>
         {{ settings_form.as_table }}
-    <tr>
-        <th></th>
-        <td>
-            <input type="button" value="Generate Keys" onClick="fetchKeys()"/>
-        </td>
-    </tr>
+        <tr>
+            <th>Public Key</th>
+            <td>
+                <textarea cols=50 rows=10>{{ public_key }}</textarea>
+            </td>
+        </tr>
         {{ pass_form.as_table }}
     <tr>
         <th></th>
