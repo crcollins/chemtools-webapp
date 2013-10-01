@@ -3,6 +3,7 @@ from itertools import product, permutations
 from django.test import TestCase
 
 import gjfwriter
+import utils
 
 
 class GJFWriterTestCase(TestCase):
@@ -207,3 +208,54 @@ class GJFWriterTestCase(TestCase):
         if errors:
             print errors
             raise errors[0][1]
+
+
+class UtilsTestCase(TestCase):
+    def test_brace_expansion(self):
+        names = [
+            ("a", ["a"]),
+            ("{a,b}", ["a", "b"]),
+            ("{a,b}c", ["ac", "bc"]),
+            ("c{a,b}", ["ca", "cb"]),
+            ("{a,b}{c}", ["ac", "bc"]),
+            ("{c}{a,b}", ["ca", "cb"]),
+            ("{a,b}{c,d}", ["ac", "bc", "ad", "bd"]),
+            ("e{a,b}{c,d}", ["eac", "ebc", "ead", "ebd"]),
+            ("{a,b}e{c,d}", ["aec", "bec", "aed", "bed"]),
+            ("{a,b}{c,d}e", ["ace", "bce", "ade", "bde"]),
+            ("{a,b}{c,d}{e,f}", ["ace", "acf", "ade", "adf", "bce", "bcf", "bde", "bdf"]),
+        ]
+        for name, result in names:
+            self.assertEqual(set(utils.name_expansion(name)),set(result))
+
+    def test_group_expansion(self):
+        names = [
+            ("{$CORES}", utils.CORES),
+            ("{$XGROUPS}", utils.XGROUPS),
+            ("{$RGROUPS}", utils.RGROUPS),
+            ("{$ARYL0}", utils.ARYL0),
+            ("{$ARYL2}", utils.ARYL2),
+            ("{$ARYL}", utils.ARYL),
+        ]
+        for name, result in names:
+            self.assertEqual(set(utils.name_expansion(name)),set(result))
+
+    def test_local_vars(self):
+        names = [
+            ("{a,b}{$0}", ["aa", "bb"]),
+            ("{a,b}{$0}{$0}", ["aaa", "bbb"]),
+            ("{a,b}{c,d}{$0}{$0}", ["acaa", "bcbb", "adaa", "bdbb"]),
+            ("{a,b}{c,d}{$1}{$1}", ["accc", "bccc", "addd", "bddd"]),
+            ("{a,b}{c,d}{$0}{$1}", ["acac", "bcbc", "adad", "bdbd"]),
+        ]
+        for name, result in names:
+            self.assertEqual(set(utils.name_expansion(name)),set(result))
+
+    def test_name_expansion(self):
+        names = [
+            ("24{$RGROUPS}_{$CORES}", ["24" + '_'.join(x) for x in product(utils.RGROUPS, utils.CORES)]),
+            ("24{$XGROUPS}_{$CORES}", ["24" + '_'.join(x) for x in product(utils.XGROUPS, utils.CORES)]),
+            ("24{$ARYL}_{$CORES}", ["24" + '_'.join(x) for x in product(utils.ARYL, utils.CORES)]),
+        ]
+        for name, result in names:
+            self.assertEqual(set(utils.name_expansion(name)),set(result))
