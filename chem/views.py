@@ -42,30 +42,6 @@ def index(request):
 ###########################################################
 ###########################################################
 
-def _get_job_form(request, molecule):
-    req = request.REQUEST
-    a = dict(req)
-
-    if a and a.keys() != ["keywords"]:
-        form = JobForm(req, initial=a)
-    else:
-        if request.user.is_authenticated():
-            email = request.user.email
-        else:
-            email = ""
-        with open("chemtools/templates/chemtools/gjob.txt" , "r") as f:
-            text = f.read()
-        form = JobForm(initial={
-            "name": molecule,
-            "email": email,
-            "cluster": 'g',
-            "allocation": "TG-CHE120081",
-            "template":text,
-            "walltime":48,
-            "nodes":1,
-            })
-    return form
-
 def _get_molecules_info(string):
     errors = []
     warnings = []
@@ -84,7 +60,7 @@ def _get_molecules_info(string):
     return molecules, warnings, errors
 
 def multi_job(request):
-    form = _get_job_form(request, "{{ name }}")
+    form = JobForm.get_form(request, "{{ name }}")
 
     if not form.is_valid():
         c = Context({
@@ -130,7 +106,7 @@ def molecule_check(request, string):
 
 def gen_detail(request, molecule):
     _, warnings, errors = _get_molecules_info(molecule)
-    form = _get_job_form(request, molecule)
+    form = JobForm.get_form(request, molecule)
     keywords = request.REQUEST.get("keywords")
     add = "" if request.GET.get("view") else "attachment; "
 
@@ -167,7 +143,7 @@ def gen_detail(request, molecule):
     return render(request, "chem/molecule_detail.html", c)
 
 def gen_multi_detail(request, string):
-    form = _get_job_form(request, "{{ name }}")
+    form = JobForm.get_form(request, "{{ name }}")
     keywords = request.REQUEST.get("keywords", "")
     add = "" if request.GET.get("view") else "attachment; "
 
@@ -226,7 +202,7 @@ def gen_multi_detail_zip(request, string):
         return render(request, "chem/multi_molecule.html", c)
 
     if request.GET.get("job"):
-        form = _get_job_form(request, "{{ name }}")
+        form = JobForm.get_form(request, "{{ name }}")
         if form.is_valid():
             d = dict(form.cleaned_data)
         else:

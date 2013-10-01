@@ -32,6 +32,31 @@ class JobForm(forms.Form):
     cluster = forms.ChoiceField(choices=CLUSTER_TUPLES)
     template = forms.CharField(widget=forms.Textarea(attrs={'cols': 50, 'rows': 26}))
 
+    @classmethod
+    def get_form(cls, request, molecule):
+        req = request.REQUEST
+        a = dict(req)
+
+        if a and a.keys() != ["keywords"]:
+            form = JobForm(req, initial=a)
+        else:
+            if request.user.is_authenticated():
+                email = request.user.email
+            else:
+                email = ""
+            with open("chemtools/templates/chemtools/gjob.txt" , "r") as f:
+                text = f.read()
+            form = JobForm(initial={
+                "name": molecule,
+                "email": email,
+                "cluster": 'g',
+                "allocation": "TG-CHE120081",
+                "template":text,
+                "walltime":48,
+                "nodes":1,
+                })
+        return form
+
 class Job(models.Model):
     molecule = models.CharField(max_length=400)
     name = models.CharField(max_length=400)
