@@ -3,9 +3,9 @@ import cStringIO
 import paramiko
 
 class StringIO(object):
-    def __init__(self, name=None, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         self.s = cStringIO.StringIO(*args, **kwargs)
-        self.name = name if name else ''
+        self.name = kwargs.get("name", "")
     def __getattr__(self, key):
         return getattr(self.s, key)
     def __iter__(self):

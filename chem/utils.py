@@ -8,7 +8,7 @@ import paramiko
 
 from chemtools import gjfwriter
 from chemtools import fileparser
-from project.utils import get_ssh_connection, get_sftp_connection
+from project.utils import get_ssh_connection, get_sftp_connection, StringIO
 
 def get_connections(server, user):
     try:
