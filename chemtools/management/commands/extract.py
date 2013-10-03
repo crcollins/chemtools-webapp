@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand, CommandError
-from chemtools.extracter import run_all
+from chemtools.extractor import run_all
 
 class Command(BaseCommand):
     args = ''
