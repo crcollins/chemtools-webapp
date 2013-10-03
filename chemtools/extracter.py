@@ -32,16 +32,15 @@ def parse_mol2(filename):
                 bonds.append(Bond((atoms[int(a1)-1], atoms[int(a2)-1]), t, bonds))
         return atoms, bonds
 
-
-if __name__ == "__main__":
-    for fname in os.listdir("mol2"):
-        name = fname[:-5]
+def run_all(base="chemtools"):
+    for fname in os.listdir(os.path.join(base,"mol2")):
+        name, ext = os.path.splitext(fname)
         for i,x in enumerate([cores, xrgroups, aryl]):
             if name in x:
                 parts = partslist[i]
 
-        atoms, bonds = parse_mol2("mol2/"+fname)
-        with open("data/"+name, "w") as f:
+        atoms, bonds = parse_mol2(os.path.join(base, "mol2", fname))
+        with open(os.path.join(base,"data",name), "w") as f:
             for atom in atoms:
                 if atom.element in ends:
                     atom.element = parts[ends.index(atom.element)]
@@ -52,3 +51,5 @@ if __name__ == "__main__":
             for bond in bonds:
                 f.write(' '.join(bond.mol2.split()[1:])+"\n")
 
+if __name__ == "__main__":
+    run_all("")
