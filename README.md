@@ -30,6 +30,8 @@ There are four main classifications of the parts of the name.
 
 ### Cores ###
 
+Cores are made up of three parts, the type, the "x" element, and the "y" element. There are 2 options for type. The molecule can either be Cis (C) or I can be Trans (T). The x element can, in theory be any element that allows at least 2 bonds (Oxygen, Sulfur, Nitrogen, Phosphorus, Carbon). The x element can be any element that allows at least 3 bonds (Nitrogen, Phosphorus, Carbon).
+
     CON = Cis Oxygen Nitrogen
     TON = Trans Oxygen Nitrogen
     CSN = Cis Sulfur Nitrogen
@@ -239,7 +241,10 @@ For generating the molecules, there is a very rough FSM that parses through the 
     digit       = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" ;
     int         = digit, { digit } ;
 
-    core        = "CON" | "TON" | "CSN" | "TSN" | "CNN" | "TNN" | "CCC" | "TCC" ;
+    YY          = "N" | "P" | "C" ;
+    XX          = "O" | "S" | YY ;
+    type        = "C" | "T" ;
+    core        = type, XX, YY ;
     aryl0       = "2" | "3" | "8" | "9" ;
     aryl2       = "4" | "5" | "6" | "7" ;
     aryl        = aryl0 | aryl2 ;
@@ -361,7 +366,7 @@ Example:
 
 With chemtools-webapp there are six variables each of which correspond to a set of the naming scheme.
 
-    CORES   = "CON,TON,CSN,TSN,CNN,TNN,CCC,TCC"
+    CORES   = "{C,T}{O,S,N,P,C}{N,P,C}""
     RGROUPS = "a,b,c,d,e,f,g,h,i,j,k,l"
     XGROUPS = "A,B,C,D,E,F,G,H,I,J,K,L"
     ARYL0   = "2,3,4,5,6,7,8,9"

@@ -9,7 +9,10 @@ coreparts = ["*~0", "*~1", "~0", "~1"]
 xrparts = ["*+0", "*+1"]
 arylparts = ["~0", "~1", "+0", "+1"]
 
+# Convention for marking ends of fragments
+# [LEFT, RIGHT, BOTTOM, TOP]
 ends = ["Sg", "Bh", "Hs", "Mt"]
+# Convention for marking X/Y of core
 xy = {"Ge": "XX", "As": "YY"}
 partslist = [coreparts, xrparts, arylparts]
 
