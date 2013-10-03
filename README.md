@@ -482,7 +482,7 @@ Where x, y, and z are all floats. Element is a String from the set of all the el
 
 Here is an example of the Triple Bond.
 
-[/chem/frag/3/](/chem/frags/3/)
+[/chem/frag/3/](/chem/frag/3/)
 
     C 0.402800 -0.479100 -0.000100
     C 1.209100 0.607700 -0.000300
