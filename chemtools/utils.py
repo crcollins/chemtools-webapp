@@ -3,7 +3,7 @@ import itertools
 
 from django.template import Template, Context
 
-CORES = ["CON","TON","CSN","TSN","CNN","TNN","CCC","TCC"]
+CORES = [''.join(x) for x in itertools.product(["C","T"],["O","S","N","P","C"],["N","P","C"])]
 XGROUPS = ["A","B","C","D","E","F","G","H","I","J","K","L"]
 RGROUPS = ["a","b","c","d","e","f","g","h","i","j","k","l"]
 ARYL0 = ["2","3","8","9"]

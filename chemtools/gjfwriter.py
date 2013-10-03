@@ -14,6 +14,10 @@ ALL = CORES + XGROUPS + RGROUPS + ARYL
 
 def read_data(filename):
     '''Reads basic data files.'''
+    atomtypes = {'C':'4', 'N': '3', 'O': '2', 'P': '3', 'S': '2'}
+    if len(filename) == 3:
+        convert = {"XX": filename[1], "YY": filename[2]}
+        filename = filename[0] + atomtypes[convert["XX"]] + atomtypes[convert["YY"]]
     #try to load file with lowercase name then upper
     try:
         f = open(os.path.join(DATAPATH, filename), "r")
@@ -22,6 +26,8 @@ def read_data(filename):
             f = open(os.path.join(DATAPATH, filename.lower()), "r")
         except:
             raise Exception(3, "Bad Substituent Name: %s" % filename)
+
+
     atoms = []
     bonds = []
     state = 0
@@ -30,6 +36,8 @@ def read_data(filename):
             state = 1
         elif state == 0:
             e, x, y, z = line.split()[-4:]
+            if len(filename) == 3 and e in convert:
+                e = convert[e]
             atoms.append(Atom(x, y, z, e, atoms))
         elif state == 1:
             a1, a2, t = line.split()
