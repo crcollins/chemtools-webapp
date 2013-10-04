@@ -83,7 +83,7 @@ def run_standard_job(user, molecule, **kwargs):
     except Exception as e:
         return None, e
 
-    gjf = out.write_file()
+    gjf = out.get_gjf()
     name = kwargs.get("name", molecule)
     return run_job(user, gjf, **kwargs)
 

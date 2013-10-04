@@ -6,6 +6,7 @@ import copy
 
 from molecule import Atom, Bond, Molecule
 from utils import CORES, XGROUPS, RGROUPS, ARYL0, ARYL2, ARYL
+from project.utils import StringIO
 
 DATAPATH = "chemtools/data"
 ALL = CORES + XGROUPS + RGROUPS + ARYL
@@ -53,23 +54,6 @@ class GJFWriter(object):
         self.keywords = keywords if keywords else "B3LYP/6-31g(d)"
         self.molecule = self.build(name)
 
-    def write_file(self, gjf=True):
-        starter = [
-                    "%mem=59GB",
-                    "%%chk=%s.chk" % self.name,
-                    "# %s geom=connectivity" % self.keywords,
-                    "",
-                    self.name,
-                    "",
-                    "0 1",
-                    ""
-                    ]
-        if gjf:
-            string = "\n".join(starter)
-            string += self.molecule.gjf
-        else:
-            string = self.molecule.mol2
-        return string
 
     def load_fragments(self, coreset):
         corename, (leftparsed, middleparsed, rightparsed) = coreset
@@ -154,6 +138,30 @@ class GJFWriter(object):
 
         a.close_ends()
         return a
+
+    def get_gjf(self):
+        starter = [
+                    "%mem=59GB",
+                    "%%chk=%s.chk" % self.name,
+                    "# %s geom=connectivity" % self.keywords,
+                    "",
+                    self.name,
+                    "",
+                    "0 1",
+                    ""
+                    ]
+        string = "\n".join(starter)
+        string += self.molecule.gjf
+        return string
+
+    def get_mol2(self):
+        return self.molecule.mol2
+
+    def get_png(self, size=10):
+        f = StringIO()
+        self.molecule(size).save(f, "PNG")
+        return f.getvalue()
+
 
 def parse_options(parts):
     newparts = []

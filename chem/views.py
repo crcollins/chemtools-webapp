@@ -228,12 +228,10 @@ def gen_multi_detail_zip(request, string):
             others = False
 
             if request.GET.get("image"):
-                f = StringIO()
-                out.molecule.draw(10).save(f, "PNG")
-                zfile.writestr(out.name + ".png", f.getvalue())
+                zfile.writestr(out.name + ".png", out.get_png(10))
                 others = True
             if request.GET.get("mol2"):
-                zfile.writestr(name + ".mol2", out.write_file(False))
+                zfile.writestr(name + ".mol2", out.get_mol2())
                 others = True
             if request.GET.get("job"):
                 dnew = d.copy()
@@ -242,7 +240,7 @@ def gen_multi_detail_zip(request, string):
                 others = True
 
             if request.GET.get("gjf") or not others:
-                zfile.writestr(name + ".gjf", out.write_file())
+                zfile.writestr(name + ".gjf", out.get_gjf())
 
         except Exception as e:
             generrors.append("%s - %s" % (name,  e))
@@ -264,7 +262,7 @@ def write_gjf(request, molecule):
     add = "" if request.GET.get("view") else "attachment; "
 
     out = gjfwriter.GJFWriter(molecule, keywords)
-    f = StringIO(out.write_file())
+    f = StringIO(out.get_gjf())
     response = HttpResponse(FileWrapper(f), content_type="text/plain")
     response['Content-Disposition'] = add + 'filename=%s.gjf' % molecule
     return response
@@ -273,7 +271,7 @@ def write_mol2(request, molecule):
     add = "" if request.GET.get("view") else "attachment; "
 
     out = gjfwriter.GJFWriter(molecule, '')
-    f = StringIO(out.write_file(False))
+    f = StringIO(out.get_mol2())
     response = HttpResponse(FileWrapper(f), content_type="text/plain")
     response['Content-Disposition'] = add + 'filename=%s.mol2' % molecule
     return response
