@@ -9,14 +9,14 @@ import utils
 class GJFWriterTestCase(TestCase):
     templates = [
         "{0}_TON",
-        "TON_{0}",
+        "CON_{0}",
         "TON_{0}_",
-        "{0}_TON_{0}",
-        "{0}_TON_{0}_",
-        "TON_{0}_{0}",
+        "{0}_TPN_{0}",
+        "{0}_TNN_{0}_",
+        "CPP_{0}_{0}",
         "{0}_TON_{0}_{0}",
     ]
-    cores = ["CON", "TON", "CSN", "TSN", "CCC", "TCC", "TNN", "CNN"]
+    cores = utils.CORES
     invalid_cores = ["cao", "bo", "CONA", "asD"]
     valid_polymer_sides = ['2', '4b', '4bc', '44bc']
     invalid_polymer_sides = ['B', '2B']
@@ -66,7 +66,7 @@ class GJFWriterTestCase(TestCase):
             name = template.format(group)
             try:
                 gjfwriter.GJFWriter(name)
-                if group != "TON" and name != "TON_BB":
+                if group != "TON" and name != "CON_BB":
                     errors.append(name)
             except Exception:
                 pass
