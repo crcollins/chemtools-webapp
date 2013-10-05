@@ -1,8 +1,9 @@
 import os
+import itertools
 
 from molecule import Atom, Bond
 
-cores = ['C23', 'C24', 'C33', 'C34', 'C43', 'C44', 'T23', 'T24', 'T33', 'T34', 'T43', 'T44']
+cores = [''.join(x) for x in itertools.product(["C","T","Z","E"],["2","3","4"],["3","4"])]
 xrgroups = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'l']
 aryl = ['2', '3', '4', '5', '6', '7', '8', '9']
 coreparts = ["*~0", "*~1", "~0", "~1"]
