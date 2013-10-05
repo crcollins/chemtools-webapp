@@ -30,7 +30,7 @@ There are four main classifications of the parts of the name.
 
 ### Cores ###
 
-Cores are made up of three parts, the type, the "x" element, and the "y" element. There are 2 options for type. The molecule can either be Cis (C) or I can be Trans (T). The x element can, in theory be any element that allows at least 2 bonds (Oxygen, Sulfur, Nitrogen, Phosphorus, Carbon). The x element can be any element that allows at least 3 bonds (Nitrogen, Phosphorus, Carbon).
+Cores are made up of three parts, the type, the "x" element, and the "y" element. There are 2 options for type. The molecule can either be Cis (C), Trans (T), single sided same side (Z), or single sided opposite side (E). The x element can, in theory, be any element that allows at least 2 bonds (Oxygen, Sulfur, Nitrogen, Phosphorus, Carbon). The x element can be any element that allows at least 3 bonds (Nitrogen, Phosphorus, Carbon).
 
     CON = Cis Oxygen Nitrogen
     TON = Trans Oxygen Nitrogen
@@ -243,7 +243,7 @@ For generating the molecules, there is a very rough FSM that parses through the 
 
     YY          = "N" | "P" | "C" ;
     XX          = "O" | "S" | YY ;
-    type        = "C" | "T" ;
+    type        = "C" | "T" | "E" | "Z" ;
     core        = type, XX, YY ;
     aryl0       = "2" | "3" | "8" | "9" ;
     aryl2       = "4" | "5" | "6" | "7" ;
@@ -286,6 +286,7 @@ The last molecule specific access is the png image. It is a very basic rendering
     Nitrogen        = blue dot
     Chlorine        = green dot
     Carbon          = medium gray dot
+    Phosphorus      = orange dot
     Hydrogen        = off white dot
     Silicon         = green/gray dot
 
@@ -510,23 +511,6 @@ Just like with the fragments, the standard job files can be found here:
 Most of the job files are just standard shell scripts with the headers required for the various supercomputers. The job files can be accessed by either the first letter of the supercomputer, or the full name (case insensitive).
 
 [/chem/template/Gordon/](/chem/template/Gordon)
-
-
-### Generate SSH Key Pair ###
-This will return json with with two values. The public key is in the OpenSSH format.
-
-[/u/genkey/](/u/genkey/)
-
-    {
-        "public": "ssh-rsa ... chemtools-webapp",
-
-        "private": "-----BEGIN RSA PRIVATE KEY-----
-        ...
-        ...
-        -----END RSA PRIVATE KEY-----"
-    }
-
-If the caller is logged in then it will return a public key with $USERNAME@chemtools-webapp.
 
 
 ### Get User's Public Key ###
