@@ -159,7 +159,7 @@ class GJFWriter(object):
 
     def get_png(self, size=10):
         f = StringIO()
-        self.molecule(size).save(f, "PNG")
+        self.molecule.draw(size).save(f, "PNG")
         return f.getvalue()
 
 
