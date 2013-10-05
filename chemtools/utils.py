@@ -117,6 +117,11 @@ def name_expansion(string):
     def expand(items):
         swapped = [re.sub(varparse, get_var, x) for x in items]
         a = [x[1:-1].split(',') for x in swapped[1::2] if x[1] != "*"]
+        operations = {
+            "":  lambda x: x,
+            "L": lambda x: x.lower(),
+            "U": lambda x: x.upper()
+        }
 
         out = []
         for stuff in itertools.product(*a):
@@ -124,7 +129,13 @@ def name_expansion(string):
             i = 0
             for thing in swapped[1::2]:
                 if thing[1] == "*":
-                    x = stuff[int(thing[2:-1])]
+                    split = thing.strip("{*}").split(".")
+                    num = split[0]
+                    if len(split) > 1:
+                        op = operations[split[1].upper()]
+                    else:
+                        op = operations['']
+                    x = op(stuff[int(num)])
                 else:
                     x = stuff[i]
                     i += 1
