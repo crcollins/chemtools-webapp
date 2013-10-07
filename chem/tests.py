@@ -72,6 +72,16 @@ class MainPageTestCase(TestCase):
             response = self.client.get(reverse(views.write_mol2, args=(name, )))
             self.assertEqual(response.status_code, 200)
 
+    def test_multi_job(self):
+        response = self.client.get(reverse(views.multi_job))
+        self.assertEqual(response.status_code, 200)
+
+    def test_molecule_check(self):
+        for name in self.names:
+            response = self.client.get(reverse(views.molecule_check, args=(name, )))
+            self.assertEqual(response.status_code, 200)
+
+
 
 class SSHPageTestCases(TestCase):
     def setUp(self):
