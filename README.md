@@ -401,6 +401,10 @@ This case creating `4 * 4 * 12 * 8 * 4 = 6144` molecules. Due to optimizations, 
 
 [/chem/4{$RGROUPS}\_TON\_4{$0}\_4{$0}\_n{1,2,3,4},4a\_{$CORES}\_4a\_4a\_n{1,2,3,4}/](/chem/4{$RGROUPS}_TON_4{$0}_4{$0}_n{1,2,3,4},4a_{$CORES}_4a_4a_n{1,2,3,4}/)
 
+In addition to the values of the there are also 2 options that can be applied to the variables to change the case. These are added by adding a .U (for uppercase) or a .L (for lowercase) to the end of the variable number. This is useful when making matching R-Groups and X-Groups.
+
+[/chem/4{$RGROUPS}\_TON\_4{$0}\_{$0.U}/](/chem/4{$RGROUPS}_TON_4{$0}_{$0.U}/)
+
 
 #### Zip Output ####
 
