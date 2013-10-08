@@ -1,6 +1,7 @@
 from django.test import Client, TestCase
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
+from django.utils import simplejson
 
 import views
 
@@ -80,6 +81,17 @@ class MainPageTestCase(TestCase):
         for name in self.names:
             response = self.client.get(reverse(views.molecule_check, args=(name, )))
             self.assertEqual(response.status_code, 200)
+
+    def test_molecule_check_specifc(self):
+        names = [
+            ("24ball_TON", "no rgroups allowed"),
+            ("AA_TON", "can not attach to end"),
+            ("A_TOO", "(1, 'Bad Core Name')"),
+        ]
+        for name, error in names:
+            response = self.client.get(reverse(views.molecule_check, args=(name, )))
+            values = simplejson.loads(response.content)["molecules"]
+            self.assertEqual(values[0][2], error)
 
 
 

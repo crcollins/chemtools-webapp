@@ -259,3 +259,19 @@ class UtilsTestCase(TestCase):
         ]
         for name, result in names:
             self.assertEqual(set(utils.name_expansion(name)),set(result))
+
+    def test_local_vars_case(self):
+        names = [
+            ("{a,b}{$0.U}", ["aA", "bB"]),
+            ("{a,b}{$0.U}{$0}", ["aAa", "bBb"]),
+            ("{a,b}{c,d}{$0.U}{$0.U}", ["acAA", "bcBB", "adAA", "bdBB"]),
+            ("{a,b}{c,d}{$1}{$1.U}", ["accC", "bccC", "addD", "bddD"]),
+            ("{a,b}{c,d}{$0.U}{$1.U}", ["acAC", "bcBC", "adAD", "bdBD"]),
+            ("{A,B}{$0.L}", ["Aa", "Bb"]),
+            ("{A,B}{$0.L}{$0}", ["AaA", "BbB"]),
+            ("{A,B}{C,D}{$0.L}{$0.L}", ["ACaa", "BCbb", "ADaa", "BDbb"]),
+            ("{A,B}{C,D}{$1}{$1.L}", ["ACCc", "BCCc", "ADDd", "BDDd"]),
+            ("{A,B}{C,D}{$0.L}{$1.L}", ["ACac", "BCbc", "ADad", "BDbd"]),
+        ]
+        for name, result in names:
+            self.assertEqual(set(utils.name_expansion(name)),set(result))
