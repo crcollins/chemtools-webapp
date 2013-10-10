@@ -1,5 +1,6 @@
 from django.test import Client, TestCase
 from django.core.urlresolvers import reverse
+from django.contrib.auth.models import User
 from Crypto.PublicKey import RSA
 
 import views
@@ -61,6 +62,46 @@ class RegistrationTestCase(TestCase):
             raise Exception()
         except ValueError:
             pass
+
+
+class SettingsTestCase(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.users = [{
+            "username": "user1",
+            "email": "user1@test.com",
+            "new_password1": "mypass",
+            "new_password2": "mypass",
+        }, {
+            "username": "user2",
+            "email": "user2@test.com",
+            "new_password1": "mypass",
+            "new_password2": "mypass",
+        }]
+        for user in self.users:
+            _register(self.client, user)
+
+    def test_get_public_key(self):
+        for user in self.users:
+            response = self.client.get(reverse(views.get_public_key, args=(user["username"], )))
+            self.assertEqual(response.status_code, 200)
+            profile = User.objects.get(username=user["username"]).get_profile()
+            self.assertEqual(response.content.strip(), profile.public_key)
+
+    def test_change_settings(self):
+        for user in self.users:
+            r = self.client.login(username=user["username"], password=user["new_password1"])
+            self.assertTrue(r)
+            response = self.client.get(reverse(views.change_settings, args=(user["username"], )))
+            self.assertEqual(response.status_code, 200)
+
+    def test_change_settings_redirect(self):
+        for i, user in enumerate(self.users):
+            r = self.client.login(username=user["username"], password=user["new_password1"])
+            self.assertTrue(r)
+            opposite = self.users[not i]["username"]
+            response = self.client.get(reverse(views.change_settings, args=(opposite, )))
+            self.assertEqual(response.status_code, 302)
 
 
 class UtilsTestCase(TestCase):
