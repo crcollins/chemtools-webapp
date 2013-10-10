@@ -5,20 +5,20 @@ from Crypto.PublicKey import RSA
 import views
 import utils
 
-class RegistrationTestCase(TestCase):
-    def _register(self, data):
-        response = self.client.post(reverse(views.register_user), data)
-        self.assertEqual(response.status_code, 200)
-        content = response.content
-        start = content.index("Please click")
-        end = content.index("this", start)-2
-        key = content[start:end].split('href="')[1]
-        response = self.client.get(reverse(views.activate_user, args=(key, )))
-        self.assertEqual(response.status_code, 200)
-        v = self.client.login(username=data["username"], password=data["new_password1"])
-        self.assertTrue(v)
-        self.client.logout()
+def _register(client, data):
+    response = client.post(reverse(views.register_user), data)
+    assert response.status_code == 200
+    content = response.content
+    start = content.index("Please click")
+    end = content.index("this", start)-2
+    key = content[start:end].split('href="')[1]
+    response = client.get(reverse(views.activate_user, args=(key, )))
+    assert response.status_code == 200
+    v = client.login(username=data["username"], password=data["new_password1"])
+    assert v
+    client.logout()
 
+class RegistrationTestCase(TestCase):
     def setUp(self):
         self.client = Client()
 
@@ -33,7 +33,7 @@ class RegistrationTestCase(TestCase):
             "new_password1": "mypass",
             "new_password2": "mypass",
         }
-        self._register(data)
+        _register(self.client, data)
 
     def test_register_taken_username(self):
         data = {
@@ -42,9 +42,9 @@ class RegistrationTestCase(TestCase):
             "new_password1": "mypass",
             "new_password2": "mypass",
         }
-        self._register(data)
+        _register(self.client, data)
         try:
-            self._register(data)
+            _register(self.client, data)
             raise Exception()
         except ValueError:
             pass
@@ -57,7 +57,7 @@ class RegistrationTestCase(TestCase):
             "new_password2": "mypass123",
         }
         try:
-            self._register(data)
+            _register(self.client, data)
             raise Exception()
         except ValueError:
             pass
