@@ -250,6 +250,7 @@ class Geometry(LineParser):
         self.start = False
         self.range = (-300, -1)
         self.newfile = True
+        self.prevline = ''
 
     @is_done
     def parse(self, line):
@@ -258,10 +259,11 @@ class Geometry(LineParser):
         # ...
         # " 4,1.2501547542\H,22.6120510229,1.0505502972,0.1022974384\H,2.283441615"
         # " 6,-0.8632316482,20.4346296726\\Version=EM64L-G09RevC.01\State=1-A\HF=-"
-        if "\\" in line:
+        if "\\" in self.prevline+line:
             self.start = True
+        line = line.strip()
         if self.start:
-            if r"\\@" in line:
+            if r"\\@" in self.prevline+line:
                 start = self.value.index("#")
                 end =  self.value.index(r"\Version", start)
 
@@ -274,7 +276,8 @@ class Geometry(LineParser):
                 self.value = value
                 self.done = True
             if not self.done:
-                self.value += line.strip()
+                self.value += line
+        self.prevline = line
 
 
 @Log.add_parser
