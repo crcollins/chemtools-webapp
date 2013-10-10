@@ -32,10 +32,14 @@ def register_user(request):
         new_user.is_active = False
 
         activation_key = utils.generate_key(d["username"])
-        new_user.get_profile().activation_key = activation_key
+        profile = new_user.get_profile()
+        profile.activation_key = activation_key
+        keypair = utils.generate_key_pair(d["username"])
+        profile.public_key = keypair["public"]
+        profile.private_key = keypair["private"]
 
         new_user.save()
-        new_user.get_profile().save()
+        profile.save()
         c = Context({
             "key": activation_key,
             })
