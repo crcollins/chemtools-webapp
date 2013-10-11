@@ -273,7 +273,7 @@ class Geometry(LineParser):
                 value = self.value[start:end]
                 for i, j in d.iteritems():
                     value = value.replace(i, j)
-                self.value = value
+                self.value = value + "\n"
                 self.done = True
             if not self.done:
                 self.value += line
