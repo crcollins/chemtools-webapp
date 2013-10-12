@@ -69,9 +69,9 @@ class MainPageTestCase(TestCase):
             response = self.client.get(reverse(views.write_mol2, args=(name, )))
             self.assertEqual(response.status_code, 200)
 
-    def test_write_mol2(self):
+    def test_write_png(self):
         for name in self.names:
-            response = self.client.get(reverse(views.write_mol2, args=(name, )))
+            response = self.client.get(reverse(views.write_png, args=(name, )))
             self.assertEqual(response.status_code, 200)
 
     def test_multi_job(self):
@@ -83,7 +83,7 @@ class MainPageTestCase(TestCase):
             response = self.client.get(reverse(views.molecule_check, args=(name, )))
             self.assertEqual(response.status_code, 200)
 
-    def test_molecule_check_specifc(self):
+    def test_molecule_check_specific(self):
         names = [
             ("24ball_TON", "no rgroups allowed"),
             ("AA_TON", "can not attach to end"),
