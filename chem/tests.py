@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from django.utils import simplejson
 
 import views
+from models import ErrorReport
 
 class MainPageTestCase(TestCase):
     names = ["24a_TON", "24b_TSP_24a_24a", "CON_24a"]
@@ -93,6 +94,32 @@ class MainPageTestCase(TestCase):
             values = simplejson.loads(response.content)["molecules"]
             self.assertEqual(values[0][2], error)
 
+    def test_report_molecule(self):
+        names = [
+            "24242424242a_TON",
+            "25252525252a_TON",
+            "26262626262a_TON",
+        ]
+        data = {
+            "email":"something@test.com",
+            "message": "something something something something"
+        }
+        for name in names:
+            for i in xrange(3):
+                data["urgency"] = i
+                response = self.client.get(reverse(views.molecule_check, args=(name, )))
+                values = simplejson.loads(response.content)["molecules"]
+                self.assertFalse(values[0][1])
+
+                response = self.client.post(reverse(views.report, args=(name, )), data)
+                self.assertEqual(response.status_code, 302)
+
+                response = self.client.get(reverse(views.molecule_check, args=(name, )))
+                values = simplejson.loads(response.content)["molecules"]
+                self.assertTrue(values[0][1])
+
+                obj = ErrorReport.objects.get(molecule=name)
+                obj.delete()
 
 
 class SSHPageTestCases(TestCase):
