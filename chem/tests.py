@@ -129,6 +129,9 @@ class SSHPageTestCases(TestCase):
         self.client = Client()
 
     def test_job_index(self):
+        response = self.client.get(reverse(views.job_index))
+        self.assertEqual(response.status_code, 302)
+
         r = self.client.login(username="testerman", password="S0m3thing")
         self.assertTrue(r)
         response = self.client.get(reverse(views.job_index))
