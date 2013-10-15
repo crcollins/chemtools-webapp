@@ -73,3 +73,7 @@ Add opt
 
     for f in `ls *.gjf`; do sed $f -i -e 's/B3LYP/opt B3LYP/I'; done
 
+
+Get all incomplete logs
+
+    grep -L "Normal termination of Gaussian" *
