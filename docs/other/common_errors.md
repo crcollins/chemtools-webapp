@@ -1,3 +1,21 @@
+### Troubleshooting Steps ###
+
+1. Check the end of the log file (`tail $FILENAME.log`)
+2. Check the $FILENAME.err and $FILENAME.out files (`cat $FILENAME.{out,err}`)
+3. Check your email for emails from XSEDE if there are any problems going on with the supercomputer (you might have to check over the course of a few hours).
+4. Check your gjf and job files for obvious errors.
+    1. Wrong names or paths used in either file
+    2. Wrong options used in gjf file
+        1. Incorrect path for `%chk` option
+        2. Wrong charge/spin specifications
+        3. Bad pairings of job options (`td` and `opt`, multiple bases or functionals)
+5. Try rerunning the job (This sometimes fixes random errors).
+6. If there is a still a problem, triple check all the files involved ($FILENAME.log, $FILENAME.gjf, $FILENAME.err, $FILENAME.job, $FILENAME.out) and look for anything that seems odd.
+7. If all else fails, try restarting from the begining (rebuild the molecule, job, etc)
+
+
+
+### Errors ###
 #### Error ####
 
     qsub: submit filter returned an error code, aborting job submission.
