@@ -19,6 +19,7 @@ This means that one of two things has happened.
 
 
 #### Error ####
+
 When submitting a job the following error is returned.
 
     -l nodes=...:ppn=<procs per node>:... is required
@@ -36,13 +37,14 @@ This problem can be fixed by adding that option to the job file. This can either
 
 
 #### Error ####
-The supercomputer sent an email with a status code that
+
+he supercomputer sent an email with a status code that
 
     which: no g09 in (/opt/gaussian/g09:/opt/gnu/bin:/opt/gnu/gcc/bin:/opt/mvapich2/intel/ib/bin:/opt/intel/composer_xe_2013.1.117/bin/intel64:/usr/lib64/qt-3.3/bin:/usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin:/usr/java/latest/bin:/opt/maui/bin:/opt/torque/bin:/opt/torque/sbin:/opt/torque/bin:/opt/torque/sbin:/state/partition1/catalina/bin:/opt/pdsh/bin:/opt/rocks/bin:/opt/rocks/sbin:/home/servers/gordon/bin:/home/dlwhee93/bin:/opt/maui/bin:/opt/torque/bin:/opt/torque/sbin:/opt/torque/bin:/opt/torque/sbin:/state/partition1/catalina/bin:/home/servers/gordon/bin:/home/dlwhee93/bin)
 
 #### Problem ####
 
-Gaussian requires that you accept their terms of service before you will be able to use their software, so for each of the supercomputers you will need to accept their terms of service. Without accepting the terms of service the gaussian module will not load.
+Gaussian requires that you accept their terms of service before you will be able to use their software, so for each of the supercomputers you will need to accept their terms of service. Without accepting the terms of service the Gaussian module will not load.
 
 #### Fix ####
 
@@ -55,11 +57,29 @@ You will need to fill out the required forms for that supercomputer to get acces
     %chk=C:\Users\research\Documents\My SugarSync\gjfs\oct_010_2.chk
     ntrex1
 
+#### Problem ####
+
+The `%chk` specification in the gjf is not correct. The path that is specified there must correspond to a path on the supercomputer (in most cases this should just be the name of the file without any folders).
+
+#### Fix ####
+
+Change the `%chk` to be a proper path (remove the `C:\Users\...` part and leave the $FILENAME.chk part)
+
 
 
 #### Error ####
 
     Post job file processing error; job 1590474.trestles-fe1.sdsc.edu on host trestles-9-10/15+trestles-9-10/14+trestles-9-10/13+trestles-9-10/12+trestles-9-10/11+trestles-9-10/10+trestles-9-10/9+trestles-9-10/8+trestles-9-10/7+trestles-9-10/6+trestles-9-10/5+trestles-9-10/4+trestles-9-10/3+trestles-9-10/2+trestles-9-10/1+trestles-9-10/0Unknown resource type  REJHOST=trestles-9-10.local MSG=invalid home directory '/home/ccollins' specified, errno=2 (No such file or directory)
+
+#### Problem ####
+
+Generally, this happens when there is a problem with the supercomputer. In this specific case, the File system on Trestles went bad and there was an email sent out from XSEDE within a few hours saying that there was a problem.
+
+This problem can also be caused by a bad job file.
+
+#### Fix ####
+
+Wait and see if XSEDE sends out an email saying that the supercomputer has been fixed. Or if it is the other problem, then check and make sure all the paths/filenames are correct in the job file.
 
 
 
@@ -67,11 +87,29 @@ You will need to fill out the required forms for that supercomputer to get acces
 
     galloc:  could not allocate memory.
 
+#### Problem ####
+
+The supercomputer was unable to allocate memory for your current job.
+
+#### Fix ####
+
+There are two possible fixes for this problem:
+1. Try rerunning the job (this might have to be done multiple times). It seems that sometimes the supercomputer is just unable to allocate memory. This problem can seem to pop up at random.
+2. Try lowering the `%mem` option in the gjf file to a lower number.
+
 
 
 #### Error ####
 
 Empty log file
+
+#### Problem ####
+
+This means that the job had an error before the execution of Gaussian. To get an exact answer to what the problem is you will have to check your email about the job, the `$FILENAME.err` file, and the `$FILENAME.out` file. In one of those places it should give you a clue to where the problem might be.
+
+#### Fix ####
+
+Fixes for these kind of problems will be completely dependent on what is seen in your email, the `$FILENAME.err` file, or the `$FILENAME.out` file.
 
 
 
@@ -105,12 +143,17 @@ This can also be confirmed by checking your email for for the walltime error mes
 
 #### Fix ####
 
-Move the incomplete log files back to your computer from the supercomputer and load them in gaussian. Then from there save them as new gjfs and resubmit those on the supercomputer.
+Move the incomplete log files back to your computer from the supercomputer and load them in Gaussian. Then from there save them as new gjfs and resubmit those on the supercomputer.
+
 
 
 #### Error ####
 
     Error termination via Lnk1e in /opt/gaussian/g09/l401.exe
+
+#### Problem ####
+
+If you make the gjf files on windows there is a chance that windows will tack on the windows line endings instead of the ones that are required for unix/linux. This is just a problem of convention differences in the two operating systems. You can see if this is actually the problem if you open one of the gjf files in `vim` on the supercomputer. If the lines end with a `^M` then they will have this problem.
 
 #### Fix ####
 
@@ -124,6 +167,10 @@ Run the dos2unix utility to fix all the line endings.
 
     End of file in ZSymb.
     Error termination via Lnk1e in /home/diag/opt/gaussian/g09/l101.exe
+
+#### Problem ####
+
+Gaussian requires that all the gjf files end with a single blank line for whatever reason. If this condition is not met then it will return this error in the log file.
 
 #### Fix ####
 
