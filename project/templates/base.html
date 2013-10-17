@@ -1,74 +1,89 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    {% block head %}
-    <link rel="shortcut icon" href="{{ STATIC_URL }}favicon.ico" type="image/x-icon" />
-    <link rel="stylesheet" href="{{ STATIC_URL }}jQueryUI/jquery-ui-1.9.2.custom.min.css" />
-    <link rel="stylesheet" href="{{ STATIC_URL }}style.css" />
-
-    <script src="{{ STATIC_URL }}jquery-1.7.1.min.js"></script>
-    <!-- jQueryUI Stuff -->
-    <script src="{{ STATIC_URL }}jQueryUI/jquery.ui.core.min.js"></script>
-    <script src="{{ STATIC_URL }}jQueryUI/jquery.ui.widget.min.js"></script>
-    <script src="{{ STATIC_URL }}jQueryUI/jquery.ui.button.min.js"></script>
-    <script src="{{ STATIC_URL }}jQueryUI/jquery.ui.draggable.min.js"></script>
-    <script src="{{ STATIC_URL }}jQueryUI/jquery.ui.mouse.min.js"></script>
-    <script src="{{ STATIC_URL }}jQueryUI/jquery.ui.position.min.js"></script>
-    <script src="{{ STATIC_URL }}jQueryUI/jquery.ui.resizable.min.js"></script>
-    <script src="{{ STATIC_URL }}jQueryUI/jquery.ui.dialog.min.js"></script>
-
-    <script src="{{ STATIC_URL }}scripts.js"></script>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="{{ STATIC_URL }}favicon.ico" type="image/x-icon" />
+
     <title>{% block title %}Demo{% endblock %}</title>
-    {% endblock %}
+
+    <link href="{{ STATIC_URL }}bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
+
 </head>
 <body>
-    <div class="header">
-        <div class="login">
-        {% block login %}
-            {% if user.is_authenticated %}
-                Welcome, <a href="{% url user_settings request.user %}">{{ user }}</a>. |
-                {% if user.is_staff %}
-                    <a href="/admin/">Admin Page</a> |
-                {% endif %}
-                <a href="{% url logout %}">Log out</a>
-            {% else %}
-                <a href="{% url login %}?next={{request.path}}">Log in</a> |
-                <a href="{% url register %}">Register</a>
-            {% endif %}
-        {% endblock %}
+    <nav class="navbar navbar-default" role="navigation">
+      <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/chem/">ChemTools</a>
         </div>
-        {% block header %}{% endblock %}
-        {% block navbar %}
-        <div id="navbar">
-            <ul>
-                <li><a href="/chem/">Home</a></li> |
-                {% if user.is_authenticated %}<li><a href="/chem/jobs/">Jobs</a></li> |{% endif %}
-                <li><a href="/chem/multi_job/">Make Jobs</a></li> |
-                <li><a href="/chem/upload/">Upload</a></li> |
-                <li><a href="/chem/frag/">Fragments</a></li> |
-                <li><a href="/chem/template/">Templates</a></li> |
-                <li><a href="/docs/">Docs</a></li> |
-                <li><a href="https://github.com/crcollins/chemtools-webapp">Code</a></li>
+
+      <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                {% if user.is_authenticated %}<li><a href="/chem/jobs/">Jobs</a></li>{% endif %}
+                <li><a href="/chem/multi_job/">Make Jobs</a></li>
+                <li><a href="/chem/upload/">Upload</a></li>
+
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Data <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="/chem/frag/">Fragments</a></li>
+                        <li><a href="/chem/template/">Templates</a></li>
+                    </ul>
+                </li>
+
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Documentation <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="/docs/">Main</a></li>
+                        <li><a href="/docs/one_liners/">One Liners</a></li>
+                        <li><a href="/docs/errors/">Common Errors</a></li>
+                    </ul>
+                </li>
+            </ul>
+
+            <ul class="nav navbar-nav navbar-right">
+            {% if user.is_authenticated %}
+                <li><a href="{% url user_settings request.user %}">Welcome, {{ user }}</a></li>
+                {% if user.is_staff %}
+                    <li><a href="/admin/">Admin Page</a></li>
+                {% endif %}
+                <li><a href="{% url logout %}">Log Out</a></li>
+            {% else %}
+                <li><a href="{% url login %}?next={{request.path}}">Log In</a></li>
+                <li><a href="{% url register %}">Register</a></li>
+            {% endif %}
             </ul>
         </div>
-        {% endblock %}
-    </div>
-    <div class="wrapper">
-        <div id="clearheader"></div>
+    </nav>
+
+    <div id="wrap">
         <div class="container">
-            <div class="container2">
-                {% block content %}
-                {% endblock %}
-            <div class="modal"></div>​
-            </div>
+            {% block content %}
+            {% endblock %}
         </div>
-        <div id="clearfooter"></div>
     </div>
-    <footer class="footer">
-    {% block footer %}
+
+    <footer class="footer"></footer>
+        <div class="container">
+        {% block footer %}
+        <p class="text-muted credit">
         Note that all of the information here is very alpha. Use at your own risk.
-    {% endblock %}
+        </p>
+        <p class="text-muted credit">
+        The source code can be found <a href="https://github.com/crcollins/chemtools-webapp">here</a>.
+        </p>
+        {% endblock %}
+        </div>
     </footer>
+    <script src="{{ STATIC_URL }}jquery-1.7.1.min.js"></script>
+    <script src="{{ STATIC_URL }}bootstrap/js/bootstrap.min.js"></script>
+    <script src="{{ STATIC_URL }}scripts.js"></script>
 </body>
 </html>
