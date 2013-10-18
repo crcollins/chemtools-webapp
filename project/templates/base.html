@@ -9,7 +9,7 @@
 
     <link href="{{ STATIC_URL }}bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
     <link href="{{ STATIC_URL }}bootstrap/css/sticky-footer-navbar.css" rel="stylesheet" media="screen">
-
+    {% block script %}{% endblock %}
 </head>
 <body>
 <div id="wrap">
@@ -66,6 +66,8 @@
     </nav>
 
     <div class="container">
+        {% block header %}
+        {% endblock %}
         {% block content %}
         {% endblock %}
     </div>

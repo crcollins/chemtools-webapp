@@ -2,8 +2,7 @@
 
 {% block title %}Jobs{% endblock %}
 
-{% block head %}
-{{ block.super }}
+{% block script %}
 <script>
 $(function() {
     $.getJSON('/chem/jobs.json', function(data) {
