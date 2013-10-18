@@ -157,6 +157,7 @@ INSTALLED_APPS = (
     'docs',
     'parse',
     'data',
+    'bootstrapform',
  )
 
 # A sample logging configuration. The only tangible logging
