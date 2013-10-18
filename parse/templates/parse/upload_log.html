@@ -6,25 +6,24 @@
     {% if error_message %}
         <p><strong>{{ error_message }}</strong></p>
     {% endif %}
-    <form enctype="multipart/form-data" action="." method="post">
+    <form enctype="multipart/form-data" role="form" action="." method="post">
         {% csrf_token %}
         <input type="file" name="myfiles" multiple />
-        <ul>
-            <li>
-                <input type="radio" name="option" id="id_log" value="logparse" />
-                <label for="id_log">Log Parse</label>
-            </li>
-            <li>
+        <div class="radio">
+            <input type="radio" name="option" id="id_log" value="logparse" />
+            <label for="id_log">Log Parse</label>
+        </div>
+
+        <div class="radio">
                 <input type="radio" name="option" id="id_gjf_reset" value="gjfreset" />
                 <label for="id_gjf_reset">Gjf Reset</label>
-            </li>
-            <li>
-                <input type="radio" name="option" id="id_data" value="dataparse" />
-                <label for="id_data">Data Parse</label>
-            </li>
-        </ul>
-        <input type="submit" value="Submit" />
-        <input type="reset" value="Reset" />
+        </div>
+        <div class="radio">
+            <input type="radio" name="option" id="id_data" value="dataparse" />
+            <label for="id_data">Data Parse</label>
+        </div>
+        <input class="btn btn-primary" type="submit" value="Upload!" />
+        <input class="btn" type="reset" value="Reset" />
     </form>
     <p>
         Files may be uploaded in zipped format (.zip, .tar.gz, .tar.bz2) or individually.
