@@ -8,10 +8,12 @@
     <title>{% block title %}Demo{% endblock %}</title>
 
     <link href="{{ STATIC_URL }}bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <link href="{{ STATIC_URL }}bootstrap/css/sticky-footer-navbar.css" rel="stylesheet" media="screen">
 
 </head>
 <body>
-    <nav class="navbar navbar-default" role="navigation">
+<div id="wrap">
+    <nav class="navbar navbar-inverse navbar-default" role="navigation">
       <!-- Brand and toggle get grouped for better mobile display -->
         <div class="navbar-header">
             <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
@@ -63,27 +65,27 @@
         </div>
     </nav>
 
-    <div id="wrap">
-        <div class="container">
-            {% block content %}
-            {% endblock %}
-        </div>
-    </div>
-
-    <footer class="footer"></footer>
-        <div class="container">
-        {% block footer %}
-        <p class="text-muted credit">
-        Note that all of the information here is very alpha. Use at your own risk.
-        </p>
-        <p class="text-muted credit">
-        The source code can be found <a href="https://github.com/crcollins/chemtools-webapp">here</a>.
-        </p>
+    <div class="container">
+        {% block content %}
         {% endblock %}
-        </div>
-    </footer>
-    <script src="{{ STATIC_URL }}jquery-1.7.1.min.js"></script>
-    <script src="{{ STATIC_URL }}bootstrap/js/bootstrap.min.js"></script>
-    <script src="{{ STATIC_URL }}scripts.js"></script>
+    </div>
+</div>
+
+<div id="footer">
+    <div class="container">
+    {% block footer %}
+    <p class="text-muted credit">
+    Note that all of the information here is very alpha. Use at your own risk.
+    </p>
+    <p class="text-muted credit">
+    The source code can be found <a href="https://github.com/crcollins/chemtools-webapp">here</a>.
+    </p>
+    {% endblock %}
+    </div>
+</div>
+
+<script src="{{ STATIC_URL }}jquery-1.7.1.min.js"></script>
+<script src="{{ STATIC_URL }}bootstrap/js/bootstrap.min.js"></script>
+<script src="{{ STATIC_URL }}scripts.js"></script>
 </body>
 </html>
