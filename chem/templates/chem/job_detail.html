@@ -4,7 +4,7 @@
 
 {% block content %}
     {% if error_message %}
-        {{ error_message }}
+        <div class="alert alert-danger">{{ error_message }}</div>
     {% else %}
         {% for part in job %}
             {{ part }}<p>
@@ -20,4 +20,5 @@
             </form>
         {% endif %}
     {% endif %}
+    <a href="/chem/jobs/">Return to Jobs List</a>
 {% endblock %}
