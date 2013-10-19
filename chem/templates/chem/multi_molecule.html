@@ -1,9 +1,9 @@
 {% extends "chem/base.html" %}
+{% load bootstrap %}
 
 {% block title %}{{ pagename }}{% endblock %}
 
-{% block header %}
-{{ block.super }}
+{% block script %}
 <script>
 {% autoescape on %}
 function submitForm(name) {
@@ -57,15 +57,15 @@ $(function() {
     })
 
     $.getJSON('check/', function(data) {
-        var table = $("table.centered");
+        var table = $("table.table");
         var text = '';
         for (var i=0; i < data.molecules.length; i++) {
             var name = data.molecules[i][0];
             var warning = data.molecules[i][1];
             var error = data.molecules[i][2];
             var message = '';
-            if (error) message = 'id="error"';
-            else if (warning) message = 'id="warning"';
+            if (error) message = 'class="danger"';
+            else if (warning) message = 'class="warning"';
 
             text += '<tr {0}>'.format(message);
             text += '<td><a href="../{0}/">{0}</a></td>'.format(name);
@@ -96,52 +96,67 @@ $(function() {
         <h1>{{ error }}</h1>
     {% else %}
     <h1>{{ pagename }}</h1>
-    <table class="centered">
+
+    <table class="table table-striped">
         <tr>
             <form id="headerform">
             <th>Name</th>
             <th>
-                <input type="checkbox" id="id_gjf" name="gjf" {{ gjf }}/>
-                <label for="id_gjf">gjf</label>
+                <div class="checkbox">
+                    <input type="checkbox" id="id_gjf" name="gjf" {{ gjf }}/>
+                    <label for="id_gjf">gjf</label>
+                </div>
             </th>
             <th>
-                <input type="checkbox" id="id_mol2" name="mol2" {{ mol2 }}/>
-                <label for="id_mol2">mol2</label>
-            </th>
-            <th><input type="checkbox" id="id_image" name="image" {{ image }}/>
-                <label for="id_image">Image</label>
+                <div class="checkbox">
+                    <input type="checkbox" id="id_mol2" name="mol2" {{ mol2 }}/>
+                    <label for="id_mol2">mol2</label>
+                </div>
             </th>
             <th>
-                <input type="checkbox" id="id_job" name="job" {{ job }}/>
-                <label for="id_job">Job</label>
+                <div class="checkbox">
+                    <input type="checkbox" id="id_image" name="image" {{ image }}/>
+                    <label for="id_image">Image</label>
+                </div>
+            </th>
+            <th>
+                <div class="checkbox">
+                    <input type="checkbox" id="id_job" name="job" {{ job }}/>
+                    <label for="id_job">Job</label>
+                </div>
             </th>
             <th></th>
             </form>
         </tr>
     </table>
-    <div class="hide-container">
-    <div class="hide-title">
-        <a href="#">Job Form</a>
-    </div>
-    <div class="hide">
-        <form id="newform" action="." method="get">
-            <table>
-                {{ form.as_table }}
-            </table>
-            {% if keywords %}<input type="hidden" name="keywords" value="{{ keywords }}">{% endif %}
-            <input type="hidden" id="id_molname" name="molname" value="">
-            <table>
-                <tr><th>
+
+    <div class="container">
+        <div class="btn-group" data-toggle="buttons-checkbox">
+            <a class="btn collapse-data-btn" data-toggle="collapse" href="#details">Job Form</a>
+        </div>
+
+        <div id="details" class="{% if form.errors %}in{% else %}collapse{% endif %}">
+            <form id="newform" action="." method="get">
+                {{ form|bootstrap }}
+                {% if keywords %}<input type="hidden" name="keywords" value="{{ keywords }}">{% endif %}
+                <input type="hidden" id="id_molname" name="molname" value="">
+                <div class="row">
                     {% if user.is_authenticated %}
+                    <div class="col-xs-4">
                         {% csrf_token %}
-                        <input type="submit" value="Submit Job" id="id_post"/>
+                        <button class="btn btn-lg btn-primary btn-block" type="submit" id="id_post">Submit Job</button>
+                    </div>
                     {% endif %}
-                    <input type="reset" value="Reset" />
-                </th></tr>
-            </table>
-        </form>
+                    <div class="col-xs-4">
+                        <button class="btn btn-lg btn-block" type="reset">Reset</button>
+                    </div>
+                </div>
+            </form>
+        </div>
     </div>
+    <div class="btn-group">
+        <a class="btn" href='../{{ pagename }}.zip' id="id_zip_download">Download All</a>
     </div>
-    <a href='../{{ pagename }}.zip' id="id_zip_download">Download All</a>
+
     {% endif %}
 {% endblock %}
