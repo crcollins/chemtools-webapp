@@ -89,8 +89,9 @@ def change_settings(request, username):
             user_profile.private_key = keys["private"]
             changed = True
 
-        if d.get("xsede_username"):
+        if d.get("xsede_username") != user_profile.xsede_username:
             user_profile.xsede_username = d.get("xsede_username")
+            changed = True
 
     pass_form = PasswordChangeForm(request.user, request.POST or None)
     if pass_form.is_valid():
