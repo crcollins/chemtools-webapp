@@ -53,7 +53,7 @@ $(function() {
         <a class="list-group-item collapse-data-btn" data-toggle="collapse" href="#details">Job Form</a>
     </div>
 
-    <div id="details" class="collapse">
+    <div id="details" class="{% if form.errors %}in{% else %}collapse{% endif %}">
         <form id="newform" action="." method="get">
             {{ form|bootstrap }}
             {% if keywords %}<input type="hidden" name="keywords" value="{{ keywords }}">{% endif %}
