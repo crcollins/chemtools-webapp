@@ -1,4 +1,5 @@
 {% extends "account/base.html" %}
+{% load bootstrap %}
 
 {% block header %}
     <h1>Settings</h1>
@@ -9,23 +10,24 @@
 <h3>{{ state }}</h3>
 <form action='' method="post">
     {% csrf_token %}
-    <table>
-        {{ settings_form.as_table }}
-        <tr>
-            <th>Public Key</th>
-            <td>
-                <textarea cols=50 rows=10>{{ public_key }}</textarea>
-            </td>
-        </tr>
-        {{ pass_form.as_table }}
-    <tr>
-        <th></th>
-        <td>
-            <br>
-            <input type="submit" value="Submit" />
-            <input type="reset" value="Reset" />
-        </td>
-    </tr>
-    </table>
+
+    {{ settings_form|bootstrap }}
+    <div class="form-group">
+        <label class="control-label" for="id_public_key">Public Key</label>
+        <div class="">
+            <textarea id="id_public_key" cols=50 rows=6 class=" form-control">{{ public_key }}</textarea>
+        </div>
+    </div>
+    <hr>
+    {{ pass_form|bootstrap }}
+    <hr>
+    <div class="row">
+        <div class="col-xs-6">
+            <button class="btn btn-lg btn-primary btn-block" type="submit">Submit</button>
+        </div>
+        <div class="col-xs-6">
+            <button class="btn btn-lg btn-block" type="reset">Reset</button>
+        </div>
+    </div>
 </form>
 {% endblock %}
