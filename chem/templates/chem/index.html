@@ -3,42 +3,58 @@
 {% block title %}Chemtools{% endblock %}
 
 {% block content %}
-    <h2>
-        Welcome to the Chemtools-Webapp!
-    </h2>
-    <div class="welcome">
-        <ul>
-            <li>To make a molecule or set a molecules, enter their name(s) in the form below.</li>
-            <li>To extract data from log files or to do other file operations click <a href="{% url upload %}">Upload</a>.</li>
-            {% if user.is_authenticated %}
-                <li><a href="{% url user_settings user %}">Click here</a> to change your account information.</li>
+<div class="jumbotron">
+    <div class="container">
+        <h1>Welcome to the ChemTools Webapp!</h1>
+  </div>
+</div>
+
+<div class="container">
+    <div class="row">
+
+        <div class="col-lg-10">
+            <h2>Make Molecules</h2>
+            <p>To make a molecule or set a molecules, enter their name(s) in the form below.</p>
+            <form class="form-inline" role="form" action="{% url chem_index %}" method="GET">
+                <div class="form-group">
+                    <label class="sr-only" for="molecule">Molecule</label>
+                    <input type="text" size=35 class="form-control" name="molecule" placeholder="Enter molecule">
+                </div>
+                <div class="form-group">
+                    <label class="sr-only" for="keywords">Keywords</label>
+                    <input type="text" class="form-control" name="keywords" value="B3LYP/6-31g(d)">
+                </div>
+                <button type="submit" class="btn btn-primary">Build!</button>
+            </form>
+        </div>
+
+        <div class="col-lg-5">
+            <h2>Make Jobs</h2>
+            <p>Create job files from files or from a list of files for any of the supercomputers.</p>
+            <p><a class="btn btn-default" href="#">View details &raquo;</a></p>
+        </div>
+
+        <div class="col-lg-5">
+            <h2>Extract Data</h2>
+            <p>Extract data from log files, calculate long chain limits, or rebuild gjf files from log files.</p>
+            <p><a class="btn btn-default" href="{% url upload %}">View details &raquo;</a></p>
+        </div>
+
+        <div class="col-lg-5">
+           {% if user.is_authenticated %}
+               <h2>Change Settings</h2>
+                <p><a class="btn btn-default" href="{% url user_settings user %}">View details &raquo;</a></p>
             {% else %}
-                <li><a href="{% url register %}">Register an account.</a></li>
+                <h2>Register an Account</h2>
+                <p><a class="btn btn-default" href="{% url register %}">View details &raquo;</a></p>
             {% endif %}
-            <li>For more information refer to the <a href="{% url docs %}">Docs</a>.</li>
-        </ul>
+        </div>
+
+        <div class="col-lg-5">
+            <h2>Documentation</h2>
+            <p>For more information and help, refer to the documentation.</p>
+            <p><a class="btn btn-default" href="{% url docs %}">View details &raquo;</a></p>
+        </div>
     </div>
-    <table class="left-min">
-        <tr>
-            <th>
-                Molecule name
-            </th>
-            <th>
-                Keywords
-            </th>
-            <th></th>
-        </tr>
-        <form enctype="multipart/form-data" action="{% url chem_index %}" method="get">
-        <tr>
-            <td>
-                <input size=35 type="text" name="molecule">
-            </td>
-            <td>
-                <input type="text" name="keywords" value="B3LYP/6-31g(d)">
-            <td>
-                <input type="submit" value="Submit" />
-            </td>
-        </tr>
-        </form>
-    </table>
+</div>
 {% endblock %}

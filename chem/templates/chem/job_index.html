@@ -2,8 +2,7 @@
 
 {% block title %}Jobs{% endblock %}
 
-{% block head %}
-{{ block.super }}
+{% block script %}
 <script>
 $(function() {
     $.getJSON('/chem/jobs.json', function(data) {
@@ -34,7 +33,7 @@ $(function() {
 {% endblock %}
 
 {% block content %}
-    <table id="id_jobs">
+    <table class="table table-striped" id="id_jobs">
     <tr>
         <th>Job ID</th>
         <th>Site</th>

@@ -1,89 +1,92 @@
 {% extends "chem/base.html" %}
+{% load bootstrap %}
 
 {% block title %}{{ pagename }}{% endblock %}
 
-{% block header %}
-{{ block.super }}
+{% block script %}
 <script>
-{% autoescape on %}
-function submitForm(name) {
-    $("form input#id_molname").val(name);
-    $("form#newform").submit();
-}
+    {% autoescape on %}
+    function submitForm(name) {
+        $("form input#id_molname").val(name);
+        $("form#newform").submit();
+    }
 
-$(function() {
-    $("#id_post").click(function() {
-        event.preventDefault();
-        var a = $('#newform').serialize();
-        $.post('', a, function(data) {
-            if (data["error"] != undefined) {
-                var text = data["error"];
-            }
-            else {
-                var text = '<ul>Worked:';
-                for (var i = 0; i < data["worked"].length; i++) {
-                    var name = data["worked"][i][0];
-                    var id = data["worked"][i][1];
-                    text += "<li>{0} -- <a href='/chem/jobs/{1}'>{1}</a></li>".format(name, id);
+    $(function() {
+        $("#id_post").click(function() {
+            event.preventDefault();
+            var a = $('#newform').serialize();
+            $.post('', a, function(data) {
+                if (data["error"] != undefined) {
+                    var text = data["error"];
                 }
-                text += "</ul>";
-                if (data["failed"].length > 0) {
-                    text += "<ul>Failed:";
-                    for (var i = 0; i < data["failed"].length; i++) {
-                        text += "<li>{0} -- {1}</li>".format(data["failed"][i][0], data["failed"][i][1]);
+                else {
+                    var text = '<div class="panel panel-success">';
+                    text += '<div class="panel-heading"><h3 class="panel-title">{0}</h3></div>'.format("Worked")
+
+                    text += '<div class="panel-body">';
+                    for (var i = 0; i < data["worked"].length; i++) {
+                        var name = data["worked"][i][0];
+                        var id = data["worked"][i][1];
+                        text += "<a class='list-group-item' href='/chem/jobs/{1}'>{0} &mdash; {1}</a>".format(name, id);
                     }
-                    text += "</ul>"
-                }
-            }
+                    text += "</div></div>";
 
-            var newdialog = $('<div id="id_results">{0}</div>'.format(text));
-            newdialog.dialog({
-                modal: true,
-                title: "Results",
-                });
+                    if (data["failed"].length > 0) {
+                        text += '<div class="panel panel-danger">';
+                        text += '<div class="panel-heading"><h3 class="panel-title">{0}</h3></div>'.format("Failed")
+                        text += '<div class="panel-body">';
+                        for (var i = 0; i < data["failed"].length; i++) {
+                            text += "<li class='list-group-item'>{0} &mdash; {1}</li>".format(data["failed"][i][0], data["failed"][i][1]);
+                        }
+                        text += "</div></div>";
+                    }
+                }
+                var dialog = $(".modal-body");
+                dialog.html(text);
+                var newdialog = $('<div id="id_results">{0}</div>'.format(text));
             },
             'json'
             );
+}
+);
+
+$("#id_zip_download").click(function() {
+    event.preventDefault();
+    var a = $('#headerform').serialize();
+    if ($('#id_job').val() === 'on'){
+        a += '&' + $('#newform').serialize()
+    }
+    window.location = "/chem/{{ pagename }}.zip?{0}".format(a);
+})
+
+$.getJSON('check/', function(data) {
+    var table = $("table.table");
+    var text = '';
+    for (var i=0; i < data.molecules.length; i++) {
+        var name = data.molecules[i][0];
+        var warning = data.molecules[i][1];
+        var error = data.molecules[i][2];
+        var message = '';
+        if (error) message = 'class="danger"';
+        else if (warning) message = 'class="warning"';
+
+        text += '<tr {0}>'.format(message);
+        text += '<td><a href="../{0}/">{0}</a></td>'.format(name);
+
+        if (!(error)) {
+            text += '<td><a href="../{0}.gjf{{ encoded_keywords }}">gjf</a></td>'.format(name);
+            text += '<td><a href="../{0}.mol2{{ encoded_keywords }}">mol2</a></td>'.format(name);
+            text += '<td><a href="../{0}.png{{ encoded_keywords }}">Image</a></td>'.format(name);
+            text += '<td><a href="#" onClick="submitForm(\'{0}\')">Job</a></td>'.format(name);
         }
-    );
-
-    $("#id_zip_download").click(function() {
-        event.preventDefault();
-        var a = $('#headerform').serialize();
-        if ($('#id_job').val() === 'on'){
-            a += '&' + $('#newform').serialize()
+        else {
+            text += '<td colspan="4">{0}</td>'.format(error);
         }
-        window.location = "/chem/{{ pagename }}.zip?{0}".format(a);
-    })
-
-    $.getJSON('check/', function(data) {
-        var table = $("table.centered");
-        var text = '';
-        for (var i=0; i < data.molecules.length; i++) {
-            var name = data.molecules[i][0];
-            var warning = data.molecules[i][1];
-            var error = data.molecules[i][2];
-            var message = '';
-            if (error) message = 'id="error"';
-            else if (warning) message = 'id="warning"';
-
-            text += '<tr {0}>'.format(message);
-            text += '<td><a href="../{0}/">{0}</a></td>'.format(name);
-
-            if (!(error)) {
-                text += '<td><a href="../{0}.gjf{{ encoded_keywords }}">gjf</a></td>'.format(name);
-                text += '<td><a href="../{0}.mol2{{ encoded_keywords }}">mol2</a></td>'.format(name);
-                text += '<td><a href="../{0}.png{{ encoded_keywords }}">Image</a></td>'.format(name);
-                text += '<td><a href="#" onClick="submitForm(\'{0}\')">Job</a></td>'.format(name);
-            }
-            else {
-                text += '<td colspan="4">{0}</td>'.format(error);
-            }
-            text += '<td><a href="../{0}/report/">Report</a></td>'.format(name);
-            text += '</tr>';
-        }
-        table.append(text);
-    })
+        text += '<td><a href="../{0}/report/">Report</a></td>'.format(name);
+        text += '</tr>';
+    }
+    table.append(text);
+})
 });
 
 
@@ -92,56 +95,89 @@ $(function() {
 {% endblock %}
 
 {% block content %}
-    {% if error %}
-        <h1>{{ error }}</h1>
-    {% else %}
-    <h1>{{ pagename }}</h1>
-    <table class="centered">
-        <tr>
-            <form id="headerform">
+{% if error %}
+<h1>{{ error }}</h1>
+{% else %}
+<h1>{{ pagename }}</h1>
+
+<table class="table table-striped">
+    <tr>
+        <form id="headerform">
             <th>Name</th>
             <th>
-                <input type="checkbox" id="id_gjf" name="gjf" {{ gjf }}/>
-                <label for="id_gjf">gjf</label>
+                <div class="checkbox">
+                    <input type="checkbox" id="id_gjf" name="gjf" {{ gjf }}/>
+                    <label for="id_gjf">gjf</label>
+                </div>
             </th>
             <th>
-                <input type="checkbox" id="id_mol2" name="mol2" {{ mol2 }}/>
-                <label for="id_mol2">mol2</label>
-            </th>
-            <th><input type="checkbox" id="id_image" name="image" {{ image }}/>
-                <label for="id_image">Image</label>
+                <div class="checkbox">
+                    <input type="checkbox" id="id_mol2" name="mol2" {{ mol2 }}/>
+                    <label for="id_mol2">mol2</label>
+                </div>
             </th>
             <th>
-                <input type="checkbox" id="id_job" name="job" {{ job }}/>
-                <label for="id_job">Job</label>
+                <div class="checkbox">
+                    <input type="checkbox" id="id_image" name="image" {{ image }}/>
+                    <label for="id_image">Image</label>
+                </div>
+            </th>
+            <th>
+                <div class="checkbox">
+                    <input type="checkbox" id="id_job" name="job" {{ job }}/>
+                    <label for="id_job">Job</label>
+                </div>
             </th>
             <th></th>
-            </form>
-        </tr>
-    </table>
-    <div class="hide-container">
-    <div class="hide-title">
-        <a href="#">Job Form</a>
+        </form>
+    </tr>
+</table>
+
+<div class="container">
+    <div class="btn-group" data-toggle="buttons-checkbox">
+        <a class="btn collapse-data-btn" data-toggle="collapse" href="#details">Job Form</a>
     </div>
-    <div class="hide">
+
+    <div id="details" class="{% if form.errors %}in{% else %}collapse{% endif %}">
         <form id="newform" action="." method="get">
-            <table>
-                {{ form.as_table }}
-            </table>
+            {{ form|bootstrap }}
             {% if keywords %}<input type="hidden" name="keywords" value="{{ keywords }}">{% endif %}
             <input type="hidden" id="id_molname" name="molname" value="">
-            <table>
-                <tr><th>
-                    {% if user.is_authenticated %}
-                        {% csrf_token %}
-                        <input type="submit" value="Submit Job" id="id_post"/>
-                    {% endif %}
-                    <input type="reset" value="Reset" />
-                </th></tr>
-            </table>
+            <div class="row">
+                {% if user.is_authenticated %}
+                <div class="col-xs-4">
+                    {% csrf_token %}
+                    <!-- Button trigger modal -->
+                    <a data-toggle="modal" id="id_post" href="#myModal" class="btn btn-lg btn-primary btn-block">Submit Jobs</a>
+                </div>
+                {% endif %}
+                <div class="col-xs-4">
+                    <button class="btn btn-lg btn-block" type="reset">Reset</button>
+                </div>
+            </div>
         </form>
     </div>
+</div>
+<div class="btn-group">
+    <a class="btn" href='../{{ pagename }}.zip' id="id_zip_download">Download All</a>
+</div>
+
+
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">Results</h4>
+            </div>
+            <div class="modal-body">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
     </div>
-    <a href='../{{ pagename }}.zip' id="id_zip_download">Download All</a>
-    {% endif %}
+</div>
+
+{% endif %}
 {% endblock %}

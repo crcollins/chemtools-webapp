@@ -1,9 +1,9 @@
 {% extends "chem/base.html" %}
+{% load bootstrap %}
 
 {% block title %}Multi Job{% endblock %}
 
-{% block header %}
-{{ block.super }}
+{% block script %}
 <script>
 {% autoescape on %}
 
@@ -33,16 +33,27 @@ $(function() {
     {% if error_message %}
         <p><strong>{{ error_message }}</strong></p>
     {% endif %}
-    <table>
-    <tr><th></th><td><input type="file" name="myfiles" multiple /></td></tr>
+
+    <div class="form-group">
+        <label class="control-label" for="id_myfiles">Upload Files</label>
+        <input type="file" id="id_myfiles" name="myfiles" multiple />
+    </div>
     <form enctype="multipart/form-data" action="." method="post">
         {% csrf_token %}
-            <tr><th>Filenames:</th><td><textarea rows="10" cols="30" name="filenames"></textarea></textarea></tr></td>
-                {{ form.as_table }}
-            <tr><th></th><td>
-                <input type="submit" value="Submit" />
-                <input type="reset" value="Reset" />
-            </tr></td>
+        <div class="form-group">
+            <label class="control-label" for="id_filenames">Filenames</label>
+            <div class="">
+                <textarea id="id_filenames" rows="26" cols="50" name="filenames" class=" form-control"></textarea>
+            </div>
+        </div>
+        {{ form|bootstrap }}
+        <div class="row">
+            <div class="col-xs-6">
+                <button class="btn btn-lg btn-primary btn-block" type="submit">Build!</button>
+            </div>
+            <div class="col-xs-6">
+                <button class="btn btn-lg btn-block" type="reset">Reset</button>
+            </div>
+        </div>
     </form>
-    </table>
 {% endblock %}

@@ -6,3 +6,4 @@ misaka==1.0.2
 paramiko==1.7.7.1
 pycrypto==2.6
 scipy==0.9.0
+django-bootstrap-form==3.0
