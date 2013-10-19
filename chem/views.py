@@ -128,7 +128,9 @@ def gen_detail(request, molecule):
                 "error": e,
             }
             if e is None:
-                job = Job(molecule=molecule, jobid=jobid, **form.cleaned_data)
+                dnew = dict(form.cleaned_data)
+                del dnew["template"]
+                job = Job(molecule=molecule, jobid=jobid, **dnew)
                 job.save()
             return HttpResponse(simplejson.dumps(a), mimetype="application/json")
 
