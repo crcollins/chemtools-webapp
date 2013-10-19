@@ -1,4 +1,5 @@
 {% extends "chem/base.html" %}
+{% load bootstrap %}
 
 {% block title %}{{ molecule }}{% endblock %}
 
@@ -37,39 +38,42 @@ $(function() {
     <h1>{{ molecule }}</h1>
     <a href="report">Report Me</a><br><br>
     {% if known_errors %}
-        <h2>WARNING</h2>
-        This molecule is reported to have errors.<br />
+        <div class="alert alert-warning">This molecule is reported to have errors.</div>
     {% endif %}
     {% if error_message %}
-        <p><strong>{{ error_message }}</strong></p>
+        <div class="alert alert-danger">{{ error_message }}</div>
     {% else %}
-        <img src="../{{ molecule }}.png"></img>
-        <ul>
-            <li><a href="../{{ molecule }}.gjf{{ encoded_keywords }}">gjf File</a></li>
-            <li><a href="../{{ molecule }}.mol2{{ encoded_keywords }}">mol2 File</a></li>
-        </ul>
-    <div class="hide-container">
-    <div class="hide-title">
-        <a href="#">Job Form</a>
+    <div class="col-lg-5 text-center">
+        <img src="../{{ molecule }}.png" alt="{{ molecule }}"></img>
     </div>
-    <div class="hide">
+    <hr>
+    <div class="list-group">
+        <a class="list-group-item" href="../{{ molecule }}.gjf{{ encoded_keywords }}">{{ molecule }}.gjf</a>
+        <a class="list-group-item" href="../{{ molecule }}.mol2">{{ molecule }}.mol2</a>
+    </div>
+
+    <div class="btn-group" data-toggle="buttons-checkbox">
+        <a class="btn collapse-data-btn" data-toggle="collapse" href="#details">Job Form</a>
+    </div>
+    <div id="details" class="collapse">
         <form id="newform" action="." method="get">
-            <table>
-                {{ form.as_table }}
-            </table>
+            {{ form|bootstrap }}
             {% if keywords %}<input type="hidden" name="keywords" value="{{ keywords }}">{% endif %}
-            <table>
-                <tr><th>
-                    {% if user.is_authenticated %}
-                        {% csrf_token %}
-                        <input type="submit" value="Submit Job" id="id_post" />
-                    {% endif %}
-                    <input type="submit" value="Get Job File" />
-                    <input type="reset" value="Reset" />
-                </th></tr>
-            </table>
+            <div class="row">
+                {% if user.is_authenticated %}
+                <div class="col-xs-4">
+                    {% csrf_token %}
+                    <button class="btn btn-lg btn-primary btn-block" type="submit" id="id_post">Submit Job</button>
+                </div>
+                {% endif %}
+                <div class="col-xs-4">
+                    <button class="btn btn-lg btn-primary btn-block" type="submit">Get Job</button>
+                </div>
+                <div class="col-xs-4">
+                    <button class="btn btn-lg btn-block" type="reset">Reset</button>
+                </div>
+            </div>
         </form>
-    </div>
     </div>
     {% endif %}
 {% endblock %}
