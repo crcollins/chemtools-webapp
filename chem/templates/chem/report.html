@@ -1,23 +1,23 @@
 {% extends "chem/base.html" %}
+{% load bootstrap %}
 
 {% block title %}Report {{ molecule }}{% endblock %}
 
 {% block content %}
     <h1>Report {{ molecule }}</h1>
     {% if error_message %}
-        <p><strong>{{ error_message }}</strong></p>
+        <div class="alert alert-danger">{{ error_message }}</div>
     {% endif %}
     <form action="." method="post">
         {% csrf_token %}
-        <table>
-            {{ form.as_table }}
-            <tr>
-                <th></th>
-                <td>
-                    <input type="submit" value="Submit" />
-                    <input type="reset" value="Reset" />
-                </td>
-            </tr>
-        </table>
+        {{ form|bootstrap }}
+        <div class="row">
+            <div class="col-xs-4">
+                <button class="btn btn-lg btn-primary btn-block" type="submit">Report</button>
+            </div>
+            <div class="col-xs-4">
+                <button class="btn btn-lg btn-block" type="reset">Reset</button>
+            </div>
+        </div>
     </form>
 {% endblock %}
