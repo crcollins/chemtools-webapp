@@ -171,11 +171,12 @@ def gen_multi_detail(request, string):
                 dnew["name"] = re.sub(r"{{\s*name\s*}}", mol, dnew["name"])
                 jobid, e = utils.run_standard_job(request.user, mol, keywords=keywords, internal=True, **dnew)
                 if e is None:
+                    del dnew["template"]
                     job = Job(molecule=mol, jobid=jobid, **dnew)
                     job.save()
                     a["worked"].append((mol, jobid))
                 else:
-                    a["failed"].append((mol, e))
+                    a["failed"].append((mol, str(e))) # str is a hack if real errors bubble up
             return HttpResponse(simplejson.dumps(a), mimetype="application/json")
 
     c = Context({
