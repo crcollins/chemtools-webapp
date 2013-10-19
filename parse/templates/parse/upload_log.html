@@ -4,7 +4,7 @@
 
 {% block content %}
     {% if error_message %}
-        <p><strong>{{ error_message }}</strong></p>
+        <div class="alert alert-danger">{{ error_message }}</div>
     {% endif %}
     <form enctype="multipart/form-data" role="form" action="." method="post">
         {% csrf_token %}
