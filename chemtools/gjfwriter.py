@@ -200,8 +200,8 @@ def parse_name(name):
     '''Parses a molecule name and returns the edge part names.
 
     >>> parse_name('4a_TON_4b_4c')
-    ('TON', (('4', -1), ('a', 0), ('a', 0)), (('4', -1), ('b', 0), ('b', 0)),
-    (('4', -1), ('c', 0), ('c', 0))
+    ([('TON', (('4', -1), ('a', 0), ('a', 0)), (('4', -1), ('b', 0), ('b', 0)),
+    (('4', -1), ('c', 0), ('c', 0))], (0, 0), (0, 0, 0))
     '''
     parts = name.split("_")
 
@@ -209,7 +209,7 @@ def parse_name(name):
     partsets = parse_cores(parts)
 
     output = []
-    for core, parts in partsets:
+    for num, (core, parts) in enumerate(partsets):
         i = parts.index(core)
         left = parts[:i][0] if parts[:i] else None
         right = parts[i + 1:]
@@ -231,8 +231,11 @@ def parse_name(name):
         parsedsides = tuple(parse_end_name(x) if x else None for x in (left, middle, right))
 
         for xside, idx, name in zip(parsedsides, [0,1,0], ["left", "middle", "right"]):
-            if xside and xside[-1][0] in XGROUPS and nm[idx] > 1:
-                raise Exception(9, "can not do nm expansion with xgroup on %s" % name)
+            if xside and xside[-1][0] in XGROUPS:
+                if nm[idx] > 1:
+                    raise Exception(9, "can not do nm expansion with xgroup on %s" % name)
+                elif len(partsets) > 1 and name == "right" and (len(partsets) - 1) != num:
+                    raise Exception(11, "can not add core to xgroup on %s" % name)
 
         output.append((core, parsedsides))
     if len(output) > 2 and nm[1] > 1:
@@ -327,9 +330,3 @@ def parse_end_name(name):
         parts.append(("a", lastconnect))
         parts.append(("a", lastconnect))
     return parts
-
-# print parse_name("24a6bcJ")
-# print parse_name("244J")
-# print parse_name("24c4J")
-# print parse_name("24c4")
-# print parse_name("2A")
