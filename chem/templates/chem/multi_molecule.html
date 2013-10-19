@@ -20,27 +20,30 @@ $(function() {
                 var text = data["error"];
             }
             else {
-                var text = '<ul>Worked:';
+                var text = '<div class="panel panel-success">';
+                text += '<div class="panel-heading"><h3 class="panel-title">{0}</h3></div>'.format("Worked")
+
+                text += '<div class="panel-body">';
                 for (var i = 0; i < data["worked"].length; i++) {
                     var name = data["worked"][i][0];
                     var id = data["worked"][i][1];
-                    text += "<li>{0} -- <a href='/chem/jobs/{1}'>{1}</a></li>".format(name, id);
+                    text += "<a class='list-group-item' href='/chem/jobs/{1}'>{0} &mdash; {1}</a>".format(name, id);
                 }
-                text += "</ul>";
+                text += "</div></div>";
+
                 if (data["failed"].length > 0) {
-                    text += "<ul>Failed:";
+                    text += '<div class="panel panel-danger">';
+                    text += '<div class="panel-heading"><h3 class="panel-title">{0}</h3></div>'.format("Failed")
+                    text += '<div class="panel-body">';
                     for (var i = 0; i < data["failed"].length; i++) {
-                        text += "<li>{0} -- {1}</li>".format(data["failed"][i][0], data["failed"][i][1]);
+                        text += "<li class='list-group-item'>{0} &mdash; {1}</li>".format(data["failed"][i][0], data["failed"][i][1]);
                     }
-                    text += "</ul>"
+                    text += "</div></div>";
                 }
             }
-
+            var dialog = $(".modal-body");
+            dialog.html(text);
             var newdialog = $('<div id="id_results">{0}</div>'.format(text));
-            newdialog.dialog({
-                modal: true,
-                title: "Results",
-                });
             },
             'json'
             );
@@ -144,7 +147,8 @@ $(function() {
                     {% if user.is_authenticated %}
                     <div class="col-xs-4">
                         {% csrf_token %}
-                        <button class="btn btn-lg btn-primary btn-block" type="submit" id="id_post">Submit Job</button>
+                        <!-- Button trigger modal -->
+                        <a data-toggle="modal" id="id_post" href="#myModal" class="btn btn-lg btn-primary btn-block">Submit Jobs</a>
                     </div>
                     {% endif %}
                     <div class="col-xs-4">
@@ -158,5 +162,23 @@ $(function() {
         <a class="btn" href='../{{ pagename }}.zip' id="id_zip_download">Download All</a>
     </div>
 
+
+
+  <!-- Modal -->
+  <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+          <h4 class="modal-title">Results</h4>
+        </div>
+        <div class="modal-body">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
     {% endif %}
 {% endblock %}
