@@ -76,8 +76,8 @@ def change_settings(request, username):
             changed = True
 
         if d.get("new_ssh_keypair"):
+            keys = utils.generate_key_pair(username)
             if user_profile.public_key:
-                keys = utils.generate_key_pair(username)
                 try:
                     utils.update_all_ssh_keys(user_profile.xsede_username,
                                     user_profile.private_key,
