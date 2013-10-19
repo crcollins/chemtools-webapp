@@ -100,31 +100,57 @@ From there the name takes a form similar to this:
 
     24a_TON_35b_24c
 
+![/chem/24a_TON_35b_24c.png](/chem/24a_TON_35b_24c.png)
+
 The left part (`24a` in this case) corresponds to the left side of the cruciform. The next part is the core. The next part goes with the two vertical parts. In an edge case this segment can be substituted to being just an X-group and added to the beginning of the last part.
 
     24a_TON_B24a
 
+![/chem/24a_TON_B24a.png](/chem/24a_TON_B24a.png)
+
 The last part of the name is the right side of the molecule. Beyond the slight option for the middle, there is also the ability to leave off any of the sides and they will be assumed to be just a hydrogen.
 
     TON_24a_24a
+
+![/chem/TON_24a_24a](/chem/TON_24a_24a.png)
+
     24a_TON_24a
+
+![/chem/24a_TON_24a](/chem/24a_TON_24a.png)
+
     24a_TON
+
+![/chem/24a_TON](/chem/24a_TON.png)
 
 Added to the naming scheme are two types of expansion. They are polymer type and stacking type. The former is a direct linking of the parts of the molecule. The latter is, basically, just a copy and paste along the respective axis. In the case of polymer type expansion, one can not have both an `n` (along the horizontal axis) and `m` (along the vertical) expansion due to conflicts in the connection points.
 
     4a_TON_n2
+
+![/chem/4a_TON_n2](/chem/4a_TON_n2.png)
+
     4a_TON_B24c_n3
+
+![/chem/4a_TON_B24c_n3](/chem/4a_TON_B24c_n3.png)
+
     4a_TON_35_2_m3
 
+![/chem/4a_TON_35_2_m3](/chem/4a_TON_35_2_m3.png)
 
 In addition to building molecules with a single core, this also allows creating multicore structures. For multicore structures, it attributes all the segments directly to the right (up until the next core) as part of the current core.
 
     TON_24a_24a_TON
 
+![/chem/TON_24a_24a_TON](/chem/TON_24a_24a_TON.png)
+
 At first glance it might seem like there would be a problem correctly grouping center verses right side groups when dealing with multicore structures. This problem is rectified by removing group that is not present and leaving the separating underscore.
 
     TON_24a__TON
+
+![/chem/TON_24a__TON](/chem/TON_24a__TON.png)
+
     TON__24a_TON
+
+![/chem/TON__24a_TON](/chem/TON__24a_TON.png)
 
 For some fun with the naming:
 
@@ -192,7 +218,7 @@ This takes a file formated like this:
     # gap values
     3.1548, 2.61, 2.4482, 2.3972
 
-Where lines starting with "#" are comments. The n values can be given as either n or 1/n. This will return a zipped file with a text file listing the fit parameters as well as two graphs plotting the HOMO/LUMO and the Gap values.
+Where lines starting with "#" are comments. The `n` values can be given as either `n` or `1/n`. This will return a zipped file with a text file listing the fit parameters as well as two graphs plotting the HOMO/LUMO and the Gap values.
 
 Data parsing can also be done now using just the log files. If you upload a set of log files with `n1, n2, ... nN` somewhere in the filename these logs will be put together. Once together they will be parsed for the relevant data parse data. This simplifies the process by not requiring the creation of a separate file just for the data.
 
@@ -298,6 +324,8 @@ Similar to the gjf file, the images can be parameterized, with their scaling. Th
 The whole thing is very hackish and is just intended to allow a preview of the molecule without having to open it in Gaussian. As expected of a 2D Image, three dimensionality is poorly shown. this is especially apparent in molecules with TMS or Carbazole. This is also compounded with the fact that the fragments have a hackish transform to align them)
 
 [/chem/7k\_TON\_7k\_7k.png](/chem/7k_TON_7k_7k.png)
+
+![/chem/7k_TON_7k_7k.png](/chem/7k_TON_7k_7k.png)
 
 
 #### Jobs ####
