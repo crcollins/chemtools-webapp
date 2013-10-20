@@ -77,3 +77,8 @@ Add opt
 Get all incomplete logs
 
     grep -L "Normal termination of Gaussian" *
+
+
+Change Gordon jobs to work on Trestles (add ppn=16)
+
+    for f in `ls *.job`; do sed $f -i -e 's/node=1^/node=1:ppn=16/'; done
