@@ -334,9 +334,9 @@ def parse_end_name(name):
 def get_exact_name(name):
     output, nm, xyz = parse_name(name)
     sidefuncs = (
-        lambda num, length: num == 0,
-        lambda num, length: 1,
-        lambda num, length: num == (length - 1),
+        lambda num, length: num == 0 and nm[0] == 1,
+        lambda num, length: nm[1] == 1,
+        lambda num, length: num == (length - 1) and nm[0] == 1,
         )
     sets = []
     for num, (core, ends) in enumerate(output):
