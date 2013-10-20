@@ -136,6 +136,7 @@ def gen_detail(request, molecule):
 
     c = Context({
         "molecule": molecule,
+        "exact_name": gjfwriter.get_exact_name(molecule),
         "form": form,
         "known_errors": warnings[0],
         "error_message": errors[0],

@@ -44,6 +44,13 @@ $(function() {
         <img src="../{{ molecule }}.png" alt="{{ molecule }}"></img>
     </div>
     <hr>
+    <table class="table">
+        <tr>
+            <th>Exact Name</th>
+            <td>{{ exact_name }}</td>
+        </tr>
+    </table>
+    <hr>
     <div class="list-group">
         <a class="list-group-item" href="../{{ molecule }}.gjf{{ encoded_keywords }}">{{ molecule }}.gjf</a>
         <a class="list-group-item" href="../{{ molecule }}.mol2">{{ molecule }}.mol2</a>
