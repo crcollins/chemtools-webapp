@@ -334,9 +334,9 @@ def parse_end_name(name):
 def get_exact_name(name):
     output, nm, xyz = parse_name(name)
     sidefuncs = (
-        lambda num, length: num == 0 and nm[0] == 1,
-        lambda num, length: nm[1] == 1,
-        lambda num, length: num == (length - 1) and nm[0] == 1,
+        lambda num: num == 0 and nm[0] == 1,
+        lambda num: nm[1] == 1,
+        lambda num: num == (len(output) - 1) and nm[0] == 1,
         )
     sets = []
     for num, (core, ends) in enumerate(output):
@@ -347,7 +347,7 @@ def get_exact_name(name):
                 endname = ''.join([x[0] for x in end])
 
             if not endname or endname[-1] not in XGROUPS:
-                if f(num, len(output)):
+                if f(num):
                     endname += 'A'
             parts.append(endname)
 
