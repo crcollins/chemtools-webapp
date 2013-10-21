@@ -134,9 +134,14 @@ def gen_detail(request, molecule):
                 job.save()
             return HttpResponse(simplejson.dumps(a), mimetype="application/json")
 
+    if not errors[0]:
+        exactname = gjfwriter.get_exact_name(molecule)
+    else:
+        exactname = ''
+
     c = Context({
         "molecule": molecule,
-        "exact_name": gjfwriter.get_exact_name(molecule),
+        "exact_name": exactname,
         "form": form,
         "known_errors": warnings[0],
         "error_message": errors[0],
