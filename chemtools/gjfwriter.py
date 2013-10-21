@@ -352,7 +352,7 @@ def get_exact_name(name):
             parts.append(endname)
 
         # only first set will have left sides
-        if num == 0:
+        if num == 0 and parts[0]:
             coreset = '_'.join([parts[0], core, parts[1], parts[2]])
         else:
             coreset = '_'.join([core, parts[1], parts[2]])
