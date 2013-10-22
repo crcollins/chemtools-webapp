@@ -21,9 +21,9 @@ def get_connections(server, user):
     else:
         username = "ccollins"
         key = open(os.path.expanduser("~/.ssh/id_rsa"), 'r')
-    sftp = get_sftp_connection(server, username, key)
+    sftp = get_sftp_connection(server, username, key=key)
     key.seek(0)  # reset to start of key file
-    ssh = get_ssh_connection(server, username, key)
+    ssh = get_ssh_connection(server, username, key=key)
     return ssh, sftp
 
 def make_folders(ssh):

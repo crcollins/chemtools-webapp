@@ -32,17 +32,27 @@ class SFTPClient(paramiko.SFTPClient):
     def __exit__(self, type, value, traceback):
         self.close()
 
-def get_sftp_connection(hostname, username, key, port=22):
-    pkey = paramiko.RSAKey.from_private_key(key)
+def get_sftp_connection(hostname, username, key=None, password=None, port=22):
+    if key is None and password is None:
+        raise Exception("no key or password")
 
     transport = paramiko.Transport((hostname, port))
-    transport.connect(username=username, pkey=pkey)
+    if key:
+        pkey = paramiko.RSAKey.from_private_key(key)
+        transport.connect(username=username, pkey=pkey)
+    else:
+        transport.connect(username=username, password=pkey)
     return SFTPClient.from_transport(transport)
 
-def get_ssh_connection(hostname, username, key, port=22):
-    pkey = paramiko.RSAKey.from_private_key(key)
+def get_ssh_connection(hostname, username, key=None, password=None, port=22):
+    if key is None and password is None:
+        raise Exception("no key or password")
 
     client = SSHClient()
     client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    client.connect(hostname, username=username, pkey=pkey)
+    if key:
+        pkey = paramiko.RSAKey.from_private_key(key)
+        client.connect(hostname, username=username, pkey=pkey, port=port)
+    else:
+        client.connect(hostname, username=username, password=password, port=port)
     return client
