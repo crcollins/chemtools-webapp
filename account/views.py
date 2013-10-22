@@ -8,7 +8,8 @@ from django.utils import simplejson
 from django.http import HttpResponse
 
 from project.settings import LOGIN_REDIRECT_URL, HOME_URL
-from account.models import RegistrationForm, SettingsForm, UserProfile
+from account.models import UserProfile
+from account.forms import RegistrationForm, SettingsForm
 
 import utils
 
