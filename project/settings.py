@@ -157,6 +157,7 @@ INSTALLED_APPS = (
     'docs',
     'parse',
     'data',
+    'cluster',
     'bootstrapform',
  )
 

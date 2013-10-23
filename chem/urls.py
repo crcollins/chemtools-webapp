@@ -7,12 +7,6 @@ urlpatterns = patterns('chem.views',
     url(r'^$', "index", name="chem_index"),
     url(r'^multi_job/$', "multi_job"),
 
-    url(r"^jobs/$", "job_index"),
-    url(r"^jobs.json$", "get_job_list"),
-    url(r"^jobs/(?P<jobid>[0-9]*)/$", "job_detail"),
-    url(r"^jobs/(?P<jobid>[0-9]*)/reset/$", "reset_job"),
-    url(r"^jobs/(?P<jobid>[0-9]*)/kill/$", "kill_job"),
-
     url(r"^(?P<molecule>[A-Za-z0-9_]*)/$", "gen_detail"),
     url(r"^(?P<molecule>[A-Za-z0-9_]*)\.gjf$", "write_gjf"),
     url(r"^(?P<molecule>[A-Za-z0-9_]*)\.mol2$", "write_mol2"),

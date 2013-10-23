@@ -1,11 +1,11 @@
-{% extends "chem/base.html" %}
+{% extends "cluster/base.html" %}
 
 {% block title %}Jobs{% endblock %}
 
 {% block script %}
 <script>
 $(function() {
-    $.getJSON('/chem/jobs.json', function(data) {
+    $.getJSON('/chem/jobs/running.json', function(data) {
         var table = $("#id_jobs")
         var output = '';
         for (i = 0; i < data.jobs.length; i++ ) {
