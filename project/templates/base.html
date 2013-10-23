@@ -6,7 +6,7 @@
     <link rel="shortcut icon" href="{{ STATIC_URL }}favicon.ico" type="image/x-icon" />
 
     <title>{% block title %}Demo{% endblock %}</title>
-
+    <link href="{{ STATIC_URL }}style.css" rel="stylesheet">
     <link href="{{ STATIC_URL }}bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
     <link href="{{ STATIC_URL }}bootstrap/css/sticky-footer-navbar.css" rel="stylesheet" media="screen">
 </head>
@@ -70,6 +70,7 @@
         </div>
     </nav>
 
+
     <div class="container">
         {% block header %}
         {% endblock %}
@@ -77,6 +78,7 @@
         {% endblock %}
     </div>
 
+    <div class="ajax-modal"></div>
     {% block buildmolecule %}
     <div class="modal fade" id="buildMolecule" tabindex="-1" role="dialog" aria-labelledby="buildMoleculeLabel" aria-hidden="true">
         <div class="modal-dialog">
