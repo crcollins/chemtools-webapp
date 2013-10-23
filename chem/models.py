@@ -3,13 +3,6 @@ from django import forms
 
 from chemtools.utils import CLUSTER_TUPLES
 
-JOBSTATE = (
-    (0, "Submitted"),
-    (1, "Started"),
-    (2, "Finished"),
-    (3, "Error"),
-    )
-
 class ErrorReport(models.Model):
     URGENCY_CHOICES = ((0, "Low"), (1, "Mid"), (2, "High"))
     molecule = models.CharField(max_length=400)
