@@ -15,6 +15,7 @@ CLUSTERS = {
     "g": "Gordon",
     "c": "Carver",
     "h": "Hooper",
+    "m": "Marcy",
 }
 CLUSTER_TUPLES = [(x, CLUSTERS[x]) for x in CLUSTERS.keys()]
 
