@@ -1,8 +1,9 @@
 from django.contrib.auth.models import User
 from django.db import models
 
-from project.utils import get_ssh_connection, get_sftp_connection, StringIO
+from project.utils import get_ssh_connection, get_sftp_connection, StringIO, AESCipher
 from chemtools.utils import CLUSTER_TUPLES
+
 
 class Job(models.Model):
     molecule = models.CharField(max_length=400)
@@ -26,12 +27,22 @@ class Cluster(models.Model):
         return "%s (%s)" % (self.name, self.hostname)
 
 
+class EncryptedCharField(models.CharField):
+    cipher = AESCipher()
+
+    def to_python(self, value):
+        return self.cipher.decrypt(value)
+
+    def get_prep_value(self, value):
+        return self.cipher.encrypt(value)
+
+
 class Credential(models.Model):
     user = models.ForeignKey(User, related_name='credentials')
 
     cluster = models.ForeignKey(Cluster)
     username = models.CharField(max_length=255, null=True, blank=True)
-    password = models.CharField(max_length=255, null=True, blank=True)
+    password = EncryptedCharField(max_length=255, null=True, blank=True)
     use_password = models.BooleanField(default=False)
 
     def get_ssh_connection(self):
