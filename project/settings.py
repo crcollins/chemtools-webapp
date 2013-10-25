@@ -2,17 +2,24 @@
 
 import os
 import random
+import hashlib
+
+from Crypto.Cipher import AES
+from Crypto import Random
+
 
 ROOT_PATH = os.getcwd()
 
 try:
-    from secret_key import SECRET_KEY
+    from secret_key import SECRET_KEY, AES_KEY
 except ImportError:
     path = os.path.join(ROOT_PATH, "project/secret_key.py")
     key = ''.join([random.choice("abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)") for i in xrange(64)])
+    aes_key = Random.new().read(AES.block_size)
     with open(path, "w") as f:
-        f.write("SECRET_KEY = '%s'" % key)
-    from secret_key import SECRET_KEY
+        f.write("SECRET_KEY = '%s'\n" % key)
+        f.write("AES_KEY = b"+ repr(aes_key) + "\n")
+    from secret_key import SECRET_KEY, AES_KEY
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
