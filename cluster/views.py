@@ -14,15 +14,16 @@ def job_index(request):
 
 @login_required
 def cred_index(request):
+    initial = {"username":request.user.get_profile().xsede_username}
     if request.method == "POST":
         form = CredentialForm(request.POST)
         if form.is_valid():
             obj = form.save(commit=False)
             obj.user = request.user
             obj.save()
-            form = CredentialForm()
+            form = CredentialForm(inital=initial)
     else:
-        form = CredentialForm()
+        form = CredentialForm(initial=initial)
 
     c = Context({
         "form": form,
