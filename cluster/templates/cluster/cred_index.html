@@ -1,6 +1,25 @@
 {% extends "cluster/base.html" %}
 {% load bootstrap %}
 
+{% block script %}
+<script>
+$(function() {
+    setWarning = function () {
+        if ($("#id_use_password").is(':checked')) {
+            $("#id_warning").show();
+        } else {
+            $("#id_warning").hide();
+        }
+    };
+
+    $("select#id_cluster").unbind("change"); // disable default from scripts.js
+
+    $("#id_use_password").change(setWarning);
+    setWarning();
+})
+</script>
+{% endblock %}
+
 {% block content %}
 <table class="table striped">
     <tr>
@@ -19,6 +38,7 @@
 <form action="." method="post">
     {% csrf_token %}
     {{ form|bootstrap }}
+    <div class="alert alert-warning" id="id_warning" style="display: none;"><strong>Warning!</strong> Using a password instead of the default SSH key is less secure!</div>
     <div class="row">
         <div class="col-xs-6">
             <button class="btn btn-lg btn-primary btn-block" type="submit">Add Credential</button>
