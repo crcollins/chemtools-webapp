@@ -32,7 +32,7 @@ class EncryptedCharField(models.CharField):
     __metaclass__ = models.SubfieldBase
 
     def to_python(self, value):
-        if value.startswith("$AES$"):
+        if value is not None and value.startswith("$AES$"):
             return self.cipher.decrypt(value[len("$AES$"):])
         else:
             return value
