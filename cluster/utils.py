@@ -107,18 +107,25 @@ def kill_job(user, jobid):
             return b
 
 def get_all_jobs(user):
-    ssh, _ = get_connections("gordon.sdsc.edu", user)
+    full_jobs = []
+    for cred in user.credentials.all():
+        try:
+            ssh = cred.get_ssh_connection()
 
-    with ssh:
-        _, stdout, stderr = ssh.exec_command(". ~/.bash_profile; qstat -u ccollins")
-        stderr.readlines()  # seems to need this slight delay to display the jobs
+            with ssh:
+                _, stdout, stderr = ssh.exec_command(". ~/.bash_profile; source .login; qstat -u %s" % cred.username)
+                print stderr.readlines()  # seems to need this slight delay to display the jobs
 
-    jobs = []
-    for job in stdout.readlines()[5:]:
-        t = job.split()
-        temp = t[0].split('.') + t[3:4] + t[5:7] + t[8:]
-        jobs.append(temp)
-    return jobs
+                jobs = []
+                for job in stdout.readlines()[5:]:
+                    t = job.split()
+                    temp = t[0].split('.') + t[3:4] + t[5:7] + t[8:]
+                    jobs.append(temp)
+                full_jobs.extend(jobs)
+        except Exception as e:
+            print e
+            pass
+    return full_jobs
 
 def wait_for_compression(ssh, zippath):
     done = False
