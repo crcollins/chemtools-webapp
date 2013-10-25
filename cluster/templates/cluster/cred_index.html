@@ -1,0 +1,31 @@
+{% extends "cluster/base.html" %}
+{% load bootstrap %}
+
+{% block content %}
+<table class="table striped">
+    <tr>
+        <th>Cluster</th>
+        <th>Username</th>
+        <th>Use Password?</th>
+    </tr>
+    {% for cred in user.credentials.all %}
+    <tr>
+        <td>{{ cred.cluster }}</td>
+        <td>{{ cred.username }}</td>
+        <td>{{ cred.use_password }}</td>
+    </tr>
+    {% endfor %}
+</table>
+<form action="." method="post">
+    {% csrf_token %}
+    {{ form|bootstrap }}
+    <div class="row">
+        <div class="col-xs-6">
+            <button class="btn btn-lg btn-primary btn-block" type="submit">Add Credential</button>
+        </div>
+        <div class="col-xs-6">
+            <button class="btn btn-lg btn-block" type="reset">Reset</button>
+        </div>
+    </div>
+</form>
+{% endblock %}

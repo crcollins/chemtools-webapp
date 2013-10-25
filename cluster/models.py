@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
+from django import forms
 
 from project.utils import get_ssh_connection, get_sftp_connection, StringIO, AESCipher
 from chemtools.utils import CLUSTER_TUPLES
@@ -64,3 +65,23 @@ class Credential(models.Model):
             profile = self.user.get_profile()
             private = StringIO(profile.private_key)
             return get_sftp_connection(self.cluster.hostname, self.username, key=private)
+
+
+class CredentialForm(forms.ModelForm):
+    password = forms.CharField(max_length=50, required=False, widget=forms.PasswordInput)
+    password2 = forms.CharField(max_length=50, required=False, widget=forms.PasswordInput)
+
+    class Meta:
+        model = Credential
+        fields = ("cluster", "username", "password", "password2", "use_password")
+
+    def clean_use_password(self):
+        password = self.cleaned_data.get("password")
+        password2 = self.cleaned_data.get("password2")
+        use_password = self.cleaned_data.get("use_password")
+
+        if not use_password:
+            return False
+        if password != password2:
+            raise forms.ValidationError("Your passwords do not match")
+        return True

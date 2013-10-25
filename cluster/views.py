@@ -4,13 +4,30 @@ from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.utils import simplejson
 
-from models import Job
+from models import Job, CredentialForm
 import utils
 
 
 @login_required
 def job_index(request):
     return render(request, "cluster/job_index.html")
+
+@login_required
+def cred_index(request):
+    if request.method == "POST":
+        form = CredentialForm(request.POST)
+        if form.is_valid():
+            obj = form.save(commit=False)
+            obj.user = request.user
+            obj.save()
+            form = CredentialForm()
+    else:
+        form = CredentialForm()
+
+    c = Context({
+        "form": form,
+        })
+    return render(request, "cluster/cred_index.html", c)
 
 @login_required
 def get_job_list(request):
