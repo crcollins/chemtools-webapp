@@ -29,12 +29,16 @@ class Cluster(models.Model):
 
 class EncryptedCharField(models.CharField):
     cipher = AESCipher()
+    __metaclass__ = models.SubfieldBase
 
     def to_python(self, value):
-        return self.cipher.decrypt(value)
+        if value.startswith("$AES$"):
+            return self.cipher.decrypt(value[len("$AES$"):])
+        else:
+            return value
 
     def get_prep_value(self, value):
-        return self.cipher.encrypt(value)
+        return "$AES$"+self.cipher.encrypt(value)
 
 
 class Credential(models.Model):
