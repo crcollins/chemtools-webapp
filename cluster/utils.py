@@ -10,6 +10,8 @@ from chemtools import gjfwriter
 from chemtools import fileparser
 from project.utils import get_ssh_connection, get_sftp_connection, StringIO
 
+PRE_INFO = ". ~/.bash_profile; source .login; "
+
 def get_connections(server, user):
     try:
         profile = user.get_profile()
@@ -66,7 +68,7 @@ def run_job(user, gjfstring, jobstring=None, **kwargs):
         f2.write(jobstring)
         f2.close()
 
-        s = ". ~/.bash_profile; qsub chemtools/%s.%sjob" % (name, cluster)
+        s = PRE_INFO + "qsub chemtools/%s.%sjob" % (name, cluster)
         _, stdout, stderr = ssh.exec_command(s)
         stderr = stderr.readlines()
         if stderr:
@@ -98,7 +100,7 @@ def kill_job(user, jobid):
             return "There are no jobs running."
 
         if jobid in jobs:
-            _, _, stderr = ssh.exec_command(". ~/.bash_profile; qdel %s" % jobid)
+            _, _, stderr = ssh.exec_command(PRE_INFO + "qdel %s" % jobid)
         else:
             return "That job number is not running."
 
@@ -113,7 +115,7 @@ def get_all_jobs(user):
             ssh = cred.get_ssh_connection()
 
             with ssh:
-                _, stdout, stderr = ssh.exec_command(". ~/.bash_profile; source .login; qstat -u %s" % cred.username)
+                _, stdout, stderr = ssh.exec_command(PRE_INFO + "qstat -u %s" % cred.username)
                 print stderr.readlines()  # seems to need this slight delay to display the jobs
 
                 jobs = []
