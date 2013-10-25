@@ -22,5 +22,13 @@
             "name": "Trestles",
             "hostname": "trestles.sdsc.edu"
         }
+    },
+    {
+        "pk": 4,
+        "model": "cluster.cluster",
+        "fields": {
+            "name": "Marcy",
+            "hostname": "marcy.bucknell.edu"
+        }
     }
 ]
