@@ -2,6 +2,7 @@ from django.db import models
 from django import forms
 
 from chemtools.utils import CLUSTER_TUPLES
+from cluster.models import Credential
 
 class ErrorReport(models.Model):
     URGENCY_CHOICES = ((0, "Low"), (1, "Mid"), (2, "High"))
@@ -25,6 +26,8 @@ class JobForm(forms.Form):
     cluster = forms.ChoiceField(choices=CLUSTER_TUPLES)
     template = forms.CharField(widget=forms.Textarea(attrs={'cols': 50, 'rows': 26}))
 
+    credential = forms.ModelChoiceField(queryset=Credential.objects.none(), required=False, widget=forms.HiddenInput())
+
     @classmethod
     def get_form(cls, request, molecule):
         req = request.REQUEST
@@ -37,6 +40,7 @@ class JobForm(forms.Form):
                 email = request.user.email
             else:
                 email = ""
+
             with open("chemtools/templates/chemtools/gjob.txt" , "r") as f:
                 text = f.read()
             form = JobForm(initial={
@@ -48,6 +52,10 @@ class JobForm(forms.Form):
                 "walltime":48,
                 "nodes":1,
                 })
+        if request.user.is_authenticated():
+            f = form.fields['credential']
+            f.widget = forms.Select()
+            f.queryset = Credential.objects.filter(user=request.user)
         return form
 
 class Job(models.Model):
