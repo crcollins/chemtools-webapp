@@ -121,7 +121,7 @@ def get_all_jobs(user):
                 jobs = []
                 for job in stdout.readlines()[5:]:
                     t = job.split()
-                    temp = t[0].split('.') + t[3:4] + t[5:7] + t[8:]
+                    temp = [t[0].split('.')[0]] + [cred.cluster.name] + t[3:4] + t[5:7] + t[8:]
                     jobs.append(temp)
                 full_jobs.extend(jobs)
         except Exception as e:
