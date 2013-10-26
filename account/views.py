@@ -185,7 +185,7 @@ def credential_settings(request, username):
             obj.user = request.user
             obj.save()
             state = "Settings Successfully Saved"
-            form = CredentialForm(inital=initial)
+            form = CredentialForm(initial=initial)
     else:
         form = CredentialForm(initial=initial)
 
