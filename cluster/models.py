@@ -50,6 +50,9 @@ class Credential(models.Model):
     password = EncryptedCharField(max_length=255, null=True, blank=True)
     use_password = models.BooleanField(default=False)
 
+    def __unicode__(self):
+        return "%s@%s" % (self.username, self.cluster.hostname)
+
     def get_ssh_connection(self):
         if self.use_password:
             return get_ssh_connection(self.cluster.hostname, self.username, password=self.password)
