@@ -8,26 +8,17 @@
 
 {% block content %}
 <h3>{{ state }}</h3>
-<form action='' method="post">
-    {% csrf_token %}
 
-    {{ settings_form|bootstrap }}
-    <div class="form-group">
-        <label class="control-label" for="id_public_key">Public Key</label>
-        <div class="">
-            <textarea id="id_public_key" cols=50 rows=6 class=" form-control">{{ public_key }}</textarea>
+<div class="row">
+    <div class="col-md-3">
+        <div class="list-group" id="sidebar">
+        {% for p in pages %}
+            <a href="/u/{{ request.user }}/{{ p }}/" class="list-group-item {% if page == p %}active{% endif %}">{{ p|title }}</a>
+        {% endfor %}
         </div>
     </div>
-    <hr>
-    {{ pass_form|bootstrap }}
-    <hr>
-    <div class="row">
-        <div class="col-xs-6">
-            <button class="btn btn-lg btn-primary btn-block" type="submit">Submit</button>
-        </div>
-        <div class="col-xs-6">
-            <button class="btn btn-lg btn-block" type="reset">Reset</button>
-        </div>
+    <div class="col-md-6">
+    {% block settingsbody %}{% endblock %}
     </div>
-</form>
+</div>
 {% endblock %}

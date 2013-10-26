@@ -1,0 +1,24 @@
+{% extends "account/settings.html" %}
+{% load bootstrap %}
+
+{% block settingsbody %}
+<form action='' method="post">
+    {% csrf_token %}
+    {{ form|bootstrap }}
+    <div class="form-group">
+        <label class="control-label" for="id_public_key">Public Key</label>
+        <div class="">
+            <textarea id="id_public_key" cols=50 rows=6 class=" form-control">{{ user.get_profile.public_key }}</textarea>
+        </div>
+    </div>
+    <hr>
+    <div class="row">
+        <div class="col-xs-6">
+            <button class="btn btn-lg btn-primary btn-block" type="submit">Submit</button>
+        </div>
+        <div class="col-xs-6">
+            <button class="btn btn-lg btn-block" type="reset">Reset</button>
+        </div>
+    </div>
+</form>
+{% endblock %}
