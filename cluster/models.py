@@ -3,21 +3,6 @@ from django.db import models
 from django import forms
 
 from project.utils import get_ssh_connection, get_sftp_connection, StringIO, AESCipher
-from chemtools.utils import CLUSTER_TUPLES
-
-
-class Job(models.Model):
-    molecule = models.CharField(max_length=400)
-    name = models.CharField(max_length=400)
-    email = models.EmailField()
-    cluster = models.CharField(max_length=1, choices=CLUSTER_TUPLES)
-    nodes = models.IntegerField()
-    walltime = models.IntegerField()
-    allocation = models.CharField(max_length=20)
-    jobid = models.CharField(max_length=400)
-    created = models.DateTimeField(auto_now=True)
-    started = models.DateTimeField(auto_now=False, null=True)
-    ended = models.DateTimeField(auto_now=False, null=True)
 
 
 class Cluster(models.Model):
@@ -88,3 +73,18 @@ class CredentialForm(forms.ModelForm):
         if password != password2:
             raise forms.ValidationError("Your passwords do not match")
         return True
+
+class Job(models.Model):
+    credential = models.ForeignKey(Credential)
+
+    molecule = models.CharField(max_length=400)
+    name = models.CharField(max_length=400)
+    email = models.EmailField()
+    nodes = models.IntegerField()
+    walltime = models.IntegerField()
+    allocation = models.CharField(max_length=20)
+
+    jobid = models.CharField(max_length=400)
+    created = models.DateTimeField(auto_now=True)
+    started = models.DateTimeField(auto_now=False, null=True)
+    ended = models.DateTimeField(auto_now=False, null=True)

@@ -12,8 +12,7 @@ from django.core.servers.basehttp import FileWrapper
 from django.core.urlresolvers import reverse
 from django.utils import simplejson
 
-from models import ErrorReport, ErrorReportForm, JobForm, Job
-import utils
+from models import ErrorReport, ErrorReportForm, JobForm
 
 from chemtools import gjfwriter
 from chemtools.utils import name_expansion, write_job

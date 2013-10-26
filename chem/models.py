@@ -57,17 +57,3 @@ class JobForm(forms.Form):
             f.widget = forms.Select()
             f.queryset = Credential.objects.filter(user=request.user)
         return form
-
-class Job(models.Model):
-    molecule = models.CharField(max_length=400)
-    name = models.CharField(max_length=400)
-    email = models.EmailField()
-    cluster = models.CharField(max_length=1, choices=CLUSTER_TUPLES)
-    nodes = models.IntegerField()
-    walltime = models.IntegerField()
-    allocation = models.CharField(max_length=20)
-    jobid = models.CharField(max_length=400)
-    created = models.DateTimeField(auto_now=True)
-    started = models.DateTimeField(auto_now=False, null=True)
-    ended = models.DateTimeField(auto_now=False, null=True)
-
