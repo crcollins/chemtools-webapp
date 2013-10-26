@@ -178,11 +178,10 @@ def credential_settings(request, username):
     initial = {"username": request.user.get_profile().xsede_username}
     if request.method == "POST":
         if "delete" in request.POST:
-            print request.POST
             form = CredentialForm(initial=initial)
             usercreds = request.user.credentials.all()
             for key in request.POST:
-                if "@" in key:
+                if "@" in key and request.POST[key] == "on":
                     username, hostname = key.split("@")
                     try:
                         usercreds.get(username=username, cluster__hostname=hostname).delete()
