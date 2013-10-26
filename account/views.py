@@ -110,9 +110,7 @@ def main_settings(request, username):
             keys = utils.generate_key_pair(username)
             if user_profile.public_key:
                 try:
-                    utils.update_all_ssh_keys(user_profile.xsede_username,
-                                    user_profile.private_key,
-                                    keys["public"])
+                    utils.update_all_ssh_keys(request.user, keys["public"])
                 except Exception as e:
                     print e
                     pass
