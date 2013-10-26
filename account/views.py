@@ -177,13 +177,25 @@ def credential_settings(request, username):
     state = "Change Settings"
     initial = {"username": request.user.get_profile().xsede_username}
     if request.method == "POST":
-        form = CredentialForm(request.POST)
-        if form.is_valid():
-            obj = form.save(commit=False)
-            obj.user = request.user
-            obj.save()
-            state = "Settings Successfully Saved"
+        if "delete" in request.POST:
+            print request.POST
             form = CredentialForm(initial=initial)
+            usercreds = request.user.credentials.all()
+            for key in request.POST:
+                if "@" in key:
+                    username, hostname = key.split("@")
+                    try:
+                        usercreds.get(username=username, cluster__hostname=hostname).delete()
+                    except:
+                        pass
+        else:
+            form = CredentialForm(request.POST)
+            if form.is_valid():
+                obj = form.save(commit=False)
+                obj.user = request.user
+                obj.save()
+                state = "Settings Successfully Saved"
+                form = CredentialForm(initial=initial)
     else:
         form = CredentialForm(initial=initial)
 
