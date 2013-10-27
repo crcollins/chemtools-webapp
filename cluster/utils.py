@@ -3,6 +3,7 @@ import bz2
 import zipfile
 import tarfile
 import time
+import re
 
 import paramiko
 
