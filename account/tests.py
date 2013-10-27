@@ -92,7 +92,7 @@ class SettingsTestCase(TestCase):
         for user in self.users:
             r = self.client.login(username=user["username"], password=user["new_password1"])
             self.assertTrue(r)
-            response = self.client.get(reverse(views.change_settings, args=(user["username"], )))
+            response = self.client.get(reverse(views.main_settings, args=(user["username"], )))
             self.assertEqual(response.status_code, 200)
 
     def test_change_settings_redirect(self):
@@ -100,7 +100,7 @@ class SettingsTestCase(TestCase):
             r = self.client.login(username=user["username"], password=user["new_password1"])
             self.assertTrue(r)
             opposite = self.users[not i]["username"]
-            response = self.client.get(reverse(views.change_settings, args=(opposite, )))
+            response = self.client.get(reverse(views.main_settings, args=(opposite, )))
             self.assertEqual(response.status_code, 302)
 
 
