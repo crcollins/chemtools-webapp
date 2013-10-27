@@ -172,7 +172,7 @@ def password_settings(request, username):
 @login_required
 def credential_settings(request, username):
     if request.user.username != username:
-        return redirect(password_settings, request.user.username)
+        return redirect(credential_settings, request.user.username)
 
     state = "Change Settings"
     initial = {"username": request.user.get_profile().xsede_username}
