@@ -5,13 +5,12 @@ import misaka
 import utils
 
 def index(request):
-    a = "".join(open("README.md", "r").readlines())
-    headerend = a.index("Build")
-    bodystart = a.index("_" * 71 + "\nNaming")
-    tree = misaka.html(a[bodystart:], render_flags=misaka.HTML_TOC_TREE)
-    body = misaka.html(a[bodystart:], render_flags=misaka.HTML_TOC)
+    a = "".join(open("docs/other/main.md", "r").readlines())
+
+    tree = misaka.html(a, render_flags=misaka.HTML_TOC_TREE)
+    body = misaka.html(a, render_flags=misaka.HTML_TOC)
     c = Context({
-        "header": misaka.html(a[:headerend]),
+        # "header": misaka.html(a),
         "toc": utils.postprocess_toc(tree, "#"),
         "docs": utils.postprocess_toc(body, 'id="'),
         })
@@ -26,6 +25,13 @@ def common_errors(request):
 
 def one_liners(request):
     a = "".join(open("docs/other/one_liners.md", "r").readlines())
+    c = Context({
+        "docs": misaka.html(a),
+        })
+    return render(request, "docs/content.html", c)
+
+def technical(request):
+    a = "".join(open("README.md", "r").readlines())
     c = Context({
         "docs": misaka.html(a),
         })
