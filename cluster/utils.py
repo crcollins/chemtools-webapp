@@ -8,7 +8,10 @@ import paramiko
 
 from chemtools import gjfwriter
 from chemtools import fileparser
+from chemtools.utils import name_expansion
 from project.utils import get_ssh_connection, get_sftp_connection, StringIO
+
+from models import Credential
 
 PRE_INFO = ". ~/.bash_profile; source .login; "
 
@@ -63,7 +66,7 @@ def run_job(user, gjfstring, jobstring=None, **kwargs):
 
 
         if jobstring is None:
-            jobstring = write_job(**kwargs)
+            jobstring = write_job(internal=True, **kwargs)
         f2 = sftp.open("chemtools/%s.%sjob" % (name, cluster))
         f2.write(jobstring)
         f2.close()
@@ -80,14 +83,49 @@ def run_job(user, gjfstring, jobstring=None, **kwargs):
         return jobid, None
 
 def run_standard_job(user, molecule, **kwargs):
+    results = {"jobid": None, "error": None}
+
+    if not user.is_staff:
+        results["error"] = "You must be a staff user to submit a job."
+        return results
     try:
         out = gjfwriter.GJFWriter(molecule, kwargs.get("keywords", "b3lyp/6-31g(d)"))
     except Exception as e:
-        return None, e
+        results["error"] = str(e)
+        return results
 
     gjf = out.get_gjf()
     name = kwargs.get("name", molecule)
-    return run_job(user, gjf, **kwargs)
+    jobid, error = run_job(user, gjf, **kwargs)
+    results["jobid"] = jobid
+    results["error"] = error
+    # if error is None:
+    #     dnew.pop("template")
+    #     job = Job(molecule=molecule, jobid=jobid, **dnew)
+    #     job.save()
+    return results
+
+def run_standard_jobs(user, string, **kwargs):
+    results = {
+        "worked": [],
+        "failed": [],
+        "error": None,
+    }
+
+    if not user.is_staff:
+        results["error"] = "You must be a staff user to submit a job."
+        return results
+
+    for mol in name_expansion(string):
+        dnew = kwargs.copy()
+        dnew["name"] = re.sub(r"{{\s*name\s*}}", mol, dnew["name"])
+        a = run_standard_job(user, mol, **dnew)
+
+        if a["error"] is None:
+            results["worked"].append((mol, a["jobid"]))
+        else:
+            results["failed"].append((mol, a["error"])) # str is a hack if real errors bubble up
+    return results
 
 def kill_job(user, jobid):
     ssh, _ = get_connections("gordon.sdsc.edu", user)

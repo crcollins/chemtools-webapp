@@ -16,6 +16,7 @@ from models import ErrorReport, ErrorReportForm, JobForm
 
 from chemtools import gjfwriter
 from chemtools.utils import name_expansion, write_job
+import cluster.utils
 
 def index(request):
     if request.GET.get("molecule"):
@@ -115,21 +116,8 @@ def gen_detail(request, molecule):
             response['Content-Disposition'] = add + 'filename=%s.job' % molecule
             return response
         elif request.method == "POST":
-            if not request.user.is_staff:
-                a = {"error": "You must be a staff user to submit a job."}
-                return HttpResponse(simplejson.dumps(a), mimetype="application/json")
             d["keywords"] = keywords
-            d["internal"] = True
-            jobid, e = utils.run_standard_job(request.user, molecule, **d)
-            a = {
-                "jobid": jobid,
-                "error": e,
-            }
-            if e is None:
-                dnew = dict(form.cleaned_data)
-                del dnew["template"]
-                job = Job(molecule=molecule, jobid=jobid, **dnew)
-                job.save()
+            a = cluster.utils.run_standard_job(request.user, molecule, **d)
             return HttpResponse(simplejson.dumps(a), mimetype="application/json")
 
     if not errors[0]:
@@ -163,26 +151,8 @@ def gen_multi_detail(request, string):
             return response
 
         elif request.method == "POST":
-            a = {
-                "worked": [],
-                "failed": [],
-                "error": None,
-            }
-            if not request.user.is_staff:
-                a["error"] = "You must be a staff user to submit a job."
-                return HttpResponse(simplejson.dumps(a), mimetype="application/json")
-
-            for mol in name_expansion(string):
-                dnew = d.copy()
-                dnew["name"] = re.sub(r"{{\s*name\s*}}", mol, dnew["name"])
-                jobid, e = utils.run_standard_job(request.user, mol, keywords=keywords, internal=True, **dnew)
-                if e is None:
-                    del dnew["template"]
-                    job = Job(molecule=mol, jobid=jobid, **dnew)
-                    job.save()
-                    a["worked"].append((mol, jobid))
-                else:
-                    a["failed"].append((mol, str(e))) # str is a hack if real errors bubble up
+            d["keywords"] = keywords
+            a = cluster.utils.run_standard_jobs(request.user, string, **d)
             return HttpResponse(simplejson.dumps(a), mimetype="application/json")
 
     c = Context({
