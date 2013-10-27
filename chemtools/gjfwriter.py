@@ -349,7 +349,7 @@ def get_exact_name(name):
             if not endname or endname[-1] not in XGROUPS:
                 if f(num):
                     endname += 'A'
-            parts.append(endname)
+            parts.append(endname.replace("J", "4aaA"))
 
         # only first set will have left sides
         if num == 0 and parts[0]:
