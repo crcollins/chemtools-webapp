@@ -178,7 +178,7 @@ def credential_settings(request, username):
     initial = {"username": request.user.get_profile().xsede_username}
     if request.method == "POST":
         if "delete" in request.POST:
-            form = CredentialForm(initial=initial)
+            form = CredentialForm(request.user, initial=initial)
             usercreds = request.user.credentials.all()
             for key in request.POST:
                 if "@" in key and request.POST[key] == "on":
@@ -188,15 +188,15 @@ def credential_settings(request, username):
                     except:
                         pass
         else:
-            form = CredentialForm(request.POST)
+            form = CredentialForm(request.user, request.POST)
             if form.is_valid():
                 obj = form.save(commit=False)
                 obj.user = request.user
                 obj.save()
                 state = "Settings Successfully Saved"
-                form = CredentialForm(initial=initial)
+                form = CredentialForm(request.user, initial=initial)
     else:
-        form = CredentialForm(initial=initial)
+        form = CredentialForm(request.user, initial=initial)
 
     c = Context({
         "pages": PAGES,
