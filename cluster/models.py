@@ -12,6 +12,10 @@ class Cluster(models.Model):
     def __unicode__(self):
         return "%s (%s)" % (self.name, self.hostname)
 
+class ClusterForm(forms.ModelForm):
+    class Meta:
+        model = Cluster
+        fields = ("name", "hostname")
 
 class EncryptedCharField(models.CharField):
     cipher = AESCipher()

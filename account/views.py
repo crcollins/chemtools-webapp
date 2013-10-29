@@ -10,7 +10,7 @@ from django.http import HttpResponse
 from project.settings import LOGIN_REDIRECT_URL, HOME_URL
 from account.models import UserProfile
 from account.forms import RegistrationForm, SettingsForm
-from cluster.models import CredentialForm
+from cluster.models import CredentialForm, ClusterForm, Cluster
 
 import utils
 
@@ -75,12 +75,11 @@ def get_public_key(request, username):
     return HttpResponse(pubkey, content_type="text/plain")
 
 
-
-
 PAGES = [
     "settings",
     "password",
     "credentials",
+    "clusters",
 ]
 
 @login_required
@@ -205,3 +204,29 @@ def credential_settings(request, username):
         "form": form,
         })
     return render(request, "account/credential_settings.html", c)
+
+@login_required
+def cluster_settings(request, username):
+    if request.user.username != username:
+        return redirect(cluster_settings, request.user.username)
+
+    state = "Change Settings"
+    if request.method == "POST":
+        form = ClusterForm(request.POST)
+        if form.is_valid():
+            obj = form.save(commit=False)
+            obj.user = request.user
+            obj.save()
+            state = "Settings Successfully Saved"
+            form = ClusterForm()
+    else:
+        form = ClusterForm()
+
+    c = Context({
+        "pages": PAGES,
+        "page": "clusters",
+        "state": state,
+        "form": form,
+        "clusters": Cluster.objects.all(),
+        })
+    return render(request, "account/cluster_settings.html", c)

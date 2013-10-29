@@ -1,0 +1,32 @@
+{% extends "account/settings.html" %}
+{% load bootstrap %}
+
+{% block settingsbody %}
+<table class="table table-striped">
+    <tr>
+        <th>Name</th>
+        <th>Hostname</th>
+    </tr>
+    {% for cluster in clusters %}
+    <tr>
+        <td>{{ cluster.name }}</td>
+        <td>{{ cluster.hostname }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<hr>
+
+<form action="." method="post">
+    {% csrf_token %}
+    {{ form|bootstrap }}
+    <div class="row">
+        <div class="col-xs-6">
+            <button class="btn btn-lg btn-primary btn-block" type="submit">Add Cluster</button>
+        </div>
+        <div class="col-xs-6">
+            <button class="btn btn-lg btn-block" type="reset">Reset</button>
+        </div>
+    </div>
+</form>
+{% endblock %}
