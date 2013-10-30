@@ -154,7 +154,23 @@ class SettingsTestCase(TestCase):
 
             r = self.client.login(username=user["username"], password=user["new_password1"]+'a')
             self.assertTrue(r)
-            user.set_password(user["new_password1"])
+            User.objects.get(username=user["username"]).set_password(user["new_password1"])
+
+    def test_add_cluster(self):
+        for user in self.users:
+            r = self.client.login(username=user["username"], password=user["new_password1"])
+            self.assertTrue(r)
+
+            response = self.client.get(reverse(views.cluster_settings, args=(user["username"], )))
+            self.assertEqual(response.status_code, 200)
+            data = {
+                "name": "test-machine",
+                "hostname": "test-machine.com",
+                }
+            response = self.client.post(reverse(views.cluster_settings, args=(user["username"], )), data)
+            self.assertEqual(response.status_code, 200)
+            self.assertIn("Settings Successfully Saved", response.content)
+
 
 
 class UtilsTestCase(TestCase):
