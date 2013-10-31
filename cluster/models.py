@@ -112,3 +112,8 @@ class Job(models.Model):
     created = models.DateTimeField(auto_now=True)
     started = models.DateTimeField(auto_now=False, null=True)
     ended = models.DateTimeField(auto_now=False, null=True)
+
+    def __init__(self, *args, **kwargs):
+        fields = set([x.name for x in Job._meta.fields])
+        newkwargs = {k:v for k,v in kwargs.items() if k in fields}
+        super(Job, self).__init__(*args, **newkwargs)
