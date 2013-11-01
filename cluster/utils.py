@@ -9,10 +9,10 @@ import paramiko
 
 from chemtools import gjfwriter
 from chemtools import fileparser
-from chemtools.utils import name_expansion
+from chemtools.utils import name_expansion, write_job
 from project.utils import get_ssh_connection, get_sftp_connection, StringIO
 
-from models import Credential
+from models import Credential, Job
 
 
 def get_connections(server, user):
@@ -58,7 +58,7 @@ def run_job(user, gjfstring, jobstring=None, **kwargs):
             return None, error
 
         name = kwargs["name"]
-        custer = kwargs.get("cluster", 'g')
+        cluster = kwargs.get("cluster", 'g')
 
         f = sftp.open("chemtools/%s.gjf" % name, 'w')
         f.write(gjfstring)
