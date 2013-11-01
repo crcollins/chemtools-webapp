@@ -14,7 +14,6 @@ from project.utils import get_ssh_connection, get_sftp_connection, StringIO
 
 from models import Credential
 
-PRE_INFO = ". ~/.bash_profile; source .login; "
 
 def get_connections(server, user):
     try:
@@ -68,11 +67,11 @@ def run_job(user, gjfstring, jobstring=None, **kwargs):
 
         if jobstring is None:
             jobstring = write_job(internal=True, **kwargs)
-        f2 = sftp.open("chemtools/%s.%sjob" % (name, cluster))
+        f2 = sftp.open("chemtools/%s.%sjob" % (name, cluster), 'w')
         f2.write(jobstring)
         f2.close()
 
-        s = PRE_INFO + "qsub chemtools/%s.%sjob" % (name, cluster)
+        s = "qsub chemtools/%s.%sjob" % (name, cluster)
         _, stdout, stderr = ssh.exec_command(s)
         stderr = stderr.readlines()
         if stderr:
@@ -139,7 +138,7 @@ def kill_job(user, jobid):
             return "There are no jobs running."
 
         if jobid in jobs:
-            _, _, stderr = ssh.exec_command(PRE_INFO + "qdel %s" % jobid)
+            _, _, stderr = ssh.exec_command("qdel %s" % jobid)
         else:
             return "That job number is not running."
 
@@ -154,8 +153,8 @@ def get_all_jobs(user):
             ssh = cred.get_ssh_connection()
 
             with ssh:
-                _, stdout, stderr = ssh.exec_command(PRE_INFO + "qstat -u %s" % cred.username)
-                print stderr.readlines()  # seems to need this slight delay to display the jobs
+                _, stdout, stderr = ssh.exec_command("qstat -u %s" % cred.username)
+                stderr.readlines()  # seems to need this slight delay to display the jobs
 
                 jobs = []
                 for job in stdout.readlines()[5:]:

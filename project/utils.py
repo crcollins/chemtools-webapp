@@ -25,10 +25,14 @@ class StringIO(object):
 class SSHClient(paramiko.SSHClient):
     def __init__(self, *args, **kwargs):
         super(SSHClient, self).__init__(*args, **kwargs)
+        self.base=""
     def __enter__(self):
         return self
     def __exit__(self, type, value, traceback):
         self.close()
+    def exec_command(self, command, *args, **kwargs):
+        command = self.base + command
+        return super(SSHClient, self).exec_command(command, *args, **kwargs)
 
 
 class SFTPClient(paramiko.SFTPClient):
@@ -63,6 +67,12 @@ def get_ssh_connection(hostname, username, key=None, password=None, port=22):
         client.connect(hostname, username=username, pkey=pkey, port=port, allow_agent=False, look_for_keys=False)
     else:
         client.connect(hostname, username=username, password=password, port=port, allow_agent=False, look_for_keys=False)
+    bases = [". ~/.bash_profile; ", "source .login; ", ". ~/.bashrc; "]
+    for base in bases:
+        _, _, err = client.exec_command(base)
+        if not err.readlines():
+            client.base = base
+            break
     return client
 
 
