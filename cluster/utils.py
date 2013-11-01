@@ -99,10 +99,9 @@ def run_standard_job(user, molecule, **kwargs):
     jobid, error = run_job(user, gjf, **kwargs)
     results["jobid"] = jobid
     results["error"] = error
-    # if error is None:
-    #     dnew.pop("template")
-    #     job = Job(molecule=molecule, jobid=jobid, **dnew)
-    #     job.save()
+    if error is None:
+        job = Job(molecule=molecule, jobid=jobid, **kwargs)
+        job.save()
     return results
 
 def run_standard_jobs(user, string, **kwargs):
