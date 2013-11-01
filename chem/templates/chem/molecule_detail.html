@@ -21,6 +21,7 @@ $(function() {
             }
             var dialog = $(".modal-body");
             dialog.html(text);
+            $('#myModal').modal();
             },
             'json'
             );
@@ -65,7 +66,7 @@ $(function() {
                 {% if user.is_authenticated %}
                 <div class="col-xs-4">
                     {% csrf_token %}
-                    <a data-toggle="modal" id="id_post" href="#myModal" class="btn btn-lg btn-primary btn-block">Submit Job</a>
+                    <a id="id_post" class="btn btn-lg btn-primary btn-block">Submit Job</a>
                 </div>
                 {% endif %}
                 <div class="col-xs-4">

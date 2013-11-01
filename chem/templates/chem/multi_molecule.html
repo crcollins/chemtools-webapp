@@ -44,6 +44,7 @@
                 var dialog = $(".modal-body");
                 dialog.html(text);
                 var newdialog = $('<div id="id_results">{0}</div>'.format(text));
+                $('#myModal').modal();
             },
             'json'
             );
@@ -148,7 +149,7 @@ $.getJSON('check/', function(data) {
                 <div class="col-xs-4">
                     {% csrf_token %}
                     <!-- Button trigger modal -->
-                    <a data-toggle="modal" id="id_post" href="#myModal" class="btn btn-lg btn-primary btn-block">Submit Jobs</a>
+                    <a id="id_post" class="btn btn-lg btn-primary btn-block">Submit Jobs</a>
                 </div>
                 {% endif %}
                 <div class="col-xs-4">
