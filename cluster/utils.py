@@ -4,6 +4,7 @@ import zipfile
 import tarfile
 import time
 import re
+import threading
 
 import paramiko
 
@@ -145,26 +146,36 @@ def kill_job(user, jobid):
         if b:
             return b
 
+def _get_jobs(cred, i, results):
+    try:
+        ssh = cred.get_ssh_connection()
+
+        with ssh:
+            _, stdout, stderr = ssh.exec_command("qstat -u %s" % cred.username)
+            stderr.readlines()  # seems to need this slight delay to display the jobs
+
+            jobs = []
+            for job in stdout.readlines()[5:]:
+                t = job.split()
+                temp = [t[0].split('.')[0]] + [cred.cluster.name] + t[3:4] + t[5:7] + t[8:]
+                jobs.append(temp)
+        results[i] = jobs
+    except Exception as e:
+        print e
+
 def get_all_jobs(user):
-    full_jobs = []
-    for cred in user.credentials.all():
-        try:
-            ssh = cred.get_ssh_connection()
+    threads = []
+    # results is a mutable object, so as the threads complete they save their results into this object
+    # this method is used in lieu of messing with multiple processes
+    results = [None] * len(user.credentials.all())
+    for i, cred in enumerate(user.credentials.all()):
+        t = threading.Thread(target=_get_jobs, args=(cred, i, results))
+        t.start()
+        threads.append(t)
 
-            with ssh:
-                _, stdout, stderr = ssh.exec_command("qstat -u %s" % cred.username)
-                stderr.readlines()  # seems to need this slight delay to display the jobs
-
-                jobs = []
-                for job in stdout.readlines()[5:]:
-                    t = job.split()
-                    temp = [t[0].split('.')[0]] + [cred.cluster.name] + t[3:4] + t[5:7] + t[8:]
-                    jobs.append(temp)
-                full_jobs.extend(jobs)
-        except Exception as e:
-            print e
-            pass
-    return full_jobs
+    for t in threads:
+        t.join()
+    return sum(results, [])
 
 def wait_for_compression(ssh, zippath):
     done = False
