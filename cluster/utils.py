@@ -42,17 +42,9 @@ def make_folders(ssh):
                 return testerr2[0]
     return None
 
-import random
 def run_job(user, gjfstring, jobstring=None, **kwargs):
-    if random.random() > .5:
-        jobid = None
-        e = "There was an error"
-    else:
-        jobid = random.randint(0, 10000)
-        e = None
-    return jobid, e
-
-    ssh, sftp = get_connections("gordon.sdsc.edu", user)
+    ssh = kwargs["credential"].get_ssh_connection()
+    sftp = kwargs["credential"].get_sftp_connection()
     with ssh, sftp:
         error = make_folders(ssh)
         if error:
