@@ -13,9 +13,17 @@ def job_index(request):
     return render(request, "cluster/job_index.html")
 
 @login_required
+def cluster_job_index(request, cluster):
+    c = Context({
+        "cluster": cluster,
+        })
+    return render(request, "cluster/job_index.html", c)
+
+@login_required
 def get_job_list(request):
     try:
-        jobs = utils.get_all_jobs(request.user)
+        cluster = request.REQUEST.get("cluster", "")
+        jobs = utils.get_all_jobs(request.user, cluster)
         e = None
     except Exception as e:
         jobs = []
@@ -26,9 +34,10 @@ def get_job_list(request):
     return HttpResponse(simplejson.dumps(a), mimetype="application/json")
 
 @login_required
-def job_detail(request, jobid):
+def job_detail(request, cluster, jobid):
     e = None
-    for job in utils.get_all_jobs(request.user):
+    jobs = utils.get_all_jobs(request.user, cluster)[0]
+    for job in jobs["jobs"]:
         if job[0] == jobid:
             break
     else:

@@ -192,23 +192,29 @@ def _get_jobs(cred, i, results):
                     temp.append(t[idx])
                 temp[0] = temp[0].split('.')[0]
                 jobs.append(temp)
-        results[i] = jobs
+        results[i] = {"name": cred.cluster.name, "columns": wantedcols, "jobs": jobs}
     except Exception as e:
         print e
+        results[i] = {"name": cred.cluster.name, "columns": wantedcols, "jobs": []}
 
-def get_all_jobs(user):
+def get_all_jobs(user, cluster=None):
+    if cluster:
+        creds = user.credentials.filter(cluster__name__iexact=cluster)
+    else:
+        creds = user.credentials.all()
+
     threads = []
     # results is a mutable object, so as the threads complete they save their results into this object
     # this method is used in lieu of messing with multiple processes
-    results = [None] * len(user.credentials.all())
-    for i, cred in enumerate(user.credentials.all()):
+    results = [None] * len(creds)
+    for i, cred in enumerate(creds):
         t = threading.Thread(target=_get_jobs, args=(cred, i, results))
         t.start()
         threads.append(t)
 
     for t in threads:
-    return sum(results, [])
         t.join(20)
+    return [x for x in results if x]
 
 def wait_for_compression(ssh, zippath):
     done = False

@@ -5,26 +5,45 @@
 {% block script %}
 <script>
 $(function() {
-    $.getJSON('/chem/jobs/running.json', function(data) {
+    $.getJSON('/chem/jobs/running.json{% if cluster %}?cluster={{ cluster }}{% endif %}', function(data) {
         var table = $("#id_jobs")
         var output = '';
-        for (i = 0; i < data.jobs.length; i++ ) {
-            output += "<tr>"
-            for (j = 0; j < data.jobs[i].length; j++ ) {
-                var cell = data.jobs[i][j];
-                if (j == 0) {
-                    output += "<td><a href=\'{0}\'>{0}</td>".format(cell);
-                } else {
-                    output += "<td>{0}</td>".format(cell);
+
+        for (var i = 0; i < data.jobs.length; i++) { // clusters
+            var cluster = data.jobs[i].name;
+            var jobs = data.jobs[i].jobs;
+            var columns = data.jobs[i].columns;
+
+            output += "<h3>{0}</h3>".format(cluster);
+            output += "<table class='table table-striped'>";
+
+            output += "<tr>";
+            for (var j = 0; j < columns.length; j++) {
+                output += "<th>{0}</th>".format(columns[j]);
+            }
+            output += "<th>Kill</th></tr>";
+
+            for (var j = 0; j < jobs.length; j++) { // jobs
+                output += "<tr>";
+                var thisjob = jobs[j];
+                for (var k = 0; k < thisjob.length; k++) { // cells
+                    var cell = thisjob[k];
+
+                    if (k == 0) {
+                        output += "<td><a href=\'/chem/jobs/{0}/{1}/\'>{1}</td>".format(cluster, cell);
+                    } else {
+                        output += "<td>{0}</td>".format(cell);
+                    }
                 }
+                if (data.is_authenticated && thisjob[6] != "C") {
+                    output += "<td><form action='"
+                    output += "/chem/{0}/{1}/kill/' method='post'>".format(cluster, thisjob[0])
+                    output += "{% csrf_token %}";
+                    output += "<input class='btn btn-sm btn-danger btn-block' type='submit' value='Kill' /></form></td>"
+                }
+                output += "</tr>";
             }
-            if (data.is_authenticated && data.jobs[i][6] != "C") {
-                output += "<td><form action='"
-                output += data.jobs[i][0] + "/kill/' method='post'>"
-                output += "{% csrf_token %}";
-                output += "<input type='submit' value='Kill' /></form></td>"
-            }
-            output += "</tr>"
+            output += "</table><hr>";
         }
         table.append(output);
     });
@@ -33,17 +52,7 @@ $(function() {
 {% endblock %}
 
 {% block content %}
-    <table class="table table-striped" id="id_jobs">
-    <tr>
-        <th>Job ID</th>
-        <th>Site</th>
-        <th>Name</th>
-        <th>Nodes</th>
-        <th>ncpus</th>
-        <th>Wall Time</th>
-        <th>Status</th>
-        <th>Running Time</th>
-    </tr>
-    </table>
+    <div id="id_jobs">
+    </div>
     <p>
 {% endblock %}
