@@ -9,10 +9,10 @@ $(function() {
         var table = $("#id_jobs")
         var output = '';
 
-        for (var i = 0; i < data.jobs.length; i++) { // clusters
-            var cluster = data.jobs[i].name;
-            var jobs = data.jobs[i].jobs;
-            var columns = data.jobs[i].columns;
+        for (var i = 0; i < data.clusters.length; i++) { // clusters
+            var cluster = data.clusters[i].name;
+            var jobs = data.clusters[i].jobs;
+            var columns = data.clusters[i].columns;
 
             output += "<h3>{0}</h3>".format(cluster);
             output += "<table class='table table-striped'>";

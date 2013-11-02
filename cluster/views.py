@@ -29,7 +29,7 @@ def get_job_list(request):
         jobs = []
     a = {
         "is_authenticated": request.user.is_authenticated(),
-        "jobs": jobs,
+        "clusters": jobs,
     }
     return HttpResponse(simplejson.dumps(a), mimetype="application/json")
 
