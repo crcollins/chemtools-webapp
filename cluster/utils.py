@@ -123,6 +123,12 @@ def kill_job(user, cluster, jobid):
         b = stderr.readlines()
         if b:
             return b
+        else:
+            try:
+                job = Job.objects.filter(jobid=jobid)[0]
+                job.delete()
+            except IndexError:
+                pass
 
 def _get_columns(lines):
     toprow = [x.strip() for x in lines[2].strip().split() if x]
