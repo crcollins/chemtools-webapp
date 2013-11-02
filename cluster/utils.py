@@ -158,9 +158,11 @@ def _get_columns(lines):
     timeidx2 = bottomrow.index("Time", timeidx+1)
     memidx = bottomrow.index("Memory")
     idxes = [timeidx,timeidx2,memidx]
+    order = sorted(idxes)
+    argorder = [order.index(x) for x in idxes]
 
     for i, x in enumerate(idxes):
-        bottomrow[x] = ' '.join([toprow[i], bottomrow[x]])
+        bottomrow[x] = ' '.join([toprow[argorder[i]], bottomrow[x]])
     return bottomrow
 
 def _get_jobs(cred, i, results):
