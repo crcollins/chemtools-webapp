@@ -37,7 +37,7 @@ $(function() {
                 }
                 if (data.is_authenticated && thisjob[6] != "C") {
                     output += "<td><form action='"
-                    output += "/chem/{0}/{1}/kill/' method='post'>".format(cluster, thisjob[0])
+                    output += "/chem/jobs/{0}/{1}/kill/' method='post'>".format(cluster, thisjob[0])
                     output += "{% csrf_token %}";
                     output += "<input class='btn btn-sm btn-danger btn-block' type='submit' value='Kill' /></form></td>"
                 }

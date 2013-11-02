@@ -65,12 +65,12 @@ def reset_job(request, jobid):
             return HttpResponse(e)
 
 @login_required
-def kill_job(request, jobid):
+def kill_job(request, cluster, jobid):
     if not request.user.is_staff:
         return HttpResponse("You must be a staff user to kill a job.")
 
     if request.method == "POST":
-        e = utils.kill_job(request.user, jobid)
+        e = utils.kill_job(request.user, cluster, jobid)
         if e is None:
             try:
                 job = Job.objects.filter(jobid=jobid)[0]

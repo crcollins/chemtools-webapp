@@ -127,13 +127,14 @@ def run_standard_jobs(user, string, **kwargs):
             results["failed"].append((mol, a["error"])) # str is a hack if real errors bubble up
     return results
 
-def kill_job(user, jobid):
-    ssh, _ = get_connections("gordon.sdsc.edu", user)
+def kill_job(user, cluster, jobid):
+    cred = user.credentials.filter(cluster__name=cluster)[0]
 
+    ssh = cred.get_ssh_connection()
     with ssh:
-        a = get_all_jobs(user)
+        a = get_all_jobs(user, cluster)
         if a:
-            jobs = [x[0] for x in a]
+            jobs = [x[0] for x in a[0]["jobs"]]
         else:
             return "There are no jobs running."
 
