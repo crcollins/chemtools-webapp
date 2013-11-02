@@ -16,22 +16,6 @@ from project.utils import get_ssh_connection, get_sftp_connection, StringIO
 from models import Credential, Job
 
 
-def get_connections(server, user):
-    try:
-        profile = user.get_profile()
-    except AttributeError:
-        profile = None
-    if profile and profile.xsede_username and profile.private_key:
-        username = profile.xsede_username
-        key = StringIO(profile.private_key)
-    else:
-        username = "ccollins"
-        key = open(os.path.expanduser("~/.ssh/id_rsa"), 'r')
-    sftp = get_sftp_connection(server, username, key=key)
-    key.seek(0)  # reset to start of key file
-    ssh = get_ssh_connection(server, username, key=key)
-    return ssh, sftp
-
 def make_folders(ssh):
     for folder in ["chemtools/", "chemtools/done/"]:
         _, _, testerr = ssh.exec_command("ls %s" % folder)
@@ -244,8 +228,6 @@ def get_compressed_file(ssh, sftp, path):
     return StringIO(decompresser.decompress(ftemp)), None, zippath
 
 def recover_output(user, name):
-    ssh, sftp = get_connections("gordon.sdsc.edu", user)
-
     with ssh, sftp:
         _, stdout, stderr = ssh.exec_command("ls done/%s.*" % name)
         files = [x.replace("\n", "").lstrip("done/") for x in stdout.readlines()]
@@ -268,8 +250,6 @@ def reset_output(user, name):
     and it will leave the old backup file. Otherwise, it will return to the
     original state.
     '''
-    ssh, sftp = get_connections("gordon.sdsc.edu", user)
-
     with ssh, sftp:
         fpath = ''.join([os.path.join("test", name), '.log'])
         jobpath = ''.join([os.path.join("test", name), '.gjob'])
