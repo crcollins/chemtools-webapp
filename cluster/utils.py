@@ -205,8 +205,8 @@ def get_all_jobs(user):
         threads.append(t)
 
     for t in threads:
-        t.join()
     return sum(results, [])
+        t.join(20)
 
 def wait_for_compression(ssh, zippath):
     done = False
