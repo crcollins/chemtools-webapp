@@ -541,15 +541,21 @@ This is used mainly for getting the user's public key for use on the clusters. S
 
 ### Get Running Jobs ###
 
-This is used to allow viewing the currently running jobs of the logged in user. It returns two values. The first is `is_authenticated` which is used internally to determine whether or not the user is logged in. The second is a 2D array of jobs. The first dimension is all of the jobs themselves. The second is the properties. The properties are the same as what is given by the command `qstat` on the clusters split up based on spaces.
+This is used to allow viewing the currently running jobs of the logged in user. It returns two values. The first is `is_authenticated` which is used internally to determine whether or not the user is logged in. The second is `clusters`, an array of clusters objects that the user has added credentials for. Each one of those objects contains 3 properties: `name`, `columns`, `jobs`. `name` is the name of the cluster. `columns` is an array of all the column names. `jobs` is a 2D array of jobs from that cluster. The first dimension is all of the jobs themselves. The second is the properties. The properties are the same as what is given by the command `qstat` on the clusters split up based on spaces.
 
-[/chem/jobs.json](/chem/jobs.json)
+[/chem/jobs/running.json](/chem/jobs/running.json)
 
     {
         "is_authenticated" : true,
-        "jobs" : [
-            [100, "gordon", "24a_TON", 1, 16, "16:00:00", "R", "11:15:00"],
-            ...
+        "clusters" : [
+            {
+                "name" : "Gordon",
+                "columns" : ["Job ID", "Username", "Jobname", "Req'd Memory", "Req'd Time", 'S', "Elap Time"],
+                "jobs" : [
+                    [100, "ccollins", "24a_TON", "59GB", "16:00:00", "R", "11:15:00"],
+                    ...
+                ]
+            },
             ...
         ]
     }
