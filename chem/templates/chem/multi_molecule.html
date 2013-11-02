@@ -20,14 +20,16 @@
                     var text = data["error"];
                 }
                 else {
-                    var text = '<div class="panel panel-success">';
+
+                    var text = "<h3>{0}</h3>".format(data["cluster"]);
+                    text += '<div class="panel panel-success">'
                     text += '<div class="panel-heading"><h3 class="panel-title">{0}</h3></div>'.format("Worked")
 
                     text += '<div class="panel-body">';
                     for (var i = 0; i < data["worked"].length; i++) {
                         var name = data["worked"][i][0];
                         var id = data["worked"][i][1];
-                        text += "<a class='list-group-item' href='/chem/jobs/{1}'>{0} &mdash; {1}</a>".format(name, id);
+                        text += "<a class='list-group-item' href='/chem/jobs/{2}/{1}'>{0} &mdash; {1}</a>".format(name, id, data["cluster"]);
                     }
                     text += "</div></div>";
 

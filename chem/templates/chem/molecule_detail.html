@@ -17,7 +17,8 @@ $(function() {
             if (data["error"] !== null ) {
                 text = data["error"];
             } else {
-                text = "Your job id is <a href='/chem/jobs/{0}/'>{0}.</a>".format(data["jobid"]);
+                var text = "<h3>{0}</h3>".format(data["cluster"]);
+                text += "Your job id is <a href='/chem/jobs/{1}/{0}/'>{0}.</a>".format(data["jobid"], data["cluster"]);
             }
             var dialog = $(".modal-body");
             dialog.html(text);
