@@ -26,7 +26,10 @@ class JobForm(forms.Form):
     cluster = forms.ChoiceField(choices=CLUSTER_TUPLES)
     template = forms.CharField(widget=forms.Textarea(attrs={'cols': 50, 'rows': 26}))
 
-    credential = forms.ModelChoiceField(queryset=Credential.objects.none(), required=False, widget=forms.HiddenInput())
+    credential = forms.ModelChoiceField(queryset=Credential.objects.none(),
+                                        required=False,
+                                        widget=forms.HiddenInput(),
+                                        help_text="Only required if you are submitting a job.")
 
     @classmethod
     def get_form(cls, request, molecule):
