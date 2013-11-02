@@ -84,7 +84,7 @@ def run_job(user, gjfstring, jobstring=None, **kwargs):
         return jobid, None
 
 def run_standard_job(user, molecule, **kwargs):
-    results = {"jobid": None, "error": None}
+    results = {"jobid": None, "error": None, "cluster": kwargs["credential"].cluster.name}
 
     if not user.is_staff:
         results["error"] = "You must be a staff user to submit a job."
@@ -110,6 +110,7 @@ def run_standard_jobs(user, string, **kwargs):
         "worked": [],
         "failed": [],
         "error": None,
+        "cluster": kwargs["credential"].cluster.name,
     }
 
     if not user.is_staff:
