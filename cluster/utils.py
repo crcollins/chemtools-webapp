@@ -146,7 +146,25 @@ def kill_job(user, jobid):
         if b:
             return b
 
+def _get_columns(lines):
+    toprow = [x.strip() for x in lines[2].strip().split() if x]
+
+    bottomrow = [x.strip() for x in lines[3].strip().split() if x]
+    bottomrow.remove("Job")
+    idx = bottomrow.index("ID")
+    bottomrow[idx] = "Job "+bottomrow[idx]
+
+    timeidx = bottomrow.index("Time")
+    timeidx2 = bottomrow.index("Time", timeidx+1)
+    memidx = bottomrow.index("Memory")
+    idxes = [timeidx,timeidx2,memidx]
+
+    for i, x in enumerate(idxes):
+        bottomrow[x] = ' '.join([toprow[i], bottomrow[x]])
+    return bottomrow
+
 def _get_jobs(cred, i, results):
+    wantedcols = ["Job ID", "Username", "Jobname", "Req'd Memory", "Req'd Time", 'S', 'Elap Time']
     try:
         ssh = cred.get_ssh_connection()
 
@@ -155,9 +173,22 @@ def _get_jobs(cred, i, results):
             stderr.readlines()  # seems to need this slight delay to display the jobs
 
             jobs = []
-            for job in stdout.readlines()[5:]:
+            lines = stdout.readlines()
+
+            cols = _get_columns(lines[:5])
+            colsidx = []
+            for x in wantedcols:
+                try:
+                    colsidx.append(cols.index(x))
+                except IndexError:
+                    pass
+
+            for job in lines[5:]:
                 t = job.split()
-                temp = [t[0].split('.')[0]] + [cred.cluster.name] + t[3:4] + t[5:7] + t[8:]
+                temp = []
+                for idx in colsidx:
+                    temp.append(t[idx])
+                temp[0] = temp[0].split('.')[0]
                 jobs.append(temp)
         results[i] = jobs
     except Exception as e:
