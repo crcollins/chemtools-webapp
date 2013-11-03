@@ -161,7 +161,7 @@ class Energy(LineParser):
     def parse(self, line):
         # " 36\\Version=EM64L-G09RevC.01\State=1-A\HF=-1127.8085512\RMSD=3.531e-09"
         modline = self.prevline + line.strip()
-        if "HF=" in modline:
+        if "\\HF=" in modline:
             idx = modline.index("HF=") + 3
             self.value = modline[idx:].split("\\")[0].strip()
             self.start = True
