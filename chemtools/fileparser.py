@@ -313,3 +313,86 @@ class Dipole(LineParser):
         if line.startswith("X="):
             self.value = line.split()[-1]
             self.done = True
+
+
+##############################################################################
+# StandAlone
+##############################################################################
+
+if __name__ == "__main__":
+    import argparse
+    import sys
+
+    class StandAlone(object):
+        def __init__(self, args):
+            self.errors = []
+            self.outputfilename = args.outputfile
+            self.error = args.error | args.verbose
+            self.paths = args.paths | args.verbose | args.rel
+            self.rel = args.rel
+            self.files = self.check_input_files(args.files
+                                + self.convert_files(args.listfiles)
+                                + self.convert_folders(args.folders))
+
+        def check_input_files(self, filelist):
+            files = []
+            for x in filelist:
+                if not os.path.isfile(x):
+                    path = os.path.relpath(x) if self.rel else os.path.abspath(x)
+                    self.errors.append("Invalid filename:  '" + path + "'")
+                else:
+                    files.append(x)
+            return files
+
+        def convert_files(self, filenames):
+            if filenames:
+                files = []
+                for filename in filenames:
+                    if os.path.isfile(filename):
+                        with open(filename, 'r') as f:
+                            files += [x.strip() for x in f if x.strip()]
+                return files
+            else:
+                return []
+
+        def convert_folders(self, folders):
+            if folders:
+                files = []
+                for folder in folders:
+                    if os.path.isdir(folder):
+                        path = os.path.relpath(folder) if self.rel else os.path.abspath(folder)
+                        files += [os.path.join(path,x) for x in os.listdir(folder) if os.path.isfile(os.path.join(path,x))]
+                return files
+            else:
+                return []
+
+        def write_file(self):
+            logs = LogSet()
+            for fname in self.files:
+                with open(fname, 'r') as f:
+                    logs.parse_file(f)
+
+            if self.outputfilename:
+                outputfile = open(self.outputfilename,'w')
+                outputfile.write(logs.format_output(errors=self.error))
+            else:
+                print logs.format_output(errors=self.error)
+                raw_input("<Press Enter>")
+
+
+    parser = argparse.ArgumentParser(description="This program extracts data from Gaussian log files.")
+    parser.add_argument('files', metavar='file', type=str, nargs='*', help='The name of single file.')
+    parser.add_argument('-i', metavar='list_file', action="store", nargs='*', dest="listfiles", type=str, help='A file with a listing of other files.')
+    parser.add_argument('-f', metavar='folder', action="store", nargs='*', dest="folders", type=str, help='A folder with a collection of files.')
+    parser.add_argument('-o', metavar='output', action="store", dest="outputfile", type=str, help='The output file.')
+    parser.add_argument('-E', action="store_true", dest="error", default=False, help='Toggles showing error messages.')
+    parser.add_argument('-P', action="store_true", dest="paths", default=False, help='Toggles showing paths to files.')
+    parser.add_argument('-R',  action="store_true", dest="rel", default=False, help='Toggles showing relative paths.')
+    parser.add_argument('-V', action="store_true", dest="verbose", default=False, help='Toggles showing all messages.')
+
+    if len(sys.argv) > 1:
+        args = sys.argv[1:]
+    else:
+        args = raw_input('Arguments: ').strip().split()
+    a = StandAlone(parser.parse_args(args))
+    a.write_file()
