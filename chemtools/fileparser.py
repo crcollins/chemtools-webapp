@@ -8,7 +8,6 @@ from utils import Output, catch
 class Log(object):
     PARSERS = dict()
     def __init__(self, f, fname=None):
-        self.f = f
         self.fname = fname if fname else f.name
         self.name, _ = os.path.splitext(self.fname)
 
@@ -18,7 +17,7 @@ class Log(object):
 
         self.order = ["Occupied", "Virtual", "HomoOrbital", "Dipole", "Energy", "Excited", "Time"]
 
-        possible = self.in_range()
+        possible = self.in_range(f)
         for i, line in enumerate(f):
             for k, parser in self.parsers.items():
                 parser.parse(line)
@@ -31,12 +30,12 @@ class Log(object):
     def __getitem__(self, name):
         return self.parsers[name].value
 
-    def in_range(self):
+    def in_range(self, f):
         '''Builds a set of line numbers based on parser params to optimally skip lines.'''
         try:
-            self.f.seek(0)
-            lines = max(i for i, x in enumerate(self.f)) + 1
-            self.f.seek(0)
+            f.seek(0)
+            lines = max(i for i, x in enumerate(f)) + 1
+            f.seek(0)
         except:
             return None
 
