@@ -9,14 +9,15 @@
         {% for part in job %}
             {{ part }}<p>
         {% endfor %}
-        {% if user.is_authenticated and job.6 != "C" %}
-            <form action="kill/"  method="post">
+        {% if job.last != "C" %}
+            <form action="/chem/jobs/{{ cluster }}/kill/"  method="post">
                 {% csrf_token %}
-                <input type="Submit" value="Kill" />
+                <input type="hidden" name={{ job.0 }} value="on" />
+                <input class='btn btn-sm btn-danger btn-block' type="Submit" value="Kill" />
             </form>
             <form action="reset/" method="post">
                 {% csrf_token %}
-                <input type="Submit" value="Reset" />
+                <input class='btn btn-sm btn-primary btn-block' type="Submit" value="Reset" />
             </form>
         {% endif %}
     {% endif %}

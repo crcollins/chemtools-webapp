@@ -104,31 +104,44 @@ def run_standard_jobs(user, string, **kwargs):
             results["failed"].append((mol, a["error"])) # str is a hack if real errors bubble up
     return results
 
-def kill_job(user, cluster, jobid):
+def kill_jobs(user, cluster, jobids):
     cred = user.credentials.filter(cluster__name=cluster)[0]
+    results = {
+        "worked": [],
+        "failed": [],
+        "error": None,
+        "cluster": cred.cluster.name,
+    }
+    if not user.is_staff:
+        results["error"] = "You must be a staff user to submit a job."
+        return results
 
     ssh = cred.get_ssh_connection()
     with ssh:
         a = get_all_jobs(user, cluster)
-        if a:
-            jobs = [x[0] for x in a[0]["jobs"]]
-        else:
-            return "There are no jobs running."
 
-        if jobid in jobs:
+        if not a:
+            results["error"] = "There are no jobs running."
+            return results
+
+        jobs = [x[0] for x in a[0]["jobs"]]
+        for jobid in jobids:
+            if jobid not in jobs:
+                results["failed"].append((jobid, "That job number is not running."))
+                continue
+
             _, _, stderr = ssh.exec_command("qdel %s" % jobid)
-        else:
-            return "That job number is not running."
+            b = stderr.readlines()
+            if not b:
+                results["failed"].append((jobid, str(b)))
+                continue
 
-        b = stderr.readlines()
-        if b:
-            return b
-        else:
             try:
                 job = Job.objects.filter(jobid=jobid)[0]
                 job.delete()
             except IndexError:
                 pass
+    return results
 
 def _get_columns(lines):
     toprow = [x.strip() for x in lines[2].strip().split() if x]
@@ -150,7 +163,7 @@ def _get_columns(lines):
     return bottomrow
 
 def _get_jobs(cred, i, results):
-    wantedcols = ["Job ID", "Username", "Jobname", "Req'd Memory", "Req'd Time", 'S', 'Elap Time']
+    wantedcols = ["Job ID", "Username", "Jobname", "Req'd Memory", "Req'd Time", 'Elap Time', 'S']
     try:
         ssh = cred.get_ssh_connection()
 

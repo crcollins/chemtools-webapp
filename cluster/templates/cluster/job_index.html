@@ -15,8 +15,10 @@ $(function() {
             var columns = data.clusters[i].columns;
 
             output += "<h3>{0}</h3>".format(cluster);
-            output += "<table class='table table-striped'>";
+            output += "<form id='{0}' action='/chem/jobs/{0}/kill/' method='post'>".format(cluster);
+            output += "{% csrf_token %}";
 
+            output += "<table class='table table-striped'>";
             output += "<tr>";
             for (var j = 0; j < columns.length; j++) {
                 output += "<th>{0}</th>".format(columns[j]);
@@ -35,15 +37,16 @@ $(function() {
                         output += "<td>{0}</td>".format(cell);
                     }
                 }
-                if (data.is_authenticated && thisjob[6] != "C") {
-                    output += "<td><form action='"
-                    output += "/chem/jobs/{0}/{1}/kill/' method='post'>".format(cluster, thisjob[0])
-                    output += "{% csrf_token %}";
-                    output += "<input class='btn btn-sm btn-danger btn-block' type='submit' value='Kill' /></form></td>"
+
+                var disabled = ""
+                if (thisjob[thisjob.length-1] == "C") {
+                    disabled = "disabled='disabled'";
                 }
+                output += "<td><div class='checkbox'><input type='checkbox' {0} name='{1}'></div></td>".format(disabled, thisjob[0]);
                 output += "</tr>";
             }
-            output += "</table><hr>";
+            output += "<tr><td colspan={0}></td><td><input class='btn btn-sm btn-danger btn-block' value='Kill' type='submit' /></td></tr>".format(columns.length);
+            output += "</form></table><hr>";
         }
         table.append(output);
     });
