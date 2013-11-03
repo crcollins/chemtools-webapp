@@ -1,17 +1,13 @@
 import os
 import bz2
-import zipfile
-import tarfile
 import time
 import re
 import threading
 
-import paramiko
-
 from chemtools import gjfwriter
 from chemtools import fileparser
 from chemtools.utils import name_expansion, write_job
-from project.utils import get_ssh_connection, get_sftp_connection, StringIO
+from project.utils import StringIO
 
 from models import Credential, Job
 
