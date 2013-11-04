@@ -373,8 +373,8 @@ if __name__ == "__main__":
                     logs.parse_file(f)
 
             if self.outputfilename:
-                outputfile = open(self.outputfilename,'w')
-                outputfile.write(logs.format_output(errors=self.error))
+                with open(self.outputfilename,'w') as outputfile:
+                    outputfile.write(logs.format_output(errors=self.error))
             else:
                 print logs.format_output(errors=self.error)
                 raw_input("<Press Enter>")
