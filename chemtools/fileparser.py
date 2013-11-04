@@ -1,6 +1,7 @@
 import os
 import re
 from cStringIO import StringIO
+import multiprocessing
 
 from utils import Output, catch
 
@@ -8,19 +9,23 @@ from utils import Output, catch
 class Log(object):
     PARSERS = dict()
     def __init__(self, f, fname=None):
-        self.fname = fname if fname else f.name
-        self.name, _ = os.path.splitext(self.fname)
+        if not hasattr(f, 'read'): # filename
+            f = open(f, 'r')
 
-        self.parsers = dict()
-        for k, v in Log.PARSERS.items():
-            self.parsers[k] = v()
+        with f:
+            self.fname = fname if fname else f.name
+            self.name, _ = os.path.splitext(self.fname)
 
-        self.order = ["Occupied", "Virtual", "HomoOrbital", "Dipole", "Energy", "Excited", "Time"]
+            self.parsers = dict()
+            for k, v in Log.PARSERS.items():
+                self.parsers[k] = v()
 
-        possible = self.in_range(f)
-        for i, line in enumerate(f):
-            for k, parser in self.parsers.items():
-                parser.parse(line)
+            self.order = ["Occupied", "Virtual", "HomoOrbital", "Dipole", "Energy", "Excited", "Time"]
+
+            possible = self.in_range(f)
+            for i, line in enumerate(f):
+                for k, parser in self.parsers.items():
+                    parser.parse(line)
 
     @classmethod
     def add_parser(cls, parser):
@@ -93,6 +98,16 @@ class LogSet(Output):
         if len(new) > len(self.header):
             self.header = new
         self.write(x.format_data())
+
+    def parse_files(self, files):
+        pool = multiprocessing.Pool(processes=4)
+        self.logs = pool.map(Log, files)
+
+        for log in self.logs:
+            new = log.format_header()
+            if len(new) > len(self.header):
+                self.header = new
+            self.write(log.format_data())
 
     def format_output(self, errors=True):
         s = self.header + "\n"
@@ -368,9 +383,7 @@ if __name__ == "__main__":
 
         def write_file(self):
             logs = LogSet()
-            for fname in self.files:
-                with open(fname, 'r') as f:
-                    logs.parse_file(f)
+            logs.parse_files(self.files)
 
             if self.outputfilename:
                 with open(self.outputfilename,'w') as outputfile:
