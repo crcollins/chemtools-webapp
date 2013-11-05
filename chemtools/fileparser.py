@@ -11,7 +11,6 @@ class Log(object):
     def __init__(self, f, fname=None):
         if not hasattr(f, 'read'): # filename
             f = open(f, 'r')
-
         with f:
             self.fname = fname if fname else f.name
             self.name, _ = os.path.splitext(self.fname)
@@ -27,13 +26,17 @@ class Log(object):
                 for k, parser in self.parsers.items():
                     parser.parse(line)
 
+            # major memory saver by deleting all the line parser objects
+            for parser in self.parsers:
+                self.parsers[parser] = (self.parsers[parser].value, self.parsers[parser].done)
+
     @classmethod
     def add_parser(cls, parser):
         cls.PARSERS[parser.__name__] = parser
         return parser
 
     def __getitem__(self, name):
-        return self.parsers[name].value
+        return self.parsers[name][0]
 
     def in_range(self, f):
         '''Builds a set of line numbers based on parser params to optimally skip lines.'''
@@ -76,8 +79,8 @@ class Log(object):
     def format_data(self):
         values = []
         for key in self.order:
-            v = self.parsers[key]
-            values.append(v.value if v.done or v.value else "---")
+            value, done = self.parsers[key]
+            values.append(value if (done or value) else "---")
         return ', '.join([self.fname] + values)
 
     def format_header(self):
@@ -143,6 +146,7 @@ class LineParser(object):
 
 ##############################################################################
 ##############################################################################
+
 
 @Log.add_parser
 class HomoOrbital(LineParser):
