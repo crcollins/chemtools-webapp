@@ -20,14 +20,20 @@ def read_data(filename):
         convert = {"XX": filename[1], "YY": filename[2]}
         filename = filename[0] + atomtypes[convert["XX"]] + atomtypes[convert["YY"]]
     #try to load file with lowercase name then upper
-    try:
-        f = open(os.path.join(DATAPATH, filename), "r")
-    except:
+    paths = [
+        os.path.join(DATAPATH, filename),
+        os.path.join(DATAPATH, filename.lower()),
+        os.path.join("data", filename),
+        os.path.join("data", filename.lower()),
+    ]
+    for path in paths:
         try:
-            f = open(os.path.join(DATAPATH, filename.lower()), "r")
+            f = open(path, "r")
+            break
         except:
-            raise Exception(3, "Bad Substituent Name: %s" % filename)
-
+            pass
+    else:
+        raise Exception(3, "Bad Substituent Name: %s" % filename)
 
     atoms = []
     bonds = []
