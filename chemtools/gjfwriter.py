@@ -4,9 +4,13 @@ import math
 import os
 import copy
 
+
 from molecule import Atom, Bond, Molecule
-from utils import CORES, XGROUPS, RGROUPS, ARYL0, ARYL2, ARYL
-from project.utils import StringIO
+from utils import CORES, XGROUPS, RGROUPS, ARYL0, ARYL2, ARYL, name_expansion
+try:
+    from project.utils import StringIO
+except ImportError:
+    from cStringIO import StringIO
 
 DATAPATH = "chemtools/data"
 ALL = CORES + XGROUPS + RGROUPS + ARYL
@@ -367,3 +371,91 @@ def get_exact_name(name):
     return '_'.join(sets) + '_n%d_m%d' % nm + '_x%d_y%d_z%d' % xyz
 
 
+##############################################################################
+# StandAlone
+##############################################################################
+
+if __name__ == "__main__":
+    import argparse
+    import sys
+
+    class StandAlone(object):
+        def __init__(self, args):
+            self.errors = []
+            self.error = args.error | args.verbose
+
+            try:
+                self.scale = args.d
+            except:
+                self.scale = 0
+
+            self.args = args
+            self.names = ','.join(args.names + self.convert_files(args.listfiles))
+            self.longname = args.longname
+            self.gjf = args.gjf
+            self.mol2 = args.mol2
+            self.folder = args.folder
+            self.keywords = args.keywords
+
+        def convert_files(self, filenames):
+            if filenames:
+                files = []
+                for filename in filenames:
+                    if os.path.isfile(filename):
+                        with open(filename, 'r') as f:
+                            files += [x.strip() for x in f if x.strip()]
+                return files
+            else:
+                return []
+
+        def write_files(self):
+            for molecule in name_expansion(self.names):
+                try:
+                    out = GJFWriter(molecule, self.keywords)
+
+                    name = molecule
+                    if self.longname:
+                        name = get_exact_name(name)
+                    pathname = os.path.join(self.folder, name)
+
+                    if self.gjf or not (self.mol2 or self.scale):
+                        with open(pathname+".gjf", 'w') as f:
+                            f.write(out.get_gjf())
+
+                    if self.mol2:
+                        with open(pathname+".mol2", 'w') as f:
+                            f.write(out.get_mol2())
+
+                    if self.scale:
+                        with open(pathname+".png", 'w') as f:
+                            f.write(out.get_png(self.scale))
+                except Exception as e:
+                    self.errors.append(e)
+
+            if self.error:
+                print "\n---- Errors ----"
+                for x in self.errors:
+                    if type(x) == tuple:
+                        print " - ".join([str(x[0]), x[1]])
+                    else:
+                        print repr(x)
+
+    parser = argparse.ArgumentParser(description="This program writes Gaussian .gjf files from molecule names.")
+    parser.add_argument('names', metavar='name', type=str, nargs='*', default=list(), help='The name of the molecule to create.')
+    parser.add_argument('-i', metavar='list_file', action="store", nargs='*', default=list(), dest="listfiles", type=str, help='A file with a listing of molecules to make.')
+    parser.add_argument('-f', metavar='folder', action="store", default=".", dest="folder", type=str, help='A folder to output the files.')
+    parser.add_argument('-k', action="store", dest="keywords", default="b3lyp/6-31g(d)", help="The keywords to use for the calculation. (b3lyp/6-31g(d) by default)")
+    parser.add_argument('-d', type=int, action="store", default=0, help="Used to scale an output image. (0 by default, meaning no picture)")
+
+    parser.add_argument('-E', action="store_true", dest="error", default=False, help='Toggles showing error messages.')
+    parser.add_argument('-V', action="store_true", dest="verbose", default=False, help='Toggles showing all messages.')
+    parser.add_argument('-L', action="store_true", dest="longname", default=False, help='Toggles showing the long name.')
+    parser.add_argument('-G', action="store_true", dest="gjf", default=False, help='Toggles writing gjf.')
+    parser.add_argument('-M', action="store_true", dest="mol2", default=False, help='Toggles writing mol2.')
+
+    if len(sys.argv) > 1:
+        args = sys.argv[1:]
+    else:
+        args = raw_input('Arguments: ').strip().split()
+    a = StandAlone(parser.parse_args(args))
+    a.write_files()
