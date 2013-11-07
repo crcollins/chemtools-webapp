@@ -62,7 +62,7 @@
                 {% if user.is_staff %}
                     <li><a href="/admin/">Admin Page</a></li>
                 {% endif %}
-                <li><a href="{% url logout %}">Log Out</a></li>
+                <li><a href="{% url logout %}?next={{ request.path }}">Log Out</a></li>
             {% else %}
                 <li><a href="{% url login %}?next={{request.path}}">Log In</a></li>
                 <li><a href="{% url register %}">Register</a></li>

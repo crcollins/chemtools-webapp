@@ -16,7 +16,7 @@ urlpatterns = patterns('',
 
 urlpatterns += patterns('django.contrib.auth.views',
     url(r"^login/$", "login", {'template_name': 'account/login.html'}, name="login"),
-    url(r"^logout/$", "logout", {'next_page': HOME_URL},  name="logout"),
+    url(r"^logout/$", "logout", name="logout"),
     url(r'^reset/$', 'password_reset',
         {
             'template_name': 'account/password_reset_form.html',
