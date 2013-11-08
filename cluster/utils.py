@@ -64,7 +64,7 @@ def run_job(connections, gjfstring, jobstring=None, **kwargs):
     with ssh, sftp:
         return _run_job(ssh, sftp, gjfstring, jobstring, **kwargs)
 
-def run_jobs(connections, gjfstrings, jobstring=None **kwargs):
+def run_jobs(connections, gjfstrings, jobstring=None, **kwargs):
     try:
         ssh = kwargs["credential"].get_ssh_connection()
         sftp = kwargs["credential"].get_sftp_connection()
