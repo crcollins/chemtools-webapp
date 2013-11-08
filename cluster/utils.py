@@ -22,10 +22,8 @@ def make_folders(ssh):
                 return testerr2[0]
     return None
 
-def run_job(user, gjfstring, jobstring=None, **kwargs):
-    ssh = kwargs["credential"].get_ssh_connection()
-    sftp = kwargs["credential"].get_sftp_connection()
-    with ssh, sftp:
+def _run_job(ssh, sftp, gjfstring, jobstring=None, **kwargs):
+    try:
         error = make_folders(ssh)
         if error:
             return None, error
@@ -49,11 +47,36 @@ def run_job(user, gjfstring, jobstring=None, **kwargs):
         stderr = stderr.readlines()
         if stderr:
             return None, stderr[0]
-        try:
-            jobid = stdout.readlines()[0].split(".")[0]
-        except Exception as e:
-            return None, e
-        return jobid, None
+
+        jobid = stdout.readlines()[0].split(".")[0]
+    except Exception as e:
+        return None, e
+    return jobid, None
+
+def run_job(connections, gjfstring, jobstring=None, **kwargs):
+    try:
+        ssh = kwargs["credential"].get_ssh_connection()
+        sftp = kwargs["credential"].get_sftp_connection()
+    except:
+        ssh = kwargs["credential"].get_ssh_connection()
+        sftp = kwargs["credential"].get_sftp_connection()
+
+    with ssh, sftp:
+        return _run_job(ssh, sftp, gjfstring, jobstring, **kwargs)
+
+def run_jobs(connections, gjfstrings, jobstring=None **kwargs):
+    try:
+        ssh = kwargs["credential"].get_ssh_connection()
+        sftp = kwargs["credential"].get_sftp_connection()
+    except:
+        ssh = kwargs["credential"].get_ssh_connection()
+        sftp = kwargs["credential"].get_sftp_connection()
+
+    with ssh, sftp:
+        results = []
+        for gjf in gjfstrings:
+            results.append(_run_job(ssh, sftp, gjf, jobstring, **kwargs))
+    return results
 
 def run_standard_job(user, molecule, **kwargs):
     results = {"jobid": None, "error": None, "cluster": kwargs["credential"].cluster.name}
