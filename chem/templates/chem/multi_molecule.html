@@ -44,10 +44,10 @@
                     }
                 }
                 text += "<br><a href='/chem/jobs/'>Go to jobs list.</a>";
-                var dialog = $(".modal-body");
+                var dialog = $("#resultsModal .modal-body");
                 dialog.html(text);
                 var newdialog = $('<div id="id_results">{0}</div>'.format(text));
-                $('#myModal').modal();
+                $('#resultsModal').modal();
             },
             'json'
             );
@@ -167,7 +167,7 @@ $.getJSON('check/', function(data) {
 </div>
 
 
-<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+<div class="modal fade" id="resultsModal" tabindex="-1" role="dialog" aria-labelledby="resultsModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
