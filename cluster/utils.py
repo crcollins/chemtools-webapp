@@ -12,19 +12,17 @@ from project.utils import StringIO
 from models import Credential, Job
 
 
-def make_folders(ssh):
-    for folder in ["chemtools/", "chemtools/done/"]:
-        _, _, testerr = ssh.exec_command("ls %s" % folder)
-        if testerr.readlines():
-            _, _, testerr2 = ssh.exec_command("mkdir %s" % folder)
-            testerr2 = testerr2.readlines()
-            if testerr2:
-                return testerr2[0]
+def _make_folders(ssh):
+    directory = 'chemtools/done/'
+    _, _, testerr2 = ssh.exec_command("mkdir -p %s" % folder)
+    testerr2 = testerr2.readlines()
+    if testerr2:
+        return testerr2[0]
     return None
 
 def _run_job(ssh, sftp, gjfstring, jobstring=None, **kwargs):
     try:
-        error = make_folders(ssh)
+        error = _make_folders(ssh)
         if error:
             return None, error
 
