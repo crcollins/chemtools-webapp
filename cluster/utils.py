@@ -45,7 +45,7 @@ def _run_job(ssh, sftp, gjfstring, jobstring=None, **kwargs):
     try:
         error = _make_folders(ssh)
         if error:
-            return None, error
+            return None, "folder - " + error
 
         name = kwargs["name"]
         cluster = kwargs.get("cluster", 'g')
@@ -65,7 +65,7 @@ def _run_job(ssh, sftp, gjfstring, jobstring=None, **kwargs):
         _, stdout, stderr = ssh.exec_command(s)
         stderr = stderr.readlines()
         if stderr:
-            return None, stderr[0]
+            return None, "qsub - " + stderr[0]
 
         jobid = stdout.readlines()[0].split(".")[0]
     except Exception as e:
