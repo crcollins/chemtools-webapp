@@ -166,7 +166,7 @@ All of the following forms of output are possible for all of the molecules gener
 
 Job files can be made on the respective molecule pages using the Job Form. The job form allows simple replacement for the mechanical task of making new job files for each molecule.
 
-Added with just being able to view the job file there is Alpha functionality to be able to directly upload both jobs and molecules to a cluster (just Gordon for now) and run the respective job.
+Added with just being able to view the job file there is Alpha functionality to be able to directly upload both jobs and molecules to a cluster and run the respective job. Currently, these submit at about a rate of half a molecule per second. The current assumption is that this is more network bound.
 
 Jobs can also be made in bulk using the [Make Jobs](/chem/multi_job/) page.
 
