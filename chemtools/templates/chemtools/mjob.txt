@@ -23,4 +23,5 @@ cd $temp
 /usr/bin/time $gaussian < $name.gjf > $name.log
 $formchk $name.chk $name.fchk
 
+mkdir -p $base/done/
 mv $name.* $base/done/
