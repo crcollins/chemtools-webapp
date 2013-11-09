@@ -23,15 +23,17 @@ Build/Run Requirements
 Setup
 -----
 
-This setup assumes that you already have python 2.7+ installed and are on a machine with the apt package manager. (Steps 3 and 4 are also in the build.sh script).
+This setup assumes that you already have python 2.7+ and git installed and are on a machine with the apt package manager.
 
-    $ git https://github.com/crcollins/chemtools-webapp.git
+
+    $ git clone https://github.com/crcollins/chemtools-webapp.git
     $ cd chemtools-webapp
-    $ sudo apt-get install python-pip git python-dev gfortran liblapack-dev libatlas-dev build-essential libfreetype6-dev libpng-dev
-    $ sudo pip install requirements.txt
+    $ sh build.sh
     $ python manage.py syncdb
     $ python manage.py runserver 0.0.0.0
     Go to http://localhost/ with your browser
+
+Note: You might have to run `sudo pip install numpy==1.6.1` before running `sudo pip install -r requirements.txt` to get it to work.
 
 
 Test
