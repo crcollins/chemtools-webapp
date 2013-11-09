@@ -117,7 +117,8 @@ def gen_detail(request, molecule):
             return response
         elif request.method == "POST":
             d["keywords"] = keywords
-            a = cluster.utils.run_standard_job(request.user, molecule, **d)
+            cred = d.pop("credential")
+            a = cluster.utils.run_standard_job(cred, molecule, **d)
             return HttpResponse(simplejson.dumps(a), mimetype="application/json")
 
     if not errors[0]:
@@ -152,7 +153,8 @@ def gen_multi_detail(request, string):
 
         elif request.method == "POST":
             d["keywords"] = keywords
-            a = cluster.utils.run_standard_jobs(request.user, string, **d)
+            cred = d.pop("credential")
+            a = cluster.utils.run_standard_jobs(cred, string, **d)
             return HttpResponse(simplejson.dumps(a), mimetype="application/json")
 
     c = Context({

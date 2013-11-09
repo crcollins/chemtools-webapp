@@ -7,13 +7,34 @@ import threading
 from chemtools import gjfwriter
 from chemtools import fileparser
 from chemtools.utils import name_expansion, write_job
-from project.utils import StringIO
+from project.utils import StringIO, SSHClient, SFTPClient
 
 from models import Credential, Job
 
+def get_ssh_connection(obj):
+    if isinstance(obj, Credential):
+        try:
+            return obj.get_ssh_connection()
+        except: # sometimes this timesout
+            return obj.get_ssh_connection()
+    elif isinstance(obj, SSHClient):
+        return obj
+    else:
+        raise TypeError
+
+def get_sftp_connection(obj):
+    if isinstance(obj, Credential):
+        try:
+            return obj.get_sftp_connection()
+        except: # sometimes this timesout
+            return obj.get_sftp_connection()
+    elif isinstance(obj, SFTPClient):
+        return obj
+    else:
+        raise TypeError
 
 def _make_folders(ssh):
-    directory = 'chemtools/done/'
+    folder = 'chemtools/done/'
     _, _, testerr2 = ssh.exec_command("mkdir -p %s" % folder)
     testerr2 = testerr2.readlines()
     if testerr2:
@@ -48,40 +69,52 @@ def _run_job(ssh, sftp, gjfstring, jobstring=None, **kwargs):
 
         jobid = stdout.readlines()[0].split(".")[0]
     except Exception as e:
-        return None, e
+        return None, str(e)
     return jobid, None
 
-def run_job(connections, gjfstring, jobstring=None, **kwargs):
-    try:
-        ssh = kwargs["credential"].get_ssh_connection()
-        sftp = kwargs["credential"].get_sftp_connection()
-    except:
-        ssh = kwargs["credential"].get_ssh_connection()
-        sftp = kwargs["credential"].get_sftp_connection()
+def run_job(credential, gjfstring, jobstring=None, **kwargs):
+    ssh = get_ssh_connection(credential)
+    sftp = get_sftp_connection(credential)
 
-    with ssh, sftp:
-        return _run_job(ssh, sftp, gjfstring, jobstring, **kwargs)
-
-def run_jobs(connections, gjfstrings, jobstring=None, **kwargs):
-    try:
-        ssh = kwargs["credential"].get_ssh_connection()
-        sftp = kwargs["credential"].get_sftp_connection()
-    except:
-        ssh = kwargs["credential"].get_ssh_connection()
-        sftp = kwargs["credential"].get_sftp_connection()
-
-    with ssh, sftp:
-        results = []
-        for gjf in gjfstrings:
-            results.append(_run_job(ssh, sftp, gjf, jobstring, **kwargs))
-    return results
-
-def run_standard_job(user, molecule, **kwargs):
-    results = {"jobid": None, "error": None, "cluster": kwargs["credential"].cluster.name}
-
-    if not user.is_staff:
+    results = {"jobid": None, "error": None, "cluster": credential.cluster.name}
+    if not credential.user.is_staff:
         results["error"] = "You must be a staff user to submit a job."
         return results
+
+    with ssh, sftp:
+        temp = _run_job(ssh, sftp, gjfstring, jobstring, **kwargs)
+        results["jobid"] = temp[0]
+        results["error"] = temp[1]
+        return results
+
+def run_jobs(credential, names, gjfstrings, jobstring=None, **kwargs):
+    ssh = get_ssh_connection(credential)
+    sftp = get_sftp_connection(credential)
+
+    results = {
+        "worked": [],
+        "failed": [],
+        "error": None,
+        "cluster": credential.cluster.name,
+    }
+    if not credential.user.is_staff:
+        results["error"] = "You must be a staff user to submit a job."
+        return results
+
+    with ssh, sftp:
+        for name, gjf in zip(names, gjfstrings):
+            dnew = kwargs.copy()
+            dnew["name"] = re.sub(r"{{\s*name\s*}}", name, dnew["name"])
+            temp = _run_job(ssh, sftp, gjf, jobstring, **dnew)
+            if temp[1] is None:
+                results["worked"].append((name, temp[0]))
+            else:
+                print temp[1]
+                results["failed"].append((name, temp[1]))
+    return results
+
+def run_standard_job(credential, molecule, **kwargs):
+    results = {"jobid": None, "error": None, "cluster": credential.cluster.name}
     try:
         out = gjfwriter.GJFWriter(molecule, kwargs.get("keywords", "b3lyp/6-31g(d)"))
     except Exception as e:
@@ -89,36 +122,39 @@ def run_standard_job(user, molecule, **kwargs):
         return results
 
     gjf = out.get_gjf()
-    name = kwargs.get("name", molecule)
-    jobid, error = run_job(user, gjf, **kwargs)
-    results["jobid"] = jobid
-    results["error"] = error
-    if error is None:
-        job = Job(molecule=molecule, jobid=jobid, **kwargs)
-        job.save()
+    results = run_job(credential, gjf, **kwargs)
+    # if results["error"] is None:
+    #     job = Job(molecule=molecule, jobid=results["jobid"], **kwargs)
+    #     job.save()
     return results
 
-def run_standard_jobs(user, string, **kwargs):
+def run_standard_jobs(credential, string, **kwargs):
     results = {
         "worked": [],
         "failed": [],
         "error": None,
-        "cluster": kwargs["credential"].cluster.name,
+        "cluster": credential.cluster.name,
     }
-
-    if not user.is_staff:
+    if not credential.user.is_staff:
         results["error"] = "You must be a staff user to submit a job."
         return results
 
+    names = []
+    gjfs = []
     for mol in name_expansion(string):
-        dnew = kwargs.copy()
-        dnew["name"] = re.sub(r"{{\s*name\s*}}", mol, dnew["name"])
-        a = run_standard_job(user, mol, **dnew)
+        try:
+            out = gjfwriter.GJFWriter(mol, kwargs.get("keywords", "b3lyp/6-31g(d)"))
+        except Exception as e:
+            results["failed"].append((mol, str(e)))
+            continue
 
-        if a["error"] is None:
-            results["worked"].append((mol, a["jobid"]))
-        else:
-            results["failed"].append((mol, a["error"])) # str is a hack if real errors bubble up
+        names.append(mol)
+        gjfs.append(out.get_gjf())
+
+    temp = run_jobs(credential, names, gjfs, **kwargs)
+    results["worked"] = temp["worked"]
+    results["failed"].extend(temp["failed"])
+    results["error"] = temp["error"]
     return results
 
 def kill_jobs(user, cluster, jobids):
