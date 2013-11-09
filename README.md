@@ -13,7 +13,7 @@ Build/Run Requirements
 - Matplotlib 1.1.1rc
 - Numpy 1.6.1
 - Paramiko 1.7.7.1
-- PIL 1.1.7
+- Pillow 2.2.1
 - PyCrypto 2.26
 - Scipy 0.9.0
 - Django bootstrap form 3.0.0
