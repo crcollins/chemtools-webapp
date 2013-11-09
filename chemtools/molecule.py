@@ -1,8 +1,7 @@
 import math
 import copy
 
-import Image
-import ImageDraw
+from PIL import Image, ImageDraw
 
 
 class Atom(object):
