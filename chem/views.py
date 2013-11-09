@@ -16,7 +16,7 @@ from models import ErrorReport, ErrorReportForm, JobForm
 
 from chemtools import gjfwriter
 from chemtools.utils import name_expansion, write_job
-import cluster.utils
+import cluster.interface
 
 def index(request):
     if request.GET.get("molecule"):
@@ -118,7 +118,7 @@ def gen_detail(request, molecule):
         elif request.method == "POST":
             d["keywords"] = keywords
             cred = d.pop("credential")
-            a = cluster.utils.run_standard_job(cred, molecule, **d)
+            a = cluster.interface.run_standard_job(cred, molecule, **d)
             return HttpResponse(simplejson.dumps(a), mimetype="application/json")
 
     if not errors[0]:
@@ -154,7 +154,7 @@ def gen_multi_detail(request, string):
         elif request.method == "POST":
             d["keywords"] = keywords
             cred = d.pop("credential")
-            a = cluster.utils.run_standard_jobs(cred, string, **d)
+            a = cluster.interface.run_standard_jobs(cred, string, **d)
             return HttpResponse(simplejson.dumps(a), mimetype="application/json")
 
     c = Context({

@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.utils import simplejson
 
 from models import Job
-import utils
+import interface
 
 
 @login_required
@@ -23,7 +23,7 @@ def cluster_job_index(request, cluster):
 def get_job_list(request):
     try:
         cluster = request.REQUEST.get("cluster", "")
-        jobs = utils.get_all_jobs(request.user, cluster)
+        jobs = interface.get_all_jobs(request.user, cluster)
         e = None
     except Exception as e:
         jobs = []
@@ -36,7 +36,7 @@ def get_job_list(request):
 @login_required
 def job_detail(request, cluster, jobid):
     e = None
-    jobs = utils.get_all_jobs(request.user, cluster)[0]
+    jobs = interface.get_all_jobs(request.user, cluster)[0]
     for job in jobs["jobs"]:
         if job[0] == jobid:
             break
@@ -59,7 +59,7 @@ def reset_job(request, jobid):
     if request.method == "POST":
         e = None
         name = Job.objects.filter(jobid=jobid).name
-        njobid, e = utils.reset_output(request.user, name)
+        njobid, e = interface.reset_output(request.user, name)
         if e is None:
             return HttpResponse("It worked. Your new job id is: %d" % njobid)
         else:
@@ -78,7 +78,7 @@ def kill_job(request, cluster):
                 jobids.append(key)
             except ValueError:
                 pass
-        result = utils.kill_jobs(request.user, cluster, jobids)
+        result = interface.kill_jobs(request.user, cluster, jobids)
         if result["error"] is None:
             return redirect(job_index)
         else:
