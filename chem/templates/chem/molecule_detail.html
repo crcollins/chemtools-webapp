@@ -52,6 +52,10 @@ $(function() {
             <th>Exact Name</th>
             <td>{{ exact_name }}</td>
         </tr>
+        <tr>
+            <th>Keywords</th>
+            <td>{% if keywords %}{{ keywords }}{% else %}{{ default_keywords}}{% endif %}</td>
+        </tr>
     </table>
     <hr>
     <div class="list-group">
