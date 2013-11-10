@@ -19,6 +19,8 @@ CLUSTERS = {
 }
 CLUSTER_TUPLES = [(x, CLUSTERS[x]) for x in CLUSTERS.keys()]
 
+KEYWORDS = "opt B3LYP/6-31g(d)"
+
 def catch(fn):
     '''Decorator to catch all exceptions and log them.'''
     def wrapper(self, *args, **kwargs):

@@ -53,7 +53,7 @@ def run_jobs(credential, names, gjfstrings, jobstring=None, **kwargs):
 def run_standard_job(credential, molecule, **kwargs):
     results = {"jobid": None, "error": None, "cluster": credential.cluster.name}
     try:
-        out = gjfwriter.GJFWriter(molecule, kwargs.get("keywords", "b3lyp/6-31g(d)"))
+        out = gjfwriter.GJFWriter(molecule, kwargs.get("keywords", None))
     except Exception as e:
         results["error"] = str(e)
         return results
@@ -80,7 +80,7 @@ def run_standard_jobs(credential, string, **kwargs):
     gjfs = []
     for mol in name_expansion(string):
         try:
-            out = gjfwriter.GJFWriter(mol, kwargs.get("keywords", "b3lyp/6-31g(d)"))
+            out = gjfwriter.GJFWriter(mol, kwargs.get("keywords", None))
         except Exception as e:
             results["failed"].append((mol, str(e)))
             continue

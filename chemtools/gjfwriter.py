@@ -6,7 +6,7 @@ import copy
 
 
 from molecule import Atom, Bond, Molecule
-from utils import CORES, XGROUPS, RGROUPS, ARYL0, ARYL2, ARYL, name_expansion
+from utils import CORES, XGROUPS, RGROUPS, ARYL0, ARYL2, ARYL, name_expansion, KEYWORDS
 try:
     from project.utils import StringIO
 except ImportError:
@@ -61,7 +61,7 @@ def read_data(filename):
 class GJFWriter(object):
     def __init__(self, name, keywords=None):
         self.name = name
-        self.keywords = keywords if keywords else "B3LYP/6-31g(d)"
+        self.keywords = keywords if keywords is not None else KEYWORDS
         self.molecule = self.build(name)
 
 
@@ -444,7 +444,7 @@ if __name__ == "__main__":
     parser.add_argument('names', metavar='name', type=str, nargs='*', default=list(), help='The name of the molecule to create.')
     parser.add_argument('-i', metavar='list_file', action="store", nargs='*', default=list(), dest="listfiles", type=str, help='A file with a listing of molecules to make.')
     parser.add_argument('-f', metavar='folder', action="store", default=".", dest="folder", type=str, help='A folder to output the files.')
-    parser.add_argument('-k', action="store", dest="keywords", default="b3lyp/6-31g(d)", help="The keywords to use for the calculation. (b3lyp/6-31g(d) by default)")
+    parser.add_argument('-k', action="store", dest="keywords", default=KEYWORDS, help="The keywords to use for the calculation. (%s by default)" % KEYWORDS)
     parser.add_argument('-d', type=int, action="store", default=0, help="Used to scale an output image. (0 by default, meaning no picture)")
 
     parser.add_argument('-E', action="store_true", dest="error", default=False, help='Toggles showing error messages.')

@@ -15,7 +15,7 @@ from django.utils import simplejson
 from models import ErrorReport, ErrorReportForm, JobForm
 
 from chemtools import gjfwriter
-from chemtools.utils import name_expansion, write_job
+from chemtools.utils import name_expansion, write_job, KEYWORDS
 import cluster.interface
 
 def index(request):
@@ -25,8 +25,8 @@ def index(request):
         if set(",{}$") & set(request.GET.get("molecule")):
             func = gen_multi_detail
 
-        a = {"keywords": request.GET.get("keywords")}
-        if a["keywords"] != "B3LYP/6-31g(d)":
+        a = {"keywords": request.GET.get("keywords", None)}
+        if a["keywords"] != KEYWORDS:
             b = "%s?%s" % (reverse(func, args=(request.GET.get("molecule"), )),
                 urllib.urlencode(a))
             return HttpResponseRedirect(b)

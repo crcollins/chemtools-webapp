@@ -274,7 +274,7 @@ For generating the molecules, there is a very rough Finite State Machine that pa
 
 ### Molecule Specific ###
 
-For all of the molecules there is a basic API access to allow getting the different types of outputs. The first, and most common, being the gjf output. This is the standard Gaussian file type and is what should be used for running the calculations. There is also an added possible parameter called "keywords" that can be added to add/change the keywords/settings of the molecule. If none is given, then `B3LYP/6-31g(d)` is assumed. Another possible parameter is "view". If this is enabled the output will be browser viewable rather than a download.
+For all of the molecules there is a basic API access to allow getting the different types of outputs. The first, and most common, being the gjf output. This is the standard Gaussian file type and is what should be used for running the calculations. There is also an added possible parameter called "keywords" that can be added to add/change the keywords/settings of the molecule. If none is given, then `opt B3LYP/6-31g(d)` is assumed. Another possible parameter is "view". If this is enabled the output will be browser viewable rather than a download.
 
     /chem/$NAME.gjf
     /chem/$NAME.gjf?keywords=B3LYP/6-31g(d)
