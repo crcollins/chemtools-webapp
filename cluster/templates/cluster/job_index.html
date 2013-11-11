@@ -23,7 +23,7 @@ $(function() {
             for (var j = 0; j < columns.length; j++) {
                 output += "<th>{0}</th>".format(columns[j]);
             }
-            output += "<th>Kill</th></tr>";
+            output += "<th>Kill <input type='checkbox' class='check_all' /></th></tr>";
 
             for (var j = 0; j < jobs.length; j++) { // jobs
                 output += "<tr>";
@@ -42,13 +42,16 @@ $(function() {
                 if (thisjob[thisjob.length-1] == "C") {
                     disabled = "disabled='disabled'";
                 }
-                output += "<td><div class='checkbox'><input type='checkbox' {0} name='{1}'></div></td>".format(disabled, thisjob[0]);
+                output += "<td><div class='checkbox'><input type='checkbox' class='idRow' {0} name='{1}'></div></td>".format(disabled, thisjob[0]);
                 output += "</tr>";
             }
             output += "<tr><td colspan={0}></td><td><input class='btn btn-sm btn-danger btn-block' value='Kill' type='submit' /></td></tr>".format(columns.length);
             output += "</table></form><hr>";
         }
         table.append(output);
+    });
+    $(document).on(' change','input.check_all',function() {
+        $(this).closest("form").find("input.idRow:enabled").prop("checked" , this.checked);
     });
 })
 </script>
