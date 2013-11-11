@@ -380,11 +380,13 @@ Example:
 
 With chemtools-webapp there are six variables each of which correspond to a set of the naming scheme.
 
-    CORES   = "{C,T}{O,S,N,P,C}{N,P,C}""
+    CORES   = "{C,T,E,Z}{O,S,N,P,C}{N,P,C}"
+    SCORES   = "{E,Z}{O,S,N,P,C}{N,P,C}"
+    DCORES   = "{C,T}{O,S,N,P,C}{N,P,C}"
     RGROUPS = "a,b,c,d,e,f,g,h,i,j,k,l"
     XGROUPS = "A,B,C,D,E,F,G,H,I,J,K,L"
-    ARYL0   = "2,3,4,5,6,7,8,9"
-    aryl0   = "2,3,8,9"
+    ARYL    = "2,3,4,5,6,7,8,9"
+    ARYL0   = "2,3,8,9"
     ARYL2   = "4,5,6,7"
 
 So, if you wanted to create all of the substituant combinations for `4X_TON`, rather than typing all the substituants out, you can just use:

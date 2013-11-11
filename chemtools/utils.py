@@ -3,7 +3,9 @@ import itertools
 
 from django.template import Template, Context
 
-CORES = [''.join(x) for x in itertools.product(["C","T","E","Z"],["O","S","N","P","C"],["N","P","C"])]
+SCORES = [''.join(x) for x in itertools.product(["E","Z"],["O","S","N","P","C"],["N","P","C"])]
+DCORES = [''.join(x) for x in itertools.product(["C","T"],["O","S","N","P","C"],["N","P","C"])]
+CORES = SCORES + DCORES
 XGROUPS = ["A","B","C","D","E","F","G","H","I","J","K","L"]
 RGROUPS = ["a","b","c","d","e","f","g","h","i","j","k","l"]
 ARYL0 = ["2","3","8","9"]
@@ -78,6 +80,8 @@ def name_expansion(string):
     varparse = re.compile(r"\$\w*")
 
     variables = {
+        "SCORES":   ','.join(SCORES),
+        "DCORES":   ','.join(DCORES),
         "CORES":    ','.join(CORES),
         "RGROUPS":  ','.join(RGROUPS),
         "XGROUPS":  ','.join(XGROUPS),
