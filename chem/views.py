@@ -139,7 +139,6 @@ def gen_detail(request, molecule):
 
 def gen_multi_detail(request, string):
     form = JobForm.get_form(request, "{{ name }}")
-    keywords = request.REQUEST.get("keywords", "")
     add = "" if request.GET.get("view") else "attachment; "
 
     if form.is_valid():
@@ -152,11 +151,12 @@ def gen_multi_detail(request, string):
             return response
 
         elif request.method == "POST":
-            d["keywords"] = keywords
+            d["keywords"] = request.REQUEST.get("keywords", None)
             cred = d.pop("credential")
             a = cluster.interface.run_standard_jobs(cred, string, **d)
             return HttpResponse(simplejson.dumps(a), mimetype="application/json")
 
+    keywords = request.REQUEST.get("keywords", "")
     c = Context({
         "pagename": string,
         "form": form,
