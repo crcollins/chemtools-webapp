@@ -75,7 +75,7 @@ $.getJSON('check/', function(data) {
         else if (warning) message = 'class="warning"';
 
         text += '<tr {0}>'.format(message);
-        text += '<td><a href="../{0}/">{0}</a></td>'.format(name);
+        text += '<td><a href="../{0}/{{ encoded_keywords }}">{0}</a></td>'.format(name);
 
         if (!(error)) {
             text += '<td><a href="../{0}.gjf{{ encoded_keywords }}">gjf</a></td>'.format(name);
