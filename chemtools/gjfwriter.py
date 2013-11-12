@@ -151,6 +151,7 @@ class GJFWriter(object):
 
     def get_gjf(self):
         starter = [
+                    "%nprocshared=16",
                     "%mem=59GB",
                     "%%chk=%s.chk" % self.name,
                     "# %s geom=connectivity" % self.keywords,
