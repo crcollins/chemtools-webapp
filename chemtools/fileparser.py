@@ -160,19 +160,21 @@ class Options(LineParser):
     def parse(self, line):
         # "12\0\\# opt B3LYP/svp geom=connectivity\\2J_TON_25a_2J_DFT\\0,1\C,-0.0"
         # "585127864,0.0307750915,0.0000205395\C,1.354447744,-0.0385659542,0.0000"
-        modline = self.prevline + line.strip()
+        line = line[1:]
+        modline = self.prevline + line.strip('\n')
         if "\\#" in modline:
             idx = modline.index("\\#") + 3
-            self.value = modline[idx:].split("\\")[0].strip()
+            self.value = modline[idx:].split("\\")[0].strip('\n')
             self.start = True
             if "\\" in modline[idx:]:
                 self.done = True
         elif self.start:
-            self.value += line.split("\\")[0].strip()
+            self.value += line.split("\\")[0].strip('\n')
             if "\\" in line:
                 self.done = True
+                self.value = self.value.strip()
         else:
-            self.prevline = line.strip()
+            self.prevline = line.strip('\n')
 
 
 @Log.add_parser
