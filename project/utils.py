@@ -53,7 +53,7 @@ def get_sftp_connection(hostname, username, key=None, password=None, port=22):
         pkey = paramiko.RSAKey.from_private_key(key)
         transport.connect(username=username, pkey=pkey)
     else:
-        transport.connect(username=username, password=pkey)
+        transport.connect(username=username, password=password)
     return SFTPClient.from_transport(transport)
 
 def get_ssh_connection(hostname, username, key=None, password=None, port=22):
