@@ -37,9 +37,12 @@
                         text += '<div class="panel panel-danger">';
                         text += '<div class="panel-heading"><h3 class="panel-title">{0}</h3></div>'.format("Failed")
                         text += '<div class="panel-body">';
+                        var mols = [];
                         for (var i = 0; i < data["failed"].length; i++) {
                             text += "<li class='list-group-item'>{0} &mdash; {1}</li>".format(data["failed"][i][0], data["failed"][i][1]);
+                            mols.push(data["failed"][i][0]);
                         }
+                        text += "<a href='/chem/{0}/{{ encoded_keywords }}'>Link to failed molecules.</a>".format(mols.join());
                         text += "</div></div>";
                     }
                 }
