@@ -80,6 +80,10 @@ class Log(object):
         values = []
         for key in self.order:
             value, done = self.parsers[key]
+            # csv fixes
+            if value and "," in value:
+                value = '"' + value.replace('"', '""') + '"'
+
             values.append(value if (done or value) else "---")
         return ', '.join([self.fname] + values)
 
