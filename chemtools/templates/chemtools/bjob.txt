@@ -6,8 +6,8 @@
 #PBS -m bea
 #PBS -M {{ email }}
 
-name={{ name }}
-base=$HOME{% if internal %}/chemtools/{% endif %}
+set name = {{ name }}
+set base = $HOME{% if internal %}/chemtools/{% endif %}
 
 # Make the module command available
 source /usr/share/modules/init/csh
@@ -21,7 +21,7 @@ module load gaussian09
 # The scratch directory offers large capacity and high performance,
 # HOWEVER:  it is not permanent storage and may be removed automatically
 # when the job ends.
-cp $HOME/$name.gjf $SCRATCH
+cp $base/$name.gjf $SCRATCH
 
 # move to the scratch directory
 
@@ -35,10 +35,10 @@ setenv GAUSS_SCRDIR $SCRATCH_RAMDISK
 
 # Execute Gaussian 09, writing the output files in the scratch directory.
 # Use omplace to run the job
-gaussian=`which g09`
-formchk=`which formchk`
+set gaussian = `which g09`
+set formchk = `which formchk`
 omplace -nt $OMP_NUM_THREADS $gaussian < $name.gjf >& $name.log
 $formchk $name.chk $name.fchk
 
 mkdir -p $base/done/
-mv $name.* $base/done/
+cp $name.* $base/done/
