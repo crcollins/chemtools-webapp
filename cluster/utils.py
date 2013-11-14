@@ -109,6 +109,11 @@ def _get_jobs(cred, i, results):
 
             for job in lines[5:]:
                 t = job.split()
+                # empty line implies a split in the table
+                # this is seen on blacklight with the "Total cpus requested from running jobs" line at the end.
+                if t == []:
+                    break
+
                 temp = []
                 for idx in colsidx:
                     temp.append(t[idx])
