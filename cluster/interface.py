@@ -46,7 +46,6 @@ def run_jobs(credential, names, gjfstrings, jobstring=None, **kwargs):
             if temp[1] is None:
                 results["worked"].append((name, temp[0]))
             else:
-                print temp[1]
                 results["failed"].append((name, temp[1]))
     return results
 
