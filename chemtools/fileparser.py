@@ -76,7 +76,7 @@ class Log(object):
         s += self["Geometry"]
         return s
 
-    def format_data(self):
+    def format_data(self, basename=False):
         values = []
         for key in self.order:
             value, done = self.parsers[key]
@@ -85,7 +85,10 @@ class Log(object):
                 value = '"' + value.replace('"', '""') + '"'
 
             values.append(value if (done or value) else "---")
-        return ', '.join([self.fname] + values)
+        name = self.fname
+        if basename:
+            name = os.path.basename(name)
+        return ', '.join([name] + values)
 
     def format_header(self):
         return ', '.join(["Name"] + self.order)
@@ -106,7 +109,7 @@ class LogSet(Output):
             self.header = new
         self.write(x.format_data())
 
-    def parse_files(self, files):
+    def parse_files(self, files, basename=False):
         pool = multiprocessing.Pool(processes=4)
         self.logs = pool.map(Log, files)
 
@@ -114,7 +117,7 @@ class LogSet(Output):
             new = log.format_header()
             if len(new) > len(self.header):
                 self.header = new
-            self.write(log.format_data())
+            self.write(log.format_data(basename))
 
     def format_output(self, errors=True):
         s = self.header + "\n"
@@ -382,6 +385,7 @@ if __name__ == "__main__":
             self.error = args.error | args.verbose
             self.paths = args.paths | args.verbose | args.rel
             self.rel = args.rel
+            self.basename = args.base
             self.files = self.check_input_files(args.files
                                 + self.convert_files(args.listfiles)
                                 + self.convert_folders(args.folders))
@@ -420,14 +424,13 @@ if __name__ == "__main__":
 
         def write_file(self):
             logs = LogSet()
-            logs.parse_files(self.files)
+            logs.parse_files(self.files, basename=self.basename)
 
             if self.outputfilename:
                 with open(self.outputfilename,'w') as outputfile:
                     outputfile.write(logs.format_output(errors=self.error))
             else:
                 print logs.format_output(errors=self.error)
-                raw_input("<Press Enter>")
 
 
     parser = argparse.ArgumentParser(description="This program extracts data from Gaussian log files.")
@@ -439,6 +442,7 @@ if __name__ == "__main__":
     parser.add_argument('-P', action="store_true", dest="paths", default=False, help='Toggles showing paths to files.')
     parser.add_argument('-R',  action="store_true", dest="rel", default=False, help='Toggles showing relative paths.')
     parser.add_argument('-V', action="store_true", dest="verbose", default=False, help='Toggles showing all messages.')
+    parser.add_argument('-B', action="store_true", dest="base", default=False, help='Toggles path.')
 
     if len(sys.argv) > 1:
         args = sys.argv[1:]
