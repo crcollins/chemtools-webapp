@@ -137,6 +137,16 @@ class Molecule(object):
             atom.y += y
             atom.z += z
 
+    def reflect(self, a, c):
+        '''Reflect molecule across arbitrary 2d line'''
+
+        for atom in self.atoms:
+            x = atom.x
+            y = atom.y
+            d = (x + (y - c)*a)/(1 + a**2)
+            atom.x = 2*d - x
+            atom.y = 2*d*a - y + 2 * c
+
     def bounding_box(self):
         '''Returns the bounding box of the molecule.'''
         minx, miny, minz = self.atoms[0].xyz
