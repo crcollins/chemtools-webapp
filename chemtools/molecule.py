@@ -137,15 +137,25 @@ class Molecule(object):
             atom.y += y
             atom.z += z
 
-    def reflect(self, a, c):
+    def reflect(self, rx, ry, rz):
         '''Reflect molecule across arbitrary 2d line'''
+        ndotn = float(rx*rx + ry*ry + rz*rz)
+        if ndotn == 0:
+            ndotn = 1
 
         for atom in self.atoms:
             x = atom.x
             y = atom.y
-            d = (x + (y - c)*a)/(1 + a**2)
-            atom.x = 2*d - x
-            atom.y = 2*d*a - y + 2 * c
+            z = atom.z
+            vdotn = (rx*x + ry*y + rz*z)
+            atom.x = x - 2 * vdotn / ndotn * rx
+            atom.y = y - 2 * vdotn / ndotn * ry
+            atom.z = z - 2 * vdotn / ndotn * rz
+
+    def reflect_ends(self):
+        bonds = self.open_ends('~')
+        slope = [x-y for (x,y) in zip(bonds[0].atoms[1].xyz, bonds[1].atoms[1].xyz)]
+        self.reflect(slope[0], slope[1], slope[2])
 
     def bounding_box(self):
         '''Returns the bounding box of the molecule.'''
