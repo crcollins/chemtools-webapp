@@ -64,7 +64,6 @@ class GJFWriter(object):
         self.keywords = keywords if keywords is not None else KEYWORDS
         self.molecule = self.build(name)
 
-
     def load_fragments(self, coreset):
         corename, (leftparsed, middleparsed, rightparsed) = coreset
         # molecule, name, parent
@@ -74,9 +73,12 @@ class GJFWriter(object):
         for side in [middleparsed] * 2 + [rightparsed, leftparsed]:
             temp = []
             if side is not None:
-                for (char, parentid) in side:
+                for (char, parentid, flip) in side:
                     parentid += 1  # offset for core
-                    temp.append((Molecule(read_data(char)), char, parentid))
+                    mol = Molecule(read_data(char))
+                    temp.append((mol, char, parentid))
+                    if flip:
+                        mol.reflect_ends()
             else:
                 temp.append(None)
             fragments.append(temp)
@@ -267,15 +269,19 @@ def parse_end_name(name):
     lastconnect = -1
     state = "start"
     for char in name:
-        if char not in substituent:
+        if char not in substituent and char != '-':
             raise ValueError("Bad Substituent Name: %s" % char)
 
     for i, char in enumerate(name):
+        if char == "-":
+            meh = parts[lastconnect]
+            parts[lastconnect] = (meh[0], meh[1], True)
+            continue
         if state == "aryl0":
             if char not in block:
                 raise ValueError("no rgroups allowed")
             else:
-                parts.append((char, lastconnect))
+                parts.append((char, lastconnect, False))
 
             if char in xgroup:
                 state = "end"
@@ -287,9 +293,9 @@ def parse_end_name(name):
 
         elif state == "aryl2":
             if char not in rgroup:
-                parts.append(("a", lastconnect))
-                parts.append(("a", lastconnect))
-                parts.append((char, lastconnect))
+                parts.append(("a", lastconnect, False))
+                parts.append(("a", lastconnect, False))
+                parts.append((char, lastconnect, False))
                 if char in xgroup:
                     state = "end"
                 elif char in aryl0:
@@ -301,20 +307,20 @@ def parse_end_name(name):
                 if r == 0:
                     try:
                         if name[i + 1] in rgroup:
-                            parts.append((char, lastconnect))
+                            parts.append((char, lastconnect, False))
                             r += 1
                         else:
-                            parts.append((char, lastconnect))
-                            parts.append((char, lastconnect))
+                            parts.append((char, lastconnect, False))
+                            parts.append((char, lastconnect, False))
                             r += 2
                             state = "start"
                     except IndexError:
-                        parts.append((char, lastconnect))
-                        parts.append((char, lastconnect))
+                        parts.append((char, lastconnect, False))
+                        parts.append((char, lastconnect, False))
                         r += 2
                         state = "start"
                 elif r == 1:
-                    parts.append((char, lastconnect))
+                    parts.append((char, lastconnect, False))
                     r += 1
                     state = "start"
                 else:
@@ -323,7 +329,7 @@ def parse_end_name(name):
             if char not in block:
                 raise ValueError("no rgroups allowed")
             else:
-                parts.append((char, lastconnect))
+                parts.append((char, lastconnect, False))
                 r = 0
 
             if char in xgroup:
@@ -338,8 +344,8 @@ def parse_end_name(name):
     if state == "aryl0":
         pass
     elif state != "end" and state != "start":
-        parts.append(("a", lastconnect))
-        parts.append(("a", lastconnect))
+        parts.append(("a", lastconnect, False))
+        parts.append(("a", lastconnect, False))
     return parts
 
 def get_exact_name(name):
