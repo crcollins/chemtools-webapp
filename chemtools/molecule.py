@@ -161,11 +161,11 @@ class Molecule(object):
             maxz = max(atom.z, maxz)
         return (minx, miny, minz), (maxx, maxy, maxz)
 
-    def open_ends(self):
+    def open_ends(self, types="+*~"):
         '''Returns a list of any bonds that contain non-standard elements.'''
         openbonds = []
         for x in self.bonds:
-            if any(True for atom in x.atoms if atom.element[0] in "+*~"):
+            if any(True for atom in x.atoms if atom.element[0] in types):
                 openbonds.append(x)
         return openbonds
 
