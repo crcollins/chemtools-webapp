@@ -4,7 +4,7 @@ from cStringIO import StringIO
 import multiprocessing
 
 from utils import Output, catch
-
+from gjfwriter import get_exact_name
 
 class Log(object):
     PARSERS = dict()
@@ -76,7 +76,7 @@ class Log(object):
         s += self["Geometry"]
         return s
 
-    def format_data(self, basename=False):
+    def format_data(self, basename=False, exactname=False):
         values = []
         for key in self.order:
             value, done = self.parsers[key]
@@ -86,8 +86,14 @@ class Log(object):
 
             values.append(value if (done or value) else "---")
         name = self.fname
-        if basename:
+        if basename or exactname:
             name = os.path.basename(name)
+        if exactname:
+            temp = name.replace(".log", "")
+            try:
+                name = get_exact_name(temp)
+            except:
+                pass
         return ', '.join([name] + values)
 
     def format_header(self):
@@ -109,7 +115,7 @@ class LogSet(Output):
             self.header = new
         self.write(x.format_data())
 
-    def parse_files(self, files, basename=False):
+    def parse_files(self, files, basename=False, exactname=False):
         pool = multiprocessing.Pool(processes=4)
         self.logs = pool.map(Log, files)
 
@@ -117,7 +123,7 @@ class LogSet(Output):
             new = log.format_header()
             if len(new) > len(self.header):
                 self.header = new
-            self.write(log.format_data(basename))
+            self.write(log.format_data(basename, exactname))
 
     def format_output(self, errors=True):
         s = self.header + "\n"
@@ -389,6 +395,7 @@ if __name__ == "__main__":
             self.files = self.check_input_files(args.files
                                 + self.convert_files(args.listfiles)
                                 + self.convert_folders(args.folders))
+            self.exactname = args.exactname
 
         def check_input_files(self, filelist):
             files = []
@@ -424,7 +431,7 @@ if __name__ == "__main__":
 
         def write_file(self):
             logs = LogSet()
-            logs.parse_files(self.files, basename=self.basename)
+            logs.parse_files(self.files, basename=self.basename, exactname=self.exactname)
 
             if self.outputfilename:
                 with open(self.outputfilename,'w') as outputfile:
@@ -443,6 +450,7 @@ if __name__ == "__main__":
     parser.add_argument('-R',  action="store_true", dest="rel", default=False, help='Toggles showing relative paths.')
     parser.add_argument('-V', action="store_true", dest="verbose", default=False, help='Toggles showing all messages.')
     parser.add_argument('-B', action="store_true", dest="base", default=False, help='Toggles path.')
+    parser.add_argument('-F', action="store_true", dest="exactname", default=False, help='Toggles exact name.')
 
     if len(sys.argv) > 1:
         args = sys.argv[1:]
