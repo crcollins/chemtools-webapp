@@ -275,7 +275,10 @@ def parse_end_name(name):
     for i, char in enumerate(name):
         if char == "-":
             meh = parts[lastconnect]
-            parts[lastconnect] = (meh[0], meh[1], True)
+            if meh[0] in aryl0+aryl2:
+                parts[lastconnect] = (meh[0], meh[1], True)
+            else:
+                raise ValueError("reflection only allowed for aryl groups")
             continue
         if state == "aryl0":
             if char not in block:
