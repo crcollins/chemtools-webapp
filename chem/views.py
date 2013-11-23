@@ -61,34 +61,37 @@ def _get_molecules_info(string):
 def multi_job(request):
     form = JobForm.get_form(request, "{{ name }}")
 
+    c = Context({
+        "form": form,
+        })
     if not form.is_valid():
-        c = Context({
-            "form": form,
-            })
         return render(request, "chem/multi_job.html", c)
 
-    buff = StringIO()
-    zfile = zipfile.ZipFile(buff, 'w', zipfile.ZIP_DEFLATED)
-    d = dict(form.cleaned_data)
+    if request.method == "GET":
+        buff = StringIO()
+        zfile = zipfile.ZipFile(buff, 'w', zipfile.ZIP_DEFLATED)
+        d = dict(form.cleaned_data)
 
-    string = request.REQUEST.get('filenames', '').replace('\n', ',')
-    for name in name_expansion(string):
-        if not name:
-            continue
-        dnew = d.copy()
-        name, _ = os.path.splitext(name)
-        dnew["name"] = re.sub(r"{{\s*name\s*}}", name, dnew["name"])
-        zfile.writestr("%s.%sjob" % (name, dnew.get("cluster")), write_job(**dnew))
+        string = request.REQUEST.get('filenames', '').replace('\n', ',')
+        for name in name_expansion(string):
+            if not name:
+                continue
+            dnew = d.copy()
+            name, _ = os.path.splitext(name)
+            dnew["name"] = re.sub(r"{{\s*name\s*}}", name, dnew["name"])
+            zfile.writestr("%s.%sjob" % (name, dnew.get("cluster")), write_job(**dnew))
 
-    zfile.close()
-    buff.flush()
+        zfile.close()
+        buff.flush()
 
-    ret_zip = buff.getvalue()
-    buff.close()
+        ret_zip = buff.getvalue()
+        buff.close()
 
-    response = HttpResponse(ret_zip, mimetype="application/zip")
-    response["Content-Disposition"] = "attachment; filename=output.zip"
-    return response
+        response = HttpResponse(ret_zip, mimetype="application/zip")
+        response["Content-Disposition"] = "attachment; filename=output.zip"
+        return response
+    else:
+        return render(request, "chem/multi_job.html", c)
 
 def molecule_check(request, string):
     a = {
