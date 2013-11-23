@@ -67,10 +67,10 @@ def multi_job(request):
     if not form.is_valid():
         return render(request, "chem/multi_job.html", c)
 
+    d = dict(form.cleaned_data)
     if request.method == "GET":
         buff = StringIO()
         zfile = zipfile.ZipFile(buff, 'w', zipfile.ZIP_DEFLATED)
-        d = dict(form.cleaned_data)
 
         string = request.REQUEST.get('filenames', '').replace('\n', ',')
         for name in name_expansion(string):
@@ -90,6 +90,13 @@ def multi_job(request):
         response = HttpResponse(ret_zip, mimetype="application/zip")
         response["Content-Disposition"] = "attachment; filename=output.zip"
         return response
+    elif request.method == "POST":
+        cred = d.pop("credential")
+        files = request.FILES.getlist("files")
+        strings = [''.join(f.readlines()) for f in files]
+        names = [os.path.splitext(f.name)[0] for f in files]
+        a = cluster.interface.run_jobs(cred, names, strings, **d)
+        return HttpResponse(simplejson.dumps(a), mimetype="application/json")
     else:
         return render(request, "chem/multi_job.html", c)
 
