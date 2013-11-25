@@ -22,11 +22,9 @@ $(function() {
         }
     });
     $("#id_post").click(function() {
-        console.log("asda")
         event.preventDefault();
         var a = new FormData($("#main")[0]);
         var files = $("input[name='myfiles']").prop('files');
-        console.log(files);
         for(var x=0;x<files.length;x++) {
             a.append("files", files[x]);
         }
