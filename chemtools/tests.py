@@ -337,6 +337,58 @@ class GJFWriterTestCase(TestCase):
             print errors
             raise errors[0][1]
 
+    def test_png(self):
+        errors = []
+        sets = [
+            self.templates,
+            self.valid_sides,
+        ]
+        for template, group in product(*sets):
+            name = template.format(group)
+            try:
+                obj = gjfwriter.GJFWriter(name)
+                obj.get_png()
+            except Exception as e:
+                errors.append((name, e))
+        if errors:
+            print errors
+            raise errors[0][1]
+
+    def test_gjf(self):
+        errors = []
+        sets = [
+            self.templates,
+            self.valid_sides,
+        ]
+        for template, group in product(*sets):
+            name = template.format(group)
+            try:
+                obj = gjfwriter.GJFWriter(name)
+                obj.get_gjf()
+            except Exception as e:
+                errors.append((name, e))
+        if errors:
+            print errors
+            raise errors[0][1]
+
+    def test_mol2(self):
+        errors = []
+        sets = [
+            self.templates,
+            self.valid_sides,
+        ]
+        for template, group in product(*sets):
+            name = template.format(group)
+            try:
+                obj = gjfwriter.GJFWriter(name)
+                obj.get_mol2()
+            except Exception as e:
+                errors.append((name, e))
+        if errors:
+            print errors
+            raise errors[0][1]
+
+
 class UtilsTestCase(TestCase):
     def test_brace_expansion(self):
         names = [
