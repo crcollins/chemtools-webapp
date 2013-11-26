@@ -18,10 +18,10 @@ class GJFWriterTestCase(TestCase):
     ]
     cores = utils.CORES
     invalid_cores = ["cao", "bo", "CONA", "asD"]
-    valid_polymer_sides = ['2', '4b', '4bc', '44bc']
+    valid_polymer_sides = ['2', '4b', '4bc', '44bc', '5-', '5-5', '55-', '5-a', '5-ab4-']
     invalid_polymer_sides = ['B', '2B']
     valid_sides = valid_polymer_sides + invalid_polymer_sides
-    invalid_sides = ['~', 'b', 'c', 'BB', 'TON', 'Dc', '4aaa', '24C2', 'awr']
+    invalid_sides = ['~', 'b', 'c', 'BB', 'TON', 'Dc', '4aaa', '24C2', 'awr', 'A-', '5B-']
     valid_polymer_options = ['_n1', '_n2', '_n3', '_m1', '_m2', '_m3', '_n1_m1']
     invalid_polymer_options = ['_n2_m2', '_n3_m3', '_m2_n2', '_m3_n3', '_n0', '_m0', '_n0_m0']
 
@@ -215,6 +215,7 @@ class GJFWriterTestCase(TestCase):
             ('TON', 'A_TON_A_A'),
 
             ('2_TON', '2A_TON_A_A'),
+            ('2-_TON', '2-A_TON_A_A'),
             ('4_TON', '4aaA_TON_A_A'),
             ('4b_TON', '4bbA_TON_A_A'),
             ('4bc_TON', '4bcA_TON_A_A'),
