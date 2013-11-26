@@ -1,3 +1,4 @@
+import time
 from itertools import product, permutations
 
 from django.test import TestCase
@@ -338,6 +339,7 @@ class GJFWriterTestCase(TestCase):
             raise errors[0][1]
 
     def test_png(self):
+        start = time.time()
         errors = []
         sets = [
             self.templates,
@@ -353,8 +355,10 @@ class GJFWriterTestCase(TestCase):
         if errors:
             print errors
             raise errors[0][1]
+        print 'png', time.time() - start
 
     def test_gjf(self):
+        start = time.time()
         errors = []
         sets = [
             self.templates,
@@ -370,8 +374,10 @@ class GJFWriterTestCase(TestCase):
         if errors:
             print errors
             raise errors[0][1]
+        print 'gjf', time.time() - start
 
     def test_mol2(self):
+        start = time.time()
         errors = []
         sets = [
             self.templates,
@@ -387,6 +393,7 @@ class GJFWriterTestCase(TestCase):
         if errors:
             print errors
             raise errors[0][1]
+        print 'mol2', time.time() - start
 
 
 class UtilsTestCase(TestCase):

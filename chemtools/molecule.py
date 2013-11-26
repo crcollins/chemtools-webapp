@@ -2,21 +2,33 @@ import math
 import copy
 
 from PIL import Image, ImageDraw
-
+import numpy
 
 class Atom(object):
     def __init__(self, x, y, z, element, parent=None):
         self.parent = parent
         self.element = element
-        self.x, self.y, self.z = float(x), float(y), float(z)
+        self.xyz = numpy.matrix([x, y, z], dtype=float).T
         self.bonds = []
 
     def remove(self):
         self.parent.remove(self)
 
     @property
-    def xyz(self):
-        return self.x, self.y, self.z
+    def xyz_tuple(self):
+        return tuple(map(tuple, numpy.asarray(self.xyz.T)))[0]
+
+    @property
+    def x(self):
+        return self.xyz[0,0]
+
+    @property
+    def y(self):
+        return self.xyz[1,0]
+
+    @property
+    def z(self):
+        return self.xyz[2,0]
 
     @property
     def id(self):
@@ -24,11 +36,11 @@ class Atom(object):
 
     @property
     def mol2(self):
-        return "{0} {1}{0} {2} {3} {4} {1}".format(self.id, self.element, *self.xyz)
+        return "{0} {1}{0} {2} {3} {4} {1}".format(self.id, self.element, *self.xyz_tuple)
 
     @property
     def gjf(self):
-        return self.element + " %f %f %f" % (self.xyz)
+        return self.element + " %f %f %f" % self.xyz_tuple
 
     @property
     def gjfbonds(self):
@@ -40,7 +52,7 @@ class Atom(object):
         return s
 
     def __str__(self):
-        return self.element + " %f %f %f" % (self.xyz)
+        return self.element + " %f %f %f" % self.xyz_tuple
 
 
 class Bond(object):
@@ -121,55 +133,43 @@ class Molecule(object):
         cs = math.cos(psi)
         ss = math.sin(psi)
 
+        rot = numpy.matrix([
+                [ct*cs, -ch*ss+sh*st*ss,  sh*ss+ch*st*cs],
+                [ct*ss,  ch*cs+sh*st*ss, -sh*cs+ch*st*ss],
+                [  -st,           sh*ct,           ch*ct],
+            ])
+
         for atom in self.atoms:
-            x = atom.x - point[0]
-            y = atom.y - point[1]
-            z = atom.z - point[2]
+            coords = atom.xyz - point
+            atom.xyz = rot * coords + offset
 
-            atom.x = (ct*cs*x + (-ch*ss+sh*st*ss)*y + (sh*ss+ch*st*cs)*z) + offset[0]
-            atom.y = (ct*ss*x + (ch*cs+sh*st*ss)*y + (-sh*cs+ch*st*ss)*z) + offset[1]
-            atom.z = ((-st)*x + (sh*ct)*y + (ch*ct)*z)                    + offset[2]
 
-    def displace(self, x, y, z):
+    def displace(self, displacement):
         '''Runs a uniform displacement on all the atoms in a molecule.'''
         for atom in self.atoms:
-            atom.x += x
-            atom.y += y
-            atom.z += z
+            atom.xyz += displacement
 
-    def reflect(self, rx, ry, rz):
-        '''Reflect molecule across arbitrary 2d line'''
-        ndotn = float(rx*rx + ry*ry + rz*rz)
+    def reflect(self, normal):
+        '''Reflect molecule across arbitrary plane'''
+        ndotn = normal.T * normal
         if ndotn == 0:
-            ndotn = 1
+            ndotn = 1.0
 
         for atom in self.atoms:
-            x = atom.x
-            y = atom.y
-            z = atom.z
-            vdotn = (rx*x + ry*y + rz*z)
-            atom.x = x - 2 * vdotn / ndotn * rx
-            atom.y = y - 2 * vdotn / ndotn * ry
-            atom.z = z - 2 * vdotn / ndotn * rz
+            vdotn = normal.T * atom.xyz
+            atom.xyz -= 2 * (vdotn / ndotn)[0,0] * normal
 
     def reflect_ends(self):
         bonds = self.open_ends('~')
-        slope = [x-y for (x,y) in zip(bonds[0].atoms[1].xyz, bonds[1].atoms[1].xyz)]
-        self.reflect(slope[0], slope[1], slope[2])
+        normal = bonds[0].atoms[1].xyz - bonds[1].atoms[1].xyz
+        self.reflect(normal)
 
     def bounding_box(self):
         '''Returns the bounding box of the molecule.'''
-        minx, miny, minz = self.atoms[0].xyz
-        maxx, maxy, maxz = self.atoms[0].xyz
-        for atom in self.atoms[1:]:
-            minx = min(atom.x, minx)
-            miny = min(atom.y, miny)
-            minz = min(atom.z, minz)
-
-            maxx = max(atom.x, maxx)
-            maxy = max(atom.y, maxy)
-            maxz = max(atom.z, maxz)
-        return (minx, miny, minz), (maxx, maxy, maxz)
+        coords = numpy.concatenate([x.xyz for x in self.atoms], 1)
+        mins = numpy.min(coords ,1)
+        maxs = numpy.max(coords, 1)
+        return mins, maxs
 
     def open_ends(self, types="+*~"):
         '''Returns a list of any bonds that contain non-standard elements.'''
@@ -220,21 +220,24 @@ class Molecule(object):
             'Si': (128, 170, 128),
             }
 
-        bounds = self.bounding_box()
-        xres = int(scale * abs(bounds[0][0] - bounds[1][0])) + int(.5 * scale)
-        yres = int(scale * abs(bounds[0][1] - bounds[1][1])) + int(.5 * scale)
+        mins, maxs = self.bounding_box()
+        res = (scale * numpy.abs(mins - maxs)).astype(int) + int(.5 * scale)
+        xres = res[0,0]
+        yres = res[1,0]
 
         img = Image.new("RGB", (xres, yres))
         draw = ImageDraw.Draw(img)
         s = int(scale * .25)
         for bond in self.bonds:
-            pts = sum([x.xyz[:2] for x in bond.atoms], tuple())
-            pts = [(coord - bounds[0][i % 2]) * scale + s for i, coord in enumerate(pts)]
+            pts = [(x.xyz[:2] - mins[:2]) * scale + s for x in bond.atoms]
 
-            draw.line(pts, fill=colors[bond.type], width=scale / 10)
+            ends = (pts[0][0,0], pts[0][1,0], pts[1][0,0], pts[1][1,0])
+            draw.line(ends, fill=colors[bond.type], width=scale / 10)
             for x in xrange(2):
                 if bond.atoms[x].element not in "C":
-                    circle = (pts[x * 2] - s, pts[x * 2 + 1] - s, pts[x * 2] + s, pts[x * 2 + 1] + s)
+                    lower = pts[x] - s
+                    higher = pts[x] + s
+                    circle = (lower[0,0], lower[1,0], higher[0,0], higher[1,0])
                     draw.ellipse(circle, fill=colors[bond.atoms[x].element])
         #rotate to standard view
         return img.rotate(-90)
@@ -280,16 +283,17 @@ class Molecule(object):
             raise Exception(6, "bad bond")
 
         #saved to prevent overwriting them
-        R2x, R2y, R2z = R2.x, R2.y, R2.z
-        C1x, C1y, C1z = C1.x, C1.y, C1.z
-        radius1 = math.sqrt((C1.x - R1.x) ** 2 + (C1.y - R1.y) ** 2 + (C1.z - R1.z) ** 2)
-        radius2 = math.sqrt((C2.x - R2.x) ** 2 + (C2.y - R2.y) ** 2 + (C2.z - R2.z) ** 2)
+        R2xyz = R2.xyz.copy()
+        C1xyz = C1.xyz.copy()
+
+        radius1 = numpy.linalg.norm(C1.xyz - R1.xyz)
+        radius2 = numpy.linalg.norm(C2.xyz - R2.xyz)
 
         #angle of 1 - angle of 2 = angle to rotate
         theta = math.acos((R1.z - C1.z) / radius1) - math.acos((C2.z - R2.z) / radius2)
         psi = math.atan2(R1.y - C1.y, R1.x - C1.x) - math.atan2(C2.y - R2.y, C2.x - R2.x)
         phi = 0
-        frag.rotate_3d(theta, phi, psi, (R2x, R2y, R2z), (C1x, C1y, C1z))
+        frag.rotate_3d(theta, phi, psi, R2xyz, C1xyz)
 
         if bond1.atoms[0].element[0] in "~*+":
             bond1.atoms = (C2, C1)
@@ -356,6 +360,6 @@ class Molecule(object):
                 use[i] = num * (2 + size[i])
                 for f in axisfrags:
                     a = copy.deepcopy(f)
-                    a.displace(*use)
+                    a.displace(numpy.matrix(use).T)
                     frags.append(a)
         return Molecule(frags)
