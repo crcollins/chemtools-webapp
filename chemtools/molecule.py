@@ -3,6 +3,7 @@ import copy
 
 from PIL import Image, ImageDraw
 
+from utils import COLORS
 
 class Atom(object):
     def __init__(self, x, y, z, element, parent=None):
@@ -204,22 +205,6 @@ class Molecule(object):
 
     def draw(self, scale):
         '''Draws a basic image of the molecule.'''
-        colors = {
-            '1': (255, 255, 255),
-            'Ar': (255, 0, 0),
-            '2': (0, 255, 0),
-            '3': (0, 0, 255),
-            'S': (255, 255, 0),
-            'O': (255, 0, 0),
-            'N': (0, 0, 255),
-            'P': (255, 128, 0),
-            'Cl': (0, 255, 0),
-            'Br': (180, 0, 0),
-            'C': (128, 128, 128),
-            'H': (220, 220, 220),
-            'Si': (128, 170, 128),
-            }
-
         bounds = self.bounding_box()
         xres = int(scale * abs(bounds[0][0] - bounds[1][0])) + int(.5 * scale)
         yres = int(scale * abs(bounds[0][1] - bounds[1][1])) + int(.5 * scale)
@@ -231,11 +216,11 @@ class Molecule(object):
             pts = sum([x.xyz[:2] for x in bond.atoms], tuple())
             pts = [(coord - bounds[0][i % 2]) * scale + s for i, coord in enumerate(pts)]
 
-            draw.line(pts, fill=colors[bond.type], width=scale / 10)
+            draw.line(pts, fill=COLORS[bond.type], width=scale / 10)
             for x in xrange(2):
                 if bond.atoms[x].element not in "C":
                     circle = (pts[x * 2] - s, pts[x * 2 + 1] - s, pts[x * 2] + s, pts[x * 2 + 1] + s)
-                    draw.ellipse(circle, fill=colors[bond.atoms[x].element])
+                    draw.ellipse(circle, fill=COLORS[bond.atoms[x].element])
         #rotate to standard view
         return img.rotate(-90)
 

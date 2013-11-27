@@ -23,6 +23,22 @@ CLUSTER_TUPLES = [(x, CLUSTERS[x]) for x in CLUSTERS.keys()]
 
 KEYWORDS = "opt B3LYP/6-31g(d)"
 
+COLORS = {
+    '1': (255, 255, 255),
+    'Ar': (255, 0, 0),
+    '2': (0, 255, 0),
+    '3': (0, 0, 255),
+    'S': (255, 255, 0),
+    'O': (255, 0, 0),
+    'N': (0, 0, 255),
+    'P': (255, 128, 0),
+    'Cl': (0, 255, 0),
+    'Br': (180, 0, 0),
+    'C': (128, 128, 128),
+    'H': (220, 220, 220),
+    'Si': (128, 170, 128),
+}
+
 def catch(fn):
     '''Decorator to catch all exceptions and log them.'''
     def wrapper(self, *args, **kwargs):
