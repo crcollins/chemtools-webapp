@@ -27,11 +27,11 @@ class Atom(object):
         return "{0} {1}{0} {2} {3} {4} {1}".format(self.id, self.element, *self.xyz)
 
     @property
-    def gjf(self):
+    def gjf_atoms(self):
         return self.element + " %f %f %f" % (self.xyz)
 
     @property
-    def gjfbonds(self):
+    def gjf_bonds(self):
         s = str(self.id) + ' '
         for bond in self.bonds:
             if bond.atoms[0] == self:
@@ -258,8 +258,8 @@ class Molecule(object):
     @property
     def gjf(self):
         '''Returns a string with the in the proper .gjf format.'''
-        string = "\n".join([x.gjf for x in self.atoms]) + "\n\n"
-        string += "\n".join([x.gjfbonds for x in self.atoms])
+        string = "\n".join([x.gjf_atoms for x in self.atoms]) + "\n\n"
+        string += "\n".join([x.gjf_bonds for x in self.atoms])
         return string
 
     def merge(self, bond1, bond2, frag):
