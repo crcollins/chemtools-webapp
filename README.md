@@ -41,7 +41,7 @@ Test
 
 Currently, there are a few tests as a sanity check for some of the main features of chemtools. You can run them with the following command.
 
-    $ python manage.py test account chem chemtools cluster data parse
+    $ python manage.py test account chem chemtools cluster data parse docs
 
 
 Database
