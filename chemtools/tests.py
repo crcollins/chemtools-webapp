@@ -266,7 +266,7 @@ class GJFWriterTestCase(TestCase):
     def test_get_exact_name_polymer(self):
         errors = []
         pairs = [
-            ('TON_n2', 'TON_A__n2_m1'),
+            ('TON_n2', '_TON_A__n2_m1'),
 
             ('2_TON_n2', '2_TON_A__n2_m1'),
             ('4_TON_n2', '4aa_TON_A__n2_m1'),
@@ -274,36 +274,36 @@ class GJFWriterTestCase(TestCase):
             ('4bc_TON_n2', '4bc_TON_A__n2_m1'),
             ('44bc_TON_n2', '4aa4bc_TON_A__n2_m1'),
 
-            ('TON_2_n2', 'TON_A_2_n2_m1'),
-            ('TON_4_n2', 'TON_A_4aa_n2_m1'),
-            ('TON_4b_n2', 'TON_A_4bb_n2_m1'),
-            ('TON_4bc_n2', 'TON_A_4bc_n2_m1'),
-            ('TON_44bc_n2', 'TON_A_4aa4bc_n2_m1'),
-            ('TON_B4bc_n2', 'TON_B_4bc_n2_m1'), # special case
+            ('TON_2_n2', '_TON_A_2_n2_m1'),
+            ('TON_4_n2', '_TON_A_4aa_n2_m1'),
+            ('TON_4b_n2', '_TON_A_4bb_n2_m1'),
+            ('TON_4bc_n2', '_TON_A_4bc_n2_m1'),
+            ('TON_44bc_n2', '_TON_A_4aa4bc_n2_m1'),
+            ('TON_B4bc_n2', '_TON_B_4bc_n2_m1'), # special case
 
-            ('TON_2__n2', 'TON_2A__n2_m1'),
-            ('TON_4__n2', 'TON_4aaA__n2_m1'),
-            ('TON_4b__n2', 'TON_4bbA__n2_m1'),
-            ('TON_4bc__n2', 'TON_4bcA__n2_m1'),
-            ('TON_44bc__n2', 'TON_4aa4bcA__n2_m1'),
+            ('TON_2__n2', '_TON_2A__n2_m1'),
+            ('TON_4__n2', '_TON_4aaA__n2_m1'),
+            ('TON_4b__n2', '_TON_4bbA__n2_m1'),
+            ('TON_4bc__n2', '_TON_4bcA__n2_m1'),
+            ('TON_44bc__n2', '_TON_4aa4bcA__n2_m1'),
 
-            ('TON_2_TON_2_n2', 'TON_A_2_TON_A_2_n2_m1'),
-            ('TON_4_TON_4_n2', 'TON_A_4aa_TON_A_4aa_n2_m1'),
-            ('TON_4b_TON_4b_n2', 'TON_A_4bb_TON_A_4bb_n2_m1'),
-            ('TON_4bc_TON_4bc_n2', 'TON_A_4bc_TON_A_4bc_n2_m1'),
-            ('TON_44bc_TON_44bc_n2', 'TON_A_4aa4bc_TON_A_4aa4bc_n2_m1'),
+            ('TON_2_TON_2_n2', '_TON_A_2_TON_A_2_n2_m1'),
+            ('TON_4_TON_4_n2', '_TON_A_4aa_TON_A_4aa_n2_m1'),
+            ('TON_4b_TON_4b_n2', '_TON_A_4bb_TON_A_4bb_n2_m1'),
+            ('TON_4bc_TON_4bc_n2', '_TON_A_4bc_TON_A_4bc_n2_m1'),
+            ('TON_44bc_TON_44bc_n2', '_TON_A_4aa4bc_TON_A_4aa4bc_n2_m1'),
 
-            ('TON_2_TON_2_TON_2_n2', 'TON_A_2_TON_A_2_TON_A_2_n2_m1'),
-            ('TON_4_TON_4_TON_4_n2', 'TON_A_4aa_TON_A_4aa_TON_A_4aa_n2_m1'),
-            ('TON_4b_TON_4b_TON_4b_n2', 'TON_A_4bb_TON_A_4bb_TON_A_4bb_n2_m1'),
-            ('TON_4bc_TON_4bc_TON_4bc_n2', 'TON_A_4bc_TON_A_4bc_TON_A_4bc_n2_m1'),
-            ('TON_44bc_TON_44bc_TON_44bc_n2', 'TON_A_4aa4bc_TON_A_4aa4bc_TON_A_4aa4bc_n2_m1'),
+            ('TON_2_TON_2_TON_2_n2', '_TON_A_2_TON_A_2_TON_A_2_n2_m1'),
+            ('TON_4_TON_4_TON_4_n2', '_TON_A_4aa_TON_A_4aa_TON_A_4aa_n2_m1'),
+            ('TON_4b_TON_4b_TON_4b_n2', '_TON_A_4bb_TON_A_4bb_TON_A_4bb_n2_m1'),
+            ('TON_4bc_TON_4bc_TON_4bc_n2', '_TON_A_4bc_TON_A_4bc_TON_A_4bc_n2_m1'),
+            ('TON_44bc_TON_44bc_TON_44bc_n2', '_TON_A_4aa4bc_TON_A_4aa4bc_TON_A_4aa4bc_n2_m1'),
 
-            ('TON_2__TON_2__n2', 'TON_2A__TON_2A__n2_m1'),
-            ('TON_4__TON_4__n2', 'TON_4aaA__TON_4aaA__n2_m1'),
-            ('TON_4b__TON_4b__n2', 'TON_4bbA__TON_4bbA__n2_m1'),
-            ('TON_4bc__TON_4bc__n2', 'TON_4bcA__TON_4bcA__n2_m1'),
-            ('TON_44bc__TON_44bc__n2', 'TON_4aa4bcA__TON_4aa4bcA__n2_m1'),
+            ('TON_2__TON_2__n2', '_TON_2A__TON_2A__n2_m1'),
+            ('TON_4__TON_4__n2', '_TON_4aaA__TON_4aaA__n2_m1'),
+            ('TON_4b__TON_4b__n2', '_TON_4bbA__TON_4bbA__n2_m1'),
+            ('TON_4bc__TON_4bc__n2', '_TON_4bcA__TON_4bcA__n2_m1'),
+            ('TON_44bc__TON_44bc__n2', '_TON_4aa4bcA__TON_4aa4bcA__n2_m1'),
 
             ('TON_m2', 'A_TON__A_n1_m2'),
 
@@ -335,7 +335,7 @@ class GJFWriterTestCase(TestCase):
                 errors.append((a, expected, e))
         if errors:
             print errors
-            raise errors[0][1]
+            raise errors[0][2]
 
     def test_png(self):
         errors = []
