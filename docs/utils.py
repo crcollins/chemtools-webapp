@@ -1,5 +1,6 @@
 from django.template.defaultfilters import slugify
 
+
 def postprocess_toc(text, base):
     usednames = {}
     finaltext = ''

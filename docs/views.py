@@ -4,6 +4,7 @@ import misaka
 
 import utils
 
+
 def index(request):
     a = "".join(open("docs/other/main.md", "r").readlines())
 
@@ -16,6 +17,7 @@ def index(request):
         })
     return render(request, "docs/index.html", c)
 
+
 def common_errors(request):
     a = "".join(open("docs/other/common_errors.md", "r").readlines())
     c = Context({
@@ -23,12 +25,14 @@ def common_errors(request):
         })
     return render(request, "docs/content.html", c)
 
+
 def one_liners(request):
     a = "".join(open("docs/other/one_liners.md", "r").readlines())
     c = Context({
         "docs": misaka.html(a),
         })
     return render(request, "docs/content.html", c)
+
 
 def technical(request):
     a = "".join(open("README.md", "r").readlines())
