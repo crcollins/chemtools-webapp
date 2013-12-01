@@ -1,15 +1,17 @@
 import re
 import itertools
+import string
 
 from django.template import Template, Context
 
-SCORES = [''.join(x) for x in itertools.product(["E","Z"],["O","S","N","P","C"],["N","P","C"])]
-DCORES = [''.join(x) for x in itertools.product(["C","T"],["O","S","N","P","C"],["N","P","C"])]
+atom_combinations = (['O', 'S', 'N', 'P', 'C'], ['N', 'P', 'C'])
+SCORES = [''.join(x) for x in itertools.product(['E', 'Z'], *atom_combinations)]
+DCORES = [''.join(x) for x in itertools.product(['C', 'T'], *atom_combinations)]
 CORES = SCORES + DCORES
-XGROUPS = ["A","B","C","D","E","F","G","H","I","J","K","L"]
-RGROUPS = ["a","b","c","d","e","f","g","h","i","j","k","l"]
 ARYL0 = ["2","3","8","9"]
 ARYL2 = ["4","5","6","7"]
+XGROUPS = list(string.uppercase[:12])
+RGROUPS = list(string.lowercase[:12])
 ARYL = ARYL0 + ARYL2
 CLUSTERS = {
     "b": "Blacklight",
