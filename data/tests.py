@@ -4,7 +4,8 @@ from django.test import Client, TestCase
 from django.core.urlresolvers import reverse
 
 import views
-from chemtools.utils import RGROUPS, ARYL, CLUSTERS
+from chemtools.utils import RGROUPS, XGROUPS, ARYL, CLUSTERS
+
 
 class FragmentTestCase(TestCase):
     def setUp(self):
@@ -15,12 +16,12 @@ class FragmentTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_detail_ends(self):
-        for frag in RGROUPS + ARYL:
+        for frag in RGROUPS + ARYL + XGROUPS:
             response = self.client.get(reverse(views.get_frag, args=(frag, )))
             self.assertEqual(response.status_code, 200)
 
     def test_detail_cores(self):
-        for frag in (''.join(x) for x in product("EZTC","234","34")):
+        for frag in (''.join(x) for x in product("EZTC", "234", "34")):
             response = self.client.get(reverse(views.get_frag, args=(frag, )))
             self.assertEqual(response.status_code, 200)
 
