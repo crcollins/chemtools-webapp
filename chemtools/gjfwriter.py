@@ -17,9 +17,10 @@ ALL = CORES + XGROUPS + RGROUPS + ARYL
 
 ##############################################################################
 
+
 def read_data(filename):
     '''Reads basic data files.'''
-    atomtypes = {'C':'4', 'N': '3', 'O': '2', 'P': '3', 'S': '2'}
+    atomtypes = {'C': '4', 'N': '3', 'O': '2', 'P': '3', 'S': '2'}
     if len(filename) == 3:
         convert = {"XX": filename[1], "YY": filename[2]}
         filename = filename[0] + atomtypes[convert["XX"]] + atomtypes[convert["YY"]]
@@ -57,6 +58,7 @@ def read_data(filename):
     return atoms, bonds
 
 ##############################################################################
+
 
 class GJFWriter(object):
     def __init__(self, name, keywords=None):
@@ -132,7 +134,7 @@ class GJFWriter(object):
                     ends.append(part.next_open('~'))
                 elif char in XGROUPS:
                     ends.append(None)
-                else: # find R-Group parent
+                else:  # find R-Group parent
                     furthest = max(x[2] for x in side)
                     ends.append(this[furthest][0].next_open('~'))
 
@@ -194,6 +196,7 @@ def parse_options(parts):
     xyz = (varset['x'], varset['y'], varset['z'])
     return newparts, nm, xyz
 
+
 def parse_cores(parts):
     output = [[None, []]]
     i = -1
@@ -203,11 +206,12 @@ def parse_cores(parts):
             if i == 0:
                 output[i][0] = part
             else:
-                output.append([part,[]])
+                output.append([part, []])
         output[i][1].append(part)
     if output[0][0] is None:
         raise Exception(1, "Bad Core Name")
     return output
+
 
 def parse_name(name):
     '''Parses a molecule name and returns the edge part names.
@@ -243,7 +247,7 @@ def parse_name(name):
                 middle = None
         parsedsides = tuple(parse_end_name(x) if x else None for x in (left, middle, right))
 
-        for xside, idx, name in zip(parsedsides, [0,1,0], ["left", "middle", "right"]):
+        for xside, idx, name in zip(parsedsides, [0, 1, 0], ["left", "middle", "right"]):
             if xside and xside[-1][0] in XGROUPS:
                 if nm[idx] > 1:
                     raise Exception(9, "can not do nm expansion with xgroup on %s" % name)
@@ -254,6 +258,7 @@ def parse_name(name):
     if len(output) > 2 and nm[1] > 1:
         raise Exception(8, "Can not do m expansion and have multiple cores")
     return output, nm, xyz
+
 
 def parse_end_name(name):
     xgroup = ''.join(XGROUPS)
@@ -275,7 +280,7 @@ def parse_end_name(name):
     for i, char in enumerate(name):
         if char == "-":
             previous = parts[lastconnect]
-            if previous[0] in aryl0+aryl2:
+            if previous[0] in aryl0 + aryl2:
                 parts[lastconnect] = (previous[0], previous[1], True)
             else:
                 raise ValueError("reflection only allowed for aryl groups")
@@ -351,6 +356,7 @@ def parse_end_name(name):
         parts.append(("a", lastconnect, False))
     return parts
 
+
 def get_exact_name(name):
     output, nm, xyz = parse_name(name)
     sidefuncs = (
@@ -364,7 +370,7 @@ def get_exact_name(name):
         for f, end in zip(sidefuncs, ends):
             endname = ''
             if end:
-                endname = ''.join([x[0]+'-' if x[2] else x[0] for x in end])
+                endname = ''.join([x[0] + '-' if x[2] else x[0] for x in end])
 
             if not endname or endname[-1] not in XGROUPS:
                 if f(num):
@@ -429,15 +435,15 @@ if __name__ == "__main__":
                     pathname = os.path.join(self.folder, name)
 
                     if self.gjf or not (self.mol2 or self.scale):
-                        with open(pathname+".gjf", 'w') as f:
+                        with open(pathname + ".gjf", 'w') as f:
                             f.write(out.get_gjf())
 
                     if self.mol2:
-                        with open(pathname+".mol2", 'w') as f:
+                        with open(pathname + ".mol2", 'w') as f:
                             f.write(out.get_mol2())
 
                     if self.scale:
-                        with open(pathname+".png", 'w') as f:
+                        with open(pathname + ".png", 'w') as f:
                             f.write(out.get_png(self.scale))
                 except Exception as e:
                     self.errors.append(e)

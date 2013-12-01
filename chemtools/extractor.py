@@ -3,7 +3,9 @@ import itertools
 
 from molecule import Atom, Bond
 
-cores = [''.join(x) for x in itertools.product(["C","T","Z","E"],["2","3","4"],["3","4"])]
+
+parts_of_name = ['C', 'T', 'Z', 'E'], ['2', '3', '4'], ['3', '4']
+cores = [''.join(x) for x in itertools.product(*parts_of_name)]
 xrgroups = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'l']
 aryl = ['2', '3', '4', '5', '6', '7', '8', '9']
 coreparts = ["*~0", "*~1", "~0", "~1"]
@@ -17,8 +19,9 @@ ends = ["Sg", "Bh", "Hs", "Mt"]
 xy = {"Ge": "XX", "As": "YY"}
 partslist = [coreparts, xrparts, arylparts]
 
+
 def parse_mol2(filename):
-    with open(filename, "r") as f:
+    with open(filename, 'r') as f:
         atoms = []
         bonds = []
         state = -2
@@ -26,31 +29,35 @@ def parse_mol2(filename):
             if "@<TRIPOS>" in line:
                 state += 1
             elif state == 0:
-                x,y,z,e = line.split()[-4:]
-                atoms.append(Atom(x,y,z,e, atoms))
+                x, y, z, e = line.split()[-4:]
+                atoms.append(Atom(x, y, z, e, atoms))
             elif state == 1:
                 a1, a2, t = line.split()[-3:]
-                bonds.append(Bond((atoms[int(a1)-1], atoms[int(a2)-1]), t, bonds))
+                atom1 = atoms[int(a1) - 1]
+                atom2 = atoms[int(a2) - 1])
+                bonds.append(Bond((atom1, atom2, t, bonds))
         return atoms, bonds
 
+
 def run_all(base="chemtools"):
-    for fname in os.listdir(os.path.join(base,"mol2")):
+    for fname in os.listdir(os.path.join(base, "mol2")):
         name, ext = os.path.splitext(fname)
-        for i,x in enumerate([cores, xrgroups, aryl]):
+        for i, x in enumerate([cores, xrgroups, aryl]):
             if name in x:
                 parts = partslist[i]
 
         atoms, bonds = parse_mol2(os.path.join(base, "mol2", fname))
-        with open(os.path.join(base,"data",name), "w") as f:
+        with open(os.path.join(base, "data", name), 'w') as f:
             for atom in atoms:
                 if atom.element in ends:
                     atom.element = parts[ends.index(atom.element)]
                 if atom.element in xy:
                     atom.element = xy[atom.element]
-                f.write(str(atom)+"\n")
-            f.write("\n")
+                f.write(str(atom) + '\n')
+            f.write('\n')
             for bond in bonds:
-                f.write(' '.join(bond.mol2.split()[1:])+"\n")
+                f.write(' '.join(bond.mol2.split()[1:]) + '\n')
+
 
 if __name__ == "__main__":
     run_all("")

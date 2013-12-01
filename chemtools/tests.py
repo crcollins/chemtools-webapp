@@ -279,7 +279,7 @@ class GJFWriterTestCase(TestCase):
             ('TON_4b_n2', '_TON_A_4bb_n2_m1'),
             ('TON_4bc_n2', '_TON_A_4bc_n2_m1'),
             ('TON_44bc_n2', '_TON_A_4aa4bc_n2_m1'),
-            ('TON_B4bc_n2', '_TON_B_4bc_n2_m1'), # special case
+            ('TON_B4bc_n2', '_TON_B_4bc_n2_m1'),  # special case
 
             ('TON_2__n2', '_TON_2A__n2_m1'),
             ('TON_4__n2', '_TON_4aaA__n2_m1'),
@@ -405,7 +405,7 @@ class UtilsTestCase(TestCase):
             ("{a,b}{c,d}{e,f}", ["ace", "acf", "ade", "adf", "bce", "bcf", "bde", "bdf"]),
         ]
         for name, result in names:
-            self.assertEqual(set(utils.name_expansion(name)),set(result))
+            self.assertEqual(set(utils.name_expansion(name)), set(result))
 
     def test_group_expansion(self):
         names = [
@@ -417,7 +417,7 @@ class UtilsTestCase(TestCase):
             ("{$ARYL}", utils.ARYL),
         ]
         for name, result in names:
-            self.assertEqual(set(utils.name_expansion(name)),set(result))
+            self.assertEqual(set(utils.name_expansion(name)), set(result))
 
     def test_local_vars(self):
         names = [
@@ -428,7 +428,7 @@ class UtilsTestCase(TestCase):
             ("{a,b}{c,d}{$0}{$1}", ["acac", "bcbc", "adad", "bdbd"]),
         ]
         for name, result in names:
-            self.assertEqual(set(utils.name_expansion(name)),set(result))
+            self.assertEqual(set(utils.name_expansion(name)), set(result))
 
     def test_name_expansion(self):
         names = [
@@ -437,7 +437,7 @@ class UtilsTestCase(TestCase):
             ("24{$ARYL}_{$CORES}", ["24" + '_'.join(x) for x in product(utils.ARYL, utils.CORES)]),
         ]
         for name, result in names:
-            self.assertEqual(set(utils.name_expansion(name)),set(result))
+            self.assertEqual(set(utils.name_expansion(name)), set(result))
 
     def test_local_vars_case(self):
         names = [
@@ -453,4 +453,4 @@ class UtilsTestCase(TestCase):
             ("{A,B}{C,D}{$0.L}{$1.L}", ["ACac", "BCbc", "ADad", "BDbd"]),
         ]
         for name, result in names:
-            self.assertEqual(set(utils.name_expansion(name)),set(result))
+            self.assertEqual(set(utils.name_expansion(name)), set(result))

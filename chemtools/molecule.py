@@ -5,6 +5,7 @@ from PIL import Image, ImageDraw
 
 from utils import COLORS
 
+
 class Atom(object):
     def __init__(self, x, y, z, element, parent=None):
         self.parent = parent
@@ -155,7 +156,7 @@ class Molecule(object):
 
     def reflect_ends(self):
         bonds = self.open_ends('~')
-        slope = [x-y for (x,y) in zip(bonds[0].atoms[1].xyz, bonds[1].atoms[1].xyz)]
+        slope = [x - y for (x, y) in zip(bonds[0].atoms[1].xyz, bonds[1].atoms[1].xyz)]
         self.reflect(slope[0], slope[1], slope[2])
 
     def bounding_box(self):
@@ -301,7 +302,6 @@ class Molecule(object):
             frags.append(mol)
             finalends[2] = ends[2]
         return Molecule(frags), finalends
-
 
     def polymerize(self, ends, nm):
         '''Returns an n length chain of the molecule.'''

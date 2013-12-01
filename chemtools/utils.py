@@ -8,18 +8,18 @@ atom_combinations = (['O', 'S', 'N', 'P', 'C'], ['N', 'P', 'C'])
 SCORES = [''.join(x) for x in itertools.product(['E', 'Z'], *atom_combinations)]
 DCORES = [''.join(x) for x in itertools.product(['C', 'T'], *atom_combinations)]
 CORES = SCORES + DCORES
-ARYL0 = ["2","3","8","9"]
-ARYL2 = ["4","5","6","7"]
 XGROUPS = list(string.uppercase[:12])
 RGROUPS = list(string.lowercase[:12])
+ARYL0 = ['2', '3', '8', '9']
+ARYL2 = ['4', '5', '6', '7']
 ARYL = ARYL0 + ARYL2
 CLUSTERS = {
-    "b": "Blacklight",
-    "t": "Trestles",
-    "g": "Gordon",
-    "c": "Carver",
-    "h": "Hooper",
-    "m": "Marcy",
+    'b': "Blacklight",
+    't': "Trestles",
+    'g': "Gordon",
+    'c': "Carver",
+    'h': "Hooper",
+    'm': "Marcy",
 }
 CLUSTER_TUPLES = [(x, CLUSTERS[x]) for x in CLUSTERS.keys()]
 
@@ -40,6 +40,7 @@ COLORS = {
     'H': (220, 220, 220),
     'Si': (128, 170, 128),
 }
+
 
 def catch(fn):
     '''Decorator to catch all exceptions and log them.'''

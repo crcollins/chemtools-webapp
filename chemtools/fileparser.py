@@ -6,10 +6,12 @@ import multiprocessing
 from utils import Output, catch
 from gjfwriter import get_exact_name
 
+
 class Log(object):
     PARSERS = dict()
+
     def __init__(self, f, fname=None):
-        if not hasattr(f, 'read'): # filename
+        if not hasattr(f, "read"):  # filename
             f = open(f, 'r')
         with f:
             self.fname = fname if fname else f.name
@@ -72,7 +74,7 @@ class Log(object):
         return a
 
     def format_gjf(self):
-        s  = self["Header"]
+        s = self["Header"]
         s += self["Geometry"]
         return s
 
@@ -150,8 +152,10 @@ class LineParser(object):
         self.value = None
         self.range = (0, 0)
         self.newfile = False
+
     def parse(self, line):
         raise NotImplementedError
+
     def __str__(self):
         return str(self.value)
     # def header(self):
@@ -159,6 +163,7 @@ class LineParser(object):
 
 ##############################################################################
 ##############################################################################
+
 
 @Log.add_parser
 class Options(LineParser):
@@ -319,13 +324,13 @@ class Geometry(LineParser):
         # ...
         # " 4,1.2501547542\H,22.6120510229,1.0505502972,0.1022974384\H,2.283441615"
         # " 6,-0.8632316482,20.4346296726\\Version=EM64L-G09RevC.01\State=1-A\HF=-"
-        if "\\" in self.prevline+line:
+        if "\\" in self.prevline + line:
             self.start = True
         line = line.strip()
         if self.start:
-            if r"\\@" in self.prevline+line:
+            if r"\\@" in self.prevline + line:
                 start = self.value.index("#")
-                end =  self.value.index(r"\Version", start)
+                end = self.value.index(r"\Version", start)
 
                 d = {",": " ", "\\": "\n",
                     "geom=connectivity": "",
@@ -361,6 +366,7 @@ class Header(LineParser):
                 self.value += line + "\n"
             elif line.startswith("-"):
                 self.done = True
+
 
 @Log.add_parser
 class Dipole(LineParser):
@@ -424,7 +430,7 @@ if __name__ == "__main__":
                 for folder in folders:
                     if os.path.isdir(folder):
                         path = os.path.relpath(folder) if self.rel else os.path.abspath(folder)
-                        files += [os.path.join(path,x) for x in os.listdir(folder) if os.path.isfile(os.path.join(path,x))]
+                        files += [os.path.join(path, x) for x in os.listdir(folder) if os.path.isfile(os.path.join(path, x))]
                 return files
             else:
                 return []
@@ -434,11 +440,10 @@ if __name__ == "__main__":
             logs.parse_files(self.files, basename=self.basename, exactname=self.exactname)
 
             if self.outputfilename:
-                with open(self.outputfilename,'w') as outputfile:
+                with open(self.outputfilename, 'w') as outputfile:
                     outputfile.write(logs.format_output(errors=self.error))
             else:
                 print logs.format_output(errors=self.error)
-
 
     parser = argparse.ArgumentParser(description="This program extracts data from Gaussian log files.")
     parser.add_argument('files', metavar='file', type=str, nargs='*', help='The name of single file.')
@@ -447,7 +452,7 @@ if __name__ == "__main__":
     parser.add_argument('-o', metavar='output', action="store", dest="outputfile", type=str, help='The output file.')
     parser.add_argument('-E', action="store_true", dest="error", default=False, help='Toggles showing error messages.')
     parser.add_argument('-P', action="store_true", dest="paths", default=False, help='Toggles showing paths to files.')
-    parser.add_argument('-R',  action="store_true", dest="rel", default=False, help='Toggles showing relative paths.')
+    parser.add_argument('-R', action="store_true", dest="rel", default=False, help='Toggles showing relative paths.')
     parser.add_argument('-V', action="store_true", dest="verbose", default=False, help='Toggles showing all messages.')
     parser.add_argument('-B', action="store_true", dest="base", default=False, help='Toggles path.')
     parser.add_argument('-F', action="store_true", dest="exactname", default=False, help='Toggles exact name.')
