@@ -6,6 +6,7 @@ from django.utils import simplejson
 import views
 from models import ErrorReport
 
+
 class MainPageTestCase(TestCase):
     names = ["24a_TON", "24b_TSP_24a_24a", "CON_24a"]
 
@@ -25,7 +26,8 @@ class MainPageTestCase(TestCase):
     def test_index_redirect(self):
         for name in self.names:
             for keywords in ["opt HF/6-31g(d)", "td b3lyp/6-31g(d)"]:
-                url = reverse("chem_index") + "?molecule=%s&keywords=%s" % (name, keywords)
+                params = "?molecule=%s&keywords=%s" % (name, keywords)
+                url = reverse("chem_index") + params
                 response = self.client.get(url)
                 self.assertEqual(response.status_code, 302)
 
@@ -101,7 +103,7 @@ class MainPageTestCase(TestCase):
             "26262626262a_TON",
         ]
         data = {
-            "email":"something@test.com",
+            "email": "something@test.com",
             "message": "something something something something"
         }
         for name in names:
@@ -120,4 +122,3 @@ class MainPageTestCase(TestCase):
 
                 obj = ErrorReport.objects.get(molecule=name)
                 obj.delete()
-

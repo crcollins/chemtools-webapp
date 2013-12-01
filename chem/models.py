@@ -6,6 +6,7 @@ from django import forms
 from chemtools.utils import CLUSTER_TUPLES
 from cluster.models import Credential
 
+
 class ErrorReport(models.Model):
     URGENCY_CHOICES = ((0, "Low"), (1, "Mid"), (2, "High"))
     molecule = models.CharField(max_length=400)
@@ -14,10 +15,12 @@ class ErrorReport(models.Model):
     urgency = models.IntegerField(choices=URGENCY_CHOICES)
     message = models.TextField()
 
+
 class ErrorReportForm(forms.ModelForm):
     class Meta:
         model = ErrorReport
         fields = ("email", "urgency", "message")
+
 
 class JobForm(forms.Form):
     name = forms.CharField(max_length=400)
@@ -26,12 +29,15 @@ class JobForm(forms.Form):
     walltime = forms.IntegerField()
     allocation = forms.CharField(max_length=12)
     cluster = forms.ChoiceField(choices=CLUSTER_TUPLES)
-    template = forms.CharField(widget=forms.Textarea(attrs={'cols': 50, 'rows': 26}))
+    template = forms.CharField(
+                        widget=forms.Textarea(attrs={'cols': 50, 'rows': 26})
+                        )
 
-    credential = forms.ModelChoiceField(queryset=Credential.objects.none(),
-                                        required=False,
-                                        widget=forms.HiddenInput(),
-                                        help_text="Only required if you are submitting a job.")
+    credential = forms.ModelChoiceField(
+                        queryset=Credential.objects.none(),
+                        required=False,
+                        widget=forms.HiddenInput(),
+                        help_text="Only required if you are submitting a job.")
 
     @classmethod
     def get_form(cls, request, molecule):
@@ -46,16 +52,16 @@ class JobForm(forms.Form):
             else:
                 email = ""
 
-            with open("chemtools/templates/chemtools/gjob.txt" , "r") as f:
+            with open("chemtools/templates/chemtools/gjob.txt", "r") as f:
                 text = f.read()
             form = JobForm(initial={
                 "name": molecule,
                 "email": email,
                 "cluster": 'g',
                 "allocation": "TG-CHE120081",
-                "template":text,
-                "walltime":48,
-                "nodes":1,
+                "template": text,
+                "walltime": 48,
+                "nodes": 1,
                 })
         if request.user.is_authenticated():
             f = form.fields['credential']
@@ -67,5 +73,3 @@ class JobForm(forms.Form):
         d = dict(self.cleaned_data)
         d["name"] = re.sub(r"{{\s*name\s*}}", name, d["name"])
         return d
-
-

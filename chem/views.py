@@ -18,6 +18,7 @@ from chemtools import gjfwriter
 from chemtools.utils import name_expansion, write_job, KEYWORDS
 import cluster.interface
 
+
 def index(request):
     if request.GET.get("molecule"):
 
@@ -57,6 +58,7 @@ def _get_molecules_info(string):
         warn = ErrorReport.objects.filter(molecule=mol)
         warnings.append(True if warn else None)
     return molecules, warnings, errors
+
 
 def multi_job(request):
     form = JobForm.get_form(request, "{{ name }}")
@@ -99,6 +101,7 @@ def multi_job(request):
     else:
         return render(request, "chem/multi_job.html", c)
 
+
 def molecule_check(request, string):
     a = {
         "error": None,
@@ -111,6 +114,7 @@ def molecule_check(request, string):
         a["error"] = "The operation timed out."
         a["molecules"] = None
     return HttpResponse(simplejson.dumps(a), mimetype="application/json")
+
 
 def molecule_detail(request, molecule):
     _, warnings, errors = _get_molecules_info(molecule)
@@ -146,6 +150,7 @@ def molecule_detail(request, molecule):
         })
     return render(request, "chem/molecule_detail.html", c)
 
+
 def multi_molecule(request, string):
     form = JobForm.get_form(request, "{{ name }}")
     add = "" if request.GET.get("view") else "attachment; "
@@ -153,7 +158,7 @@ def multi_molecule(request, string):
     if form.is_valid():
         d = dict(form.cleaned_data)
         if request.method == "GET":
-            molecule = request.REQUEST.get("molname","")
+            molecule = request.REQUEST.get("molname", "")
             d = form.get_single_data(molecule)
             response = HttpResponse(write_job(**d), content_type="text/plain")
             response['Content-Disposition'] = add + 'filename=%s.job' % molecule
@@ -174,6 +179,7 @@ def multi_molecule(request, string):
         "keywords": keywords,
         })
     return render(request, "chem/multi_molecule.html", c)
+
 
 def multi_molecule_zip(request, string):
     keywords = request.GET.get("keywords")
@@ -230,7 +236,7 @@ def multi_molecule_zip(request, string):
                 zfile.writestr(name + ".gjf", out.get_gjf())
 
         except Exception as e:
-            generrors.append("%s - %s" % (name,  e))
+            generrors.append("%s - %s" % (name, e))
     if generrors:
         zfile.writestr("errors.txt", '\n'.join(generrors))
 
@@ -244,6 +250,7 @@ def multi_molecule_zip(request, string):
     response["Content-Disposition"] = "attachment; filename=molecules.zip"
     return response
 
+
 def write_gjf(request, molecule):
     keywords = request.GET.get("keywords")
     add = "" if request.GET.get("view") else "attachment; "
@@ -254,6 +261,7 @@ def write_gjf(request, molecule):
     response['Content-Disposition'] = add + 'filename=%s.gjf' % molecule
     return response
 
+
 def write_mol2(request, molecule):
     add = "" if request.GET.get("view") else "attachment; "
 
@@ -263,6 +271,7 @@ def write_mol2(request, molecule):
     response['Content-Disposition'] = add + 'filename=%s.mol2' % molecule
     return response
 
+
 def write_png(request, molecule):
     scale = request.GET.get("scale", 10)
 
@@ -271,6 +280,7 @@ def write_png(request, molecule):
     out.molecule.draw(int(scale)).save(response, "PNG")
     response['Content-Disposition'] = 'filename=%s.png' % molecule
     return response
+
 
 def report(request, molecule):
     if request.user.is_authenticated():
@@ -287,7 +297,7 @@ def report(request, molecule):
             form.save()
             return redirect(molecule_detail, molecule)
     else:
-        form = ErrorReportForm(initial={"email" : email})
+        form = ErrorReportForm(initial={"email": email})
 
     c = Context({
         "form": form,
