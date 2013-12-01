@@ -1,3 +1,5 @@
+import re
+
 from django.db import models
 from django import forms
 
@@ -60,3 +62,10 @@ class JobForm(forms.Form):
             f.widget = forms.Select()
             f.queryset = Credential.objects.filter(user=request.user)
         return form
+
+    def get_single_data(self, name):
+        d = dict(self.cleaned_data)
+        d["name"] = re.sub(r"{{\s*name\s*}}", name, d["name"])
+        return d
+
+

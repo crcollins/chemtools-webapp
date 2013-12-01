@@ -76,9 +76,8 @@ def multi_job(request):
         for name in name_expansion(string):
             if not name:
                 continue
-            dnew = d.copy()
             name, _ = os.path.splitext(name)
-            dnew["name"] = re.sub(r"{{\s*name\s*}}", name, dnew["name"])
+            dnew = form.get_single_data(name)
             zfile.writestr("%s.%sjob" % (name, dnew.get("cluster")), write_job(**dnew))
 
         zfile.close()
@@ -155,7 +154,7 @@ def multi_molecule(request, string):
         d = dict(form.cleaned_data)
         if request.method == "GET":
             molecule = request.REQUEST.get("molname","")
-            d["name"] = re.sub(r"{{\s*name\s*}}", molecule, d["name"])
+            d = form.get_single_data(molecule)
             response = HttpResponse(write_job(**d), content_type="text/plain")
             response['Content-Disposition'] = add + 'filename=%s.job' % molecule
             return response
@@ -223,8 +222,7 @@ def multi_molecule_zip(request, string):
                 zfile.writestr(name + ".mol2", out.get_mol2())
                 others = True
             if request.GET.get("job"):
-                dnew = d.copy()
-                dnew["name"] = re.sub(r"{{\s*name\s*}}", name, dnew["name"])
+                dnew = form.get_single_data(name)
                 zfile.writestr(name + ".job", write_job(**dnew))
                 others = True
 
