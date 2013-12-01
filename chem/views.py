@@ -21,9 +21,9 @@ import cluster.interface
 def index(request):
     if request.GET.get("molecule"):
 
-        func = gen_detail
+        func = molecule_detail
         if set(",{}$") & set(request.GET.get("molecule")):
-            func = gen_multi_detail
+            func = multi_molecule
 
         a = {"keywords": request.GET.get("keywords", None)}
         if a["keywords"] != KEYWORDS:
@@ -113,7 +113,7 @@ def molecule_check(request, string):
         a["molecules"] = None
     return HttpResponse(simplejson.dumps(a), mimetype="application/json")
 
-def gen_detail(request, molecule):
+def molecule_detail(request, molecule):
     _, warnings, errors = _get_molecules_info(molecule)
     form = JobForm.get_form(request, molecule)
     keywords = request.REQUEST.get("keywords")
@@ -147,7 +147,7 @@ def gen_detail(request, molecule):
         })
     return render(request, "chem/molecule_detail.html", c)
 
-def gen_multi_detail(request, string):
+def multi_molecule(request, string):
     form = JobForm.get_form(request, "{{ name }}")
     add = "" if request.GET.get("view") else "attachment; "
 
@@ -176,7 +176,7 @@ def gen_multi_detail(request, string):
         })
     return render(request, "chem/multi_molecule.html", c)
 
-def gen_multi_detail_zip(request, string):
+def multi_molecule_zip(request, string):
     keywords = request.GET.get("keywords")
 
     buff = StringIO()
@@ -287,7 +287,7 @@ def report(request, molecule):
             initial={"email": email})
         if form.is_valid():
             form.save()
-            return redirect(gen_detail, molecule)
+            return redirect(molecule_detail, molecule)
     else:
         form = ErrorReportForm(initial={"email" : email})
 

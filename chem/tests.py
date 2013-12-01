@@ -31,7 +31,7 @@ class MainPageTestCase(TestCase):
 
     def test_molecule_detail(self):
         for name in self.names:
-            response = self.client.get(reverse(views.gen_detail, args=(name, )))
+            response = self.client.get(reverse(views.molecule_detail, args=(name, )))
             self.assertEqual(response.status_code, 200)
 
     def test_molecule_gjf(self):
@@ -51,12 +51,12 @@ class MainPageTestCase(TestCase):
 
     def test_multi_molecule(self):
         names = ",".join(self.names)
-        response = self.client.get(reverse(views.gen_multi_detail, args=(names, )))
+        response = self.client.get(reverse(views.multi_molecule, args=(names, )))
         self.assertEqual(response.status_code, 200)
 
     def test_multi_molecule_zip(self):
         names = ",".join(self.names)
-        response = self.client.get(reverse(views.gen_multi_detail_zip, args=(names, )))
+        response = self.client.get(reverse(views.multi_molecule_zip, args=(names, )))
         self.assertEqual(response.status_code, 200)
 
     def test_write_gjf(self):
