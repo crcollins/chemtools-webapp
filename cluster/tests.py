@@ -5,6 +5,7 @@ from django.utils import simplejson
 
 import views
 
+
 class SSHPageTestCases(TestCase):
     def setUp(self):
         user = User.objects.create_user("testerman", email="test@test.com", password="S0m3thing")

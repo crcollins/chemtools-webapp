@@ -9,6 +9,7 @@ from chemtools.utils import name_expansion
 from models import Job
 from utils import get_ssh_connection, get_sftp_connection, _run_job, _get_jobs, get_compressed_file
 
+
 def run_job(credential, gjfstring, jobstring=None, **kwargs):
     ssh = get_ssh_connection(credential)
     sftp = get_sftp_connection(credential)
@@ -23,6 +24,7 @@ def run_job(credential, gjfstring, jobstring=None, **kwargs):
         results["jobid"] = temp[0]
         results["error"] = temp[1]
         return results
+
 
 def run_jobs(credential, names, gjfstrings, jobstring=None, **kwargs):
     ssh = get_ssh_connection(credential)
@@ -49,6 +51,7 @@ def run_jobs(credential, names, gjfstrings, jobstring=None, **kwargs):
                 results["failed"].append((name, temp[1]))
     return results
 
+
 def run_standard_job(credential, molecule, **kwargs):
     results = {"jobid": None, "error": None, "cluster": credential.cluster.name}
     try:
@@ -63,6 +66,7 @@ def run_standard_job(credential, molecule, **kwargs):
     #     job = Job(molecule=molecule, jobid=results["jobid"], **kwargs)
     #     job.save()
     return results
+
 
 def run_standard_jobs(credential, string, **kwargs):
     results = {
@@ -92,6 +96,7 @@ def run_standard_jobs(credential, string, **kwargs):
     results["failed"].extend(temp["failed"])
     results["error"] = temp["error"]
     return results
+
 
 def kill_jobs(user, cluster, jobids):
     cred = user.credentials.filter(cluster__name=cluster)[0]
@@ -132,6 +137,7 @@ def kill_jobs(user, cluster, jobids):
                 pass
     return results
 
+
 def get_all_jobs(user, cluster=None):
     if cluster:
         creds = user.credentials.filter(cluster__name__iexact=cluster)
@@ -151,6 +157,7 @@ def get_all_jobs(user, cluster=None):
         t.join(20)
     return [x for x in results if x]
 
+
 def recover_output(user, name):
     with ssh, sftp:
         _, stdout, stderr = ssh.exec_command("ls done/%s.*" % name)
@@ -168,6 +175,7 @@ def recover_output(user, name):
                     for line in f:
                         f2.write(line)
                 ssh.exec_command("rm %s %s" % (zippath, path + ".bak"))
+
 
 def reset_output(user, name):
     '''If successful this is successful, it will start the file that was reset,

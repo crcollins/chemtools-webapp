@@ -7,27 +7,30 @@ from project.utils import StringIO, SSHClient, SFTPClient
 
 from models import Credential
 
+
 def get_ssh_connection(obj):
     if isinstance(obj, Credential):
         try:
             return obj.get_ssh_connection()
-        except: # sometimes this timesout
+        except:  # sometimes this timesout
             return obj.get_ssh_connection()
     elif isinstance(obj, SSHClient):
         return obj
     else:
         raise TypeError
 
+
 def get_sftp_connection(obj):
     if isinstance(obj, Credential):
         try:
             return obj.get_sftp_connection()
-        except: # sometimes this timesout
+        except:  # sometimes this timesout
             return obj.get_sftp_connection()
     elif isinstance(obj, SFTPClient):
         return obj
     else:
         raise TypeError
+
 
 def _make_folders(ssh):
     folder = 'chemtools/done/'
@@ -36,6 +39,7 @@ def _make_folders(ssh):
     if testerr2:
         return testerr2[0]
     return None
+
 
 def _run_job(ssh, sftp, gjfstring, jobstring=None, **kwargs):
     try:
@@ -49,7 +53,6 @@ def _run_job(ssh, sftp, gjfstring, jobstring=None, **kwargs):
         f = sftp.open("chemtools/%s.gjf" % name, 'w')
         f.write(gjfstring)
         f.close()
-
 
         if jobstring is None:
             jobstring = write_job(internal=True, **kwargs)
@@ -68,24 +71,26 @@ def _run_job(ssh, sftp, gjfstring, jobstring=None, **kwargs):
         return None, str(e)
     return jobid, None
 
+
 def _get_columns(lines):
     toprow = [x.strip() for x in lines[2].strip().split() if x]
 
     bottomrow = [x.strip() for x in lines[3].strip().split() if x]
     bottomrow.remove("Job")
     idx = bottomrow.index("ID")
-    bottomrow[idx] = "Job "+bottomrow[idx]
+    bottomrow[idx] = "Job " + bottomrow[idx]
 
     timeidx = bottomrow.index("Time")
-    timeidx2 = bottomrow.index("Time", timeidx+1)
+    timeidx2 = bottomrow.index("Time", timeidx + 1)
     memidx = bottomrow.index("Memory")
-    idxes = [timeidx,timeidx2,memidx]
+    idxes = [timeidx, timeidx2, memidx]
     order = sorted(idxes)
     argorder = [order.index(x) for x in idxes]
 
     for i, x in enumerate(idxes):
         bottomrow[x] = ' '.join([toprow[argorder[i]], bottomrow[x]])
     return bottomrow
+
 
 def _get_jobs(cred, i, results):
     wantedcols = ["Job ID", "Username", "Jobname", "Req'd Memory", "Req'd Time", 'Elap Time', 'S']
@@ -124,6 +129,7 @@ def _get_jobs(cred, i, results):
         print e
         results[i] = {"name": cred.cluster.name, "columns": wantedcols, "jobs": []}
 
+
 def wait_for_compression(ssh, zippath):
     done = False
     while not done:
@@ -133,6 +139,7 @@ def wait_for_compression(ssh, zippath):
             done = True
         else:
             time.sleep(.01)
+
 
 def get_compressed_file(ssh, sftp, path):
     dirname, fname = os.path.split(path)

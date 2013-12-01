@@ -12,10 +12,12 @@ class Cluster(models.Model):
     def __unicode__(self):
         return "%s (%s)" % (self.name, self.hostname)
 
+
 class ClusterForm(forms.ModelForm):
     class Meta:
         model = Cluster
         fields = ("name", "hostname")
+
 
 class EncryptedCharField(models.CharField):
     cipher = AESCipher()
@@ -28,7 +30,7 @@ class EncryptedCharField(models.CharField):
             return value
 
     def get_prep_value(self, value):
-        return "$AES$"+self.cipher.encrypt(value)
+        return "$AES$" + self.cipher.encrypt(value)
 
 
 class Credential(models.Model):
@@ -98,6 +100,7 @@ class CredentialForm(forms.ModelForm):
             raise forms.ValidationError("Those credentials did not work.")
         return cleaned_data
 
+
 class Job(models.Model):
     credential = models.ForeignKey(Credential)
 
@@ -115,5 +118,5 @@ class Job(models.Model):
 
     def __init__(self, *args, **kwargs):
         fields = set([x.name for x in Job._meta.fields])
-        newkwargs = {k:v for k,v in kwargs.items() if k in fields}
+        newkwargs = {k: v for k, v in kwargs.items() if k in fields}
         super(Job, self).__init__(*args, **newkwargs)

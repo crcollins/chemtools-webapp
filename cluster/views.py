@@ -12,12 +12,14 @@ import interface
 def job_index(request):
     return render(request, "cluster/job_index.html")
 
+
 @login_required
 def cluster_job_index(request, cluster):
     c = Context({
         "cluster": cluster,
         })
     return render(request, "cluster/job_index.html", c)
+
 
 @login_required
 def get_job_list(request):
@@ -32,6 +34,7 @@ def get_job_list(request):
         "clusters": jobs,
     }
     return HttpResponse(simplejson.dumps(a), mimetype="application/json")
+
 
 @login_required
 def job_detail(request, cluster, jobid):
@@ -50,6 +53,7 @@ def job_detail(request, cluster, jobid):
         })
     return render(request, "cluster/job_detail.html", c)
 
+
 @login_required
 def reset_job(request, jobid):
     """Used to restart jobs that have hit the time limit."""
@@ -64,6 +68,7 @@ def reset_job(request, jobid):
             return HttpResponse("It worked. Your new job id is: %d" % njobid)
         else:
             return HttpResponse(e)
+
 
 @login_required
 def kill_job(request, cluster):
