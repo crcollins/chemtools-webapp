@@ -94,10 +94,10 @@ class Log(object):
                 name = get_exact_name(temp)
             except:
                 pass
-        return ', '.join([name] + values)
+        return ','.join([name] + values)
 
     def format_header(self):
-        return ', '.join(["Name"] + self.order)
+        return ','.join(["Name"] + self.order)
 
 
 class LogSet(Output):
