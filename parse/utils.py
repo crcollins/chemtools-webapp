@@ -2,6 +2,7 @@ import bz2
 import zipfile
 import tarfile
 
+
 def parse_file_list(files):
     for f in files:
         if f.name.endswith(".zip"):

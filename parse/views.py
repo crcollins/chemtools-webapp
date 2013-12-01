@@ -11,6 +11,7 @@ from chemtools import fileparser, dataparser
 from project.utils import StringIO
 import utils
 
+
 def upload_data(request):
     switch = {
         "logparse": parse_log,
@@ -28,6 +29,7 @@ def upload_data(request):
         })
     return render(request, "parse/upload_log.html", c)
 
+
 def parse_log(request):
     parser = fileparser.LogSet()
     for f in utils.parse_file_list(request.FILES.getlist('myfiles')):
@@ -36,6 +38,7 @@ def parse_log(request):
     f = StringIO(parser.format_output())
     response = HttpResponse(FileWrapper(f), content_type="text/plain")
     return response
+
 
 def _find_sets(files):
     logs = []
@@ -55,9 +58,9 @@ def _find_sets(files):
 
         name = f.name.replace(".log", '').replace("n%s" % num, '')
         if name in logsets.keys():
-            logsets[name].append((num,f))
+            logsets[name].append((num, f))
         else:
-            logsets[name] = [(num,f)]
+            logsets[name] = [(num, f)]
     return logsets, datasets
 
 
@@ -77,13 +80,14 @@ def _convert_logs(logsets):
             gapvals.append(parser["Excited"])
 
         f = StringIO(key)
-        f.write(', '.join(nvals)+"\n")
-        f.write(', '.join(homovals)+"\n")
-        f.write(', '.join(lumovals)+"\n")
-        f.write(', '.join(gapvals)+"\n")
+        f.write(', '.join(nvals) + '\n')
+        f.write(', '.join(homovals) + '\n')
+        f.write(', '.join(lumovals) + '\n')
+        f.write(', '.join(gapvals) + '\n')
         f.seek(0)
         converted.append(f)
     return converted
+
 
 def parse_data(request):
     buff = StringIO()
@@ -119,6 +123,7 @@ def parse_data(request):
     response = HttpResponse(ret_zip, mimetype="application/zip")
     response["Content-Disposition"] = "attachment; filename=%s.zip" % name
     return response
+
 
 def reset_gjf(request):
     buff = StringIO()
