@@ -69,15 +69,15 @@ $(function() {
             {{ form|bootstrap }}
             {% if keywords %}<input type="hidden" name="keywords" value="{{ keywords }}">{% endif %}
             <div class="row">
+                <div class="col-xs-4">
+                    <button class="btn btn-lg btn-primary btn-block" type="submit">Get Job</button>
+                </div>
                 {% if user.is_authenticated %}
                 <div class="col-xs-4">
                     {% csrf_token %}
                     <a id="id_post" class="btn btn-lg btn-primary btn-block">Submit Job</a>
                 </div>
                 {% endif %}
-                <div class="col-xs-4">
-                    <button class="btn btn-lg btn-primary btn-block" type="submit">Get Job</button>
-                </div>
                 <div class="col-xs-4">
                     <button class="btn btn-lg btn-block" type="reset">Reset</button>
                 </div>
