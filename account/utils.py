@@ -7,6 +7,7 @@ from Crypto import Random
 from project.utils import StringIO, get_ssh_connection
 from cluster.models import Credential
 
+
 def generate_key_pair(username=None):
     random_generator = Random.new().read
     key = RSA.generate(2048, random_generator)
@@ -19,6 +20,7 @@ def generate_key_pair(username=None):
         "private": key.exportKey('PEM'),
     }
     return a
+
 
 def update_all_ssh_keys(user, new_public):
     for cred in Credential.objects.filter(user=user, use_password=False):
@@ -33,6 +35,7 @@ def update_all_ssh_keys(user, new_public):
             a = err.readlines()
             if a:
                 raise Exception(str(a))
+
 
 def generate_key(text):
     salt = hashlib.sha1(str(random.random())).hexdigest()[:10]

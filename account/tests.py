@@ -6,18 +6,20 @@ from Crypto.PublicKey import RSA
 import views
 import utils
 
+
 def _register(client, data):
     response = client.post(reverse(views.register_user), data)
     assert response.status_code == 200
     content = response.content
     start = content.index("Please click")
-    end = content.index("this", start)-2
+    end = content.index("this", start) - 2
     key = content[start:end].split('href="')[1]
     response = client.get(reverse(views.activate_user, args=(key, )))
     assert response.status_code == 200
     v = client.login(username=data["username"], password=data["new_password1"])
     assert v
     client.logout()
+
 
 class RegistrationTestCase(TestCase):
     def setUp(self):
@@ -144,15 +146,15 @@ class SettingsTestCase(TestCase):
             self.assertEqual(response.status_code, 200)
             data = {
                 "old_password": user["new_password1"],
-                "new_password1": user["new_password1"]+'a',
-                "new_password2": user["new_password2"]+'a',
+                "new_password1": user["new_password1"] + 'a',
+                "new_password2": user["new_password2"] + 'a',
                 }
             response = self.client.post(reverse(views.password_settings, args=(user["username"], )), data)
             self.assertEqual(response.status_code, 200)
             self.assertIn("Settings Successfully Saved", response.content)
             self.client.logout()
 
-            r = self.client.login(username=user["username"], password=user["new_password1"]+'a')
+            r = self.client.login(username=user["username"], password=user["new_password1"] + 'a')
             self.assertTrue(r)
             User.objects.get(username=user["username"]).set_password(user["new_password1"])
 
@@ -172,7 +174,6 @@ class SettingsTestCase(TestCase):
             self.assertIn("Settings Successfully Saved", response.content)
 
 
-
 class UtilsTestCase(TestCase):
     def test_generate_key_pair(self):
         self.assertIsNotNone(utils.generate_key_pair())
@@ -190,8 +191,8 @@ class UtilsTestCase(TestCase):
 
     def test_invalid_key_pair(self):
         keypair = utils.generate_key_pair()
-        keypair["private"] = keypair["private"][:50]+keypair["private"][53:]
-        keypair["public"] = keypair["public"][:50]+keypair["public"][53:]
+        keypair["private"] = keypair["private"][:50] + keypair["private"][53:]
+        keypair["public"] = keypair["public"][:50] + keypair["public"][53:]
         try:
             key = RSA.importKey(keypair["private"])
             pubkey = RSA.importKey(keypair["public"])

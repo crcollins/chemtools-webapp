@@ -6,6 +6,7 @@ from account.models import UserProfile
 
 attributes = {"class": "required"}
 
+
 class RegistrationForm(forms.Form):
     username = forms.RegexField(regex=r'^[\w.@+-]+$',
                                 max_length=30,
@@ -39,9 +40,11 @@ class SettingsForm(forms.Form):
                 raise forms.ValidationError("The two password fields did not match.")
         return self.cleaned_data
 
+
 class UserProfileForm(forms.ModelForm):
     private_key = forms.CharField(widget=forms.Textarea)
     public_key = forms.CharField(widget=forms.Textarea)
+
     class Meta:
         model = UserProfile
         fields = ("xsede_username", "public_key", "activation_key", "password_reset_key", "reset_expires")

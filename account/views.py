@@ -14,8 +14,10 @@ from cluster.models import CredentialForm, ClusterForm, Cluster
 
 import utils
 
+
 def index(request):
     pass
+
 
 def register_user(request):
     if request.user.is_authenticated():
@@ -47,13 +49,13 @@ def register_user(request):
             })
         return render(request, "account/post_register.html", c)
 
-
     c = Context({
         "state": state,
         "reg_form": reg_form,
         "pass_form": pass_form,
         })
     return render(request, "account/register.html", c)
+
 
 def activate_user(request, activation_key):
     user = get_object_or_404(UserProfile, activation_key=activation_key).user
@@ -63,6 +65,7 @@ def activate_user(request, activation_key):
         return render(request, "account/activate.html")
     else:
         return redirect(HOME_URL)
+
 
 def get_public_key(request, username):
     pubkey = ''
@@ -82,9 +85,11 @@ PAGES = [
     "clusters",
 ]
 
+
 @login_required
 def user_settings(request, username):
     return redirect(main_settings, request.user.username)
+
 
 @login_required
 def main_settings(request, username):
@@ -133,6 +138,7 @@ def main_settings(request, username):
     })
     return render(request, "account/main_settings.html", c)
 
+
 @login_required
 def password_settings(request, username):
     if request.user.username != username:
@@ -152,7 +158,7 @@ def password_settings(request, username):
         old = d.get("old_password")
         new1 = d.get("new_password1")
         new2 = d.get("new_password2")
-        if old == [u''] and new1 ==  new2 == old:
+        if old == [u''] and new1 == new2 == old:
             pass_form = PasswordChangeForm(request.user, None)
 
     if changed:
@@ -167,6 +173,7 @@ def password_settings(request, username):
         "form": pass_form,
     })
     return render(request, "account/password_settings.html", c)
+
 
 @login_required
 def credential_settings(request, username):
@@ -204,6 +211,7 @@ def credential_settings(request, username):
         "form": form,
         })
     return render(request, "account/credential_settings.html", c)
+
 
 @login_required
 def cluster_settings(request, username):
