@@ -65,11 +65,19 @@ class MainPageTestCase(TestCase):
         for name in self.names:
             response = self.client.get(reverse(views.write_gjf, args=(name, )))
             self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.get('Content-Disposition'),
+                "attachment; filename=%s.gjf" % name)
+            string = "%%nprocshared=16\n%%mem=59GB\n%%chk=%s.chk\n# opt B3LYP/6-31g(d) geom=connectivity"
+            self.assertTrue(response.content.startswith(string % name))
 
     def test_write_mol2(self):
         for name in self.names:
             response = self.client.get(reverse(views.write_mol2, args=(name, )))
             self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.get('Content-Disposition'),
+                "attachment; filename=%s.mol2" % name)
+            string = "@<TRIPOS>MOLECULE"
+            self.assertTrue(response.content.startswith(string))
 
     def test_write_png(self):
         for name in self.names:
