@@ -1,5 +1,6 @@
 import zipfile
 import itertools
+import urllib
 
 from django.test import Client, TestCase
 from django.core.urlresolvers import reverse
@@ -131,6 +132,23 @@ class MainPageTestCase(TestCase):
     def test_multi_job(self):
         response = self.client.get(reverse(views.multi_job))
         self.assertEqual(response.status_code, 200)
+        options = {
+            "filenames": '\n'.join(self.names),
+            "name": "{{ name }}",
+            "email": "test@test.com",
+            "nodes": 1,
+            "walltime": 48,
+            "allocation": "TG-CHE120081",
+            "cluster": 'g',
+            "template": "{{ name }} {{ email }} {{ nodes }} {{ walltime }} {{ allocation }}",
+        }
+        url = reverse(views.multi_job) + '?' + urllib.urlencode(options)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        with StringIO(response.content) as f:
+            with zipfile.ZipFile(f, "r") as zfile:
+                names = set([x + ".gjob" for x in self.names])
+                self.assertEqual(set(zfile.namelist()), names)
 
     def test_molecule_check(self):
         for name in self.names:
