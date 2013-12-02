@@ -1,8 +1,12 @@
+import zipfile
+import itertools
+
 from django.test import Client, TestCase
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from django.utils import simplejson
 
+from project.utils import StringIO
 import views
 from models import ErrorReport
 
@@ -58,8 +62,36 @@ class MainPageTestCase(TestCase):
 
     def test_multi_molecule_zip(self):
         names = ",".join(self.names)
+        gjfnames = set([name + ".gjf" for name in self.names])
         response = self.client.get(reverse(views.multi_molecule_zip, args=(names, )))
         self.assertEqual(response.status_code, 200)
+        with StringIO(response.content) as f:
+            with zipfile.ZipFile(f, "r") as zfile:
+                self.assertEqual(set(zfile.namelist()), gjfnames)
+
+    def test_multi_molecule_zip_options(self):
+        names = ",".join(self.names)
+        sets = {
+            "gjf": set([name + ".gjf" for name in self.names]),
+            "image": set([name + ".png" for name in self.names]),
+            "mol2": set([name + ".mol2" for name in self.names]),
+            "": set(),
+        }
+
+        for group in itertools.product(["gjf", ""], ["image", ""], ["mol2", ""]):
+            params = '?' + '&'.join([x + "=true" for x in group if x])
+            if params == '?':  # remove the blank case
+                continue
+            comparenames = set()
+            for x in group:
+                comparenames |= sets[x]
+            url = reverse(views.multi_molecule_zip, args=(names, )) + params
+
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 200)
+            with StringIO(response.content) as f:
+                with zipfile.ZipFile(f, "r") as zfile:
+                    self.assertEqual(set(zfile.namelist()), comparenames)
 
     def test_write_gjf(self):
         for name in self.names:
@@ -69,6 +101,18 @@ class MainPageTestCase(TestCase):
                 "attachment; filename=%s.gjf" % name)
             string = "%%nprocshared=16\n%%mem=59GB\n%%chk=%s.chk\n# opt B3LYP/6-31g(d) geom=connectivity"
             self.assertTrue(response.content.startswith(string % name))
+
+    def test_write_gjf_keywords(self):
+        for name in self.names:
+            for keywords in ["opt HF/6-31g(d)", "td b3lyp/6-31g(d)"]:
+                params = "?keywords=%s" % keywords
+                url = reverse(views.write_gjf, args=(name, )) + params
+                response = self.client.get(url)
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(response.get('Content-Disposition'),
+                    "attachment; filename=%s.gjf" % name)
+                string = "%%nprocshared=16\n%%mem=59GB\n%%chk=%s.chk\n# %s geom=connectivity"
+                self.assertTrue(response.content.startswith(string % (name, keywords)))
 
     def test_write_mol2(self):
         for name in self.names:
