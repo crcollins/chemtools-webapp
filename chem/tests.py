@@ -147,6 +147,9 @@ class MainPageTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         with StringIO(response.content) as f:
             with zipfile.ZipFile(f, "r") as zfile:
+                for name in [x for x in zfile.namelist() if not x.endswith("/")]:
+                    with zfile.open(name) as f2:
+                        self.assertEqual(len(f2.read().split()), 5)
                 names = set([x + ".gjob" for x in self.names])
                 self.assertEqual(set(zfile.namelist()), names)
 
