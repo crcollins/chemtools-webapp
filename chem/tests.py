@@ -41,21 +41,6 @@ class MainPageTestCase(TestCase):
             response = self.client.get(reverse(views.molecule_detail, args=(name, )))
             self.assertEqual(response.status_code, 200)
 
-    def test_molecule_gjf(self):
-        for name in self.names:
-            response = self.client.get(reverse(views.write_gjf, args=(name, )))
-            self.assertEqual(response.status_code, 200)
-
-    def test_molecule_mol2(self):
-        for name in self.names:
-            response = self.client.get(reverse(views.write_mol2, args=(name, )))
-            self.assertEqual(response.status_code, 200)
-
-    def test_molecule_mol2(self):
-        for name in self.names:
-            response = self.client.get(reverse(views.write_png, args=(name, )))
-            self.assertEqual(response.status_code, 200)
-
     def test_multi_molecule(self):
         names = ",".join(self.names)
         response = self.client.get(reverse(views.multi_molecule, args=(names, )))
