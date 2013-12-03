@@ -114,6 +114,25 @@ class MainPageTestCase(TestCase):
             response = self.client.get(reverse(views.write_png, args=(name, )))
             self.assertEqual(response.status_code, 200)
 
+    def test_write_job(self):
+        options = {
+            "email": "test@test.com",
+            "nodes": 1,
+            "walltime": 48,
+            "allocation": "TG-CHE120081",
+            "cluster": 'g',
+            "template": "{{ name }} {{ email }} {{ nodes }} {{ time }} {{ allocation }}",
+        }
+        for name in self.names:
+            options["name"] = name
+            response = self.client.get(reverse(views.molecule_detail, args=(name, )))
+            self.assertEqual(response.status_code, 200)
+            url = reverse(views.molecule_detail, args=(name, )) + '?' + urllib.urlencode(options)
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 200)
+            string = "{name} {email} {nodes} {walltime}:00:00 {allocation}".format(**options)
+            self.assertEqual(response.content, string)
+
     def test_multi_job(self):
         response = self.client.get(reverse(views.multi_job))
         self.assertEqual(response.status_code, 200)
