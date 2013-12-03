@@ -153,7 +153,10 @@ class MainPageTestCase(TestCase):
             with zipfile.ZipFile(f, "r") as zfile:
                 for name in [x for x in zfile.namelist() if not x.endswith("/")]:
                     with zfile.open(name) as f2:
-                        self.assertEqual(len(f2.read().split()), 5)
+                        d = options.copy()
+                        d["name"] = name.split('.')[0]
+                        string = "{name} {email} {nodes} {walltime}:00:00 {allocation}".format(**d)
+                        self.assertEqual(f2.read(), string)
                 names = set([x + ".gjob" for x in self.names])
                 self.assertEqual(set(zfile.namelist()), names)
 
