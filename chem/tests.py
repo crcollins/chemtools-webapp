@@ -140,7 +140,7 @@ class MainPageTestCase(TestCase):
             "walltime": 48,
             "allocation": "TG-CHE120081",
             "cluster": 'g',
-            "template": "{{ name }} {{ email }} {{ nodes }} {{ walltime }} {{ allocation }}",
+            "template": "{{ name }} {{ email }} {{ nodes }} {{ time }} {{ allocation }}",
         }
         url = reverse(views.multi_job) + '?' + urllib.urlencode(options)
         response = self.client.get(url)
