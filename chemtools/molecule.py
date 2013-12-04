@@ -125,24 +125,14 @@ class Molecule(object):
                 bond.parent = self.bonds
                 self.bonds.append(bond)
 
-    def rotate_3d(self, theta, phi, psi, point, offset):
-        ct = math.cos(theta)
-        st = math.sin(theta)
-        ch = math.cos(phi)
-        sh = math.sin(phi)
-        cs = math.cos(psi)
-        ss = math.sin(psi)
+    ######################################################################
+    # Matrix ops
+    ######################################################################
 
-        rot = numpy.matrix([
-                [ct*cs, -ch*ss+sh*st*ss,  sh*ss+ch*st*cs],
-                [ct*ss,  ch*cs+sh*st*ss, -sh*cs+ch*st*ss],
-                [  -st,           sh*ct,           ch*ct],
-            ])
-
+    def rotate_3d(self, rotation_matrix, point, offset):
         for atom in self.atoms:
             coords = atom.xyz - point
-            atom.xyz = rot * coords + offset
-
+            atom.xyz = rotation_matrix * coords + offset
 
     def displace(self, displacement):
         '''Runs a uniform displacement on all the atoms in a molecule.'''
@@ -170,6 +160,42 @@ class Molecule(object):
         mins = numpy.min(coords ,1)
         maxs = numpy.max(coords, 1)
         return mins, maxs
+
+    def get_full_rotation_matrix(self, vector, azimuth, altitude):
+        xyaxis = vector[:2,0]
+        zaxis = numpy.matrix([0,0,1]).T
+        raxis = numpy.cross(zaxis.T, xyaxis.T)
+        rotz = self.get_axis_rotation_matrix(numpy.matrix(raxis).T, altitude)
+        rotxy = self.get_axis_rotation_matrix(-zaxis, azimuth)
+        return rotxy*rotz
+
+    def get_angles(self, vector):
+        x = vector[0,0]
+        y = vector[1,0]
+        z = vector[2,0]
+        r = numpy.linalg.norm(vector)
+        azimuth = math.atan2(y,x)
+        altitude = math.asin(z/r)
+        return azimuth, altitude
+
+    def get_axis_rotation_matrix(self, axis, theta):
+        # http://stackoverflow.com/questions/6721544/circular-rotation-around-an-arbitrary-axis
+        ct = math.cos(theta)
+        nct = 1 - ct
+        st = math.sin(theta)
+        r = numpy.linalg.norm(axis)
+        ux = axis[0,0] / r
+        uy = axis[1,0] / r
+        uz = axis[2,0] / r
+        rot = numpy.matrix([
+            [ct+ux**2*nct, ux*uy*nct-uz*st, ux*uz*nct+uy*st],
+            [uy*ux*nct+uz*st, ct+uy**2*nct, uy*uz*nct-ux*st],
+            [uz*ux*nct-uy*st, uz*uy*nct+ux*st, ct+uz**2*nct],
+        ])
+        return rot
+
+    ######################################################################
+    ######################################################################
 
     def open_ends(self, types="+*~"):
         '''Returns a list of any bonds that contain non-standard elements.'''
@@ -286,14 +312,14 @@ class Molecule(object):
         R2xyz = R2.xyz.copy()
         C1xyz = C1.xyz.copy()
 
-        radius1 = numpy.linalg.norm(C1.xyz - R1.xyz)
-        radius2 = numpy.linalg.norm(C2.xyz - R2.xyz)
+        vec1 = R1.xyz - C1.xyz
+        vec2 = C2.xyz - R2.xyz
 
+        # diff = [azimuth, altitude]
+        diff = numpy.matrix(self.get_angles(vec1)) - numpy.matrix(self.get_angles(vec2))
         #angle of 1 - angle of 2 = angle to rotate
-        theta = math.acos((R1.z - C1.z) / radius1) - math.acos((C2.z - R2.z) / radius2)
-        psi = math.atan2(R1.y - C1.y, R1.x - C1.x) - math.atan2(C2.y - R2.y, C2.x - R2.x)
-        phi = 0
-        frag.rotate_3d(theta, phi, psi, R2xyz, C1xyz)
+        rot = self.get_full_rotation_matrix(vec2, -diff[0,0], -diff[0,1])
+        frag.rotate_3d(rot, R2xyz, C1xyz)
 
         if bond1.atoms[0].element[0] in "~*+":
             bond1.atoms = (C2, C1)
