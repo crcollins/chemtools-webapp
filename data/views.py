@@ -6,19 +6,16 @@ from django.http import HttpResponse
 from django.core.servers.basehttp import FileWrapper
 
 from chemtools.utils import CLUSTERS, CLUSTER_TUPLES
+from chemtools.extractor import CORES, RGROUPS, ARYL
 
 
 def frag_index(request):
+    xrnames = ["H", "Cl", "Br", "CN", "CCH", "OH", "SH", "NH_2", "CH_3", "phenyl", "TMS", "OCH_3"]
+    arylnames = ["double bond", "triple bond", "phenyl", "thiophene", "pyridine", "carbazole", "TZ", "EDOT"]
     data = (
-        ["Cores", ("CON", "TON", "TSN", "CSN", "TNN", "CNN", "CCC", "TCC")],
-        ["X Groups", (["A", "H"], ["B", "Cl"], ["C", "Br"], ["D", "CN"], ["E", "CCH"],
-            ["F", "OH"], ["G", "SH"], ["H", "NH_2"], ["I", "CH_3"], ["J", "phenyl"], ["K", "TMS"],
-             ["L", "OCH_3"])],
-        ["Aryl Groups", (["2", "double"], ["3", "triple"], ["4", "phenyl"], ["5", "thiophene"],
-            ["6", "pyridine"], ["7", "carbazole"], ["8", "TZ"], ["9", "EDOT"])],
-        ["R Groups", (["a", "H"], ["b", "Cl"], ["c", "Br"], ["d", "CN"], ["e", "CCH"],
-            ["f", "OH"], ["g", "SH"], ["h", "NH_2"], ["i", "CH_3"], ["j", "phenyl"], ["k", "TMS"],
-             ["l", "OCH_3"])],
+        ["Cores", CORES],
+        ["X/R Groups", zip(RGROUPS, xrnames)],
+        ["Aryl Groups", zip(ARYL, arylnames)],
     )
     c = Context({"usable_parts": data})
     return render(request, "data/frag_index.html", c)

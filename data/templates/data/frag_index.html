@@ -16,11 +16,7 @@ Atom1 Atom2 Connection
     <ul>
         {% if "Groups" in title %}
         {% for id, name in parts %}
-            {% if title == "X Groups" %}
-            <li><a href="{{ id|lower }}">{{ id }} : {{ name }}</a></li>
-            {% else %}
             <li><a href="{{ id }}">{{ id }} : {{ name }}</a></li>
-            {% endif %}
         {% endfor %}
         {% else %}
         {% for name in parts %}
