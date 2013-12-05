@@ -25,8 +25,6 @@ def frag_index(request):
 
 
 def get_frag(request, frag):
-    if len(frag) == 1:
-        frag = frag.lower()
     if frag in os.listdir("chemtools/data/"):
         f = open("chemtools/data/" + frag, "r")
         response = HttpResponse(FileWrapper(f), content_type="text/plain")

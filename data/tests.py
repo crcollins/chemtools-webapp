@@ -16,7 +16,7 @@ class FragmentTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_detail_ends(self):
-        for frag in RGROUPS + ARYL + XGROUPS:
+        for frag in RGROUPS + ARYL:
             response = self.client.get(reverse(views.get_frag, args=(frag, )))
             self.assertEqual(response.status_code, 200)
 
