@@ -81,7 +81,8 @@ class SettingsTestCase(TestCase):
             "new_password2": "mypass",
         }]
         for user in self.users:
-            _register(self.client, user)
+            new_user = User.objects.create_user(user["username"], user["email"], user["new_password1"])
+            new_user.save()
 
     def test_get_public_key(self):
         for user in self.users:
