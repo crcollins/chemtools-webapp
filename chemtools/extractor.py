@@ -4,20 +4,20 @@ import itertools
 from molecule import Atom, Bond
 
 
-parts_of_name = ['C', 'T', 'Z', 'E'], ['2', '3', '4'], ['3', '4']
-cores = [''.join(x) for x in itertools.product(*parts_of_name)]
-xrgroups = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'l']
-aryl = ['2', '3', '4', '5', '6', '7', '8', '9']
-coreparts = ["*~0", "*~1", "~0", "~1"]
-xrparts = ["*+0", "*+1"]
-arylparts = ["~0", "~1", "+0", "+1"]
+PARTS_OF_NAME = ['C', 'T', 'Z', 'E'], ['2', '3', '4'], ['3', '4']
+CORES = [''.join(x) for x in itertools.product(*PARTS_OF_NAME)]
+RGROUPS = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l']
+ARYL = ['2', '3', '4', '5', '6', '7', '8', '9']
+COREPARTS = ["*~0", "*~1", "~0", "~1"]
+XRPARTS = ["*+0", "*+1"]
+ARYLPARTS = ["~0", "~1", "+0", "+1"]
 
 # Convention for marking ends of fragments
 # [LEFT, RIGHT, BOTTOM, TOP]
-ends = ["Sg", "Bh", "Hs", "Mt"]
+ENDS = ["Sg", "Bh", "Hs", "Mt"]
 # Convention for marking X/Y of core
-xy = {"Ge": "XX", "As": "YY"}
-partslist = [coreparts, xrparts, arylparts]
+XY = {"Ge": "XX", "As": "YY"}
+PARTSLIST = [COREPARTS, XRPARTS, ARYLPARTS]
 
 
 def parse_mol2(filename):
@@ -42,17 +42,17 @@ def parse_mol2(filename):
 def run_all(base="chemtools"):
     for fname in os.listdir(os.path.join(base, "mol2")):
         name, ext = os.path.splitext(fname)
-        for i, x in enumerate([cores, xrgroups, aryl]):
+        for i, x in enumerate([CORES, RGROUPS, ARYL]):
             if name in x:
-                parts = partslist[i]
+                parts = PARTSLIST[i]
 
         atoms, bonds = parse_mol2(os.path.join(base, "mol2", fname))
         with open(os.path.join(base, "data", name), 'w') as f:
             for atom in atoms:
-                if atom.element in ends:
-                    atom.element = parts[ends.index(atom.element)]
-                if atom.element in xy:
-                    atom.element = xy[atom.element]
+                if atom.element in ENDS:
+                    atom.element = parts[ENDS.index(atom.element)]
+                if atom.element in XY:
+                    atom.element = XY[atom.element]
                 f.write(str(atom) + '\n')
             f.write('\n')
             for bond in bonds:
