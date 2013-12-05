@@ -173,6 +173,12 @@ class SettingsTestCase(TestCase):
             self.assertEqual(response.status_code, 200)
             self.assertIn("Settings Successfully Saved", response.content)
 
+    def test_add_credential(self):
+        for user in self.users:
+            r = self.client.login(username=user["username"], password=user["new_password1"])
+            self.assertTrue(r)
+            response = self.client.get(reverse(views.credential_settings, args=(user["username"], )))
+            self.assertEqual(response.status_code, 200)
 
 class UtilsTestCase(TestCase):
     def test_generate_key_pair(self):
