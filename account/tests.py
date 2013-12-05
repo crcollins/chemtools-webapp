@@ -181,6 +181,50 @@ class SettingsTestCase(TestCase):
             response = self.client.get(reverse(views.credential_settings, args=(user["username"], )))
             self.assertEqual(response.status_code, 200)
 
+
+class LoginTestCase(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.users = [{
+            "username": "user1",
+            "email": "user1@test.com",
+            "new_password1": "mypass",
+            "new_password2": "mypass",
+        }, {
+            "username": "user2",
+            "email": "user2@test.com",
+            "new_password1": "mypass",
+            "new_password2": "mypass",
+        }]
+        for user in self.users:
+            new_user = User.objects.create_user(user["username"], user["email"], user["new_password1"])
+            new_user.save()
+
+    def test_login(self):
+        for user in self.users:
+            response = self.client.get("/login/")
+            self.assertEqual(response.status_code, 200)
+
+            data = {
+                "username": user["username"],
+                "password": user["new_password1"],
+                }
+            response = self.client.post("/login/", data)
+            self.assertEqual(response.status_code, 302)
+
+    def test_logout(self):
+        for user in self.users:
+            r = self.client.login(username=user["username"], password=user["new_password1"])
+            self.assertTrue(r)
+
+            data = {
+                "username": user["username"],
+                "password": user["new_password1"],
+                }
+            response = self.client.get("/logout/", data)
+            self.assertEqual(response.status_code, 200)
+
+
 class UtilsTestCase(TestCase):
     def test_generate_key_pair(self):
         self.assertIsNotNone(utils.generate_key_pair())
