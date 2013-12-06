@@ -35,7 +35,7 @@ def parse_mol2(filename):
                 a1, a2, t = line.split()[-3:]
                 atom1 = atoms[int(a1) - 1]
                 atom2 = atoms[int(a2) - 1]
-                bonds.append(Bond(atom1, atom2, t, bonds))
+                bonds.append(Bond((atom1, atom2), t, bonds))
         return atoms, bonds
 
 
