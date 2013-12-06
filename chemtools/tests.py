@@ -4,6 +4,7 @@ from django.test import TestCase
 
 import gjfwriter
 import utils
+import extractor
 
 
 class GJFWriterTestCase(TestCase):
@@ -454,3 +455,8 @@ class UtilsTestCase(TestCase):
         ]
         for name, result in names:
             self.assertEqual(set(utils.name_expansion(name)), set(result))
+
+
+class ExtractorTestCase(TestCase):
+    def test_run_all(self):
+        extractor.run_all()
