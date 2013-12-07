@@ -363,7 +363,7 @@ class Header(LineParser):
         # " %chk=2_4g_TON_4g_4g_n4.chk"
         # " --------------------------------------------------"
         line = line.strip()
-        if "%mem" in line:
+        if line.startswith('%'):
             self.start = 1
         if self.start and not self.done:
             if line.startswith("%"):
