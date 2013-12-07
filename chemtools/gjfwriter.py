@@ -6,7 +6,7 @@ import copy
 
 
 from molecule import Atom, Bond, Molecule
-from utils import CORES, XGROUPS, RGROUPS, ARYL0, ARYL2, ARYL, name_expansion, KEYWORDS
+from utils import CORES, XGROUPS, RGROUPS, ARYL0, ARYL2, ARYL, atom_combinations, name_expansion, KEYWORDS
 try:
     from project.utils import StringIO
 except ImportError:
@@ -371,6 +371,7 @@ def get_exact_name(name, spacers=False):
         for f, end in zip(sidefuncs, ends):
             endname = ''
             if end:
+                # [char, conn, flip?]
                 endname = ''.join([x[0] + '-' if x[2] else x[0] for x in end])
 
             if not endname or endname[-1] not in XGROUPS:
@@ -390,6 +391,44 @@ def get_exact_name(name, spacers=False):
 
         sets.append(coreset)
     return '_'.join(sets) + '_n%d_m%d' % nm + '_x%d_y%d_z%d' % xyz
+
+
+def get_feature_vector(exactname, limit=4):
+    left, core, center, right, n, m, x, y, z = exactname.split('_')
+
+    first = ARYL + XGROUPS
+    second = ['*'] + RGROUPS
+    length = len(first) + 2 * len(second)
+    endfeatures = []
+    for end in [left, center, right]:
+        partfeatures = []
+        end = end.replace('-', '')  # no support for flipping yet
+        count = 0
+        for char in end:
+            base = second
+            if char in first:
+                if count == limit:
+                    break
+                count += 1
+                base = first
+            temp = [0] * len(base)
+            temp[base.index(char)] = 1
+            partfeatures.extend(temp)
+        partfeatures += [0] * length * (limit - count)
+        endfeatures.extend(partfeatures)
+
+    if core[0] == "T":
+        corefeatures = [1]
+    else:
+        corefeatures = [0]
+    first, second = atom_combinations
+    for base, char in zip(atom_combinations, core[1:]):
+        temp = [0] * len(base)
+        temp[base.index(char)] = 1
+        corefeatures.extend(temp)
+
+    extrafeatures = [int(group[1:]) for group in [n, m, x, y, z]]
+    return corefeatures + endfeatures + extrafeatures
 
 
 ##############################################################################
