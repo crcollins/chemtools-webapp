@@ -135,14 +135,13 @@ def molecule_detail(request, molecule):
             return HttpResponse(simplejson.dumps(a), mimetype="application/json")
 
     if not errors[0]:
-        exactname = gjfwriter.get_exact_name(molecule)
         exactspacer = gjfwriter.get_exact_name(molecule, spacers=True)
+        exactname = exactspacer.replace('*', '')
         featurevector = gjfwriter.get_feature_vector(exactspacer)
     else:
         exactname = ''
         exactspacer = ''
         featurevector = ''
-
 
     c = Context({
         "molecule": molecule,
