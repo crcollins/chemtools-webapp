@@ -324,25 +324,29 @@ class Geometry(LineParser):
         # ...
         # " 4,1.2501547542\H,22.6120510229,1.0505502972,0.1022974384\H,2.283441615"
         # " 6,-0.8632316482,20.4346296726\\Version=EM64L-G09RevC.01\State=1-A\HF=-"
-        if "\\" in self.prevline + line:
+        line = line[1:]
+        modline = self.prevline + line.strip('\n')
+        if "\\" in modline:
             self.start = True
-        line = line.strip()
+
         if self.start:
-            if r"\\@" in self.prevline + line:
-                start = self.value.index("#")
+            # self.value += line.split("\\")[0].strip('\n')
+            if r"\\@" in modline:
+                # select only the gjf part of the results
+                start = self.value.index('#')
                 end = self.value.index(r"\Version", start)
 
-                d = {",": " ", "\\": "\n",
+                d = {',': ' ', "\\": '\n',
                     "geom=connectivity": "",
                 }
                 value = self.value[start:end]
                 for i, j in d.iteritems():
                     value = value.replace(i, j)
-                self.value = value + "\n"
+                lines = [x.strip() for x in value.split('\n')]
+                self.value = '\n'.join(lines) + '\n'
                 self.done = True
             if not self.done:
-                self.value += line
-        self.prevline = line
+                self.value += line.strip('\n')
 
 
 @Log.add_parser
