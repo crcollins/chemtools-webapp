@@ -1,4 +1,5 @@
 import os
+import zipfile
 
 from django.conf import settings
 from django.test import Client, TestCase
@@ -27,4 +28,18 @@ class MainPageTestCase(TestCase):
             results = response.content.split('\n')[1]
             expected = "A_TON_A_A.log,opt B3LYP/6-31g(d) geom=connectivity,-6.460873931,-1.31976745,41,0.0006,-567.1965205,---,0.35"
             self.assertEqual(results, expected)
+
+    def test_gjf_reset(self):
+        base = os.path.join(settings.MEDIA_ROOT, "tests", "A_TON_A_A")
+        with open(base + ".log", 'r') as log, open(base + ".gjf", 'r') as gjf:
+            data = {
+                "myfiles": log,
+                "option": "gjfreset",
+            }
+            response = self.client.post(reverse(views.upload_data), data)
+            self.assertEqual(response.status_code, 200)
+            with StringIO(response.content) as f:
+                with zipfile.ZipFile(f, "r") as zfile:
+                    with zfile.open("A_TON_A_A.gjf") as f2:
+                        self.assertEqual(f2.read(), gjf.read())
 
