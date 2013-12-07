@@ -43,3 +43,17 @@ class MainPageTestCase(TestCase):
                     with zfile.open("A_TON_A_A.gjf") as f2:
                         self.assertEqual(f2.read(), gjf.read())
 
+    def test_data_parse(self):
+        datatxt = os.path.join(settings.MEDIA_ROOT, "tests", "data.txt")
+        outputtxt = os.path.join(settings.MEDIA_ROOT, "tests", "output.txt")
+        with open(datatxt, 'r') as txt:
+            data = {
+                "myfiles": txt,
+                "option": "dataparse",
+            }
+            response = self.client.post(reverse(views.upload_data), data)
+            self.assertEqual(response.status_code, 200)
+            with StringIO(response.content) as f, open(outputtxt, 'r') as output:
+                with zipfile.ZipFile(f, "r") as zfile:
+                    with zfile.open("output.txt") as f2:
+                        self.assertEqual(f2.read(), output.read())
