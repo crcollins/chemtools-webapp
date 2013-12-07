@@ -136,12 +136,14 @@ def molecule_detail(request, molecule):
 
     if not errors[0]:
         exactname = gjfwriter.get_exact_name(molecule)
+        exactspacer = gjfwriter.get_exact_name(molecule, spacers=True)
     else:
         exactname = ''
 
     c = Context({
         "molecule": molecule,
         "exact_name": exactname,
+        "exact_name_spacers": exactspacer,
         "form": form,
         "known_errors": warnings[0],
         "error_message": errors[0],

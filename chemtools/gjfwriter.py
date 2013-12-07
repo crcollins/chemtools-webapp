@@ -14,6 +14,7 @@ except ImportError:
 
 DATAPATH = "chemtools/data"
 ALL = CORES + XGROUPS + RGROUPS + ARYL
+NEEDSPACE = XGROUPS + ARYL0
 
 ##############################################################################
 
@@ -357,7 +358,7 @@ def parse_end_name(name):
     return parts
 
 
-def get_exact_name(name):
+def get_exact_name(name, spacers=False):
     output, nm, xyz = parse_name(name)
     sidefuncs = (
         lambda num: num == 0 and nm[0] == 1,
@@ -375,7 +376,11 @@ def get_exact_name(name):
             if not endname or endname[-1] not in XGROUPS:
                 if f(num):
                     endname += 'A'
-            parts.append(endname.replace("J", "4aaA"))
+
+            endname = endname.replace("J", "4aaA")
+            if spacers:
+                endname = ''.join([char + "**" if char in NEEDSPACE else char for char in endname])
+            parts.append(endname)
 
         # only first set will have left sides
         if num == 0:
