@@ -210,134 +210,6 @@ class GJFWriterTestCase(TestCase):
             print errors
             raise errors[0][1]
 
-    def test_get_exact_name(self):
-        errors = []
-        pairs = [
-            ('TON', 'A_TON_A_A'),
-
-            ('2_TON', '2A_TON_A_A'),
-            ('2-_TON', '2-A_TON_A_A'),
-            ('4_TON', '4aaA_TON_A_A'),
-            ('4b_TON', '4bbA_TON_A_A'),
-            ('4bc_TON', '4bcA_TON_A_A'),
-            ('44bc_TON', '4aa4bcA_TON_A_A'),
-
-            ('TON_2', 'A_TON_A_2A'),
-            ('TON_4', 'A_TON_A_4aaA'),
-            ('TON_4b', 'A_TON_A_4bbA'),
-            ('TON_4bc', 'A_TON_A_4bcA'),
-            ('TON_44bc', 'A_TON_A_4aa4bcA'),
-
-            ('TON_2_', 'A_TON_2A_A'),
-            ('TON_4_', 'A_TON_4aaA_A'),
-            ('TON_4b_', 'A_TON_4bbA_A'),
-            ('TON_4bc_', 'A_TON_4bcA_A'),
-            ('TON_44bc_', 'A_TON_4aa4bcA_A'),
-
-            ('TON_2_TON_2', 'A_TON_A_2_TON_A_2A'),
-            ('TON_4_TON_4', 'A_TON_A_4aa_TON_A_4aaA'),
-            ('TON_4b_TON_4b', 'A_TON_A_4bb_TON_A_4bbA'),
-            ('TON_4bc_TON_4bc', 'A_TON_A_4bc_TON_A_4bcA'),
-            ('TON_44bc_TON_44bc', 'A_TON_A_4aa4bc_TON_A_4aa4bcA'),
-
-            ('TON_2_TON_2_TON_2', 'A_TON_A_2_TON_A_2_TON_A_2A'),
-            ('TON_4_TON_4_TON_4', 'A_TON_A_4aa_TON_A_4aa_TON_A_4aaA'),
-            ('TON_4b_TON_4b_TON_4b', 'A_TON_A_4bb_TON_A_4bb_TON_A_4bbA'),
-            ('TON_4bc_TON_4bc_TON_4bc', 'A_TON_A_4bc_TON_A_4bc_TON_A_4bcA'),
-            ('TON_44bc_TON_44bc_TON_44bc', 'A_TON_A_4aa4bc_TON_A_4aa4bc_TON_A_4aa4bcA'),
-
-            ('TON_2__TON_2_', 'A_TON_2A__TON_2A_A'),
-            ('TON_4__TON_4_', 'A_TON_4aaA__TON_4aaA_A'),
-            ('TON_4b__TON_4b_', 'A_TON_4bbA__TON_4bbA_A'),
-            ('TON_4bc__TON_4bc_', 'A_TON_4bcA__TON_4bcA_A'),
-            ('TON_44bc__TON_44bc_', 'A_TON_4aa4bcA__TON_4aa4bcA_A'),
-        ]
-        for name, expected in pairs:
-            try:
-                a = gjfwriter.get_exact_name(name)
-                expected = expected + "_n1_m1_x1_y1_z1"
-                assert a == expected
-            except Exception as e:
-                print e
-                errors.append((a, expected, e))
-        if errors:
-            print errors
-            raise errors[0][1]
-
-    def test_get_exact_name_polymer(self):
-        errors = []
-        pairs = [
-            ('TON_n2', '_TON_A__n2_m1'),
-
-            ('2_TON_n2', '2_TON_A__n2_m1'),
-            ('4_TON_n2', '4aa_TON_A__n2_m1'),
-            ('4b_TON_n2', '4bb_TON_A__n2_m1'),
-            ('4bc_TON_n2', '4bc_TON_A__n2_m1'),
-            ('44bc_TON_n2', '4aa4bc_TON_A__n2_m1'),
-
-            ('TON_2_n2', '_TON_A_2_n2_m1'),
-            ('TON_4_n2', '_TON_A_4aa_n2_m1'),
-            ('TON_4b_n2', '_TON_A_4bb_n2_m1'),
-            ('TON_4bc_n2', '_TON_A_4bc_n2_m1'),
-            ('TON_44bc_n2', '_TON_A_4aa4bc_n2_m1'),
-            ('TON_B4bc_n2', '_TON_B_4bc_n2_m1'),  # special case
-
-            ('TON_2__n2', '_TON_2A__n2_m1'),
-            ('TON_4__n2', '_TON_4aaA__n2_m1'),
-            ('TON_4b__n2', '_TON_4bbA__n2_m1'),
-            ('TON_4bc__n2', '_TON_4bcA__n2_m1'),
-            ('TON_44bc__n2', '_TON_4aa4bcA__n2_m1'),
-
-            ('TON_2_TON_2_n2', '_TON_A_2_TON_A_2_n2_m1'),
-            ('TON_4_TON_4_n2', '_TON_A_4aa_TON_A_4aa_n2_m1'),
-            ('TON_4b_TON_4b_n2', '_TON_A_4bb_TON_A_4bb_n2_m1'),
-            ('TON_4bc_TON_4bc_n2', '_TON_A_4bc_TON_A_4bc_n2_m1'),
-            ('TON_44bc_TON_44bc_n2', '_TON_A_4aa4bc_TON_A_4aa4bc_n2_m1'),
-
-            ('TON_2_TON_2_TON_2_n2', '_TON_A_2_TON_A_2_TON_A_2_n2_m1'),
-            ('TON_4_TON_4_TON_4_n2', '_TON_A_4aa_TON_A_4aa_TON_A_4aa_n2_m1'),
-            ('TON_4b_TON_4b_TON_4b_n2', '_TON_A_4bb_TON_A_4bb_TON_A_4bb_n2_m1'),
-            ('TON_4bc_TON_4bc_TON_4bc_n2', '_TON_A_4bc_TON_A_4bc_TON_A_4bc_n2_m1'),
-            ('TON_44bc_TON_44bc_TON_44bc_n2', '_TON_A_4aa4bc_TON_A_4aa4bc_TON_A_4aa4bc_n2_m1'),
-
-            ('TON_2__TON_2__n2', '_TON_2A__TON_2A__n2_m1'),
-            ('TON_4__TON_4__n2', '_TON_4aaA__TON_4aaA__n2_m1'),
-            ('TON_4b__TON_4b__n2', '_TON_4bbA__TON_4bbA__n2_m1'),
-            ('TON_4bc__TON_4bc__n2', '_TON_4bcA__TON_4bcA__n2_m1'),
-            ('TON_44bc__TON_44bc__n2', '_TON_4aa4bcA__TON_4aa4bcA__n2_m1'),
-
-            ('TON_m2', 'A_TON__A_n1_m2'),
-
-            ('2_TON_m2', '2A_TON__A_n1_m2'),
-            ('4_TON_m2', '4aaA_TON__A_n1_m2'),
-            ('4b_TON_m2', '4bbA_TON__A_n1_m2'),
-            ('4bc_TON_m2', '4bcA_TON__A_n1_m2'),
-            ('44bc_TON_m2', '4aa4bcA_TON__A_n1_m2'),
-
-            ('TON_2_m2', 'A_TON__2A_n1_m2'),
-            ('TON_4_m2', 'A_TON__4aaA_n1_m2'),
-            ('TON_4b_m2', 'A_TON__4bbA_n1_m2'),
-            ('TON_4bc_m2', 'A_TON__4bcA_n1_m2'),
-            ('TON_44bc_m2', 'A_TON__4aa4bcA_n1_m2'),
-
-            ('TON_2__m2', 'A_TON_2_A_n1_m2'),
-            ('TON_4__m2', 'A_TON_4aa_A_n1_m2'),
-            ('TON_4b__m2', 'A_TON_4bb_A_n1_m2'),
-            ('TON_4bc__m2', 'A_TON_4bc_A_n1_m2'),
-            ('TON_44bc__m2', 'A_TON_4aa4bc_A_n1_m2'),
-        ]
-        for name, expected in pairs:
-            try:
-                a = gjfwriter.get_exact_name(name)
-                expected = expected + "_x1_y1_z1"
-                assert a == expected
-            except Exception as e:
-                print e
-                errors.append((a, expected, e))
-        if errors:
-            print errors
-            raise errors[0][2]
-
     def test_png(self):
         errors = []
         sets = [
@@ -456,6 +328,133 @@ class UtilsTestCase(TestCase):
         for name, result in names:
             self.assertEqual(set(utils.name_expansion(name)), set(result))
 
+    def test_get_exact_name(self):
+        errors = []
+        pairs = [
+            ('TON', 'A_TON_A_A'),
+
+            ('2_TON', '2A_TON_A_A'),
+            ('2-_TON', '2-A_TON_A_A'),
+            ('4_TON', '4aaA_TON_A_A'),
+            ('4b_TON', '4bbA_TON_A_A'),
+            ('4bc_TON', '4bcA_TON_A_A'),
+            ('44bc_TON', '4aa4bcA_TON_A_A'),
+
+            ('TON_2', 'A_TON_A_2A'),
+            ('TON_4', 'A_TON_A_4aaA'),
+            ('TON_4b', 'A_TON_A_4bbA'),
+            ('TON_4bc', 'A_TON_A_4bcA'),
+            ('TON_44bc', 'A_TON_A_4aa4bcA'),
+
+            ('TON_2_', 'A_TON_2A_A'),
+            ('TON_4_', 'A_TON_4aaA_A'),
+            ('TON_4b_', 'A_TON_4bbA_A'),
+            ('TON_4bc_', 'A_TON_4bcA_A'),
+            ('TON_44bc_', 'A_TON_4aa4bcA_A'),
+
+            ('TON_2_TON_2', 'A_TON_A_2_TON_A_2A'),
+            ('TON_4_TON_4', 'A_TON_A_4aa_TON_A_4aaA'),
+            ('TON_4b_TON_4b', 'A_TON_A_4bb_TON_A_4bbA'),
+            ('TON_4bc_TON_4bc', 'A_TON_A_4bc_TON_A_4bcA'),
+            ('TON_44bc_TON_44bc', 'A_TON_A_4aa4bc_TON_A_4aa4bcA'),
+
+            ('TON_2_TON_2_TON_2', 'A_TON_A_2_TON_A_2_TON_A_2A'),
+            ('TON_4_TON_4_TON_4', 'A_TON_A_4aa_TON_A_4aa_TON_A_4aaA'),
+            ('TON_4b_TON_4b_TON_4b', 'A_TON_A_4bb_TON_A_4bb_TON_A_4bbA'),
+            ('TON_4bc_TON_4bc_TON_4bc', 'A_TON_A_4bc_TON_A_4bc_TON_A_4bcA'),
+            ('TON_44bc_TON_44bc_TON_44bc', 'A_TON_A_4aa4bc_TON_A_4aa4bc_TON_A_4aa4bcA'),
+
+            ('TON_2__TON_2_', 'A_TON_2A__TON_2A_A'),
+            ('TON_4__TON_4_', 'A_TON_4aaA__TON_4aaA_A'),
+            ('TON_4b__TON_4b_', 'A_TON_4bbA__TON_4bbA_A'),
+            ('TON_4bc__TON_4bc_', 'A_TON_4bcA__TON_4bcA_A'),
+            ('TON_44bc__TON_44bc_', 'A_TON_4aa4bcA__TON_4aa4bcA_A'),
+        ]
+        for name, expected in pairs:
+            try:
+                a = utils.get_exact_name(name)
+                expected = expected + "_n1_m1_x1_y1_z1"
+                assert a == expected
+            except Exception as e:
+                print e
+                errors.append((a, expected, e))
+        if errors:
+            print errors
+            raise errors[0][1]
+
+    def test_get_exact_name_polymer(self):
+        errors = []
+        pairs = [
+            ('TON_n2', '_TON_A__n2_m1'),
+
+            ('2_TON_n2', '2_TON_A__n2_m1'),
+            ('4_TON_n2', '4aa_TON_A__n2_m1'),
+            ('4b_TON_n2', '4bb_TON_A__n2_m1'),
+            ('4bc_TON_n2', '4bc_TON_A__n2_m1'),
+            ('44bc_TON_n2', '4aa4bc_TON_A__n2_m1'),
+
+            ('TON_2_n2', '_TON_A_2_n2_m1'),
+            ('TON_4_n2', '_TON_A_4aa_n2_m1'),
+            ('TON_4b_n2', '_TON_A_4bb_n2_m1'),
+            ('TON_4bc_n2', '_TON_A_4bc_n2_m1'),
+            ('TON_44bc_n2', '_TON_A_4aa4bc_n2_m1'),
+            ('TON_B4bc_n2', '_TON_B_4bc_n2_m1'),  # special case
+
+            ('TON_2__n2', '_TON_2A__n2_m1'),
+            ('TON_4__n2', '_TON_4aaA__n2_m1'),
+            ('TON_4b__n2', '_TON_4bbA__n2_m1'),
+            ('TON_4bc__n2', '_TON_4bcA__n2_m1'),
+            ('TON_44bc__n2', '_TON_4aa4bcA__n2_m1'),
+
+            ('TON_2_TON_2_n2', '_TON_A_2_TON_A_2_n2_m1'),
+            ('TON_4_TON_4_n2', '_TON_A_4aa_TON_A_4aa_n2_m1'),
+            ('TON_4b_TON_4b_n2', '_TON_A_4bb_TON_A_4bb_n2_m1'),
+            ('TON_4bc_TON_4bc_n2', '_TON_A_4bc_TON_A_4bc_n2_m1'),
+            ('TON_44bc_TON_44bc_n2', '_TON_A_4aa4bc_TON_A_4aa4bc_n2_m1'),
+
+            ('TON_2_TON_2_TON_2_n2', '_TON_A_2_TON_A_2_TON_A_2_n2_m1'),
+            ('TON_4_TON_4_TON_4_n2', '_TON_A_4aa_TON_A_4aa_TON_A_4aa_n2_m1'),
+            ('TON_4b_TON_4b_TON_4b_n2', '_TON_A_4bb_TON_A_4bb_TON_A_4bb_n2_m1'),
+            ('TON_4bc_TON_4bc_TON_4bc_n2', '_TON_A_4bc_TON_A_4bc_TON_A_4bc_n2_m1'),
+            ('TON_44bc_TON_44bc_TON_44bc_n2', '_TON_A_4aa4bc_TON_A_4aa4bc_TON_A_4aa4bc_n2_m1'),
+
+            ('TON_2__TON_2__n2', '_TON_2A__TON_2A__n2_m1'),
+            ('TON_4__TON_4__n2', '_TON_4aaA__TON_4aaA__n2_m1'),
+            ('TON_4b__TON_4b__n2', '_TON_4bbA__TON_4bbA__n2_m1'),
+            ('TON_4bc__TON_4bc__n2', '_TON_4bcA__TON_4bcA__n2_m1'),
+            ('TON_44bc__TON_44bc__n2', '_TON_4aa4bcA__TON_4aa4bcA__n2_m1'),
+
+            ('TON_m2', 'A_TON__A_n1_m2'),
+
+            ('2_TON_m2', '2A_TON__A_n1_m2'),
+            ('4_TON_m2', '4aaA_TON__A_n1_m2'),
+            ('4b_TON_m2', '4bbA_TON__A_n1_m2'),
+            ('4bc_TON_m2', '4bcA_TON__A_n1_m2'),
+            ('44bc_TON_m2', '4aa4bcA_TON__A_n1_m2'),
+
+            ('TON_2_m2', 'A_TON__2A_n1_m2'),
+            ('TON_4_m2', 'A_TON__4aaA_n1_m2'),
+            ('TON_4b_m2', 'A_TON__4bbA_n1_m2'),
+            ('TON_4bc_m2', 'A_TON__4bcA_n1_m2'),
+            ('TON_44bc_m2', 'A_TON__4aa4bcA_n1_m2'),
+
+            ('TON_2__m2', 'A_TON_2_A_n1_m2'),
+            ('TON_4__m2', 'A_TON_4aa_A_n1_m2'),
+            ('TON_4b__m2', 'A_TON_4bb_A_n1_m2'),
+            ('TON_4bc__m2', 'A_TON_4bc_A_n1_m2'),
+            ('TON_44bc__m2', 'A_TON_4aa4bc_A_n1_m2'),
+        ]
+        for name, expected in pairs:
+            try:
+                a = utils.get_exact_name(name)
+                expected = expected + "_x1_y1_z1"
+                assert a == expected
+            except Exception as e:
+                print e
+                errors.append((a, expected, e))
+        if errors:
+            print errors
+            raise errors[0][2]
 
 class ExtractorTestCase(TestCase):
     def test_run_all(self):
