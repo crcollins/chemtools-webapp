@@ -456,6 +456,61 @@ class UtilsTestCase(TestCase):
             print errors
             raise errors[0][2]
 
+    def test_get_exact_name_spacers(self):
+        errors = []
+        pairs = [
+            ('TON', 'A**_TON_A**_A**'),
+
+            ('2_TON', '2**A**_TON_A**_A**'),
+            ('2-_TON', '2**-A**_TON_A**_A**'),
+            ('4_TON', '4aaA**_TON_A**_A**'),
+            ('4b_TON', '4bbA**_TON_A**_A**'),
+            ('4bc_TON', '4bcA**_TON_A**_A**'),
+            ('44bc_TON', '4aa4bcA**_TON_A**_A**'),
+
+            ('TON_2', 'A**_TON_A**_2**A**'),
+            ('TON_4', 'A**_TON_A**_4aaA**'),
+            ('TON_4b', 'A**_TON_A**_4bbA**'),
+            ('TON_4bc', 'A**_TON_A**_4bcA**'),
+            ('TON_44bc', 'A**_TON_A**_4aa4bcA**'),
+
+            ('TON_2_', 'A**_TON_2**A**_A**'),
+            ('TON_4_', 'A**_TON_4aaA**_A**'),
+            ('TON_4b_', 'A**_TON_4bbA**_A**'),
+            ('TON_4bc_', 'A**_TON_4bcA**_A**'),
+            ('TON_44bc_', 'A**_TON_4aa4bcA**_A**'),
+
+            ('TON_2_TON_2', 'A**_TON_A**_2**_TON_A**_2**A**'),
+            ('TON_4_TON_4', 'A**_TON_A**_4aa_TON_A**_4aaA**'),
+            ('TON_4b_TON_4b', 'A**_TON_A**_4bb_TON_A**_4bbA**'),
+            ('TON_4bc_TON_4bc', 'A**_TON_A**_4bc_TON_A**_4bcA**'),
+            ('TON_44bc_TON_44bc', 'A**_TON_A**_4aa4bc_TON_A**_4aa4bcA**'),
+
+            ('TON_2_TON_2_TON_2', 'A**_TON_A**_2**_TON_A**_2**_TON_A**_2**A**'),
+            ('TON_4_TON_4_TON_4', 'A**_TON_A**_4aa_TON_A**_4aa_TON_A**_4aaA**'),
+            ('TON_4b_TON_4b_TON_4b', 'A**_TON_A**_4bb_TON_A**_4bb_TON_A**_4bbA**'),
+            ('TON_4bc_TON_4bc_TON_4bc', 'A**_TON_A**_4bc_TON_A**_4bc_TON_A**_4bcA**'),
+            ('TON_44bc_TON_44bc_TON_44bc', 'A**_TON_A**_4aa4bc_TON_A**_4aa4bc_TON_A**_4aa4bcA**'),
+
+            ('TON_2__TON_2_', 'A**_TON_2**A**__TON_2**A**_A**'),
+            ('TON_4__TON_4_', 'A**_TON_4aaA**__TON_4aaA**_A**'),
+            ('TON_4b__TON_4b_', 'A**_TON_4bbA**__TON_4bbA**_A**'),
+            ('TON_4bc__TON_4bc_', 'A**_TON_4bcA**__TON_4bcA**_A**'),
+            ('TON_44bc__TON_44bc_', 'A**_TON_4aa4bcA**__TON_4aa4bcA**_A**'),
+        ]
+        for name, expected in pairs:
+            try:
+                a = utils.get_exact_name(name, spacers=True)
+                expected = expected + "_n1_m1_x1_y1_z1"
+                assert a == expected
+            except Exception as e:
+                print e
+                errors.append((a, expected, e))
+        if errors:
+            print errors
+            raise errors[0][1]
+
+
 class ExtractorTestCase(TestCase):
     def test_run_all(self):
         extractor.run_all()
