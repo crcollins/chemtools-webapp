@@ -471,6 +471,19 @@ class UtilsTestCase(TestCase):
             print errors
             raise errors[0][1]
 
+    def test_get_exact_name_polymer_spacers(self):
+        errors = []
+        for name, expected in self.polymer_pairs:
+            try:
+                a = utils.get_exact_name(name, spacers=True)
+                expected = expected + "_x1_y1_z1"
+                assert a == expected
+            except Exception as e:
+                print e
+                errors.append((a, expected, e))
+        if errors:
+            print errors
+            raise errors[0][2]
 
 class ExtractorTestCase(TestCase):
     def test_run_all(self):
