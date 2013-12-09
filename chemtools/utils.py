@@ -428,7 +428,6 @@ def get_feature_vector(exactname, limit=4):
         corefeatures = [1]
     else:
         corefeatures = [0]
-    first, second = atom_combinations
     for base, char in zip(atom_combinations, core[1:]):
         temp = [0] * len(base)
         temp[base.index(char)] = 1
@@ -436,3 +435,42 @@ def get_feature_vector(exactname, limit=4):
 
     extrafeatures = [int(group[1:]) for group in [n, m, x, y, z]]
     return corefeatures + endfeatures + extrafeatures
+
+
+def get_name_from_feature_vector(vector, limit=4):
+    core = ''
+    if vector[0]:
+        core += 'T'
+    else:
+        core += 'C'
+    vector = vector[1:]
+
+    first, second = atom_combinations
+    core += first[vector.index(1)]
+    vector = vector[len(first):]
+    core += second[vector.index(1)]
+    vector = vector[len(second):]
+
+    first = ARYL + XGROUPS
+    second = ['*'] + RGROUPS
+    length = len(first) + 2 * len(second)
+    sides = []
+    while len(vector) > length:
+        count = 0
+        name = ''
+        while count < limit:
+            try:
+                name += first[vector.index(1)]
+                vector = vector[len(first):]
+                name += second[vector.index(1)]
+                vector = vector[len(second):]
+                name += second[vector.index(1)]
+                vector = vector[len(second):]
+                count += 1
+            except IndexError:
+                vector = vector[length*(limit - count):]
+                break
+        sides.append(name)
+
+    extra = "n%d_m%d_x%d_y%d_z%d" % tuple(vector)
+    return '_'.join([sides[0], core, sides[1], sides[2], extra])
