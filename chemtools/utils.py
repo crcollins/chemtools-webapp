@@ -2,6 +2,7 @@ import re
 import itertools
 import string
 import os
+import math
 
 from django.template import Template, Context
 
@@ -473,4 +474,53 @@ def get_name_from_feature_vector(vector, limit=4):
         sides.append(name)
 
     extra = "n%d_m%d_x%d_y%d_z%d" % tuple(vector)
+    return '_'.join([sides[0], core, sides[1], sides[2], extra])
+
+
+def argmax(vector):
+    return max(enumerate(vector), key=lambda x:x[1])[0]
+
+def consume(vector, options):
+    temp = vector[:len(options)]
+    idx = argmax(temp)
+    if temp[idx] == 0:
+        raise IndexError
+    return options[idx]
+
+def get_name_from_weighted_feature_vector(vector, limit=4):
+    core = ''
+    if vector[0] > 0:
+        core += 'T'
+    else:
+        core += 'C'
+    vector = vector[1:]
+
+    first, second = atom_combinations
+    core += consume(vector, first)
+    vector = vector[len(first):]
+    core += consume(vector, second)
+    vector = vector[len(second):]
+
+    first = ARYL + XGROUPS
+    second = ['*'] + RGROUPS
+    length = len(first) + 2 * len(second)
+    sides = []
+    while len(vector) > length:
+        count = 0
+        name = ''
+        while count < limit:
+            try:
+                name += consume(vector, first)
+                vector = vector[len(first):]
+                name += consume(vector, second)
+                vector = vector[len(second):]
+                name += consume(vector, second)
+                vector = vector[len(second):]
+                count += 1
+            except IndexError:
+                vector = vector[length*(limit - count):]
+                break
+        sides.append(name)
+
+    extra = "n%d_m%d_x%d_y%d_z%d" % tuple([math.ceil(x) for x in vector])
     return '_'.join([sides[0], core, sides[1], sides[2], extra])
