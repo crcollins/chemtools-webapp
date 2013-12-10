@@ -15,3 +15,4 @@ Hammet Parameters
     k   TMS
     l   OCH_3 -0.268  +0.115
 
+0.043 eV = 1 kcal/mol
