@@ -509,18 +509,22 @@ def get_name_from_weighted_feature_vector(vector, limit=4):
         count = 0
         name = ''
         while count < limit:
+            fraction = 0
+            count += 1
             try:
                 name += consume(vector, first)
                 vector = vector[len(first):]
+                fraction += len(first)
                 name += consume(vector, second)
                 vector = vector[len(second):]
+                fraction += len(second)
                 name += consume(vector, second)
                 vector = vector[len(second):]
-                count += 1
+                fraction += len(second)
             except IndexError:
-                vector = vector[length*(limit - count):]
+                vector = vector[length*(limit - count)+(length-fraction):]
                 break
         sides.append(name)
 
-    extra = "n%d_m%d_x%d_y%d_z%d" % tuple([math.ceil(x) for x in vector])
+    extra = "n%d_m%d_x%d_y%d_z%d" % tuple([math.ceil(abs(x)) for x in vector])
     return '_'.join([sides[0], core, sides[1], sides[2], extra])
