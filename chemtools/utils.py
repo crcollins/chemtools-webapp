@@ -435,7 +435,7 @@ def get_feature_vector(exactname, limit=4):
         corefeatures.extend(temp)
 
     extrafeatures = [int(group[1:]) for group in [n, m, x, y, z]]
-    return corefeatures + endfeatures + extrafeatures
+    return corefeatures + endfeatures + extrafeatures + [1]
 
 
 def get_name_from_feature_vector(vector, limit=4):
