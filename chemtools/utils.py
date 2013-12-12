@@ -6,6 +6,8 @@ import math
 
 from django.template import Template, Context
 
+from fits import WH, WL, SLOPE
+
 atom_combinations = (['O', 'S', 'N', 'P', 'C'], ['N', 'P', 'C'])
 SCORES = [''.join(x) for x in itertools.product(['E', 'Z'], *atom_combinations)]
 DCORES = [''.join(x) for x in itertools.product(['C', 'T'], *atom_combinations)]
@@ -528,3 +530,8 @@ def get_name_from_weighted_feature_vector(vector, limit=4):
 
     extra = "n%d_m%d_x%d_y%d_z%d" % tuple([math.ceil(abs(x)) for x in vector])
     return '_'.join([sides[0], core, sides[1], sides[2], extra])
+def get_properties_from_feature_vector(feature):
+    homo = feature * WH
+    lumo = feature * WL
+    gap = SLOPE * (lumo - homo)
+    return homo[0,0], lumo[0,0], gap[0,0]

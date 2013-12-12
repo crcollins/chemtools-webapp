@@ -15,7 +15,7 @@ from django.utils import simplejson
 from models import ErrorReport, ErrorReportForm, JobForm
 
 from chemtools import gjfwriter
-from chemtools.utils import name_expansion, write_job, KEYWORDS
+from chemtools.utils import name_expansion, write_job, KEYWORDS, get_properties_from_feature_vector
 import cluster.interface
 
 
@@ -138,16 +138,21 @@ def molecule_detail(request, molecule):
         exactspacer = gjfwriter.get_exact_name(molecule, spacers=True)
         exactname = exactspacer.replace('*', '')
         featurevector = gjfwriter.get_feature_vector(exactspacer)
+        homo, lumo, gap = get_properties_from_feature_vector(featurevector)
     else:
         exactname = ''
         exactspacer = ''
         featurevector = ''
+        homo, lumo, gap = None, None, None
 
     c = Context({
         "molecule": molecule,
         "exact_name": exactname,
         "exact_name_spacers": exactspacer,
         "feature_vector": featurevector,
+        "homo": homo,
+        "lumo": lumo,
+        "band_gap": gap,
         "form": form,
         "known_errors": warnings[0],
         "error_message": errors[0],

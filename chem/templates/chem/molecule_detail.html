@@ -61,6 +61,18 @@ $(function() {
             <td>{{ feature_vector }}</td>
         </tr>
         <tr>
+            <th>Predicted HOMO (+/- 0.28 eV)</th>
+            <td>{{ homo|floatformat:2 }} eV</td>
+        </tr>
+        <tr>
+            <th>Predicted LUMO (+/- 0.22 eV)</th>
+            <td>{{ lumo|floatformat:2 }} eV</td>
+        </tr>
+        <tr>
+            <th>Predicted Band Gap (10-25%)</th>
+            <td>{{ band_gap|floatformat:2 }} eV</td>
+        </tr>
+        <tr>
             <th>Keywords</th>
             <td>{% if keywords %}{{ keywords }}{% else %}{{ default_keywords}}{% endif %}</td>
         </tr>
