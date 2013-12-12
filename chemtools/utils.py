@@ -530,6 +530,26 @@ def get_name_from_weighted_feature_vector(vector, limit=4):
 
     extra = "n%d_m%d_x%d_y%d_z%d" % tuple([math.ceil(abs(x)) for x in vector])
     return '_'.join([sides[0], core, sides[1], sides[2], extra])
+
+def get_vector_for_specific_gap_value(gap):
+    # a := relation between (lumo - homo) and gap (~.9)
+    # gap = a * (lumo - homo)
+    # 1/a * gap = lumo - homo
+    #   X := goal feature vector (1 x N+1)
+    #   WH := fit parameters for homo (N+1 x 1)
+    #   WL := fit parameters for lumo (N+1 x 1)
+    #   lumo = X * WL; homo = X * WH
+    #   WL.I * lumo = X; WH.I * homo = X
+    #   define lumo or homo to be x
+    # 1/a * gap = (X * WL) - (X * WH)
+    # 1/a * gap = ((WL.I * x) * WL) - ((WL.I * x) * WH)
+    #   WL.I * WL = 1
+    # 1/a * gap = x - ((WL.I * x) * WH)
+    # 1/a * gap = x * (1 - WL.I * WH)
+    # 1/a * gap / (1 - WL.I * WH) = x
+    value = (1/SLOPE) * gap / (1 - WL.I * WH)
+    return WL * value
+
 def get_properties_from_feature_vector(feature):
     homo = feature * WH
     lumo = feature * WL
