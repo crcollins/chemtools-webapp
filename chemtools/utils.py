@@ -548,7 +548,8 @@ def get_vector_for_specific_gap_value(gap):
     # 1/a * gap = x * (1 - WL.I * WH)
     # 1/a * gap / (1 - WL.I * WH) = x
     value = (1/SLOPE) * gap / (1 - WL.I * WH)
-    return WL * value
+    return (WL * value).T.tolist()[0]
+
 
 def get_properties_from_feature_vector(feature):
     homo = feature * WH
