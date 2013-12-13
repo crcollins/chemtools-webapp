@@ -482,12 +482,14 @@ def get_name_from_feature_vector(vector, limit=4):
 def argmax(vector):
     return max(enumerate(vector), key=lambda x:x[1])[0]
 
+
 def consume(vector, options):
     temp = vector[:len(options)]
     idx = argmax(temp)
     if temp[idx] == 0:
         raise IndexError
     return options[idx]
+
 
 def get_name_from_weighted_feature_vector(vector, limit=4):
     core = ''
@@ -510,26 +512,65 @@ def get_name_from_weighted_feature_vector(vector, limit=4):
     while len(vector) > length:
         count = 0
         name = ''
+        saved = []
         while count < limit:
             fraction = 0
             count += 1
+            temp = []
             try:
-                name += consume(vector, first)
-                vector = vector[len(first):]
-                fraction += len(first)
-                name += consume(vector, second)
-                vector = vector[len(second):]
-                fraction += len(second)
-                name += consume(vector, second)
-                vector = vector[len(second):]
-                fraction += len(second)
+                for group in [first, second, second]:
+                    temp.append(sorted([(x,group[i]) for i, x in enumerate(vector[:len(group)])], reverse=True))
+                    vector = vector[len(group):]
+                    fraction += len(group)
             except IndexError:
                 vector = vector[length*(limit - count)+(length-fraction):]
                 break
-        sides.append(name)
 
-    extra = "n%d_m%d_x%d_y%d_z%d" % tuple([math.ceil(abs(x)) for x in vector])
+            singlemain = None
+            multimain = None
+            for val, char in temp[0]:
+                if singlemain is None and char in NEEDSPACE:
+                    singlemain = val, char
+                elif multimain is None and char in ARYL2:
+                    multimain = val, char
+
+            singlestar0 = None
+            multirgroup0 = None
+            for val, char in temp[1]:
+                if singlestar0 is None and char == '*':
+                    singlestar0 = val, char
+                elif multirgroup0 is None and char in RGROUPS:
+                    multirgroup0 = val, char
+
+            singlestar1 = None
+            multirgroup1 = None
+            for val, char in temp[2]:
+                if singlestar1 is None and char in '*':
+                    singlestar1 = val, char
+                elif multirgroup1 is None and char in RGROUPS:
+                    multirgroup1 = val, char
+
+            single = (singlemain, singlestar0, singlestar1)
+            singleval = sum(x[0] for x in single)
+            multi = (multimain, multirgroup0, multirgroup1)
+            multival = sum(x[0] for x in multi)
+            saved.append(((singleval, single), (multival, multi)))
+
+        names = [(0, '')]
+        total = 0
+        totalname = ''
+        for i, (single, multi) in enumerate(saved):
+            names[-1] = (names[-1][0] + single[0], names[-1][1] + single[1][0][1] + '**')
+            total += multi[0]
+            totalname += ''.join([x[1] for x in multi[1]])
+            names.append((total, totalname))
+        single, _ = saved[-1]
+        names[-1] = (names[-1][0] + single[0], names[-1][1] + single[1][0][1] + '**')
+        sides.append(sorted(names, reverse=True)[0][1])
+    print vector
+    extra = "n%d_m%d_x%d_y%d_z%d" % tuple([math.ceil(abs(x)) for x in vector[:-1]])
     return '_'.join([sides[0], core, sides[1], sides[2], extra])
+
 
 def get_vector_for_specific_gap_value(gap):
     # a := relation between (lumo - homo) and gap (~.9)
