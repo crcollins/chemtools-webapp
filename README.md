@@ -25,10 +25,16 @@ Setup
 
 This setup assumes that you already have python 2.7+ and git installed and are on a machine with the apt package manager.
 
+    $ sudo apt-get install python-dev gfortran liblapack-dev libatlas-dev build-essential libfreetype6-dev libpng-dev python-cairo python-pip
+    $ sudo pip install virtualenv
+    $ virtualenv project
+    $ cd project/
+    $ . bin/activate
+    $ ln -s /usr/lib/python2.7/dist-packages/cairo/ lib/python2.7/site-packages/
 
     $ git clone https://github.com/crcollins/chemtools-webapp.git
     $ cd chemtools-webapp
-    $ sh build.sh
+    $ pip install -r requirements.txt
     $ python manage.py syncdb
     $ python manage.py runserver 0.0.0.0
     Go to http://localhost/ with your browser
