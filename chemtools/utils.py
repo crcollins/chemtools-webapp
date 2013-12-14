@@ -567,7 +567,6 @@ def get_name_from_weighted_feature_vector(vector, limit=4):
         single, _ = saved[-1]
         names[-1] = (names[-1][0] + single[0], names[-1][1] + single[1][0][1] + '**')
         sides.append(sorted(names, reverse=True)[0][1])
-    print vector
     extra = "n%d_m%d_x%d_y%d_z%d" % tuple([math.ceil(abs(x)) for x in vector[:-1]])
     return '_'.join([sides[0], core, sides[1], sides[2], extra])
 
