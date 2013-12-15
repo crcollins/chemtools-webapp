@@ -41,7 +41,6 @@ This setup assumes that you already have python 2.7+ and git installed and are o
 
 Note: You might have to run `sudo pip install numpy==1.6.1` before running `sudo pip install -r requirements.txt` to get it to work.
 
-
 Test
 ----
 
@@ -49,8 +48,24 @@ Currently, there are a few tests as a sanity check for some of the main features
 
     $ python manage.py test account chem chemtools cluster data parse docs
 
-
 Database
 --------
 
 The database used can be changed in by going in project/settings.py and changing the DATABASE dictionary.
+
+
+Deploy
+------
+
+This assumes you have already made it through the setup.
+
+    $ sudo apt-get install supervisor nginix
+    # While in your virtualenv from before
+    $ pip install gunicorn
+
+    $ sudo vim /etc/nginx/nginx.conf
+    $ sudo vim /etc/supervisor/conf.d/chemtools.conf
+    $ sudo supervisorctl reread
+    $ sudo supervisorctl update
+    $ sudo supervisorctl start chemtools
+    Go to http://yourdomain.com/ with your browser
