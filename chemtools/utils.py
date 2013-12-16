@@ -526,33 +526,19 @@ def get_name_from_weighted_feature_vector(vector, limit=4):
                 vector = vector[length*(limit - count)+(length-fraction):]
                 break
 
-            singlemain = None
-            multimain = None
-            for val, char in temp[0]:
-                if singlemain is None and char in NEEDSPACE:
-                    singlemain = val, char
-                elif multimain is None and char in ARYL2:
-                    multimain = val, char
+            single = []
+            multi = []
 
-            singlestar0 = None
-            multirgroup0 = None
-            for val, char in temp[1]:
-                if singlestar0 is None and char == '*':
-                    singlestar0 = val, char
-                elif multirgroup0 is None and char in RGROUPS:
-                    multirgroup0 = val, char
+            singleoption = [NEEDSPACE, '*', '*']
+            multioption = [ARYL2, RGROUPS, RGROUPS]
+            for pair, selector, selector2 in zip(temp, singleoption, multioption):
+                for i, (val, char) in enumerate(pair):
+                    if len(single) <= i and char in selector:
+                        single.append((val, char))
+                    elif len(multi) <= i and char in selector2:
+                        multi.append((val, char))
 
-            singlestar1 = None
-            multirgroup1 = None
-            for val, char in temp[2]:
-                if singlestar1 is None and char in '*':
-                    singlestar1 = val, char
-                elif multirgroup1 is None and char in RGROUPS:
-                    multirgroup1 = val, char
-
-            single = (singlemain, singlestar0, singlestar1)
             singleval = sum(x[0] for x in single)
-            multi = (multimain, multirgroup0, multirgroup1)
             multival = sum(x[0] for x in multi)
             saved.append(((singleval, single), (multival, multi)))
 
