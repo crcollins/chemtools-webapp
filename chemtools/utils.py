@@ -528,11 +528,10 @@ def get_name_from_weighted_feature_vector(vector, limit=4):
 
             single = []
             multi = []
-
             singleoption = [NEEDSPACE, '*', '*']
             multioption = [ARYL2, RGROUPS, RGROUPS]
-            for pair, selector, selector2 in zip(temp, singleoption, multioption):
-                for i, (val, char) in enumerate(pair):
+            for i, (pair, selector, selector2) in enumerate(zip(temp, singleoption, multioption)):
+                for (val, char) in pair:
                     if len(single) <= i and char in selector:
                         single.append((val, char))
                     elif len(multi) <= i and char in selector2:
