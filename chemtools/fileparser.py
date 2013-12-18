@@ -406,6 +406,7 @@ if __name__ == "__main__":
                                 + self.convert_files(args.listfiles)
                                 + self.convert_folders(args.folders))
             self.exactname = args.exactname
+            self.output_gjf = args.gjf
 
         def check_input_files(self, filelist):
             files = []
@@ -443,11 +444,16 @@ if __name__ == "__main__":
             logs = LogSet()
             logs.parse_files(self.files, basename=self.basename, exactname=self.exactname)
 
-            if self.outputfilename:
-                with open(self.outputfilename, 'w') as outputfile:
-                    outputfile.write(logs.format_output(errors=self.error))
+            if self.output_gjf:
+                for log in logs.logs:
+                    with open(log.name + ".gjf", 'w') as outputfile:
+                        outputfile.write(log.format_gjf())
             else:
-                print logs.format_output(errors=self.error)
+                if self.outputfilename:
+                    with open(self.outputfilename, 'w') as outputfile:
+                        outputfile.write(logs.format_output(errors=self.error))
+                else:
+                    print logs.format_output(errors=self.error)
 
     parser = argparse.ArgumentParser(description="This program extracts data from Gaussian log files.")
     parser.add_argument('files', metavar='file', type=str, nargs='*', help='The name of single file.')
@@ -460,6 +466,7 @@ if __name__ == "__main__":
     parser.add_argument('-V', action="store_true", dest="verbose", default=False, help='Toggles showing all messages.')
     parser.add_argument('-B', action="store_true", dest="base", default=False, help='Toggles path.')
     parser.add_argument('-F', action="store_true", dest="exactname", default=False, help='Toggles exact name.')
+    parser.add_argument('-G', action="store_true", dest="gjf", default=False, help='Toggles writing gjf file from log.')
 
     if len(sys.argv) > 1:
         args = sys.argv[1:]
