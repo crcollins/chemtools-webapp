@@ -23,7 +23,6 @@ class Log(object):
 
             self.order = ["Options", "Occupied", "Virtual", "HomoOrbital", "Dipole", "Energy", "Excited", "Time"]
 
-            possible = self.in_range(f)
             for i, line in enumerate(f):
                 for k, parser in self.parsers.items():
                     parser.parse(line)
@@ -39,39 +38,6 @@ class Log(object):
 
     def __getitem__(self, name):
         return self.parsers[name][0]
-
-    def in_range(self, f):
-        '''Builds a set of line numbers based on parser params to optimally skip lines.'''
-        try:
-            f.seek(0)
-            lines = max(i for i, x in enumerate(f)) + 1
-            f.seek(0)
-        except:
-            return None
-
-        ranges = []
-        for k, parser in self.parsers.items():
-            parts = []
-            for x in parser.range:
-                if x < 0:
-                    x += lines
-                elif x is None:
-                    x = lines
-                parts.append(x)
-            parts = tuple(parts)
-
-            if parts[0] > parts[1]:
-                ranges.append((parts[0], lines))
-                ranges.append((0, parts[1]))
-                parser.possible = set(xrange(*ranges[-1])) | set(xrange(*ranges[-2]))
-            else:
-                ranges.append(parts)
-                parser.possible = set(xrange(*ranges[-1]))
-
-        a = set()
-        for x in ranges:
-            a |= set(xrange(*x))
-        return a
 
     def format_gjf(self):
         s = self["Header"]
@@ -150,7 +116,6 @@ class LineParser(object):
     def __init__(self):
         self.done = False
         self.value = None
-        self.range = (0, 0)
         self.newfile = False
 
     def parse(self, line):
@@ -171,7 +136,6 @@ class Options(LineParser):
         super(Options, self).__init__()
         self.start = False
         self.value = ''
-        self.range = (3000, -1000)
         self.prevline = ''
 
     @is_done
@@ -200,7 +164,6 @@ class HomoOrbital(LineParser):
     def __init__(self):
         super(HomoOrbital, self).__init__()
         self.value = 0
-        self.range = (3000, -1000)
 
     @is_done
     def parse(self, line):
@@ -220,7 +183,6 @@ class Energy(LineParser):
     def __init__(self):
         super(Energy, self).__init__()
         self.start = False
-        self.range = (-30, -1)
         self.prevline = ''
 
     @is_done
@@ -245,7 +207,6 @@ class Energy(LineParser):
 class Time(LineParser):
     def __init__(self):
         super(Time, self).__init__()
-        self.range = (-10, -1)
 
     @is_done
     def parse(self, line):
@@ -261,7 +222,6 @@ class Time(LineParser):
 class Excited(LineParser):
     def __init__(self):
         super(Excited, self).__init__()
-        self.range = (300, 3000)
 
     @is_done
     def parse(self, line):
@@ -276,7 +236,6 @@ class Occupied(LineParser):
     def __init__(self):
         super(Occupied, self).__init__()
         self.prevline = ''
-        self.range = (3000, -1000)
 
     @is_done
     def parse(self, line):
@@ -294,7 +253,6 @@ class Virtual(LineParser):
     def __init__(self):
         super(Virtual, self).__init__()
         self.prevline = ''
-        self.range = (3000, -1000)
 
     @is_done
     def parse(self, line):
@@ -313,7 +271,6 @@ class Geometry(LineParser):
         super(Geometry, self).__init__()
         self.value = ''
         self.start = False
-        self.range = (-300, -1)
         self.newfile = True
         self.prevline = ''
 
@@ -355,7 +312,6 @@ class Header(LineParser):
     def __init__(self):
         super(Header, self).__init__()
         self.value = ''
-        self.range = (70, 150)
         self.start = False
 
     @is_done
@@ -377,7 +333,6 @@ class Header(LineParser):
 class Dipole(LineParser):
     def __init__(self):
         super(Dipole, self).__init__()
-        self.range = (-300, -1)
 
     @is_done
     def parse(self, line):
