@@ -17,3 +17,51 @@ def parse_file_list(files):
                         yield tfile.extractfile(name)
         else:
             yield f
+
+def find_sets(files):
+    logs = []
+    datasets = []
+    for f in files:
+        if f.name.endswith(".log"):
+            logs.append(f)
+        else:
+            datasets.append(f)
+
+    logsets = {}
+    for f in logs:
+        nums = re.findall(r'n(\d+)', f.name)
+        if not nums:
+            continue
+        num = nums[-1]
+
+        name = f.name.replace(".log", '').replace("n%s" % num, '')
+        if name in logsets.keys():
+            logsets[name].append((num, f))
+        else:
+            logsets[name] = [(num, f)]
+    return logsets, datasets
+
+
+def convert_logs(logsets):
+    converted = []
+    for key in logsets:
+        nvals = []
+        homovals = []
+        lumovals = []
+        gapvals = []
+        for num, log in logsets[key]:
+            parser = fileparser.Log(log)
+
+            nvals.append(num)
+            homovals.append(parser["Occupied"])
+            lumovals.append(parser["Virtual"])
+            gapvals.append(parser["Excited"])
+
+        f = StringIO(key)
+        f.write(', '.join(nvals) + '\n')
+        f.write(', '.join(homovals) + '\n')
+        f.write(', '.join(lumovals) + '\n')
+        f.write(', '.join(gapvals) + '\n')
+        f.seek(0)
+        converted.append(f)
+    return converted
