@@ -64,6 +64,8 @@ class Log(object):
         name = os.path.basename(filename).replace(".log", "")
         if name.lower().endswith("_td"):
             name = name[:-3]  # rstrip does not work because some names end with a "d"
+        elif name.lower().endswith("_tddft"):
+            name = name[:-6]
         try:
             exactname = get_exact_name(name)
         except:
