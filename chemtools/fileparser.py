@@ -346,6 +346,7 @@ class Geometry(LineParser):
                 self.value = '\n'.join(lines) + '\n'
                 self.done = True
             if not self.done:
+                self.prevline = line.strip('\n')
                 self.value += line.strip('\n')
 
 
