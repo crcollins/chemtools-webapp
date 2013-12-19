@@ -39,9 +39,15 @@ class Log(object):
     def __getitem__(self, name):
         return self.parsers[name][0]
 
-    def format_gjf(self):
-        s = self["Header"]
-        s += self["Geometry"]
+    def format_gjf(self, td=False):
+        if td:
+            header = self["Header"].replace(".chk", "_TD.chk")
+            geometry = self["Geometry"].lower().replace("opt", "td")
+        else:
+            header = self["Header"]
+            geometry = self["Geometry"]
+        s = header
+        s += geometry
         return s
 
     def format_data(self):
