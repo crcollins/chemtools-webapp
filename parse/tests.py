@@ -26,7 +26,7 @@ class MainPageTestCase(TestCase):
             response = self.client.post(reverse(views.upload_data), data)
             self.assertEqual(response.status_code, 200)
             results = response.content.split('\n')[1]
-            expected = "A_TON_A_A.log,opt B3LYP/6-31g(d) geom=connectivity,-6.460873931,-1.31976745,41,0.0006,-567.1965205,---,0.35"
+            expected = "A_TON_A_A.log,A_TON_A_A,A_TON_A_A_n1_m1_x1_y1_z1,opt B3LYP/6-31g(d) geom=connectivity,-6.460873931,-1.31976745,41,0.0006,-567.1965205,---,0.35"
             self.assertEqual(results, expected)
 
     def test_gjf_reset(self):
