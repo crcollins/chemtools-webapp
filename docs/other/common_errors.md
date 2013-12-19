@@ -194,3 +194,17 @@ Gaussian requires that all the gjf files end with a single blank line for whatev
 
 Add a newline to the end of the file.
 
+
+
+#### Error ####
+
+    Route card not found.
+    Error termination via Lnk1e in /usr/local/Dist/g09/l1.exe at Thu Dec 19 17:38:29 2013.
+
+#### Problem ####
+
+Gaussian requires that all job files have the route card information line (the line with the #). If that line is not there then it will return an error.
+
+#### Fix ####
+
+Add the route card line with the proper parameters.
