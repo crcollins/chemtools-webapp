@@ -26,11 +26,11 @@ def index(request):
         if set(",{}$") & set(request.GET.get("molecule")):
             func = multi_molecule
 
-        a = {"keywords": request.GET.get("keywords", None)}
+        params = {"keywords": request.GET.get("keywords", None)}
         if a["keywords"] != KEYWORDS:
-            b = "%s?%s" % (reverse(func, args=(request.GET.get("molecule"), )),
-                urllib.urlencode(a))
-            return HttpResponseRedirect(b)
+            url = "%s?%s" % (reverse(func, args=(request.GET.get("molecule"), )),
+                urllib.urlencode(params))
+            return HttpResponseRedirect(url)
         else:
             return redirect(func, request.GET.get("molecule"))
     return render(request, "chem/index.html")
