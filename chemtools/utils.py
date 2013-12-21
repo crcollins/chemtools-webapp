@@ -128,7 +128,7 @@ def name_expansion(string):
             x = variables[newname]
         except:
             try:
-                int(newname)
+                int(newname)  # internal variable
                 x = '$' + newname
             except:
                 x = newname
@@ -151,7 +151,11 @@ def name_expansion(string):
 
     def expand(items):
         swapped = [re.sub(varparse, get_var, x) for x in items]
-        a = [x[1:-1].split(',') for x in swapped[1::2]]
+        withbrace = swapped[1::2] # every other one has {}
+        withoutbrace = swapped[::2]
+
+        # remove {} from x and split
+        cleaned = [x[1:-1].split(',') for x in withbrace]
         operations = {
             "":  lambda x: x,
             "L": lambda x: x.lower(),
@@ -159,29 +163,29 @@ def name_expansion(string):
         }
 
         out = []
-        for stuff in itertools.product(*a):
-            temp = []
-            for i, item in enumerate(stuff):
+        for group in itertools.product(*cleaned):
+            currentvalues = []
+            for i, item in enumerate(group):
                 if '$' in item:
                     split = item.strip('$').split('.')
-                    num = split[0]
+                    num = int(split[0])
                     if len(split) > 1:
                         op = operations[split[1].upper()]
                     else:
                         op = operations['']
-                    x = op(temp[int(num)])
+                    x = op(currentvalues[num])
                 else:
-                    x = stuff[i]
-                temp.append(x)
-            out.append(temp)
+                    x = group[i]
+                currentvalues.append(x)
+            out.append(currentvalues)
 
-        return [''.join(sum(zip(swapped[::2], x), ()) + (swapped[-1], )) for x in out]
+        return [''.join(sum(zip(withoutbrace, x), ()) + (swapped[-1], )) for x in out]
 
     braces = []
-    inter = set('{}').intersection
     for part in split_molecules(string):
-        if inter(part):
-            braces.extend(expand(re.split(braceparse, part)))
+        if set('{}').intersection(part):
+            split = re.split(braceparse, part)
+            braces.extend(expand(split))
         else:
             braces.append(part)
     return braces
