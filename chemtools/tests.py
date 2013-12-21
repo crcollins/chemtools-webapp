@@ -485,6 +485,6 @@ class UtilsTestCase(TestCase):
             print errors
             raise errors[0][2]
 
-class ExtractorTestCase(TestCase):
-    def test_run_all(self):
-        extractor.run_all()
+# class ExtractorTestCase(TestCase):
+#     def test_run_all(self):
+#         extractor.run_all()
