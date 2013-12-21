@@ -129,7 +129,7 @@ def name_expansion(string):
         except:
             try:
                 int(newname)
-                x = "*" + newname
+                x = '$' + newname
             except:
                 x = newname
         return x
@@ -162,8 +162,8 @@ def name_expansion(string):
         for stuff in itertools.product(*a):
             temp = []
             for i, item in enumerate(stuff):
-                if '*' in item:
-                    split = item.strip('*').split('.')
+                if '$' in item:
+                    split = item.strip('$').split('.')
                     num = split[0]
                     if len(split) > 1:
                         op = operations[split[1].upper()]
