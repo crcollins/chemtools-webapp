@@ -128,6 +128,27 @@ At first glance it might seem like there would be a problem correctly grouping c
 
 ![/chem/TON__24a_TON](/chem/TON__24a_TON.png)
 
+A little less obvious of a problem that arises from this naming scheme is how to handle rotations (a group can be rotated 180 degrees around the bond axis). This problem has been solved by the addition of a meta character `-`.
+
+    TON_55
+
+![/chem/TON_55](/chem/TON_55.png)
+
+    TON_5-5
+
+![/chem/TON_5-5](/chem/TON_5-5.png)
+
+This character applies to the the Aryl group directly preceding the character. So the following names are all equivalent.
+
+    TON_5-b
+    TON_5b-
+    TON_5-bb
+    TON_5b-b
+    TON_5bb-
+
+![/chem/TON_5b-](/chem/TON_5b-.png)
+
+
 For some fun with the naming:
 
     4a_TON_5555555555_4a
@@ -159,6 +180,8 @@ All of the following forms of output are possible for all of the molecules gener
 - mol2 - a standard Cartesian-style molecule file format
 - png - this is just a very rough rendering of the structure of the molecule.
 - Job - there also is a job form on each molecule page that will allow generation of job files for any of the clusters given a few parameters.
+
+In addition to the files, the page for each structure also includes the exact name, the feature vector, and estimates for the HOMO, LUMO, and Band Gap energies. These estimates are calculated using the weights from a 567 dimensional linear regression on the feature vector. The linear regression was trained on ~1000 benzobisazole structures.
 
 
 ### Jobs ###
@@ -202,6 +225,8 @@ Data parsing can also be done now using just the log files. If you upload a set 
 #### Gjf Reset ####
 
 This takes a log file (assumed to be correct) and returns a gjf file with the extracted geometry. This is intended to be used to extract the optimized geometry from the DFT log files to then use as the TDDFT gjf file. _WARNING: this will not work in some cases where the job stopped part way through writing._
+
+In addition to just being able to write out the gjf with the same parameters that were used to generate the log file, this also allows the creation of TDDFT files.
 
 
 ### Users ###
@@ -261,7 +286,7 @@ For generating the molecules, there is a very rough Finite State Machine that pa
     aryl        = aryl0 | aryl2 ;
     xgroup      = "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" | "K" | "L" ;
     rgroup      = "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k" | "l" ;
-    full        = aryl2, [rgroup], [rgroup]
+    full        = aryl2, ["-"], [rgroup], ["-"], [rgroup], ["-"]
     end         = [aryl0, {aryl0}], [full, {full}], [xgroup]
     end2        = "_", end
 
