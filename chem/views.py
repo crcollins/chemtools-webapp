@@ -162,6 +162,36 @@ def molecule_detail(request, molecule):
     return render(request, "chem/molecule_detail.html", c)
 
 
+def molecule_detail_json(request, molecule):
+    _, warnings, errors = _get_molecules_info(molecule)
+    keywords = request.REQUEST.get("keywords", KEYWORDS)
+
+    if not errors[0]:
+        exactspacer = gjfwriter.get_exact_name(molecule, spacers=True)
+        exactname = exactspacer.replace('*', '')
+        featurevector = gjfwriter.get_feature_vector(exactspacer)
+        homo, lumo, gap = get_properties_from_feature_vector(featurevector)
+    else:
+        exactname = ''
+        exactspacer = ''
+        featurevector = ''
+        homo, lumo, gap = None, None, None
+
+    a = {
+        "molecule": molecule,
+        "exact_name": exactname,
+        "exact_name_spacers": exactspacer,
+        "feature_vector": featurevector,
+        "homo": homo,
+        "lumo": lumo,
+        "band_gap": gap,
+        "known_errors": warnings[0],
+        "error_message": errors[0],
+        "keywords": keywords,
+        }
+    return HttpResponse(simplejson.dumps(a), mimetype="application/json")
+
+
 def multi_molecule(request, string):
     form = JobForm.get_form(request, "{{ name }}")
     add = "" if request.GET.get("view") else "attachment; "
