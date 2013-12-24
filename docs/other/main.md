@@ -572,17 +572,17 @@ This is used to allow viewing the currently running jobs of the logged in user. 
 
 [/chem/jobs/running.json](/chem/jobs/running.json)
 
+{
+  "is_authenticated": true,
+  "clusters": [
     {
-        "is_authenticated" : true,
-        "clusters" : [
-            {
-                "name" : "Gordon",
-                "columns" : ["Job ID", "Username", "Jobname", "Req'd Memory", "Req'd Time", 'S', "Elap Time"],
-                "jobs" : [
-                    [100, "ccollins", "24a_TON", "59GB", "16:00:00", "R", "11:15:00"],
-                    ...
-                ]
-            },
-            ...
-        ]
-    }
+      "jobs": [
+        ["9969", "ccollins", "5b_TON_4c_6d.mjo", "59gb", "48:00:00", "--", "R"],
+        ...
+      ],
+      "name": "Marcy",
+      "columns": ["Job ID", "Username", "Jobname", "Req'd Memory", "Req'd Time", "Elap Time", "S"]
+    },
+    ...
+  ]
+}
