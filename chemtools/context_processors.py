@@ -1,5 +1,5 @@
-import utils
+import constants
 
 
 def default_keywords(request):
-    return {"default_keywords": utils.KEYWORDS}
+    return {"default_keywords": constants.KEYWORDS}

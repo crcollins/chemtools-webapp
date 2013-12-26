@@ -4,6 +4,7 @@ from django.test import TestCase
 
 import gjfwriter
 import utils
+import constants
 import extractor
 
 
@@ -17,7 +18,7 @@ class GJFWriterTestCase(TestCase):
         "CPP_{0}_{0}",
         "{0}_TON_{0}_{0}",
     ]
-    cores = utils.CORES
+    cores = constants.CORES
     invalid_cores = ["cao", "bo", "CONA", "asD"]
     valid_polymer_sides = ['2', '4b', '4bc', '44bc', '5-', '5-5', '55-', '5-a', '5-ab4-']
     invalid_polymer_sides = ['B', '2B']
@@ -383,12 +384,12 @@ class UtilsTestCase(TestCase):
 
     def test_group_expansion(self):
         names = [
-            ("{$CORES}", utils.CORES),
-            ("{$XGROUPS}", utils.XGROUPS),
-            ("{$RGROUPS}", utils.RGROUPS),
-            ("{$ARYL0}", utils.ARYL0),
-            ("{$ARYL2}", utils.ARYL2),
-            ("{$ARYL}", utils.ARYL),
+            ("{$CORES}", constants.CORES),
+            ("{$XGROUPS}", constants.XGROUPS),
+            ("{$RGROUPS}", constants.RGROUPS),
+            ("{$ARYL0}", constants.ARYL0),
+            ("{$ARYL2}", constants.ARYL2),
+            ("{$ARYL}", constants.ARYL),
         ]
         for name, result in names:
             self.assertEqual(set(utils.name_expansion(name)), set(result))
@@ -406,9 +407,9 @@ class UtilsTestCase(TestCase):
 
     def test_name_expansion(self):
         names = [
-            ("24{$RGROUPS}_{$CORES}", ["24" + '_'.join(x) for x in product(utils.RGROUPS, utils.CORES)]),
-            ("24{$XGROUPS}_{$CORES}", ["24" + '_'.join(x) for x in product(utils.XGROUPS, utils.CORES)]),
-            ("24{$ARYL}_{$CORES}", ["24" + '_'.join(x) for x in product(utils.ARYL, utils.CORES)]),
+            ("24{$RGROUPS}_{$CORES}", ["24" + '_'.join(x) for x in product(constants.RGROUPS, constants.CORES)]),
+            ("24{$XGROUPS}_{$CORES}", ["24" + '_'.join(x) for x in product(constants.XGROUPS, constants.CORES)]),
+            ("24{$ARYL}_{$CORES}", ["24" + '_'.join(x) for x in product(constants.ARYL, constants.CORES)]),
         ]
         for name, result in names:
             self.assertEqual(set(utils.name_expansion(name)), set(result))

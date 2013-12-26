@@ -3,7 +3,7 @@
 import os
 
 from molecule import Atom, Bond, Molecule
-from utils import CORES, XGROUPS, RGROUPS, ARYL0, ARYL2, ARYL, atom_combinations, KEYWORDS
+from constants import *
 from utils import name_expansion, get_exact_name, get_feature_vector, get_feature_vector2, parse_name
 try:
     from project.utils import StringIO

@@ -15,7 +15,8 @@ from django.utils import simplejson
 from models import ErrorReport, ErrorReportForm, JobForm
 
 from chemtools import gjfwriter
-from chemtools.utils import name_expansion, write_job, KEYWORDS, get_properties_from_feature_vector
+from chemtools.utils import name_expansion, write_job, get_properties_from_feature_vector
+from chemtools.constants import KEYWORDS
 import cluster.interface
 
 
