@@ -119,7 +119,7 @@ def molecule_check(request, string):
 def molecule_detail(request, molecule):
     _, warnings, errors = _get_molecules_info(molecule)
     form = JobForm.get_form(request, molecule)
-    keywords = request.REQUEST.get("keywords")
+    keywords = request.REQUEST.get("keywords", '')
     add = "" if request.GET.get("view") else "attachment; "
 
     if form.is_valid():
@@ -159,7 +159,6 @@ def molecule_detail(request, molecule):
         "form": form,
         "known_errors": warnings[0],
         "error_message": errors[0],
-        "encoded_keywords": '?' + urllib.urlencode({"keywords": keywords}) if keywords else '',
         "keywords": keywords,
         })
     return render(request, "chem/molecule_detail.html", c)

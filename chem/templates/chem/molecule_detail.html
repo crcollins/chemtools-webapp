@@ -78,12 +78,12 @@ $(function() {
         </tr>
         <tr>
             <th>Keywords</th>
-            <td>{% if keywords %}{{ keywords }}{% else %}{{ default_keywords}}{% endif %}</td>
+            <td>{% if keywords %}{{ keywords }}{% else %}{{ default_keywords }}{% endif %}</td>
         </tr>
     </table>
     <hr>
     <div class="list-group">
-        <a class="list-group-item" href="../{{ molecule }}.gjf{{ encoded_keywords }}">{{ molecule }}.gjf</a>
+        <a class="list-group-item" href="../{{ molecule }}.gjf?{{ keywords|urlencode }}">{{ molecule }}.gjf</a>
         <a class="list-group-item" href="../{{ molecule }}.mol2">{{ molecule }}.mol2</a>
         <a class="list-group-item collapse-data-btn" data-toggle="collapse" href="#details">Job Form</a>
     </div>
