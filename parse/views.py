@@ -84,9 +84,12 @@ def reset_gjf(request):
         parser = fileparser.Log(f)
 
         name, _ = os.path.splitext(f.name)
+        td = False
         if request.REQUEST.get("reset_td"):
             name += '_TD'
-        zfile.writestr("%s.gjf" % name, parser.format_gjf(td=True))
+            td = True
+
+        zfile.writestr("%s.gjf" % name, parser.format_gjf(td=td))
 
     zfile.close()
     buff.flush()
