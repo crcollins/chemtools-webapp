@@ -6,6 +6,7 @@ import gjfwriter
 import utils
 import constants
 import extractor
+import mol_name
 
 
 class GJFWriterTestCase(TestCase):
@@ -263,7 +264,7 @@ class GJFWriterTestCase(TestCase):
             raise errors[0][1]
 
 
-class UtilsTestCase(TestCase):
+class MolNameTestCase(TestCase):
     pairs = [
         ('TON', 'A**_TON_A**_A**'),
 
@@ -380,7 +381,7 @@ class UtilsTestCase(TestCase):
             ("{a,b}{c,d}{e,f}", ["ace", "acf", "ade", "adf", "bce", "bcf", "bde", "bdf"]),
         ]
         for name, result in names:
-            self.assertEqual(set(utils.name_expansion(name)), set(result))
+            self.assertEqual(set(mol_name.name_expansion(name)), set(result))
 
     def test_group_expansion(self):
         names = [
@@ -392,7 +393,7 @@ class UtilsTestCase(TestCase):
             ("{$ARYL}", constants.ARYL),
         ]
         for name, result in names:
-            self.assertEqual(set(utils.name_expansion(name)), set(result))
+            self.assertEqual(set(mol_name.name_expansion(name)), set(result))
 
     def test_local_vars(self):
         names = [
@@ -403,7 +404,7 @@ class UtilsTestCase(TestCase):
             ("{a,b}{c,d}{$0}{$1}", ["acac", "bcbc", "adad", "bdbd"]),
         ]
         for name, result in names:
-            self.assertEqual(set(utils.name_expansion(name)), set(result))
+            self.assertEqual(set(mol_name.name_expansion(name)), set(result))
 
     def test_name_expansion(self):
         names = [
@@ -412,7 +413,7 @@ class UtilsTestCase(TestCase):
             ("24{$ARYL}_{$CORES}", ["24" + '_'.join(x) for x in product(constants.ARYL, constants.CORES)]),
         ]
         for name, result in names:
-            self.assertEqual(set(utils.name_expansion(name)), set(result))
+            self.assertEqual(set(mol_name.name_expansion(name)), set(result))
 
     def test_local_vars_case(self):
         names = [
@@ -428,13 +429,13 @@ class UtilsTestCase(TestCase):
             ("{A,B}{C,D}{$0.L}{$1.L}", ["ACac", "BCbc", "ADad", "BDbd"]),
         ]
         for name, result in names:
-            self.assertEqual(set(utils.name_expansion(name)), set(result))
+            self.assertEqual(set(mol_name.name_expansion(name)), set(result))
 
     def test_get_exact_name(self):
         errors = []
         for name, expected in self.pairs:
             try:
-                a = utils.get_exact_name(name)
+                a = mol_name.get_exact_name(name)
                 expected = expected + "_n1_m1_x1_y1_z1"
                 assert a == expected.replace('*','')
             except Exception as e:
@@ -448,7 +449,7 @@ class UtilsTestCase(TestCase):
         errors = []
         for name, expected in self.polymer_pairs:
             try:
-                a = utils.get_exact_name(name)
+                a = mol_name.get_exact_name(name)
                 expected = expected + "_x1_y1_z1"
                 assert a == expected.replace('*', '')
             except Exception as e:
@@ -462,7 +463,7 @@ class UtilsTestCase(TestCase):
         errors = []
         for name, expected in self.pairs:
             try:
-                a = utils.get_exact_name(name, spacers=True)
+                a = mol_name.get_exact_name(name, spacers=True)
                 expected = expected + "_n1_m1_x1_y1_z1"
                 assert a == expected
             except Exception as e:
@@ -476,7 +477,7 @@ class UtilsTestCase(TestCase):
         errors = []
         for name, expected in self.polymer_pairs:
             try:
-                a = utils.get_exact_name(name, spacers=True)
+                a = mol_name.get_exact_name(name, spacers=True)
                 expected = expected + "_x1_y1_z1"
                 assert a == expected
             except Exception as e:
@@ -485,6 +486,7 @@ class UtilsTestCase(TestCase):
         if errors:
             print errors
             raise errors[0][2]
+
 
 # class ExtractorTestCase(TestCase):
 #     def test_run_all(self):

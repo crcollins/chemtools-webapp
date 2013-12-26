@@ -4,7 +4,7 @@ import threading
 
 from chemtools import gjfwriter
 from chemtools import fileparser
-from chemtools.utils import name_expansion
+from chemtools.mol_name import name_expansion
 
 from models import Job
 from utils import get_ssh_connection, get_sftp_connection, _run_job, _get_jobs, get_compressed_file

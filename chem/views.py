@@ -15,8 +15,9 @@ from django.utils import simplejson
 from models import ErrorReport, ErrorReportForm, JobForm
 
 from chemtools import gjfwriter
-from chemtools.utils import name_expansion, write_job
+from chemtools.utils import write_job
 from chemtools.ml import get_properties_from_feature_vector, get_feature_vector, get_feature_vector2
+from chemtools.mol_name import name_expansion, get_exact_name
 from chemtools.constants import KEYWORDS
 import cluster.interface
 
@@ -137,7 +138,7 @@ def molecule_detail(request, molecule):
             return HttpResponse(simplejson.dumps(a), mimetype="application/json")
 
     if not errors[0]:
-        exactspacer = gjfwriter.get_exact_name(molecule, spacers=True)
+        exactspacer = get_exact_name(molecule, spacers=True)
         exactname = exactspacer.replace('*', '')
         featurevector = get_feature_vector(exactspacer)
         featurevector2 = get_feature_vector2(exactspacer)
@@ -171,7 +172,7 @@ def molecule_detail_json(request, molecule):
     keywords = request.REQUEST.get("keywords", KEYWORDS)
 
     if not errors[0]:
-        exactspacer = gjfwriter.get_exact_name(molecule, spacers=True)
+        exactspacer = get_exact_name(molecule, spacers=True)
         exactname = exactspacer.replace('*', '')
         featurevector = get_feature_vector(exactspacer)
         featurevector2 = get_feature_vector2(exactspacer)

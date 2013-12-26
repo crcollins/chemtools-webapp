@@ -4,7 +4,7 @@ import copy
 import numpy
 from PIL import Image, ImageDraw
 
-from utils import COLORS
+from constants import COLORS
 
 
 class Atom(object):

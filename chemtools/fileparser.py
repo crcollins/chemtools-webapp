@@ -4,7 +4,7 @@ from cStringIO import StringIO
 import multiprocessing
 
 from utils import Output, catch
-from gjfwriter import get_exact_name
+from mol_name import get_exact_name
 
 
 class Log(object):
