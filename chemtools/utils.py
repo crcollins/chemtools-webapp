@@ -442,6 +442,40 @@ def get_feature_vector(exactname, limit=4):
     return corefeatures + endfeatures + extrafeatures + [1]
 
 
+def get_feature_vector2(exactname):
+    left, core, center, right, n, m, x, y, z = exactname.split('_')
+
+    first = ARYL + XGROUPS
+    second = ['*'] + RGROUPS
+    both = first + 2 * second
+    length = len(both)
+    endfeatures = []
+    for end in [left, center, right]:
+        end = end.replace('-', '')  # no support for flipping yet
+
+        partfeatures = [0] * length
+        for i, char in enumerate(end):
+            count = i / 3
+            part = i % 3
+            idx = both.index(char)
+            if char in second and part == 2:
+                idx = both.index(char, idx + 1)
+            partfeatures[idx] += 2 ** -count
+        endfeatures.extend(partfeatures)
+
+    if core[0] == "T":
+        corefeatures = [1]
+    else:
+        corefeatures = [0]
+    for base, char in zip(atom_combinations, core[1:]):
+        temp = [0] * len(base)
+        temp[base.index(char)] = 1
+        corefeatures.extend(temp)
+
+    extrafeatures = [int(group[1:]) for group in [n, m, x, y, z]]
+    return corefeatures + endfeatures + extrafeatures + [1]
+
+
 def get_name_from_feature_vector(vector, limit=4):
     core = ''
     if vector[0]:

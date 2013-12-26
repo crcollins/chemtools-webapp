@@ -138,11 +138,13 @@ def molecule_detail(request, molecule):
         exactspacer = gjfwriter.get_exact_name(molecule, spacers=True)
         exactname = exactspacer.replace('*', '')
         featurevector = gjfwriter.get_feature_vector(exactspacer)
+        featurevector2 = gjfwriter.get_feature_vector2(exactspacer)
         homo, lumo, gap = get_properties_from_feature_vector(featurevector)
     else:
         exactname = ''
         exactspacer = ''
         featurevector = ''
+        featurevector2 = ''
         homo, lumo, gap = None, None, None
 
     c = Context({
@@ -150,6 +152,7 @@ def molecule_detail(request, molecule):
         "exact_name": exactname,
         "exact_name_spacers": exactspacer,
         "feature_vector": featurevector,
+        "feature_vector2": featurevector2,
         "homo": homo,
         "lumo": lumo,
         "band_gap": gap,
@@ -170,11 +173,13 @@ def molecule_detail_json(request, molecule):
         exactspacer = gjfwriter.get_exact_name(molecule, spacers=True)
         exactname = exactspacer.replace('*', '')
         featurevector = gjfwriter.get_feature_vector(exactspacer)
+        featurevector2 = gjfwriter.get_feature_vector2(exactspacer)
         homo, lumo, gap = get_properties_from_feature_vector(featurevector)
     else:
         exactname = ''
         exactspacer = ''
         featurevector = ''
+        featurevector2 = ''
         homo, lumo, gap = None, None, None
 
     a = {
@@ -182,6 +187,7 @@ def molecule_detail_json(request, molecule):
         "exact_name": exactname,
         "exact_name_spacers": exactspacer,
         "feature_vector": featurevector,
+        "feature_vector2": featurevector2,
         "homo": homo,
         "lumo": lumo,
         "band_gap": gap,
