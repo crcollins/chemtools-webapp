@@ -78,7 +78,7 @@ $(function() {
         </tr>
         <tr>
             <th>Keywords</th>
-            <td>{% if keywords %}{{ keywords }}{% else %}{{ default_keywords }}{% endif %}</td>
+            <td>{% if keywords %}{{ keywords|escape }}{% else %}{{ default_keywords|escape }}{% endif %}</td>
         </tr>
     </table>
     <hr>
@@ -91,7 +91,7 @@ $(function() {
     <div id="details" class="{% if form.errors %}in{% else %}collapse{% endif %}">
         <form id="newform" action="." method="get">
             {{ form|bootstrap }}
-            {% if keywords %}<input type="hidden" name="keywords" value="{{ keywords }}">{% endif %}
+            {% if keywords %}<input type="hidden" name="keywords" value="{{ keywords|escape }}">{% endif %}
             <div class="row">
                 <div class="col-xs-4">
                     <button class="btn btn-lg btn-primary btn-block" type="submit">Get Job</button>
