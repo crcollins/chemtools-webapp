@@ -42,7 +42,7 @@ class Log(object):
     def format_gjf(self, td=False):
         if td:
             header = self["Header"].replace(".chk", "_TD.chk")
-            geometry = self["Geometry"].lower().replace("opt", "td")
+            geometry = self["Geometry"].replace("opt", "td").replace("OPT", "td")
         else:
             header = self["Header"]
             geometry = self["Geometry"]
