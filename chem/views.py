@@ -27,7 +27,7 @@ def index(request):
             func = multi_molecule
 
         params = {"keywords": request.GET.get("keywords", None)}
-        if a["keywords"] != KEYWORDS:
+        if params["keywords"] != KEYWORDS:
             url = "%s?%s" % (reverse(func, args=(request.GET.get("molecule"), )),
                 urllib.urlencode(params))
             return HttpResponseRedirect(url)
