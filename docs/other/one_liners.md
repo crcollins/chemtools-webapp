@@ -82,3 +82,8 @@ Get all incomplete logs
 Change Gordon jobs to work on Trestles (add ppn=16)
 
     for f in `ls *.job`; do sed $f -i -e 's/node=1^/node=1:ppn=16/'; done
+
+
+Parse, Prep, Build
+
+    ./build; python clean_data.py; python run.py
