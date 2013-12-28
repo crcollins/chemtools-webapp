@@ -65,13 +65,16 @@ def get_feature_vector2(exactname):
             idx = both.index(char)
             if char in second and part == 2:
                 idx = both.index(char, idx + 1)
-            partfeatures[idx] += 2 ** -count
+            partfeatures[idx] += get_value(count)
         endfeatures.extend(partfeatures)
 
     corefeatures = get_core_features(core)
     extrafeatures = get_extra_features(n, m, x, y, z)
-
     return corefeatures + endfeatures + extrafeatures + [1]
+
+
+def get_value(i, frequency=2, H=1, lacunarity=1):
+    return (lacunarity * (frequency ** -H)) ** i
 
 
 def get_name_from_feature_vector(vector, limit=4):
