@@ -47,7 +47,7 @@ def get_feature_vector(exactname, limit=4):
     return corefeatures + endfeatures + extrafeatures + [1]
 
 
-def get_feature_vector2(exactname):
+def get_feature_vector2(exactname, H=1):
     left, core, center, right, n, m, x, y, z = exactname.split('_')
 
     first = ARYL + XGROUPS
@@ -65,7 +65,7 @@ def get_feature_vector2(exactname):
             idx = both.index(char)
             if char in second and part == 2:
                 idx = both.index(char, idx + 1)
-            partfeatures[idx] += get_value(count)
+            partfeatures[idx] += get_value(count, H=H)
         endfeatures.extend(partfeatures)
 
     corefeatures = get_core_features(core)
