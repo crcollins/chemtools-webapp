@@ -1,5 +1,22 @@
 from constants import *
 
+
+def get_core_features(core):
+    if core[0] == "T":
+        corefeatures = [1]
+    else:
+        corefeatures = [0]
+    for base, char in zip(atom_combinations, core[1:]):
+        temp = [0] * len(base)
+        temp[base.index(char)] = 1
+        corefeatures.extend(temp)
+    return corefeatures
+
+
+def get_extra_features(n, m, x, y, z):
+    return [int(group[1:]) for group in [n, m, x, y, z]]
+
+
 def get_feature_vector(exactname, limit=4):
     left, core, center, right, n, m, x, y, z = exactname.split('_')
 
@@ -24,16 +41,9 @@ def get_feature_vector(exactname, limit=4):
         partfeatures += [0] * length * (limit - count)
         endfeatures.extend(partfeatures)
 
-    if core[0] == "T":
-        corefeatures = [1]
-    else:
-        corefeatures = [0]
-    for base, char in zip(atom_combinations, core[1:]):
-        temp = [0] * len(base)
-        temp[base.index(char)] = 1
-        corefeatures.extend(temp)
+    corefeatures = get_core_features(core)
+    extrafeatures = get_extra_features(n, m, x, y, z)
 
-    extrafeatures = [int(group[1:]) for group in [n, m, x, y, z]]
     return corefeatures + endfeatures + extrafeatures + [1]
 
 
@@ -58,16 +68,9 @@ def get_feature_vector2(exactname):
             partfeatures[idx] += 2 ** -count
         endfeatures.extend(partfeatures)
 
-    if core[0] == "T":
-        corefeatures = [1]
-    else:
-        corefeatures = [0]
-    for base, char in zip(atom_combinations, core[1:]):
-        temp = [0] * len(base)
-        temp[base.index(char)] = 1
-        corefeatures.extend(temp)
+    corefeatures = get_core_features(core)
+    extrafeatures = get_extra_features(n, m, x, y, z)
 
-    extrafeatures = [int(group[1:]) for group in [n, m, x, y, z]]
     return corefeatures + endfeatures + extrafeatures + [1]
 
 
