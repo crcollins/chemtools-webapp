@@ -78,20 +78,17 @@ def get_public_key(request, username):
     return HttpResponse(pubkey, content_type="text/plain")
 
 
-PAGES = [
-    "settings",
-    "password",
-    "credentials",
-    "clusters",
-]
-
+@login_required
+def account_page(request, username, page):
+    return utils.PAGES[page](request, username)
 
 @login_required
 def user_settings(request, username):
-    return redirect(main_settings, request.user.username)
+    return redirect(account_page, request.user.username, "settings")
 
 
 @login_required
+@utils.add_account_page("settings")
 def main_settings(request, username):
     if request.user.username != username:
         return redirect(main_settings, request.user.username)
@@ -131,7 +128,7 @@ def main_settings(request, username):
         state = "Settings Successfully Saved"
 
     c = Context({
-        "pages": PAGES,
+        "pages": utils.PAGES,
         "page": "settings",
         "state": state,
         "form": settings_form,
@@ -140,6 +137,7 @@ def main_settings(request, username):
 
 
 @login_required
+@utils.add_account_page("password")
 def password_settings(request, username):
     if request.user.username != username:
         return redirect(password_settings, request.user.username)
@@ -167,7 +165,7 @@ def password_settings(request, username):
         state = "Settings Successfully Saved"
 
     c = Context({
-        "pages": PAGES,
+        "pages": utils.PAGES,
         "page": "password",
         "state": state,
         "form": pass_form,
@@ -176,6 +174,7 @@ def password_settings(request, username):
 
 
 @login_required
+@utils.add_account_page("credentials")
 def credential_settings(request, username):
     if request.user.username != username:
         return redirect(credential_settings, request.user.username)
@@ -205,7 +204,7 @@ def credential_settings(request, username):
         form = CredentialForm(request.user, initial=initial)
 
     c = Context({
-        "pages": PAGES,
+        "pages": utils.PAGES,
         "page": "credentials",
         "state": state,
         "form": form,
@@ -214,6 +213,7 @@ def credential_settings(request, username):
 
 
 @login_required
+@utils.add_account_page("clusters")
 def cluster_settings(request, username):
     if request.user.username != username:
         return redirect(cluster_settings, request.user.username)
@@ -231,7 +231,7 @@ def cluster_settings(request, username):
         form = ClusterForm()
 
     c = Context({
-        "pages": PAGES,
+        "pages": utils.PAGES,
         "page": "clusters",
         "state": state,
         "form": form,

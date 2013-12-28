@@ -1,5 +1,6 @@
 import random
 import hashlib
+import functools
 
 from Crypto.PublicKey import RSA
 from Crypto import Random
@@ -40,3 +41,15 @@ def update_all_ssh_keys(user, new_public):
 def generate_key(text):
     salt = hashlib.sha1(str(random.random())).hexdigest()[:10]
     return hashlib.sha1(salt + text).hexdigest()
+
+
+PAGES = {}
+def add_account_page(url):
+    def decorator(f):
+        @functools.wraps(f)
+        def wrapper(*args, **kwargs):
+            return f(*args, **kwargs)
+        global PAGES
+        PAGES[url] = wrapper
+        return wrapper
+    return decorator
