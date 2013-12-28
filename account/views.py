@@ -80,6 +80,8 @@ def get_public_key(request, username):
 
 @login_required
 def account_page(request, username, page):
+    if request.user.username != username:
+        return redirect(account_page, request.user.username, page)
     return utils.PAGES[page](request, username)
 
 @login_required
@@ -90,8 +92,6 @@ def user_settings(request, username):
 @login_required
 @utils.add_account_page("settings")
 def main_settings(request, username):
-    if request.user.username != username:
-        return redirect(main_settings, request.user.username)
     state = "Change Settings"
     user_profile = request.user.get_profile()
 
@@ -139,8 +139,6 @@ def main_settings(request, username):
 @login_required
 @utils.add_account_page("password")
 def password_settings(request, username):
-    if request.user.username != username:
-        return redirect(password_settings, request.user.username)
     state = "Change Settings"
     user_profile = request.user.get_profile()
 
@@ -176,9 +174,6 @@ def password_settings(request, username):
 @login_required
 @utils.add_account_page("credentials")
 def credential_settings(request, username):
-    if request.user.username != username:
-        return redirect(credential_settings, request.user.username)
-
     state = "Change Settings"
     initial = {"username": request.user.get_profile().xsede_username}
     if request.method == "POST":
@@ -215,9 +210,6 @@ def credential_settings(request, username):
 @login_required
 @utils.add_account_page("clusters")
 def cluster_settings(request, username):
-    if request.user.username != username:
-        return redirect(cluster_settings, request.user.username)
-
     state = "Change Settings"
     if request.method == "POST":
         form = ClusterForm(request.POST)
