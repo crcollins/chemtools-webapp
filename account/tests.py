@@ -95,7 +95,7 @@ class SettingsTestCase(TestCase):
         for user in self.users:
             r = self.client.login(username=user["username"], password=user["new_password1"])
             self.assertTrue(r)
-            response = self.client.get(reverse(views.main_settings, args=(user["username"], )))
+            response = self.client.get(reverse(views.account_page, args=(user["username"], "settings")))
             self.assertEqual(response.status_code, 200)
 
     def test_change_settings_redirect(self):
@@ -103,7 +103,7 @@ class SettingsTestCase(TestCase):
             r = self.client.login(username=user["username"], password=user["new_password1"])
             self.assertTrue(r)
             opposite = self.users[not i]["username"]
-            response = self.client.get(reverse(views.main_settings, args=(opposite, )))
+            response = self.client.get(reverse(views.account_page, args=(opposite, "settings")))
             self.assertEqual(response.status_code, 302)
 
     def test_change_xsede_username(self):
@@ -111,11 +111,11 @@ class SettingsTestCase(TestCase):
             r = self.client.login(username=user["username"], password=user["new_password1"])
             self.assertTrue(r)
 
-            response = self.client.get(reverse(views.main_settings, args=(user["username"], )))
+            response = self.client.get(reverse(views.account_page, args=(user["username"], "settings")))
             self.assertEqual(response.status_code, 200)
 
             data = {"xsede_username": user["username"], "email": user["email"]}
-            response = self.client.post(reverse(views.main_settings, args=(user["username"], )), data)
+            response = self.client.post(reverse(views.account_page, args=(user["username"], "settings")), data)
             self.assertIn("Settings Successfully Saved", response.content)
 
             profile = User.objects.get(username=user["username"]).get_profile()
@@ -127,12 +127,12 @@ class SettingsTestCase(TestCase):
             r = self.client.login(username=user["username"], password=user["new_password1"])
             self.assertTrue(r)
 
-            response = self.client.get(reverse(views.main_settings, args=(user["username"], )))
+            response = self.client.get(reverse(views.account_page, args=(user["username"], "settings")))
             self.assertEqual(response.status_code, 200)
 
             initial = profile.public_key
             data = {"new_ssh_keypair": "on", "email": user["email"]}
-            response = self.client.post(reverse(views.main_settings, args=(user["username"], )), data)
+            response = self.client.post(reverse(views.account_page, args=(user["username"], "settings")), data)
             self.assertIn("Settings Successfully Saved", response.content)
 
             profile = User.objects.get(username=user["username"]).get_profile()
@@ -143,14 +143,14 @@ class SettingsTestCase(TestCase):
             r = self.client.login(username=user["username"], password=user["new_password1"])
             self.assertTrue(r)
 
-            response = self.client.get(reverse(views.password_settings, args=(user["username"], )))
+            response = self.client.get(reverse(views.account_page, args=(user["username"], "password")))
             self.assertEqual(response.status_code, 200)
             data = {
                 "old_password": user["new_password1"],
                 "new_password1": user["new_password1"] + 'a',
                 "new_password2": user["new_password2"] + 'a',
                 }
-            response = self.client.post(reverse(views.password_settings, args=(user["username"], )), data)
+            response = self.client.post(reverse(views.account_page, args=(user["username"], "password")), data)
             self.assertEqual(response.status_code, 200)
             self.assertIn("Settings Successfully Saved", response.content)
             self.client.logout()
@@ -164,13 +164,13 @@ class SettingsTestCase(TestCase):
             r = self.client.login(username=user["username"], password=user["new_password1"])
             self.assertTrue(r)
 
-            response = self.client.get(reverse(views.cluster_settings, args=(user["username"], )))
+            response = self.client.get(reverse(views.account_page, args=(user["username"], "clusters")))
             self.assertEqual(response.status_code, 200)
             data = {
                 "name": "test-machine",
                 "hostname": "test-machine.com",
                 }
-            response = self.client.post(reverse(views.cluster_settings, args=(user["username"], )), data)
+            response = self.client.post(reverse(views.account_page, args=(user["username"], "clusters")), data)
             self.assertEqual(response.status_code, 200)
             self.assertIn("Settings Successfully Saved", response.content)
 
@@ -178,7 +178,7 @@ class SettingsTestCase(TestCase):
         for user in self.users:
             r = self.client.login(username=user["username"], password=user["new_password1"])
             self.assertTrue(r)
-            response = self.client.get(reverse(views.credential_settings, args=(user["username"], )))
+            response = self.client.get(reverse(views.account_page, args=(user["username"], "credentials")))
             self.assertEqual(response.status_code, 200)
 
 
