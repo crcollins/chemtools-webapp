@@ -368,7 +368,8 @@ if __name__ == "__main__":
             self.files = self.check_input_files(args.files
                                 + self.convert_files(args.listfiles)
                                 + self.convert_folders(args.folders))
-            self.output_gjf = args.gjf
+            self.output_gjf = args.gjf | args.td
+            self.td = args.td
 
         def check_input_files(self, filelist):
             files = []
@@ -408,8 +409,12 @@ if __name__ == "__main__":
 
             if self.output_gjf:
                 for log in logs.logs:
-                    with open(log.name + ".gjf", 'w') as outputfile:
-                        outputfile.write(log.format_gjf())
+                    ending = ".gjf"
+                    if self.td:
+                        ending = "_TD" + ending
+
+                    with open(log.name + ending, 'w') as outputfile:
+                        outputfile.write(log.format_gjf(self.td))
             else:
                 if self.outputfilename:
                     with open(self.outputfilename, 'w') as outputfile:
@@ -427,6 +432,7 @@ if __name__ == "__main__":
     parser.add_argument('-R', action="store_true", dest="rel", default=False, help='Toggles showing relative paths.')
     parser.add_argument('-V', action="store_true", dest="verbose", default=False, help='Toggles showing all messages.')
     parser.add_argument('-G', action="store_true", dest="gjf", default=False, help='Toggles writing gjf file from log.')
+    parser.add_argument('-T', action="store_true", dest="td", default=False, help='Toggles writing TD gjf file from log.')
 
     if len(sys.argv) > 1:
         args = sys.argv[1:]
