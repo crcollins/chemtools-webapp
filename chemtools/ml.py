@@ -47,7 +47,7 @@ def get_feature_vector(exactname, limit=4):
     return corefeatures + endfeatures + extrafeatures + [1]
 
 
-def get_feature_vector2(exactname, n=1, H=1, lacunarity=1):
+def get_feature_vector2(exactname, power=1, H=1, lacunarity=1):
     left, core, center, right, n, m, x, y, z = exactname.split('_')
 
     first = ARYL + XGROUPS
@@ -65,7 +65,7 @@ def get_feature_vector2(exactname, n=1, H=1, lacunarity=1):
             idx = both.index(char)
             if char in second and part == 2:
                 idx = both.index(char, idx + 1)
-            partfeatures[idx] += decay_function(count+1, n=n, H=H, lacunarity=lacunarity)
+            partfeatures[idx] += decay_function(count+1, power=power, H=H, lacunarity=lacunarity)
         endfeatures.extend(partfeatures)
 
     corefeatures = get_core_features(core)
@@ -73,8 +73,8 @@ def get_feature_vector2(exactname, n=1, H=1, lacunarity=1):
     return corefeatures + endfeatures + extrafeatures + [1]
 
 
-def decay_function(distance, n=1, H=1, lacunarity=1):
-    return (lacunarity * (distance ** -H)) ** n
+def decay_function(distance, power=1, H=1, lacunarity=1):
+    return (lacunarity * (distance ** -H)) ** power
 
 
 def get_name_from_feature_vector(vector, limit=4):
