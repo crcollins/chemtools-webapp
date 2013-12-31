@@ -5,6 +5,7 @@ import multiprocessing
 
 from utils import Output, catch
 from mol_name import get_exact_name
+from ml import get_feature_vector, get_feature_vector2
 
 
 class Log(object):
@@ -67,13 +68,24 @@ class Log(object):
         elif name.lower().endswith("_tddft"):
             name = name[:-6]
         try:
-            exactname = get_exact_name(name)
+            spacer = get_exact_name(name, spacers=True)
+            exactname = spacer.replace('*', '')
+            features = str([
+                get_feature_vector2(spacer, H=2.0),
+                get_feature_vector2(spacer, H=1.5),
+                get_feature_vector2(spacer, H=1.5),
+                get_feature_vector2(spacer, H=1.0),
+                get_feature_vector2(spacer, H=0.71),
+                get_feature_vector2(spacer, H=0.5),
+                get_feature_vector2(spacer, H=0.25),
+            ])
         except:
             exactname = "---"
-        return ','.join([filename, name, exactname] + values)
+            features = "[]"
+        return ','.join([filename, name, exactname, features] + values)
 
     def format_header(self):
-        return ','.join(["Filename", "Name", "ExactName"] + self.order)
+        return ','.join(["Filename", "Name", "ExactName", "Features"] + self.order)
 
 
 class LogSet(Output):
