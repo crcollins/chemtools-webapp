@@ -70,7 +70,7 @@ class Log(object):
         try:
             spacer = get_exact_name(name, spacers=True)
             exactname = spacer.replace('*', '')
-            features = str([
+            features = '"' + str([
                 get_feature_vector2(spacer, H=2.0),
                 get_feature_vector2(spacer, H=1.5),
                 get_feature_vector2(spacer, H=1.5),
@@ -78,7 +78,7 @@ class Log(object):
                 get_feature_vector2(spacer, H=0.71),
                 get_feature_vector2(spacer, H=0.5),
                 get_feature_vector2(spacer, H=0.25),
-            ])
+            ]) + '"'
         except:
             exactname = "---"
             features = "[]"
