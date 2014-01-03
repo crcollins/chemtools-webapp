@@ -2,7 +2,6 @@ from cStringIO import StringIO
 import zipfile
 import os
 import urllib
-import re
 import time
 
 from django.shortcuts import render, redirect

@@ -4,7 +4,6 @@ import urllib
 
 from django.test import Client, TestCase
 from django.core.urlresolvers import reverse
-from django.contrib.auth.models import User
 from django.utils import simplejson
 
 from project.utils import StringIO

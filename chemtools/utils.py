@@ -1,9 +1,3 @@
-import re
-import itertools
-import string
-import os
-import math
-
 from django.template import Template, Context
 
 from constants import *

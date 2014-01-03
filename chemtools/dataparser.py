@@ -1,4 +1,3 @@
-import math
 from cStringIO import StringIO
 
 import numpy as np
