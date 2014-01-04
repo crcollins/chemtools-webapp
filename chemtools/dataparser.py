@@ -29,7 +29,7 @@ class DataParser(Output):
     @catch
     def parse_file(self, f):
         def homofunc(x, a, b):
-            return a * np.sqrt(1 - b * np.cos(math.pi / (x + 1)))
+            return a * np.sqrt(1 - b * np.cos(scipy.constants.pi / (x + 1)))
 
         datax, datahomo, datalumo, datagap = self.extract_data(f)
 
