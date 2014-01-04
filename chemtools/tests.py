@@ -7,6 +7,7 @@ import utils
 import constants
 import extractor
 import mol_name
+import ml
 
 
 class GJFWriterTestCase(TestCase):
@@ -491,3 +492,107 @@ class MolNameTestCase(TestCase):
 # class ExtractorTestCase(TestCase):
 #     def test_run_all(self):
 #         extractor.run_all()
+
+class MLTestCase(TestCase):
+    def test_get_core_features(self):
+        errors = []
+        cores = [
+            ("TON", [1, 1, 0, 0, 0, 0, 1, 0, 0]),
+            ("CON", [0, 1, 0, 0, 0, 0, 1, 0, 0]),
+            ("COP", [0, 1, 0, 0, 0, 0, 0, 1, 0]),
+            ("COC", [0, 1, 0, 0, 0, 0, 0, 0, 1]),
+            ("CSC", [0, 0, 1, 0, 0, 0, 0, 0, 1]),
+            ("CNC", [0, 0, 0, 1, 0, 0, 0, 0, 1]),
+            ("CPC", [0, 0, 0, 0, 1, 0, 0, 0, 1]),
+            ("CCC", [0, 0, 0, 0, 0, 1, 0, 0, 1]),
+        ]
+        for core, expected in cores:
+            try:
+                vector = ml.get_core_features(core)
+                self.assertEqual(vector, expected)
+            except Exception as e:
+                print e
+                errors.append((vector, expected, e))
+        if errors:
+            print errors
+            raise errors[0][2]
+
+    def test_get_extra_features(self):
+        errors = []
+        values = [0, 2, 12]
+        names = "nmxyz"
+        for numbers in product(values, values, values, values, values):
+            try:
+                use = [n+str(v) for n,v in zip(names, numbers)]
+                vector = ml.get_extra_features(*use)
+                self.assertEqual(vector, list(numbers))
+            except Exception as e:
+                print e
+                errors.append((vector, numbers, e))
+        if errors:
+            print errors
+            raise errors[0][2]
+
+    def test_get_feature_vector(self):
+        expected = [
+             1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0,
+             0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+             0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+             1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+             0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,
+             0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+             0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+             0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0,
+             0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,
+             0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+             0, 1, 1, 1, 1, 1, 1
+         ]
+        name = "A**_TON_A**_A**_n1_m1_x1_y1_z1"
+        self.assertEqual(ml.get_feature_vector(name), expected)
+
+    def test_get_feature_vector2(self):
+        expected = [
+            1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 1.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 1.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            1.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 1.0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 1.0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 1.0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1.0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 1.0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 1.0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1
+        ]
+        name = "A**_TON_A**_A**_n1_m1_x1_y1_z1"
+        self.assertEqual(ml.get_feature_vector2(name), expected)
