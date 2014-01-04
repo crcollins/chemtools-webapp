@@ -51,6 +51,8 @@ class Log(object):
         else:
             header = self["Header"]
             geometry = self["Geometry"]
+        if not geometry or not header:
+            raise Exception("The log file was invalid")
         s = header
         s += geometry
         return s

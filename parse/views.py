@@ -80,6 +80,7 @@ def reset_gjf(request):
     buff = StringIO()
     zfile = zipfile.ZipFile(buff, 'w', zipfile.ZIP_DEFLATED)
 
+    errors = []
     for f in utils.parse_file_list(request.FILES.getlist('myfiles')):
         parser = fileparser.Log(f)
 
@@ -88,8 +89,12 @@ def reset_gjf(request):
         if request.REQUEST.get("reset_td"):
             name += '_TD'
             td = True
-
-        zfile.writestr("%s.gjf" % name, parser.format_gjf(td=td))
+        try:
+            zfile.writestr("%s.gjf" % name, parser.format_gjf(td=td))
+        except Exception as e:
+            errors.append("%s - %s" % (name, e))
+    if errors:
+        zfile.writestr("errors.txt", '\n'.join(errors))
 
     zfile.close()
     buff.flush()
