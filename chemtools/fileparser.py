@@ -3,11 +3,14 @@ from cStringIO import StringIO
 import multiprocessing
 
 from django.utils import simplejson
+from scipy import constants
 
 from utils import Output, catch
 from mol_name import get_exact_name
 from ml import get_feature_vector, get_feature_vector2
 
+
+HARTREETOEV = 1/constants.physical_constants["electron volt-hartree relationship"][0]
 
 class Log(object):
     PARSERS = dict()
@@ -260,7 +263,7 @@ class Occupied(LineParser):
         if "occ. eigenvalues" in line:
             self.prevline = line
         elif "virt. eigenvalues" in line and self.prevline:
-            self.value = str(float(self.prevline.split()[-1]) * 27.2117)
+            self.value = str(float(self.prevline.split()[-1]) * HARTREETOEV)
             self.prevline = ''
 
 
@@ -277,7 +280,7 @@ class Virtual(LineParser):
         if "occ. eigenvalues" in line:
             self.prevline = line
         elif "virt. eigenvalues" in line and self.prevline:
-            self.value = str(float(line.split()[4]) * 27.2117)
+            self.value = str(float(line.split()[4]) * HARTREETOEV)
             self.prevline = ''
 
 
