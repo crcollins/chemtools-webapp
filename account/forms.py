@@ -21,8 +21,6 @@ class RegistrationForm(forms.Form):
         existing = User.objects.filter(username__iexact=username)
         if existing.exists():
             raise forms.ValidationError("A user with that username already exists.")
-        elif username == "getkey":
-            raise forms.ValidationError("That is not a valid username.")
         else:
             return self.cleaned_data["username"]
 
