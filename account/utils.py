@@ -51,7 +51,7 @@ class Pages(object):
     def __setitem__(self, name, value):
         self.__registry[name] = value
     def __iter__(self):
-        return iter(self.__registry.keys())
+        return iter(sorted(self.__registry.keys()))
 
 PAGES = Pages()
 
