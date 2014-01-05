@@ -43,13 +43,20 @@ def generate_key(text):
     return hashlib.sha1(salt + text).hexdigest()
 
 
-PAGES = {}
+class Pages(object):
+    def __init__(self):
+        self.__registry = dict()
+    def __getitem__(self, name):
+        return self.__registry[name]
+    def __setitem__(self, name, value):
+        self.__registry[name] = value
+    def __iter__(self):
+        return iter(self.__registry.keys())
+
+PAGES = Pages()
+
 def add_account_page(url):
     def decorator(f):
-        @functools.wraps(f)
-        def wrapper(*args, **kwargs):
-            return f(*args, **kwargs)
-        global PAGES
-        PAGES[url] = wrapper
-        return wrapper
+        PAGES[url] = f
+        return f
     return decorator
