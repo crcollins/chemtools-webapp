@@ -425,9 +425,13 @@ if __name__ == "__main__":
                     ending = ".gjf"
                     if self.td:
                         ending = "_TD" + ending
-
-                    with open(log.name + ending, 'w') as outputfile:
-                        outputfile.write(log.format_gjf(self.td))
+                    try:
+                        # used to bubble up errors before creating the file
+                        string = log.format_gjf(self.td)
+                        with open(log.name + ending, 'w') as outputfile:
+                            outputfile.write(string)
+                    except Exception as e:
+                        print log.name, str(e)
             else:
                 if self.outputfilename:
                     with open(self.outputfilename, 'w') as outputfile:
