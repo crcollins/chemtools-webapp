@@ -4,7 +4,7 @@ from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.utils import simplejson
 
-from account.utils import add_account_page
+from account.utils import add_account_page, PAGES
 from models import Job, CredentialForm, ClusterForm, Cluster
 import interface
 
@@ -121,7 +121,7 @@ def credential_settings(request, username):
         form = CredentialForm(request.user, initial=initial)
 
     c = Context({
-        "pages": utils.PAGES,
+        "pages": PAGES,
         "page": "credentials",
         "state": state,
         "form": form,
@@ -145,7 +145,7 @@ def cluster_settings(request, username):
         form = ClusterForm()
 
     c = Context({
-        "pages": utils.PAGES,
+        "pages": PAGES,
         "page": "clusters",
         "state": state,
         "form": form,
