@@ -4,7 +4,8 @@ from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.utils import simplejson
 
-from models import Job
+from account.utils import add_account_page
+from models import Job, CredentialForm, ClusterForm, Cluster
 import interface
 
 
@@ -90,3 +91,64 @@ def kill_job(request, cluster):
             return HttpResponse(e)
     else:
         return redirect(job_index)
+
+
+@login_required
+@add_account_page("credentials")
+def credential_settings(request, username):
+    state = "Change Settings"
+    initial = {"username": request.user.get_profile().xsede_username}
+    if request.method == "POST":
+        if "delete" in request.POST:
+            form = CredentialForm(request.user, initial=initial)
+            usercreds = request.user.credentials.all()
+            for key in request.POST:
+                if "@" in key and request.POST[key] == "on":
+                    username, hostname = key.split("@")
+                    try:
+                        usercreds.get(username=username, cluster__hostname=hostname).delete()
+                    except:
+                        pass
+        else:
+            form = CredentialForm(request.user, request.POST)
+            if form.is_valid():
+                obj = form.save(commit=False)
+                obj.user = request.user
+                obj.save()
+                state = "Settings Successfully Saved"
+                form = CredentialForm(request.user, initial=initial)
+    else:
+        form = CredentialForm(request.user, initial=initial)
+
+    c = Context({
+        "pages": utils.PAGES,
+        "page": "credentials",
+        "state": state,
+        "form": form,
+        })
+    return render(request, "account/credential_settings.html", c)
+
+
+@login_required
+@add_account_page("clusters")
+def cluster_settings(request, username):
+    state = "Change Settings"
+    if request.method == "POST":
+        form = ClusterForm(request.POST)
+        if form.is_valid():
+            obj = form.save(commit=False)
+            obj.user = request.user
+            obj.save()
+            state = "Settings Successfully Saved"
+            form = ClusterForm()
+    else:
+        form = ClusterForm()
+
+    c = Context({
+        "pages": utils.PAGES,
+        "page": "clusters",
+        "state": state,
+        "form": form,
+        "clusters": Cluster.objects.all(),
+        })
+    return render(request, "account/cluster_settings.html", c)
