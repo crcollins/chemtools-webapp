@@ -2,7 +2,6 @@ import os
 from cStringIO import StringIO
 import multiprocessing
 
-from django.utils import simplejson
 from scipy import constants
 
 from utils import Output, catch

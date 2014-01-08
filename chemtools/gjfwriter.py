@@ -5,7 +5,6 @@ import os
 from molecule import Atom, Bond, Molecule
 from constants import *
 from mol_name import name_expansion, get_exact_name, parse_name
-from ml import get_feature_vector, get_feature_vector2
 try:
     from project.utils import StringIO
 except ImportError:
