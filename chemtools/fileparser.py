@@ -6,7 +6,7 @@ from scipy import constants
 
 from utils import Output, catch
 from mol_name import get_exact_name
-from ml import get_feature_vector, get_feature_vector2
+from ml import get_feature_vector, get_feature_vector2, get_feature_vector3
 
 
 HARTREETOEV = 1/constants.physical_constants["electron volt-hartree relationship"][0]
@@ -77,7 +77,8 @@ class Log(object):
             exactname = spacer.replace('*', '')
             features = '"' + str([
                 get_feature_vector(spacer),
-                get_feature_vector2(spacer, power=0.71),
+                get_feature_vector2(spacer),
+                get_feature_vector3(spacer),
             ]) + '"'
         except:
             exactname = "---"

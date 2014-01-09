@@ -1,4 +1,7 @@
+from numpy.linalg import norm
+
 from constants import *
+from gjfwriter import Molecule, read_data
 
 
 def get_core_features(core):
@@ -62,6 +65,47 @@ def get_end_features2(left, center, right, power=1, H=1, lacunarity=1):
     return endfeatures
 
 
+def get_end_features3(left, center, right, power=1, H=1, lacunarity=1):
+
+    lengths = []
+    for name in ARYL:
+        mol = Molecule(read_data(name))
+        atoms = [x.atoms[1] for x in mol.open_ends("~")]
+        lengths.append(norm(atoms[0].xyz - atoms[1].xyz))
+    lengths = numpy.matrix(lengths)
+    minlen = lengths.argmin()
+    ratio_matrix = lengths/lengths.T
+
+    first = ARYL + XGROUPS
+    second = ['*'] + RGROUPS
+    both = first + 2 * second
+    length = len(both)
+    endfeatures = []
+    for end in [left, center, right]:
+        end = end.replace('-', '')  # no support for flipping yet
+
+        partfeatures = [0] * length
+        arylparts = []
+        for i, char in enumerate(end):
+            if char in ARYL:
+                arylparts.append(ARYL.index(char))
+            part = i % 3
+            idx = both.index(char)
+            if char in second and part == 2:
+                idx = both.index(char, idx + 1) # go to the second rgroup
+            if char in ARYL:
+                distance = ratio_matrix[arylparts[-1], arylparts].sum()
+            elif char in XGROUPS + second:
+                if arylparts:
+                    distance = ratio_matrix[minlen, arylparts].sum()
+                else:
+                    distance = 1
+
+            partfeatures[idx] += decay_function(distance, power=power, H=H, lacunarity=lacunarity)
+        endfeatures.extend(partfeatures)
+    return endfeatures
+
+
 def get_feature_vector(exactname, limit=4):
     left, core, center, right, n, m, x, y, z = exactname.split('_')
     endfeatures = get_end_features(left, center, right, limit=limit)
@@ -73,6 +117,14 @@ def get_feature_vector(exactname, limit=4):
 def get_feature_vector2(exactname, power=1, H=1, lacunarity=1):
     left, core, center, right, n, m, x, y, z = exactname.split('_')
     endfeatures = get_end_features2(left, center, right, power=power, H=H, lacunarity=lacunarity)
+    corefeatures = get_core_features(core)
+    extrafeatures = get_extra_features(n, m, x, y, z)
+    return corefeatures + endfeatures + extrafeatures + [1]
+
+
+def get_feature_vector3(exactname, power=1, H=1, lacunarity=1):
+    left, core, center, right, n, m, x, y, z = exactname.split('_')
+    endfeatures = get_end_features3(left, center, right, power=power, H=H, lacunarity=lacunarity)
     corefeatures = get_core_features(core)
     extrafeatures = get_extra_features(n, m, x, y, z)
     return corefeatures + endfeatures + extrafeatures + [1]
