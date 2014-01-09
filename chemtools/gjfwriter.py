@@ -10,7 +10,8 @@ try:
 except ImportError:
     from cStringIO import StringIO
 
-DATAPATH = "chemtools/data"
+folder, _ = os.path.split(__file__)
+DATAPATH = os.path.join(folder, "data")
 
 ##############################################################################
 
