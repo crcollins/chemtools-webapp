@@ -180,6 +180,7 @@ class SettingsTestCase(TestCase):
             self.assertTrue(r)
             response = self.client.get(reverse(views.account_page, args=(user["username"], "credentials")))
             self.assertEqual(response.status_code, 200)
+            # lacks a test to actually add a credential because it would require an external server
 
 
 class LoginTestCase(TestCase):
