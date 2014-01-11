@@ -1,8 +1,11 @@
+import os
 from cStringIO import StringIO
 import zipfile
 
 import gjfwriter
 import utils
+import mol_name
+
 
 def get_multi_molecule(molecules, keywords, options, form):
     buff = StringIO()
@@ -32,6 +35,25 @@ def get_multi_molecule(molecules, keywords, options, form):
             generrors.append("%s - %s" % (name, e))
     if generrors:
         zfile.writestr("errors.txt", '\n'.join(generrors))
+
+    zfile.close()
+    buff.flush()
+
+    ret_zip = buff.getvalue()
+    buff.close()
+    return ret_zip
+
+
+def get_multi_job(string, form):
+    buff = StringIO()
+    zfile = zipfile.ZipFile(buff, 'w', zipfile.ZIP_DEFLATED)
+
+    for name in mol_name.name_expansion(string):
+        if not name:
+            continue
+        name, _ = os.path.splitext(name)
+        dnew = form.get_single_data(name)
+        zfile.writestr("%s.%sjob" % (name, dnew.get("cluster")), utils.write_job(**dnew))
 
     zfile.close()
     buff.flush()

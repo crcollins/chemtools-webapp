@@ -18,7 +18,7 @@ from chemtools.utils import write_job
 from chemtools.ml import get_properties_from_feature_vector, get_feature_vector, get_feature_vector2
 from chemtools.mol_name import name_expansion, get_exact_name
 from chemtools.constants import KEYWORDS
-from chemtools.interface import get_multi_molecule
+from chemtools.interface import get_multi_molecule, get_multi_job
 import cluster.interface
 
 
@@ -74,22 +74,9 @@ def multi_job(request):
 
     d = dict(form.cleaned_data)
     if request.method == "GET":
-        buff = StringIO()
-        zfile = zipfile.ZipFile(buff, 'w', zipfile.ZIP_DEFLATED)
-
         string = request.REQUEST.get('filenames', '').replace('\n', ',')
-        for name in name_expansion(string):
-            if not name:
-                continue
-            name, _ = os.path.splitext(name)
-            dnew = form.get_single_data(name)
-            zfile.writestr("%s.%sjob" % (name, dnew.get("cluster")), write_job(**dnew))
 
-        zfile.close()
-        buff.flush()
-
-        ret_zip = buff.getvalue()
-        buff.close()
+        ret_zip = get_multi_job(string, form)
 
         response = HttpResponse(ret_zip, mimetype="application/zip")
         response["Content-Disposition"] = "attachment; filename=output.zip"
