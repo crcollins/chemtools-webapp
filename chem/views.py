@@ -18,6 +18,7 @@ from chemtools.utils import write_job
 from chemtools.ml import get_properties_from_feature_vector, get_feature_vector, get_feature_vector2
 from chemtools.mol_name import name_expansion, get_exact_name
 from chemtools.constants import KEYWORDS
+from chemtools.interface import get_multi_molecule
 import cluster.interface
 
 
@@ -232,9 +233,6 @@ def multi_molecule(request, string):
 def multi_molecule_zip(request, string):
     keywords = request.GET.get("keywords")
 
-    buff = StringIO()
-    zfile = zipfile.ZipFile(buff, "w", zipfile.ZIP_DEFLATED)
-
     try:
         molecules, warnings, errors = _get_molecules_info(string)
     except ValueError:
@@ -245,9 +243,7 @@ def multi_molecule_zip(request, string):
 
     if request.GET.get("job"):
         form = JobForm.get_form(request, "{{ name }}")
-        if form.is_valid():
-            d = dict(form.cleaned_data)
-        else:
+        if not form.is_valid():
             keywords = request.GET.get("keywords")
             f = lambda x: 'checked' if request.GET.get(x) else ''
 
@@ -262,37 +258,11 @@ def multi_molecule_zip(request, string):
                 "keywords": '?' + urllib.urlencode({"keywords": keywords}) if keywords else '',
                 })
             return render(request, "chem/multi_molecule.html", c)
+    else:
+        form = None
 
-    generrors = []
-    for name in molecules:
-        try:
-            out = gjfwriter.GJFWriter(name, keywords)
-            others = False
-
-            if request.GET.get("image"):
-                zfile.writestr(out.name + ".png", out.get_png(10))
-                others = True
-            if request.GET.get("mol2"):
-                zfile.writestr(name + ".mol2", out.get_mol2())
-                others = True
-            if request.GET.get("job"):
-                dnew = form.get_single_data(name)
-                zfile.writestr(name + ".job", write_job(**dnew))
-                others = True
-
-            if request.GET.get("gjf") or not others:
-                zfile.writestr(name + ".gjf", out.get_gjf())
-
-        except Exception as e:
-            generrors.append("%s - %s" % (name, e))
-    if generrors:
-        zfile.writestr("errors.txt", '\n'.join(generrors))
-
-    zfile.close()
-    buff.flush()
-
-    ret_zip = buff.getvalue()
-    buff.close()
+    options = [x for x in ("image", "mol2", "job", "gjf") if request.GET.get(x)]
+    ret_zip = get_multi_molecule(molecules, keywords, options, form)
 
     response = HttpResponse(ret_zip, mimetype="application/zip")
     response["Content-Disposition"] = "attachment; filename=molecules.zip"
