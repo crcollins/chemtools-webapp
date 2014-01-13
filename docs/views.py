@@ -40,3 +40,11 @@ def technical(request):
         "docs": misaka.html(a),
         })
     return render(request, "docs/content.html", c)
+
+
+def resources(request):
+    a = "".join(open("docs/other/resources.md", "r").readlines())
+    c = Context({
+        "docs": misaka.html(a),
+        })
+    return render(request, "docs/content.html", c)
