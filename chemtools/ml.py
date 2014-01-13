@@ -273,5 +273,5 @@ def get_vector_for_specific_gap_value(gap):
 def get_properties_from_feature_vector(feature):
     homo = feature * WH
     lumo = feature * WL
-    gap = SLOPE * (lumo - homo)
+    gap = feature * WG
     return homo[0,0], lumo[0,0], gap[0,0]

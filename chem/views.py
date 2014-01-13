@@ -129,7 +129,7 @@ def molecule_detail(request, molecule):
         exactname = exactspacer.replace('*', '')
         featurevector = get_feature_vector(exactspacer)
         featurevector2 = get_feature_vector2(exactspacer)
-        homo, lumo, gap = get_properties_from_feature_vector(featurevector)
+        homo, lumo, gap = get_properties_from_feature_vector(featurevector2)
     else:
         exactname = ''
         exactspacer = ''
