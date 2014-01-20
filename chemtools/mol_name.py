@@ -143,7 +143,10 @@ def parse_name(name):
         left = parts[:i][0] if parts[:i] else None
         right = parts[i + 1:]
 
-        if len(right) > 1:
+        if not right:
+            right = None
+            middle = None
+        elif len(right) > 1:
             middle = right[0]
             right = right[1]
         else:
