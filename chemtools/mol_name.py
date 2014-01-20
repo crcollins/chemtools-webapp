@@ -155,8 +155,9 @@ def parse_name(name):
                 else:
                     middle = None
                     right = right[0]
-            except:
+            except IndexError:
                 middle = None
+                right = right[0]
         parsedsides = tuple(parse_end_name(x) if x else None for x in (left, middle, right))
 
         for xside, idx, name in zip(parsedsides, [0, 1, 0], ["left", "middle", "right"]):
