@@ -1,5 +1,4 @@
 from cStringIO import StringIO
-import zipfile
 import os
 import urllib
 import time
@@ -15,7 +14,7 @@ from models import ErrorReport, ErrorReportForm, JobForm
 
 from chemtools import gjfwriter
 from chemtools.utils import write_job
-from chemtools.ml import get_properties_from_feature_vector, get_feature_vector, get_feature_vector2
+from chemtools.ml import get_properties_from_feature_vector, get_properties_from_feature_vector2, get_feature_vector, get_feature_vector2
 from chemtools.mol_name import name_expansion, get_exact_name
 from chemtools.constants import KEYWORDS
 from chemtools.interface import get_multi_molecule, get_multi_job
@@ -129,7 +128,7 @@ def molecule_detail(request, molecule):
         exactname = exactspacer.replace('*', '')
         featurevector = get_feature_vector(exactspacer)
         featurevector2 = get_feature_vector2(exactspacer)
-        homo, lumo, gap = get_properties_from_feature_vector(featurevector2)
+        homo, lumo, gap = get_properties_from_feature_vector2(featurevector2)
     else:
         exactname = ''
         exactspacer = ''

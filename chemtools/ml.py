@@ -275,3 +275,10 @@ def get_properties_from_feature_vector(feature):
     lumo = feature * WL
     gap = feature * WG
     return homo[0,0], lumo[0,0], gap[0,0]
+
+
+def get_properties_from_feature_vector2(feature):
+    homo = HOMO_CLF.predict(feature)
+    lumo = LUMO_CLF.predict(feature)
+    gap = GAP_CLF.predict(feature)
+    return homo[0], lumo[0], gap[0]

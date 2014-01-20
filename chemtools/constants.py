@@ -25,8 +25,6 @@ CLUSTERS = {
 }
 CLUSTER_TUPLES = [(x, CLUSTERS[x]) for x in CLUSTERS.keys()]
 
-DATAPATH = "chemtools/data"
-
 KEYWORDS = "opt B3LYP/6-31g(d)"
 
 COLORS = {
@@ -173,3 +171,16 @@ WG = numpy.matrix(
         -1.77040082e-01,  7.69869242e-01,  7.69869242e-01,  7.69869242e-01,
          7.69869242e-01,
          ]).T
+
+
+import cPickle
+import os
+folder, _ = os.path.split(__file__)
+DATAPATH = os.path.join(folder, "data")
+
+with open(os.path.join(DATAPATH, "feat1homo.pkl"), "rb") as f:
+    HOMO_CLF = cPickle.load(f)
+with open(os.path.join(DATAPATH, "feat1lumo.pkl"), "rb") as f:
+    LUMO_CLF = cPickle.load(f)
+with open(os.path.join(DATAPATH, "feat1gap.pkl"), "rb") as f:
+    GAP_CLF = cPickle.load(f)

@@ -17,6 +17,7 @@ Build/Run Requirements
 - PyCrypto 2.26
 - Scipy 0.9.0
 - Django bootstrap form 3.0.0
+- Scikit-Learn 0.14.1
 
 
 
