@@ -1,3 +1,4 @@
+{% load url from future %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -59,14 +60,14 @@
 
             <ul class="nav navbar-nav navbar-right">
             {% if user.is_authenticated %}
-                <li><a href="{% url user_settings request.user %}">Welcome, {{ user }}</a></li>
+                <li><a href="{% url "user_settings" request.user %}">Welcome, {{ user }}</a></li>
                 {% if user.is_staff %}
                     <li><a href="/admin/">Admin Page</a></li>
                 {% endif %}
-                <li><a href="{% url logout %}?next={{ request.path }}">Log Out</a></li>
+                <li><a href="{% url "logout" %}?next={{ request.path }}">Log Out</a></li>
             {% else %}
-                <li><a href="{% url login %}?next={{request.path}}">Log In</a></li>
-                <li><a href="{% url register %}">Register</a></li>
+                <li><a href="{% url "login" %}?next={{request.path}}">Log In</a></li>
+                <li><a href="{% url "register" %}">Register</a></li>
             {% endif %}
             </ul>
         </div>
@@ -85,7 +86,7 @@
     <div class="modal fade" id="buildMolecule" tabindex="-1" role="dialog" aria-labelledby="buildMoleculeLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                <form class="form-inline" role="form" action="{% url chem_index %}" method="GET">
+                <form class="form-inline" role="form" action="{% url "chem_index" %}" method="GET">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                     <h4 class="modal-title">Build</h4>

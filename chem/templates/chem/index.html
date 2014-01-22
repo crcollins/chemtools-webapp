@@ -1,5 +1,6 @@
 {% extends "chem/base.html" %}
 
+{% load url from future %}
 {% block title %}Chemtools{% endblock %}
 
 {% block content %}
@@ -22,29 +23,29 @@
         <div class="col-lg-5">
             <h2>Make Jobs</h2>
             <p>Create job files from files or from a list of files for any of the supercomputers.</p>
-            <p><a class="btn btn-default" href="{% url multi_job %}">View details &raquo;</a></p>
+            <p><a class="btn btn-default" href="{% url "multi_job" %}">View details &raquo;</a></p>
         </div>
 
         <div class="col-lg-5">
             <h2>Extract Data</h2>
             <p>Extract data from log files, calculate long chain limits, or rebuild gjf files from log files.</p>
-            <p><a class="btn btn-default" href="{% url upload %}">View details &raquo;</a></p>
+            <p><a class="btn btn-default" href="{% url "upload" %}">View details &raquo;</a></p>
         </div>
 
         <div class="col-lg-5">
            {% if user.is_authenticated %}
                <h2>Change Settings</h2>
-                <p><a class="btn btn-default" href="{% url user_settings user %}">View details &raquo;</a></p>
+                <p><a class="btn btn-default" href="{% url "user_settings" user %}">View details &raquo;</a></p>
             {% else %}
                 <h2>Register an Account</h2>
-                <p><a class="btn btn-default" href="{% url register %}">View details &raquo;</a></p>
+                <p><a class="btn btn-default" href="{% url "register" %}">View details &raquo;</a></p>
             {% endif %}
         </div>
 
         <div class="col-lg-5">
             <h2>Documentation</h2>
             <p>For more information and help, refer to the documentation.</p>
-            <p><a class="btn btn-default" href="{% url docs %}">View details &raquo;</a></p>
+            <p><a class="btn btn-default" href="{% url "docs" %}">View details &raquo;</a></p>
         </div>
     </div>
 </div>

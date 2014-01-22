@@ -1,5 +1,6 @@
 {% extends "chem/base.html" %}
 {% load bootstrap %}
+{% load url from future %}
 
 {% block title %}Multi Job{% endblock %}
 
@@ -82,7 +83,7 @@ $(function() {
 
 {% block content %}
     <p>
-        Filenames can be separated by newlines or by commas. File extensions do not matter because they will be stripped off before the job file is made. This method also allows generating jobs using brace expansions as seen in the <a href="{% url docs %}#brace-expansion">docs</a>.
+        Filenames can be separated by newlines or by commas. File extensions do not matter because they will be stripped off before the job file is made. This method also allows generating jobs using brace expansions as seen in the <a href="{% url "docs" %}#brace-expansion">docs</a>.
     </p>
     {% if error_message %}
         <p><strong>{{ error_message }}</strong></p>

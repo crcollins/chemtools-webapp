@@ -1,9 +1,9 @@
 {% extends "account/base.html" %}
-
+{% load url from future %}
 {% block header %}
     <h1>Activation Complete</h1>
 {% endblock %}
 
 {% block content %}
-Your account is now activated. You may now <a href="{% url login %}">Log In</a>.
+Your account is now activated. You may now <a href="{% url "login" %}">Log In</a>.
 {% endblock %}
