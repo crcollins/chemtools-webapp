@@ -12,3 +12,6 @@ class DataPoint(models.Model):
     energy = models.FloatField()
     dipole = models.FloatField()
     band_gap = models.FloatField(null=True, blank=True)
+
+    def __unicode__(self):
+        return self.exact_name
