@@ -57,6 +57,10 @@ $(function() {
             <td>{{ exact_name_spacers }}</td>
         </tr>
         <tr>
+            <th>Keywords</th>
+            <td>{% if keywords %}{{ keywords|escape }}{% else %}{{ default_keywords|escape }}{% endif %}</td>
+        </tr>
+        <tr>
             <th>Feature Vector</th>
             <td>{{ feature_vector }}</td>
         </tr>
@@ -64,22 +68,32 @@ $(function() {
             <th>Feature Vector2</th>
             <td>{{ feature_vector2 }}</td>
         </tr>
+    </table>
+    <table class="table">
         <tr>
-            <th>Predicted HOMO (+/- 0.11 eV)</th>
-            <td>{{ homo|floatformat:2 }} eV</td>
+            <th></th>
+            <th>HOMO (eV)</th>
+            <th>LUMO (eV)</th>
+            <th>Band Gap (eV)</th>
         </tr>
         <tr>
-            <th>Predicted LUMO (+/- 0.10 eV)</th>
-            <td>{{ lumo|floatformat:2 }} eV</td>
+            <th>Predicted</td>
+            <td>{{ homo|floatformat:2 }} (± 0.11)</td>
+            <td>{{ lumo|floatformat:2 }} (± 0.10)</td>
+            <td>{{ band_gap|floatformat:2 }} (± 0.13)</td>
+        </tr>
+        {% if datapoint %}
+        <tr>
+            <th>Calculated</td>
+            <td>{{ datapoint.occupied|floatformat:2 }}</td>
+            <td>{{ datapoint.virtual|floatformat:2 }}</td>
+            <td>{{ datapoint.band_gap|floatformat:2 }}</td>
         </tr>
         <tr>
-            <th>Predicted Band Gap (+/- 0.13 eV)</th>
-            <td>{{ band_gap|floatformat:2 }} eV</td>
+            <th>Calculation Options</th>
+            <td class="text-center" colspan="3">{{ datapoint.options }}</td>
         </tr>
-        <tr>
-            <th>Keywords</th>
-            <td>{% if keywords %}{{ keywords|escape }}{% else %}{{ default_keywords|escape }}{% endif %}</td>
-        </tr>
+        {% endif %}
     </table>
     <hr>
     <div class="list-group">
