@@ -60,15 +60,18 @@ $(function() {
             <th>Keywords</th>
             <td>{% if keywords %}{{ keywords|escape }}{% else %}{{ default_keywords|escape }}{% endif %}</td>
         </tr>
-        <tr>
-            <th>Feature Vector</th>
-            <td>{{ feature_vector }}</td>
-        </tr>
-        <tr>
-            <th>Feature Vector2</th>
-            <td>{{ feature_vector2 }}</td>
-        </tr>
     </table>
+
+    <a class="btn collapse-data-btn collapsed" data-toggle="collapse" href="#features">Feature Vectors</a>
+    <table id="features" class="table collapse">
+        {% for feature in features %}
+        <tr>
+            <th>{{ forloop.counter }}</th>
+            <td>{{ feature }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
     <table class="table">
         <tr>
             <th></th>

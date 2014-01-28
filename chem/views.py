@@ -127,20 +127,17 @@ def molecule_detail(request, molecule):
     if not errors[0]:
         exactspacer = get_exact_name(molecule, spacers=True)
         exactname = exactspacer.replace('*', '')
-        featurevector = get_feature_vector(exactspacer)
-        featurevector2 = get_feature_vector2(exactspacer)
-        homo, lumo, gap = get_properties_from_feature_vector2(featurevector2)
+        features = [get_feature_vector(exactspacer), get_feature_vector2(exactspacer)]
+        homo, lumo, gap = get_properties_from_feature_vector2(features[1])
         temp = DataPoint.objects.filter(exact_name=exactname, band_gap__isnull=False)
         if temp:
             datapoint = temp[0]
         else:
             datapoint = None
-
     else:
         exactname = ''
         exactspacer = ''
-        featurevector = ''
-        featurevector2 = ''
+        features = ['', '']
         homo, lumo, gap = None, None, None
         datapoint = None
 
@@ -148,8 +145,7 @@ def molecule_detail(request, molecule):
         "molecule": molecule,
         "exact_name": exactname,
         "exact_name_spacers": exactspacer,
-        "feature_vector": featurevector,
-        "feature_vector2": featurevector2,
+        "features": features,
         "homo": homo,
         "lumo": lumo,
         "band_gap": gap,
@@ -169,22 +165,24 @@ def molecule_detail_json(request, molecule):
     if not errors[0]:
         exactspacer = get_exact_name(molecule, spacers=True)
         exactname = exactspacer.replace('*', '')
-        featurevector = get_feature_vector(exactspacer)
-        featurevector2 = get_feature_vector2(exactspacer)
-        homo, lumo, gap = get_properties_from_feature_vector(featurevector)
+        features = [get_feature_vector(exactspacer), get_feature_vector2(exactspacer)]
+        homo, lumo, gap = get_properties_from_feature_vector(features[1])
+        temp = DataPoint.objects.filter(exact_name=exactname, band_gap__isnull=False)
+        if temp:
+            datapoint = temp[0]
+        else:
+            datapoint = None
     else:
         exactname = ''
         exactspacer = ''
-        featurevector = ''
-        featurevector2 = ''
+        features = ['', '']
         homo, lumo, gap = None, None, None
 
     a = {
         "molecule": molecule,
         "exact_name": exactname,
         "exact_name_spacers": exactspacer,
-        "feature_vector": featurevector,
-        "feature_vector2": featurevector2,
+        "features": features,
         "homo": homo,
         "lumo": lumo,
         "band_gap": gap,
