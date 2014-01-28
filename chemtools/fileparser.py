@@ -25,7 +25,7 @@ class Log(object):
             for k, v in Log.PARSERS.items():
                 self.parsers[k] = v()
 
-            self.order = ["Options", "Occupied", "Virtual", "HomoOrbital", "Dipole", "Energy", "Excited", "Time"]
+            self.order = ["Options", "HOMO", "LUMO", "HomoOrbital", "Dipole", "Energy", "BandGap", "Time"]
 
             for i, line in enumerate(f):
                 for k, parser in self.parsers.items():
@@ -240,9 +240,9 @@ class Time(LineParser):
 
 
 @Log.add_parser
-class Excited(LineParser):
+class BandGap(LineParser):
     def __init__(self):
-        super(Excited, self).__init__()
+        super(BandGap, self).__init__()
 
     @is_done
     def parse(self, line):
@@ -253,9 +253,9 @@ class Excited(LineParser):
 
 
 @Log.add_parser
-class Occupied(LineParser):
+class HOMO(LineParser):
     def __init__(self):
-        super(Occupied, self).__init__()
+        super(HOMO, self).__init__()
         self.prevline = ''
 
     @is_done
@@ -270,9 +270,9 @@ class Occupied(LineParser):
 
 
 @Log.add_parser
-class Virtual(LineParser):
+class LUMO(LineParser):
     def __init__(self):
-        super(Virtual, self).__init__()
+        super(LUMO, self).__init__()
         self.prevline = ''
 
     @is_done

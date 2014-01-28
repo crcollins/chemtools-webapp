@@ -26,7 +26,7 @@ with open(PATH, "r") as csvfile:
             print row[1]
             point = DataPoint(
                     name=row[1], options=row[4],
-                    occupied=row[5], virtual=row[6],
+                    homo=row[5], lumo=row[6],
                     homo_orbital=row[7], dipole=row[8],
                     energy=row[9], band_gap=band_gap,
                     exact_name=exact_name)

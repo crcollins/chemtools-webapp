@@ -85,8 +85,8 @@ $(function() {
         {% if datapoint %}
         <tr>
             <th>Calculated</td>
-            <td>{{ datapoint.occupied|floatformat:2 }}</td>
-            <td>{{ datapoint.virtual|floatformat:2 }}</td>
+            <td>{{ datapoint.homo|floatformat:2 }}</td>
+            <td>{{ datapoint.lumo|floatformat:2 }}</td>
             <td>{{ datapoint.band_gap|floatformat:2 }}</td>
         </tr>
         <tr>

@@ -53,9 +53,9 @@ def convert_logs(logsets):
             parser = fileparser.Log(log)
 
             nvals.append(num)
-            homovals.append(parser["Occupied"])
-            lumovals.append(parser["Virtual"])
-            gapvals.append(parser["Excited"])
+            homovals.append(parser["HOMO"])
+            lumovals.append(parser["LUMO"])
+            gapvals.append(parser["BandGap"])
 
         f = StringIO(key)
         f.write(', '.join(nvals) + '\n')

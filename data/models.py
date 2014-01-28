@@ -6,8 +6,8 @@ class DataPoint(models.Model):
     exact_name = models.CharField(max_length=600, null=True, blank=True)
 
     options = models.CharField(max_length=100)
-    occupied = models.FloatField()
-    virtual = models.FloatField()
+    homo = models.FloatField()
+    lumo = models.FloatField()
     homo_orbital = models.IntegerField()
     energy = models.FloatField()
     dipole = models.FloatField()

@@ -201,7 +201,7 @@ If you are logged in, and have set up your ssh keys, then under the [Running](/c
 ### Upload ###
 #### Log Parse ####
 
-This takes normal Gaussian log files and will output a text file comma delimited with various useful values from the log file (Name, Occupied, Virtual, HomoOrbital, Dipole, Energy, Excited, Time).
+This takes normal Gaussian log files and will output a text file comma delimited with various useful values from the log file (Name, HOMO, LUMO, HomoOrbital, Dipole, Energy, Excited, Time).
 
 
 #### Data Parse ####
