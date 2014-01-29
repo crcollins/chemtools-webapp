@@ -124,6 +124,11 @@ class SettingsTestCase(TestCase):
             profile = User.objects.get(username=user["username"]).get_profile()
             self.assertEqual(response.content.strip(), profile.public_key)
 
+    def test_get_public_key_invalid(self):
+        response = self.client.get(reverse(views.get_public_key, args=("notauser", )))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content.strip(), '')
+
     def test_change_settings_page(self):
         for user in self.users:
             r = self.client.login(username=user["username"], password=user["new_password1"])
