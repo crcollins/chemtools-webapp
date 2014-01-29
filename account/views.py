@@ -144,13 +144,7 @@ def password_settings(request, username):
         if d.get("new_password1"):
             request.user.set_password(d.get("new_password1"))
             changed = True
-    else:
-        d = dict(request.POST)
-        old = d.get("old_password")
-        new1 = d.get("new_password1")
-        new2 = d.get("new_password2")
-        if old == [u''] and new1 == new2 == old:
-            pass_form = PasswordChangeForm(request.user, None)
+
 
     if changed:
         request.user.save()
