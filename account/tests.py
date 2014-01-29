@@ -19,6 +19,7 @@ def _register(client, data):
     v = client.login(username=data["username"], password=data["new_password1"])
     assert v
     client.logout()
+    return key
 
 
 class RegistrationTestCase(TestCase):
@@ -85,6 +86,18 @@ class RegistrationTestCase(TestCase):
             self.assertTrue(r)
             response = self.client.get(reverse(views.register_user))
             assert response.status_code == 302
+
+    def test_activation_page_after_activated(self):
+        data = {
+            "username": "testmankey",
+            "email": "testmankey@test.com",
+            "new_password1": "mypass",
+            "new_password2": "mypass",
+        }
+        key = _register(self.client, data)
+        response = self.client.get(reverse(views.activate_user, args=(key, )))
+        assert response.status_code == 302
+
 
 class SettingsTestCase(TestCase):
     def setUp(self):
