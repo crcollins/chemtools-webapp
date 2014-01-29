@@ -290,9 +290,11 @@ class UtilsTestCase(TestCase):
         keypair["public"] = keypair["public"][:50] + keypair["public"][53:]
         try:
             key = RSA.importKey(keypair["private"])
-            pubkey = RSA.importKey(keypair["public"])
         except:
-            return
+            try:
+                pubkey = RSA.importKey(keypair["public"])
+            except:
+                return
         raise Exception
 
     def test_mismatch_keypair(self):
