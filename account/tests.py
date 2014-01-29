@@ -68,8 +68,8 @@ class RegistrationTestCase(TestCase):
 
     def test_register_bad_password(self):
         data = {
-            "username": "testman",
-            "email": "testman@test.com",
+            "username": "testmanpass",
+            "email": "testmanpass@test.com",
             "new_password1": "mypass",
             "new_password2": "mypass123",
         }
