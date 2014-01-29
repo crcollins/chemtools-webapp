@@ -119,6 +119,7 @@ def main_settings(request, username):
 
     if changed:
         user_profile.save()
+        request.user.save()
         state = "Settings Successfully Saved"
 
     c = Context({
