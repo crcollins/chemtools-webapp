@@ -13,10 +13,6 @@ from account.forms import RegistrationForm, SettingsForm
 import utils
 
 
-def index(request):
-    pass
-
-
 def register_user(request):
     if request.user.is_authenticated():
         return redirect(HOME_URL)
