@@ -85,7 +85,7 @@ class RegistrationTestCase(TestCase):
             r = self.client.login(username=user["username"], password=user["new_password1"])
             self.assertTrue(r)
             response = self.client.get(reverse(views.register_user))
-            assert response.status_code == 302
+            self.assertEqual(response.status_code, 302)
 
     def test_activation_page_after_activated(self):
         data = {
@@ -96,7 +96,7 @@ class RegistrationTestCase(TestCase):
         }
         key = _register(self.client, data)
         response = self.client.get(reverse(views.activate_user, args=(key, )))
-        assert response.status_code == 302
+        self.assertEqual(response.status_code, 302)
 
 
 class SettingsTestCase(TestCase):
@@ -159,7 +159,7 @@ class SettingsTestCase(TestCase):
             profile = User.objects.get(username=user["username"]).get_profile()
             self.assertEqual(profile.xsede_username, user["username"])
 
-    def test_update_ssh_key(self):
+    def test_change_ssh_key(self):
         for user in self.users:
             profile = User.objects.get(username=user["username"]).get_profile()
             r = self.client.login(username=user["username"], password=user["new_password1"])
@@ -176,7 +176,7 @@ class SettingsTestCase(TestCase):
             profile = User.objects.get(username=user["username"]).get_profile()
             self.assertNotEqual(profile.public_key, initial)
 
-    def test_update_password(self):
+    def test_change_password(self):
         for user in self.users:
             r = self.client.login(username=user["username"], password=user["new_password1"])
             self.assertTrue(r)
@@ -197,7 +197,7 @@ class SettingsTestCase(TestCase):
             self.assertTrue(r)
             User.objects.get(username=user["username"]).set_password(user["new_password1"])
 
-    def test_update_password_fail(self):
+    def test_change_password_fail(self):
         for user in self.users:
             r = self.client.login(username=user["username"], password=user["new_password1"])
             self.assertTrue(r)
