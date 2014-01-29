@@ -24,6 +24,20 @@ def _register(client, data):
 class RegistrationTestCase(TestCase):
     def setUp(self):
         self.client = Client()
+        self.users = [{
+            "username": "user1",
+            "email": "user1@test.com",
+            "new_password1": "mypass",
+            "new_password2": "mypass",
+        }, {
+            "username": "user2",
+            "email": "user2@test.com",
+            "new_password1": "mypass",
+            "new_password2": "mypass",
+        }]
+        for user in self.users:
+            new_user = User.objects.create_user(user["username"], user["email"], user["new_password1"])
+            new_user.save()
 
     def test_register_page(self):
         response = self.client.get(reverse(views.register_user))
@@ -65,6 +79,12 @@ class RegistrationTestCase(TestCase):
         except ValueError:
             pass
 
+    def test_register_after_login(self):
+        for user in self.users:
+            r = self.client.login(username=user["username"], password=user["new_password1"])
+            self.assertTrue(r)
+            response = self.client.get(reverse(views.register_user))
+            assert response.status_code == 302
 
 class SettingsTestCase(TestCase):
     def setUp(self):
