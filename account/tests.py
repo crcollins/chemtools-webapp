@@ -129,6 +129,13 @@ class SettingsTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content.strip(), '')
 
+    def test_settings_redirect_page(self):
+        for user in self.users:
+            r = self.client.login(username=user["username"], password=user["new_password1"])
+            self.assertTrue(r)
+            response = self.client.get(reverse(views.user_settings, args=(user["username"], )))
+            self.assertEqual(response.status_code, 302)
+
     def test_change_settings_page(self):
         for user in self.users:
             r = self.client.login(username=user["username"], password=user["new_password1"])
