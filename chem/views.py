@@ -45,7 +45,7 @@ def index(request):
 ###########################################################
 ###########################################################
 
-def _get_molecules_info(string):
+def _get_molecule_warnings(string):
     errors = []
     warnings = []
     molecules = name_expansion(string)
@@ -61,6 +61,41 @@ def _get_molecules_info(string):
         warn = ErrorReport.objects.filter(molecule=mol)
         warnings.append(True if warn else None)
     return molecules, warnings, errors
+
+
+def _get_molecule_info(request, molecule):
+    _, warnings, errors = _get_molecule_warnings(molecule)
+    keywords = request.REQUEST.get("keywords", KEYWORDS)
+
+    if not errors[0]:
+        exactspacer = get_exact_name(molecule, spacers=True)
+        exactname = exactspacer.replace('*', '')
+        features = [get_feature_vector(exactspacer), get_feature_vector2(exactspacer)]
+        homo, lumo, gap = get_properties_from_feature_vector(features[1])
+        temp = DataPoint.objects.filter(exact_name=exactname, band_gap__isnull=False)
+        if temp:
+            datapoint = temp[0]
+        else:
+            datapoint = None
+    else:
+        exactname = ''
+        exactspacer = ''
+        features = ['', '']
+        homo, lumo, gap = None, None, None
+
+    a = {
+        "molecule": molecule,
+        "exact_name": exactname,
+        "exact_name_spacers": exactspacer,
+        "features": features,
+        "homo": homo,
+        "lumo": lumo,
+        "band_gap": gap,
+        "known_errors": warnings[0],
+        "error_message": errors[0],
+        "keywords": keywords,
+        }
+    return a
 
 
 def multi_job(request):
@@ -98,7 +133,7 @@ def molecule_check(request, string):
         "molecules": [[x] for x in name_expansion(string)]
     }
     try:
-        molecules, warnings, errors = _get_molecules_info(string)
+        molecules, warnings, errors = _get_molecule_warnings(string)
         a["molecules"] = zip(molecules, warnings, errors)
     except ValueError:
         a["error"] = "The operation timed out."
@@ -107,7 +142,6 @@ def molecule_check(request, string):
 
 
 def molecule_detail(request, molecule):
-    _, warnings, errors = _get_molecules_info(molecule)
     form = JobForm.get_form(request, molecule)
     keywords = request.REQUEST.get("keywords", '')
     add = "" if request.GET.get("view") else "attachment; "
@@ -123,73 +157,14 @@ def molecule_detail(request, molecule):
             cred = d.pop("credential")
             a = cluster.interface.run_standard_job(cred, molecule, **d)
             return HttpResponse(simplejson.dumps(a), mimetype="application/json")
-
-    if not errors[0]:
-        exactspacer = get_exact_name(molecule, spacers=True)
-        exactname = exactspacer.replace('*', '')
-        features = [get_feature_vector(exactspacer), get_feature_vector2(exactspacer)]
-        homo, lumo, gap = get_properties_from_feature_vector2(features[1])
-        temp = DataPoint.objects.filter(exact_name=exactname, band_gap__isnull=False)
-        if temp:
-            datapoint = temp[0]
-        else:
-            datapoint = None
-    else:
-        exactname = ''
-        exactspacer = ''
-        features = ['', '']
-        homo, lumo, gap = None, None, None
-        datapoint = None
-
-    c = Context({
-        "molecule": molecule,
-        "exact_name": exactname,
-        "exact_name_spacers": exactspacer,
-        "features": features,
-        "homo": homo,
-        "lumo": lumo,
-        "band_gap": gap,
-        "form": form,
-        "datapoint": datapoint,
-        "known_errors": warnings[0],
-        "error_message": errors[0],
-        "keywords": keywords,
-        })
+    a = _get_molecule_info(request, molecule)
+    a["form"] = form
+    c = Context(a)
     return render(request, "chem/molecule_detail.html", c)
 
 
 def molecule_detail_json(request, molecule):
-    _, warnings, errors = _get_molecules_info(molecule)
-    keywords = request.REQUEST.get("keywords", KEYWORDS)
-
-    if not errors[0]:
-        exactspacer = get_exact_name(molecule, spacers=True)
-        exactname = exactspacer.replace('*', '')
-        features = [get_feature_vector(exactspacer), get_feature_vector2(exactspacer)]
-        homo, lumo, gap = get_properties_from_feature_vector(features[1])
-        temp = DataPoint.objects.filter(exact_name=exactname, band_gap__isnull=False)
-        if temp:
-            datapoint = temp[0]
-        else:
-            datapoint = None
-    else:
-        exactname = ''
-        exactspacer = ''
-        features = ['', '']
-        homo, lumo, gap = None, None, None
-
-    a = {
-        "molecule": molecule,
-        "exact_name": exactname,
-        "exact_name_spacers": exactspacer,
-        "features": features,
-        "homo": homo,
-        "lumo": lumo,
-        "band_gap": gap,
-        "known_errors": warnings[0],
-        "error_message": errors[0],
-        "keywords": keywords,
-        }
+    a = _get_molecule_info(request, molecule)
     return HttpResponse(simplejson.dumps(a), mimetype="application/json")
 
 
@@ -227,7 +202,7 @@ def multi_molecule_zip(request, string):
     keywords = request.GET.get("keywords")
 
     try:
-        molecules, warnings, errors = _get_molecules_info(string)
+        molecules, warnings, errors = _get_molecule_warnings(string)
     except ValueError:
         c = Context({
             "error": "The operation timed out."
