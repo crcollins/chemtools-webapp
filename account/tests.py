@@ -151,6 +151,23 @@ class SettingsTestCase(TestCase):
             response = self.client.get(reverse(views.account_page, args=(opposite, "settings")))
             self.assertEqual(response.status_code, 302)
 
+    def test_change_email(self):
+        for user in self.users:
+            r = self.client.login(username=user["username"], password=user["new_password1"])
+            self.assertTrue(r)
+
+            response = self.client.get(reverse(views.account_page, args=(user["username"], "settings")))
+            self.assertEqual(response.status_code, 200)
+
+            data = {"email": 'a' + user["email"]}
+            response = self.client.post(reverse(views.account_page, args=(user["username"], "settings")), data)
+            self.assertIn("Settings Successfully Saved", response.content)
+
+            u = User.objects.get(username=user["username"])
+            self.assertEqual(u.email, 'a' + user["email"])
+            u.email = user["email"]
+            u.save()
+
     def test_change_xsede_username(self):
         for user in self.users:
             r = self.client.login(username=user["username"], password=user["new_password1"])
