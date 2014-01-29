@@ -40,6 +40,11 @@ class MainPageTestCase(TestCase):
             response = self.client.get(reverse(views.molecule_detail, args=(name, )))
             self.assertEqual(response.status_code, 200)
 
+    def test_molecule_detail_json(self):
+        for name in self.names:
+            response = self.client.get(reverse(views.molecule_detail_json, args=(name, )))
+            self.assertEqual(response.status_code, 200)
+
     def test_multi_molecule(self):
         names = ",".join(self.names)
         response = self.client.get(reverse(views.multi_molecule, args=(names, )))
