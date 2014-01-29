@@ -159,6 +159,23 @@ class SettingsTestCase(TestCase):
             self.assertTrue(r)
             User.objects.get(username=user["username"]).set_password(user["new_password1"])
 
+    def test_update_password_fail(self):
+        for user in self.users:
+            r = self.client.login(username=user["username"], password=user["new_password1"])
+            self.assertTrue(r)
+
+            response = self.client.get(reverse(views.account_page, args=(user["username"], "password")))
+            self.assertEqual(response.status_code, 200)
+            data = {
+                "old_password": user["new_password1"],
+                "new_password1": user["new_password1"] + 'a',
+                "new_password2": user["new_password2"],
+                }
+            self.assertNotIn("The two password fields", response.content)
+            response = self.client.post(reverse(views.account_page, args=(user["username"], "password")), data)
+            self.assertEqual(response.status_code, 200)
+            self.assertIn("The two password fields", response.content)
+
     def test_add_cluster(self):
         for user in self.users:
             r = self.client.login(username=user["username"], password=user["new_password1"])
