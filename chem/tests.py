@@ -8,13 +8,14 @@ from django.utils import simplejson
 from django.contrib.auth.models import User
 
 from project.utils import StringIO
+from data.models import DataPoint
 from chemtools.constants import KEYWORDS
 import views
 from models import ErrorReport
 
 
 class MainPageTestCase(TestCase):
-    names = ["24a_TON", "24b_TSP_24a_24a", "CON_24a"]
+    names = ["24a_TON", "24b_TSP_24a_24a", "CON_24a", "A_TON_A_A"]
 
     def setUp(self):
         self.client = Client()
@@ -25,6 +26,11 @@ class MainPageTestCase(TestCase):
         }
         new_user = User.objects.create_user(self.user["username"], self.user["email"], self.user["password"])
         new_user.save()
+        new_data = DataPoint(name="A_TON_A_A", exact_name="A_TON_A_A_n1_m1_x1_y1_z1",
+                            options="td B3LYP/6-31g(d) geom=connectivity", homo=-6.460873931,
+                            lumo=-1.31976745, homo_orbital=41, dipole=0.0006,
+                            energy=-567.1965205, band_gap=4.8068)
+        new_data.save()
 
     def test_index(self):
         response = self.client.get(reverse("chem_index"))
