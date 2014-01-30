@@ -8,6 +8,7 @@ from django.utils import simplejson
 from django.contrib.auth.models import User
 
 from project.utils import StringIO
+from chemtools.constants import KEYWORDS
 import views
 from models import ErrorReport
 
@@ -31,7 +32,7 @@ class MainPageTestCase(TestCase):
 
     def test_index_redirect(self):
         for name in self.names + ["24{a,b}_TON"]:
-            for keywords in ["opt HF/6-31g(d)", "td b3lyp/6-31g(d)"]:
+            for keywords in ["opt HF/6-31g(d)", "td b3lyp/6-31g(d)", KEYWORDS]:
                 params = "?molecule=%s&keywords=%s" % (name, keywords)
                 url = reverse("chem_index") + params
                 response = self.client.get(url)
