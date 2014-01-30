@@ -30,13 +30,7 @@ class MainPageTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_index_redirect(self):
-        for name in self.names:
-            url = reverse("chem_index") + "?molecule=%s" % name
-            response = self.client.get(url)
-            self.assertEqual(response.status_code, 302)
-
-    def test_index_redirect(self):
-        for name in self.names:
+        for name in self.names + ["24{a,b}_TON"]:
             for keywords in ["opt HF/6-31g(d)", "td b3lyp/6-31g(d)"]:
                 params = "?molecule=%s&keywords=%s" % (name, keywords)
                 url = reverse("chem_index") + params
