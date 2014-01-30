@@ -5,6 +5,7 @@ import urllib
 from django.test import Client, TestCase
 from django.core.urlresolvers import reverse
 from django.utils import simplejson
+from django.contrib.auth.models import User
 
 from project.utils import StringIO
 import views
@@ -16,6 +17,13 @@ class MainPageTestCase(TestCase):
 
     def setUp(self):
         self.client = Client()
+        self.user = {
+            "username": "user1",
+            "email": "user1@test.com",
+            "password": "mypass",
+        }
+        new_user = User.objects.create_user(self.user["username"], self.user["email"], self.user["password"])
+        new_user.save()
 
     def test_index(self):
         response = self.client.get(reverse("chem_index"))
@@ -129,6 +137,28 @@ class MainPageTestCase(TestCase):
         }
         for name in self.names:
             options["name"] = name
+            response = self.client.get(reverse(views.molecule_detail, args=(name, )))
+            self.assertEqual(response.status_code, 200)
+            url = reverse(views.molecule_detail, args=(name, )) + '?' + urllib.urlencode(options)
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 200)
+            string = "{name} {email} {nodes} {walltime}:00:00 {allocation}".format(**options)
+            self.assertEqual(response.content, string)
+
+    def test_write_job_after_login(self):
+        options = {
+            "nodes": 1,
+            "walltime": 48,
+            "allocation": "TG-CHE120081",
+            "cluster": 'g',
+            "template": "{{ name }} {{ email }} {{ nodes }} {{ time }} {{ allocation }}",
+        }
+        for name in self.names:
+            r = self.client.login(username=self.user["username"], password=self.user["password"])
+            self.assertTrue(r)
+
+            options["name"] = name
+            options["email"] = self.user["email"]
             response = self.client.get(reverse(views.molecule_detail, args=(name, )))
             self.assertEqual(response.status_code, 200)
             url = reverse(views.molecule_detail, args=(name, )) + '?' + urllib.urlencode(options)
