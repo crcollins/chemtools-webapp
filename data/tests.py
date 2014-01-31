@@ -21,6 +21,10 @@ class FragmentTestCase(TestCase):
             response = self.client.get(reverse(views.get_frag, args=(frag, )))
             self.assertEqual(response.status_code, 200)
 
+    def test_frag_redirect(self):
+        response = self.client.get(reverse(views.get_frag, args=("notafragment", )))
+        self.assertEqual(response.status_code, 302)
+
     def test_detail_cores(self):
         for frag in (''.join(x) for x in product("EZTC", "234", "34")):
             response = self.client.get(reverse(views.get_frag, args=(frag, )))
