@@ -44,6 +44,11 @@ class TemplateTestCase(TestCase):
             response = self.client.get(reverse(views.get_template, args=(cluster, )))
             self.assertEqual(response.status_code, 200)
 
+    def test_empty_template(self):
+        response = self.client.get(reverse(views.get_template, args=("notarealtemplate", )))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, '')
+
 
 class ModelTestCase(TestCase):
     def setUp(self):
