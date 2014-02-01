@@ -88,6 +88,7 @@ def _get_molecule_info(request, molecule):
         "exact_name": exactname,
         "exact_name_spacers": exactspacer,
         "features": features,
+        "datapoint": datapoint,
         "homo": homo,
         "lumo": lumo,
         "band_gap": gap,
