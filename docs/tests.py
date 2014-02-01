@@ -23,3 +23,7 @@ class DocsTestCase(TestCase):
     def test_technical(self):
         response = self.client.get(reverse(views.technical))
         self.assertEqual(response.status_code, 200)
+
+    def test_resources(self):
+        response = self.client.get(reverse(views.resources))
+        self.assertEqual(response.status_code, 200)
