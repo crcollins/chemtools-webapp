@@ -71,7 +71,7 @@ def _get_molecule_info(request, molecule):
         exactspacer = get_exact_name(molecule, spacers=True)
         exactname = exactspacer.replace('*', '')
         features = [get_feature_vector(exactspacer), get_feature_vector2(exactspacer)]
-        homo, lumo, gap = get_properties_from_feature_vector(features[1])
+        homo, lumo, gap = get_properties_from_feature_vector2(features[1])
         temp = DataPoint.objects.filter(exact_name=exactname, band_gap__isnull=False).values()
         if temp:
             datapoint = temp[0]
