@@ -1,7 +1,10 @@
 import bz2
 import zipfile
 import tarfile
+import re
 
+from chemtools import fileparser
+from project.utils import StringIO
 
 def parse_file_list(files):
     for f in files:
@@ -57,7 +60,7 @@ def convert_logs(logsets):
             lumovals.append(parser["LUMO"])
             gapvals.append(parser["BandGap"])
 
-        f = StringIO(key)
+        f = StringIO(name=key)
         f.write(', '.join(nvals) + '\n')
         f.write(', '.join(homovals) + '\n')
         f.write(', '.join(lumovals) + '\n')
