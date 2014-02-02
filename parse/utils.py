@@ -11,15 +11,18 @@ def parse_file_list(files):
         if f.name.endswith(".zip"):
             with zipfile.ZipFile(f, "r") as zfile:
                 for name in [x for x in zfile.namelist() if not x.endswith("/")]:
-                    yield zfile.open(name)
+                    newfile = StringIO(zfile.open(name).read(), name=name)
+                    yield newfile
         elif f.name.endswith(".tar.bz2") or f.name.endswith(".tar.gz"):
             end = f.name.split(".")[-1]
             with tarfile.open(fileobj=f, mode='r:' + end) as tfile:
                 for name in tfile.getnames():
                     if tfile.getmember(name).isfile():
-                        yield tfile.extractfile(name)
+                        newfile = StringIO(tfile.extractfile(name).read(), name=name)
+                        yield newfile
         else:
             yield f
+
 
 def find_sets(files):
     logs = []
