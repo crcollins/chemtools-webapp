@@ -38,6 +38,7 @@ class DataParser(Output):
         maxx = max(datax)
         if maxx > 1:
             x = 1. / x
+            maxx = x.max()
 
         homoy = np.array(datahomo)
         (homoa, homob), var_matrix = curve_fit(homofunc, x, homoy, p0=[-8, -.8])
