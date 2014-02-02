@@ -73,3 +73,17 @@ class MainPageTestCase(TestCase):
                     with zfile.open("output.txt") as f2:
                         self.assertEqual(f2.read(), output.read())
 
+    def test_data_parse_set(self):
+        for ending in [".zip", ".tar.gz", ".tar.bz2"]:
+            filepath = os.path.join(settings.MEDIA_ROOT, "tests", "test" + ending)
+            with open(filepath, 'r') as zfile:
+                data = {
+                    "myfiles": zfile,
+                    "option": "dataparse",
+                }
+                response = self.client.post(reverse(views.upload_data), data)
+                self.assertEqual(response.status_code, 200)
+                with StringIO(response.content) as f:
+                    with zipfile.ZipFile(f, "r") as zfile2:
+                        with zfile2.open("output.txt") as f2:
+                            self.assertIn("Errors (0)", f2.read())
