@@ -9,8 +9,8 @@ from settings import AES_KEY
 
 class StringIO(object):
     def __init__(self, *args, **kwargs):
-        self.s = cStringIO.StringIO(*args, **kwargs)
-        self.name = kwargs.get("name", "")
+        self.s = cStringIO.StringIO(*args)
+        self.name = kwargs.get("name", '')
     def __getattr__(self, key):
         return getattr(self.s, key)
     def __iter__(self):
