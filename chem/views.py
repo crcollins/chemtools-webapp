@@ -82,6 +82,7 @@ def _get_molecule_info(request, molecule):
         exactspacer = ''
         features = ['', '']
         homo, lumo, gap = None, None, None
+        datapoint = None
 
     a = {
         "molecule": molecule,
