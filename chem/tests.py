@@ -49,6 +49,11 @@ class MainPageTestCase(TestCase):
             response = self.client.get(reverse(views.molecule_detail, args=(name, )))
             self.assertEqual(response.status_code, 200)
 
+    def test_molecule_detail_invalid(self):
+        for name in ["bad_name", "2nota_BEN"]:
+            response = self.client.get(reverse(views.molecule_detail, args=(name, )))
+            self.assertEqual(response.status_code, 200)
+
     def test_molecule_detail_json(self):
         for name in self.names:
             response = self.client.get(reverse(views.molecule_detail_json, args=(name, )))
