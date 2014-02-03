@@ -341,11 +341,10 @@ class UtilsTestCase(TestCase):
         self.assertTrue(pubkey.verify(message, sig))
 
     def test_invalid_key_pair(self):
-        keypair = utils.generate_key_pair()
-        keypair["private"] = keypair["private"][:50] + keypair["private"][53:]
-        keypair["public"] = keypair["public"][:50] + keypair["public"][53:]
-        self.assertRaises(ValueError, RSA.importKey, keypair["private"])
-        self.assertRaises(binascii.Error, RSA.importKey, keypair["public"])
+        private = b"thisisnotavalidprivatekey"
+        public = b"thisisnotavalidpublickey"
+        self.assertRaises(ValueError, RSA.importKey, (private, ))
+        self.assertRaises(ValueError, RSA.importKey, (public, ))
 
     def test_mismatch_keypair(self):
         keypair0 = utils.generate_key_pair()
