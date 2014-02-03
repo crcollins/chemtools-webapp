@@ -1,3 +1,5 @@
+import binascii
+
 from django.test import Client, TestCase
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
@@ -61,11 +63,7 @@ class RegistrationTestCase(TestCase):
             "new_password2": "mypass",
         }
         _register(self.client, data)
-        try:
-            _register(self.client, data)
-            raise Exception()
-        except ValueError:
-            pass
+        self.assertRaises(ValueError, _register, self.client, data)
 
     def test_register_bad_password(self):
         data = {
@@ -74,11 +72,7 @@ class RegistrationTestCase(TestCase):
             "new_password1": "mypass",
             "new_password2": "mypass123",
         }
-        try:
-            _register(self.client, data)
-            raise Exception()
-        except ValueError:
-            pass
+        self.assertRaises(ValueError, _register, self.client, data)
 
     def test_register_after_login(self):
         for user in self.users:
@@ -350,14 +344,8 @@ class UtilsTestCase(TestCase):
         keypair = utils.generate_key_pair()
         keypair["private"] = keypair["private"][:50] + keypair["private"][53:]
         keypair["public"] = keypair["public"][:50] + keypair["public"][53:]
-        try:
-            key = RSA.importKey(keypair["private"])
-        except:
-            try:
-                pubkey = RSA.importKey(keypair["public"])
-            except:
-                return
-        raise Exception
+        self.assertRaises(ValueError, RSA.importKey, keypair["private"])
+        self.assertRaises(binascii.Error, RSA.importKey, keypair["public"])
 
     def test_mismatch_keypair(self):
         keypair0 = utils.generate_key_pair()
