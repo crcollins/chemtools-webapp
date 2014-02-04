@@ -87,3 +87,12 @@ class MainPageTestCase(TestCase):
                     with zipfile.ZipFile(f, "r") as zfile2:
                         with zfile2.open("output.txt") as f2:
                             self.assertIn("Errors (0)", f2.read())
+
+    def test_data_parse_log(self):
+        with open(os.path.join(settings.MEDIA_ROOT, "tests", "A_TON_A_A.log"), 'r') as f:
+            data = {
+                "myfiles": f,
+                "option": "dataparse",
+            }
+            response = self.client.post(reverse(views.upload_data), data)
+        self.assertEqual(response.status_code, 200)
