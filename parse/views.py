@@ -21,7 +21,10 @@ def upload_data(request):
     error = None
     if request.method == "POST":
         if request.FILES.getlist('myfiles'):
-            return switch[request.POST["option"]](request)
+            try:
+                return switch[request.POST["option"]](request)
+            except ValueError as e:
+                error = str(e)
         else:
             error = "Please add some files."
     c = Context({
@@ -49,6 +52,9 @@ def parse_data(request):
     files.extend(utils.convert_logs(logsets))
 
     num = len(files)
+    if not num:
+        raise ValueError("There are no data files to parse.")
+
     for f in files:
         parser = dataparser.DataParser(f)
         homolumo, gap = parser.get_graphs()
