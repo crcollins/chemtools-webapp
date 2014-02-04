@@ -58,6 +58,20 @@ class MainPageTestCase(TestCase):
                     with zfile.open("A_TON_A_A_TD.gjf") as f2:
                         self.assertEqual(f2.read(), gjf.read())
 
+    def test_gjf_reset_fail(self):
+        base = os.path.join(settings.MEDIA_ROOT, "tests", "A_TON_A_A")
+        with open(base + ".gjf", 'r') as gjf:
+            data = {
+                "myfiles": gjf,
+                "option": "gjfreset",
+            }
+            response = self.client.post(reverse(views.upload_data), data)
+            self.assertEqual(response.status_code, 200)
+            with StringIO(response.content) as f:
+                with zipfile.ZipFile(f, "r") as zfile:
+                    with zfile.open("errors.txt") as f2:
+                        self.assertEqual(f2.read(), "A_TON_A_A - The log file was invalid")
+
     def test_data_parse(self):
         datatxt = os.path.join(settings.MEDIA_ROOT, "tests", "data.txt")
         outputtxt = os.path.join(settings.MEDIA_ROOT, "tests", "output.txt")
@@ -120,3 +134,4 @@ class MainPageTestCase(TestCase):
         }
         response = self.client.post(reverse(views.upload_data), data)
         self.assertEqual(response.status_code, 200)
+
