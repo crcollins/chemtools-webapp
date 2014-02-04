@@ -112,3 +112,11 @@ class MainPageTestCase(TestCase):
             }
             response = self.client.post(reverse(views.upload_data), data)
         self.assertEqual(response.status_code, 200)
+
+    def test_parse_without_data(self):
+        data = {
+            "myfiles": '',
+            "option": "dataparse",
+        }
+        response = self.client.post(reverse(views.upload_data), data)
+        self.assertEqual(response.status_code, 200)
