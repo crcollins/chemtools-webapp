@@ -74,8 +74,8 @@ class MainPageTestCase(TestCase):
                         self.assertEqual(f2.read(), output.read())
 
     def test_data_parse_set(self):
-        for ending in [".zip", ".tar.gz", ".tar.bz2"]:
-            filepath = os.path.join(settings.MEDIA_ROOT, "tests", "test" + ending)
+        for filename in ["CON.tar.gz", "TON.tar.bz2"]:
+            filepath = os.path.join(settings.MEDIA_ROOT, "tests", filename)
             with open(filepath, 'r') as zfile:
                 data = {
                     "myfiles": zfile,
@@ -87,6 +87,22 @@ class MainPageTestCase(TestCase):
                     with zipfile.ZipFile(f, "r") as zfile2:
                         with zfile2.open("output.txt") as f2:
                             self.assertIn("Errors (0)", f2.read())
+
+    def test_data_parse_multi_set(self):
+        filepath = os.path.join(settings.MEDIA_ROOT, "tests", "both.zip")
+        with open(filepath, 'r') as zfile:
+            data = {
+                "myfiles": zfile,
+                "option": "dataparse",
+            }
+            response = self.client.post(reverse(views.upload_data), data)
+            self.assertEqual(response.status_code, 200)
+            with StringIO(response.content) as f:
+                with zipfile.ZipFile(f, "r") as zfile2:
+                    for folder in ["CON__TD/", "TON__TD/"]:
+                        with zfile2.open(folder+"output.txt") as f2:
+                            self.assertIn("Errors (0)", f2.read())
+
 
     def test_data_parse_log(self):
         with open(os.path.join(settings.MEDIA_ROOT, "tests", "A_TON_A_A.log"), 'r') as f:
