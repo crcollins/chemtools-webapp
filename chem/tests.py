@@ -205,6 +205,13 @@ class MainPageTestCase(TestCase):
             response = self.client.get(reverse(views.molecule_check, args=(name, )))
             self.assertEqual(response.status_code, 200)
 
+    def test_molecule_check_timeout(self):
+        string = "{$ARYL2}{$RGROUPS}{$RGROUPS}{$XGROUPS}_TON"
+        response = self.client.get(reverse(views.molecule_check, args=(string, )))
+        self.assertEqual(response.status_code, 200)
+        value = simplejson.loads(response.content)["error"]
+        self.assertEqual(value, "The operation timed out.")
+
     def test_molecule_check_specific(self):
         names = [
             ("24ball_TON", "no rgroups allowed"),
