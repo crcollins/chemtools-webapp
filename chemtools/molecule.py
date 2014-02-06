@@ -19,7 +19,7 @@ class Atom(object):
 
     @property
     def xyz_tuple(self):
-        return tuple(map(tuple, numpy.asarray(self.xyz.T)))[0]
+        return tuple(self.xyz.T.tolist()[0])
 
     @property
     def id(self):
