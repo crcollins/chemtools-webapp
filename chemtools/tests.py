@@ -8,6 +8,7 @@ import constants
 import extractor
 import mol_name
 import ml
+import molecule
 
 
 class GJFWriterTestCase(TestCase):
@@ -596,3 +597,9 @@ class MLTestCase(TestCase):
         ]
         name = "A**_TON_A**_A**_n1_m1_x1_y1_z1"
         self.assertEqual(ml.get_feature_vector2(name), expected)
+
+
+class MoleculeTestCase(TestCase):
+    def test_atom_print(self):
+        atom = molecule.Atom(0, 0, 0, "C")
+        self.assertEqual(str(atom), "C 0.000000 0.000000 0.000000")
