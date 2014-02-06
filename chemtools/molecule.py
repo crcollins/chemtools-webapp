@@ -242,13 +242,6 @@ class Molecule(object):
         #rotate to standard view
         return img.rotate(-90)
 
-    def __getitem__(self, key):
-        for x in self.bonds:
-            if key in [y.element for y in x.atoms]:
-                return x
-        else:
-            raise KeyError(key)
-
     @property
     def mol2(self):
         '''Returns a string with the in the proper .mol2 format.'''
