@@ -22,18 +22,6 @@ class Atom(object):
         return tuple(map(tuple, numpy.asarray(self.xyz.T)))[0]
 
     @property
-    def x(self):
-        return self.xyz[0,0]
-
-    @property
-    def y(self):
-        return self.xyz[1,0]
-
-    @property
-    def z(self):
-        return self.xyz[2,0]
-
-    @property
     def id(self):
         return self.parent.index(self) + 1
 
