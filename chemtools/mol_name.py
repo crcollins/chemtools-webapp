@@ -171,7 +171,7 @@ def parse_name(name):
                     raise Exception(11, "can not add core to xgroup on %s" % name)
 
         output.append((core, parsedsides))
-    if len(output) > 2 and nm[1] > 1:
+    if len(output) > 1 and nm[1] > 1:
         raise Exception(8, "Can not do m expansion and have multiple cores")
     return output, nm, xyz
 
