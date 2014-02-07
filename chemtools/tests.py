@@ -23,10 +23,10 @@ class GJFWriterTestCase(TestCase):
     ]
     cores = constants.CORES
     invalid_cores = ["cao", "bo", "CONA", "asD"]
-    valid_polymer_sides = ['2', '4b', '4bc', '44bc', '5-', '5-5', '55-', '5-a', '5-ab4-']
+    valid_polymer_sides = ['2', '4b', '22', '24', '4bc', '44bc', '4b4', '5-', '5-5', '55-', '5-a', '5-ab4-']
     invalid_polymer_sides = ['B', '2B']
     valid_sides = valid_polymer_sides + invalid_polymer_sides
-    invalid_sides = ['~', 'b', 'c', 'BB', 'TON', 'Dc', '4aaa', '24C2', 'awr', 'A-', '5B-']
+    invalid_sides = ['~', 'b', 'c', 'BB', 'TON', 'Dc', '4aaa', '24C2', 'awr', 'A-', '5B-', '2a', '4abc']
     valid_polymer_options = ['_n1', '_n2', '_n3', '_m1', '_m2', '_m3', '_n1_m1']
     invalid_polymer_options = ['_n2_m2', '_n3_m3', '_m2_n2', '_m3_n3', '_n0', '_m0', '_n0_m0']
 
