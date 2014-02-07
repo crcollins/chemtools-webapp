@@ -35,12 +35,11 @@ This setup assumes that you already have python 2.7+ and git installed and are o
 
     $ git clone https://github.com/crcollins/chemtools-webapp.git
     $ cd chemtools-webapp
+    $ pip install numpy==1.6.1
     $ pip install -r requirements.txt
     $ python manage.py syncdb
     $ python manage.py runserver 0.0.0.0
     Go to http://localhost/ with your browser
-
-Note: You might have to run `sudo pip install numpy==1.6.1` before running `sudo pip install -r requirements.txt` to get it to work.
 
 Test
 ----
