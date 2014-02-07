@@ -235,27 +235,19 @@ def parse_end_name(name):
                 parts.append((char, lastconnect, False))
                 lastconnect = len(parts) - 1
             else:
-                if r == 0:
-                    try:
-                        if name[i + 1] in rgroup:
-                            parts.append((char, lastconnect, False))
-                            r += 1
-                        else:
-                            parts.append((char, lastconnect, False))
-                            parts.append((char, lastconnect, False))
-                            r += 2
-                            state = "start"
-                    except IndexError:
+                if not r:
+                    if i + 1 < len(name) and name[i + 1] in rgroup:
+                        parts.append((char, lastconnect, False))
+                        r += 1
+                    else:
                         parts.append((char, lastconnect, False))
                         parts.append((char, lastconnect, False))
                         r += 2
                         state = "start"
-                elif r == 1:
+                else:
                     parts.append((char, lastconnect, False))
                     r += 1
                     state = "start"
-                else:
-                    raise ValueError("too many rgroups")
 
         elif state == "end":
             raise ValueError("can not attach to end")
