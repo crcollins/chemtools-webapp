@@ -251,9 +251,8 @@ def parse_end_name(name):
 
         elif state == "end":
             raise ValueError("can not attach to end")
-    if state == "aryl0":
-        pass
-    elif state != "end" and state != "start":
+
+    if state not in ["start", "end", "aryl0"]:
         parts.append(("a", lastconnect, False))
         parts.append(("a", lastconnect, False))
     return parts
