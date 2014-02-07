@@ -214,6 +214,21 @@ class GJFWriterTestCase(TestCase):
             print errors
             raise errors[0][1]
 
+    def test_spot_check_invalid(self):
+        errors = []
+        pairs = [
+            ("B_TON_n2", "(9, 'can not do nm expansion with xgroup on left')"),
+            ("TON_B__m2", "(9, 'can not do nm expansion with xgroup on middle')"),
+            ("TON__B_n2", "(9, 'can not do nm expansion with xgroup on right')"),
+            ("TON_TON_m2", "(8, 'Can not do m expansion and have multiple cores')"),
+        ]
+        for name, message in pairs:
+            try:
+                gjfwriter.GJFWriter(name)
+                raise ValueError
+            except Exception as e:
+                self.assertEqual(message, str(e))
+
     def test_png(self):
         errors = []
         sets = [
