@@ -185,11 +185,10 @@ def parse_end_name(name):
     # start with -1 to add 1 later for core
     lastconnect = -1
     state = "start"
-    for char in name:
-        if char not in substituent and char != '-':
-            raise ValueError("Bad Substituent Name: %s" % char)
-
     for i, char in enumerate(name):
+        if char not in substituent and char != '-':
+            raise ValueError("Bad Substituent Name: %s (%d)" % (char, i))
+
         if char == "-":
             previous = parts[lastconnect]
             if previous[0] in aryl0 + aryl2:
