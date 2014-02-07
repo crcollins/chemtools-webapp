@@ -193,34 +193,46 @@ def parse_end_name(name):
             previous = parts[lastconnect]
             if previous[0] in aryl0 + aryl2:
                 parts[lastconnect] = (previous[0], previous[1], True)
+                continue
             else:
                 raise ValueError("reflection only allowed for aryl groups")
-            continue
-        if state == "aryl0":
-            if char not in block:
-                raise ValueError("no rgroups allowed")
-            else:
-                parts.append((char, lastconnect, False))
 
+        if state == "start":
             if char in xgroup:
                 state = "end"
             elif char in aryl0:
                 state = "aryl0"
             elif char in aryl2:
                 state = "aryl2"
+            else:
+                raise ValueError("no rgroups allowed")
+            parts.append((char, lastconnect, False))
+            r = 0
+            lastconnect = len(parts) - 1
+
+        elif state == "aryl0":
+            if char in xgroup:
+                state = "end"
+            elif char in aryl0:
+                state = "aryl0"
+            elif char in aryl2:
+                state = "aryl2"
+            else:
+                raise ValueError("no rgroups allowed")
+            parts.append((char, lastconnect, False))
             lastconnect = len(parts) - 1
 
         elif state == "aryl2":
             if char not in rgroup:
-                parts.append(("a", lastconnect, False))
-                parts.append(("a", lastconnect, False))
-                parts.append((char, lastconnect, False))
                 if char in xgroup:
                     state = "end"
                 elif char in aryl0:
                     state = "aryl0"
                 elif char in aryl2:
                     state = "aryl2"
+                parts.append(("a", lastconnect, False))
+                parts.append(("a", lastconnect, False))
+                parts.append((char, lastconnect, False))
                 lastconnect = len(parts) - 1
             else:
                 if r == 0:
@@ -244,20 +256,7 @@ def parse_end_name(name):
                     state = "start"
                 else:
                     raise ValueError("too many rgroups")
-        elif state == "start":
-            if char not in block:
-                raise ValueError("no rgroups allowed")
-            else:
-                parts.append((char, lastconnect, False))
-                r = 0
 
-            if char in xgroup:
-                state = "end"
-            elif char in aryl0:
-                state = "aryl0"
-            elif char in aryl2:
-                state = "aryl2"
-            lastconnect = len(parts) - 1
         elif state == "end":
             raise ValueError("can not attach to end")
     if state == "aryl0":
