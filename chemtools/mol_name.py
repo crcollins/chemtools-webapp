@@ -18,11 +18,7 @@ def name_expansion(string):
     }
 
     def get_var(name):
-        try:
-            newname = name.group(0).lstrip("$")
-        except AttributeError:
-            newname = name.lstrip("$")
-
+        newname = name.group(0).lstrip("$")
         try:
             x = variables[newname]
         except:
