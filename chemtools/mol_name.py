@@ -30,7 +30,7 @@ def name_expansion(string):
                 int(newname)  # internal variable
                 x = '$' + newname
             except:
-                x = newname
+                x = ''
         return x
 
     def split_molecules(string):
