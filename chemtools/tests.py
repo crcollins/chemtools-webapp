@@ -371,6 +371,7 @@ class MolNameTestCase(TestCase):
     def test_brace_expansion(self):
         names = [
             ("a", ["a"]),
+            ("{,a}", ["", "a"]),
             ("{a,b}", ["a", "b"]),
             ("{a,b}c", ["ac", "bc"]),
             ("c{a,b}", ["ca", "cb"]),
@@ -381,6 +382,15 @@ class MolNameTestCase(TestCase):
             ("{a,b}e{c,d}", ["aec", "bec", "aed", "bed"]),
             ("{a,b}{c,d}e", ["ace", "bce", "ade", "bde"]),
             ("{a,b}{c,d}{e,f}", ["ace", "acf", "ade", "adf", "bce", "bcf", "bde", "bdf"]),
+        ]
+        for name, result in names:
+            self.assertEqual(set(mol_name.name_expansion(name)), set(result))
+
+    def test_comma_name_split(self):
+        names = [
+            ("a,", ["a", ""]),
+            (",b", ["", "b"]),
+            ("a,b", ["a", "b"]),
         ]
         for name, result in names:
             self.assertEqual(set(mol_name.name_expansion(name)), set(result))
