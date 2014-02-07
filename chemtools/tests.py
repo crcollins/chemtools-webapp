@@ -393,6 +393,8 @@ class MolNameTestCase(TestCase):
             ("{$ARYL0}", constants.ARYL0),
             ("{$ARYL2}", constants.ARYL2),
             ("{$ARYL}", constants.ARYL),
+            ("{$a}", ['']),
+            ("{$a,$ARYL}", ['']+constants.ARYL),
         ]
         for name, result in names:
             self.assertEqual(set(mol_name.name_expansion(name)), set(result))
