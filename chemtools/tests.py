@@ -517,9 +517,9 @@ class MolNameTestCase(TestCase):
             raise errors[0][2]
 
 
-# class ExtractorTestCase(TestCase):
-#     def test_run_all(self):
-#         extractor.run_all()
+class ExtractorTestCase(TestCase):
+    def test_run_all(self):
+        extractor.run_all()
 
 class MLTestCase(TestCase):
     def test_get_core_features(self):
