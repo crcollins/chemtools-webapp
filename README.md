@@ -59,7 +59,7 @@ Deploy
 
 This assumes you have already made it through the setup.
 
-    $ sudo apt-get install supervisor nginix
+    $ sudo apt-get install supervisor nginx
     # While in your virtualenv from before
     $ pip install gunicorn
 
