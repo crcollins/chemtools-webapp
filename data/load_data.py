@@ -1,13 +1,10 @@
 import csv
-import os
 
 from chemtools.mol_name import get_exact_name
 from models import DataPoint
 
-def main():
-    folder, _ = os.path.split(__file__)
-    PATH = os.path.join(folder, "data.csv")
-    with open(PATH, "r") as csvfile:
+def main(path):
+    with open(path, "r") as csvfile:
         reader = csv.reader(csvfile, delimiter=',', quotechar='"')
         points = []
         for row in reader:

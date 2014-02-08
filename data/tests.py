@@ -1,5 +1,7 @@
 from itertools import product
+import os
 
+from django.conf import settings
 from django.test import Client, TestCase
 from django.core.urlresolvers import reverse
 
@@ -66,4 +68,5 @@ class ModelTestCase(TestCase):
 
 class LoadDataTestCase(TestCase):
     def test_load_data(self):
-        load_data.main()
+        path = os.path.join(settings.MEDIA_ROOT, "tests", "data.csv")
+        load_data.main(path)
