@@ -3,5 +3,4 @@ database
 scratch
 project/secret_key.py
 chemtools/mol2/*
-coverage_html_report/
 .coverage*
