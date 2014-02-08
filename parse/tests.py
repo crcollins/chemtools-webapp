@@ -1,5 +1,6 @@
 import os
 import zipfile
+import csv
 
 from django.conf import settings
 from django.test import Client, TestCase
@@ -25,9 +26,15 @@ class MainPageTestCase(TestCase):
             }
             response = self.client.post(reverse(views.upload_data), data)
             self.assertEqual(response.status_code, 200)
-            results = response.content.split('\n')[1]
-            expected = "A_TON_A_A.log,A_TON_A_A,A_TON_A_A_n1_m1_x1_y1_z1,opt B3LYP/6-31g(d) geom=connectivity,-6.460873931,-1.31976745,41,0.0006,-567.1965205,---,0.35"
-            self.assertEqual(results, expected)
+            with StringIO(response.content) as f:
+                reader = csv.reader(f, delimiter=',', quotechar='"')
+                expected = ["A_TON_A_A.log", "A_TON_A_A", "A_TON_A_A_n1_m1_x1_y1_z1",
+                            "opt B3LYP/6-31g(d) geom=connectivity", "-6.46079886952",
+                            "-1.31975211714", "41", "0.0006", "-567.1965205",
+                            "---", "0.35"]
+                lines = [x for x in reader]
+                results = lines[1][:3] + lines[1][4:]
+                self.assertEqual(results, expected)
 
     def test_gjf_reset(self):
         base = os.path.join(settings.MEDIA_ROOT, "tests", "A_TON_A_A")
