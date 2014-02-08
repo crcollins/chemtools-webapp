@@ -121,6 +121,25 @@ class MainPageTestCase(TestCase):
                         options["name"] = name.strip(".job")
                         string = "{name} {email} {nodes} {walltime}:00:00 {allocation}".format(**options)
                         self.assertEqual(f2.read(), string)
+
+    def test_multi_molecule_zip_job_bad(self):
+        options = {
+            "job": True,
+            "name": "{{ name }}",
+            "email": "test.com",
+            "nodes": 1,
+            "walltime": 48,
+            "allocation": "TG-CHE120081",
+            "cluster": 'g',
+            "template": "{{ name }} {{ email }} {{ nodes }} {{ time }} {{ allocation }}",
+        }
+        names = ",".join(self.names)
+        jobnames = set([name + ".job" for name in self.names])
+        url = reverse(views.multi_molecule_zip, args=(names, )) + "?" + urllib.urlencode(options)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("has-error", response.content)
+
     def test_write_gjf(self):
         for name in self.names:
             response = self.client.get(reverse(views.write_gjf, args=(name, )))
