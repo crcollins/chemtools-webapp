@@ -60,9 +60,25 @@ class MainPageTestCase(TestCase):
             self.assertEqual(response.status_code, 200)
 
     def test_multi_molecule(self):
-        names = ",".join(self.names)
+        names = ','.join(self.names)
         response = self.client.get(reverse(views.multi_molecule, args=(names, )))
         self.assertEqual(response.status_code, 200)
+        options = {
+            "job": True,
+            "name": "{{ name }}",
+            "email": "test@test.com",
+            "nodes": 1,
+            "walltime": 48,
+            "allocation": "TG-CHE120081",
+            "cluster": 'g',
+            "template": "{{ name }} {{ email }} {{ nodes }} {{ time }} {{ allocation }}",
+            "molname": "24a_TON",
+        }
+        url = reverse(views.multi_molecule, args=(names, )) + "?" + urllib.urlencode(options)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        string = "{molname} {email} {nodes} {walltime}:00:00 {allocation}".format(**options)
+        self.assertEqual(response.content, string)
 
     def test_multi_molecule_zip(self):
         names = ",".join(self.names)
