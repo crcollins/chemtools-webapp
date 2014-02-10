@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from django.utils import simplejson
 
 import views
+from project.utils import get_sftp_connection, get_ssh_connection, AESCipher
 
 
 class SSHPageTestCases(TestCase):
@@ -34,3 +35,19 @@ class SSHPageTestCases(TestCase):
         self.assertEqual(response.status_code, 200)
         data = simplejson.loads(response.content)
         self.assertTrue(data["is_authenticated"])
+
+
+
+class UtilsTestCase(TestCase):
+    def test_AES(self):
+        cipher = AESCipher()
+        string = "The quick brown fox jumps over the lazy dog."
+        ct = cipher.encrypt(string)
+        pt = cipher.decrypt(ct)
+        self.assertEqual(pt, string)
+
+    def test_AES_error(self):
+        cipher = AESCipher()
+        string = "The quick brown fox jumps over the lazy dog."
+        ct = cipher.encrypt(string)[:10] + "randomgarbage"
+        self.assertRaises(TypeError, cipher.decrypt, ct)
