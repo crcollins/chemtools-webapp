@@ -1,14 +1,12 @@
 #!/usr/bin/env python
 
 import os
+from cStringIO import StringIO
 
 from molecule import Atom, Bond, Molecule
 from constants import *
 from mol_name import name_expansion, get_exact_name, parse_name
-try:
-    from project.utils import StringIO
-except ImportError:
-    from cStringIO import StringIO
+
 
 folder, _ = os.path.split(__file__)
 DATAPATH = os.path.join(folder, "data")
