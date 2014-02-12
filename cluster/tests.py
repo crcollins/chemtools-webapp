@@ -61,6 +61,7 @@ class SSHSettings(TestCase):
         data = {
             "name": "test-machine",
             "hostname": "test-machine.com",
+            "port": 22,
             }
         response = self.client.post(reverse(account_page, args=(self.user["username"], "clusters")), data)
         self.assertEqual(response.status_code, 200)
