@@ -4,7 +4,8 @@
         "model": "cluster.cluster",
         "fields": {
             "name": "Blacklight",
-            "hostname": "blacklight.psc.teragrid.org"
+            "hostname": "blacklight.psc.teragrid.org",
+            "port": 22
         }
     },
     {
@@ -12,7 +13,8 @@
         "model": "cluster.cluster",
         "fields": {
             "name": "Gordon",
-            "hostname": "gordon.sdsc.edu"
+            "hostname": "gordon.sdsc.edu",
+            "port": 22
         }
     },
     {
@@ -20,7 +22,8 @@
         "model": "cluster.cluster",
         "fields": {
             "name": "Trestles",
-            "hostname": "trestles.sdsc.edu"
+            "hostname": "trestles.sdsc.edu",
+            "port": 22
         }
     },
     {
@@ -28,7 +31,8 @@
         "model": "cluster.cluster",
         "fields": {
             "name": "Marcy",
-            "hostname": "marcy.bucknell.edu"
+            "hostname": "marcy.bucknell.edu",
+            "port": 22
         }
     }
 ]

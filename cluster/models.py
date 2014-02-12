@@ -8,15 +8,16 @@ from project.utils import get_ssh_connection, get_sftp_connection, StringIO, AES
 class Cluster(models.Model):
     name = models.CharField(max_length=50)
     hostname = models.CharField(max_length=255)
+    port = models.IntegerField()
 
     def __unicode__(self):
-        return "%s (%s)" % (self.name, self.hostname)
+        return "%s (%s:%d)" % (self.name, self.hostname, self.port)
 
 
 class ClusterForm(forms.ModelForm):
     class Meta:
         model = Cluster
-        fields = ("name", "hostname")
+        fields = ("name", "hostname", "port")
 
 
 class EncryptedCharField(models.CharField):
