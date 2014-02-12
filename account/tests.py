@@ -232,29 +232,6 @@ class SettingsTestCase(TestCase):
             self.assertEqual(response.status_code, 200)
             self.assertIn("The two password fields", response.content)
 
-    def test_add_cluster(self):
-        for user in self.users:
-            r = self.client.login(username=user["username"], password=user["new_password1"])
-            self.assertTrue(r)
-
-            response = self.client.get(reverse(views.account_page, args=(user["username"], "clusters")))
-            self.assertEqual(response.status_code, 200)
-            data = {
-                "name": "test-machine",
-                "hostname": "test-machine.com",
-                }
-            response = self.client.post(reverse(views.account_page, args=(user["username"], "clusters")), data)
-            self.assertEqual(response.status_code, 200)
-            self.assertIn("Settings Successfully Saved", response.content)
-
-    def test_add_credential(self):
-        for user in self.users:
-            r = self.client.login(username=user["username"], password=user["new_password1"])
-            self.assertTrue(r)
-            response = self.client.get(reverse(views.account_page, args=(user["username"], "credentials")))
-            self.assertEqual(response.status_code, 200)
-            # lacks a test to actually add a credential because it would require an external server
-
 
 class LoginTestCase(TestCase):
     def setUp(self):

@@ -7,6 +7,7 @@ from django.contrib.auth.models import User
 from django.utils import simplejson
 
 import views
+from account.views import account_page
 from project.utils import get_sftp_connection, get_ssh_connection, AESCipher
 
 
@@ -39,6 +40,38 @@ class SSHPageTestCases(TestCase):
         data = simplejson.loads(response.content)
         self.assertTrue(data["is_authenticated"])
 
+
+class SSHSettings(TestCase):
+    user = {
+        "username": "testerman",
+        "email": "test@test.com",
+        "password": "S0m3thing",
+    }
+    def setUp(self):
+        user = User.objects.create_user(self.user["username"], email=self.user["email"], password=self.user["password"])
+        user.save()
+        self.client = Client()
+
+    def test_add_cluster(self):
+        r = self.client.login(username=self.user["username"], password=self.user["password"])
+        self.assertTrue(r)
+
+        response = self.client.get(reverse(account_page, args=(self.user["username"], "clusters")))
+        self.assertEqual(response.status_code, 200)
+        data = {
+            "name": "test-machine",
+            "hostname": "test-machine.com",
+            }
+        response = self.client.post(reverse(account_page, args=(self.user["username"], "clusters")), data)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Settings Successfully Saved", response.content)
+
+    def test_add_credential(self):
+        r = self.client.login(username=self.user["username"], password=self.user["password"])
+        self.assertTrue(r)
+        response = self.client.get(reverse(account_page, args=(self.user["username"], "credentials")))
+        self.assertEqual(response.status_code, 200)
+        # lacks a test to actually add a credential because it would require an external server
 
 class UtilsTestCase(TestCase):
     def test_get_sftp_password(self):
