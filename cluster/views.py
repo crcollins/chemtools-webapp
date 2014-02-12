@@ -103,10 +103,14 @@ def credential_settings(request, username):
             form = CredentialForm(request.user, initial=initial)
             usercreds = request.user.credentials.all()
             for key in request.POST:
-                if "@" in key and request.POST[key] == "on":
-                    username, hostname = key.split("@")
+                if "@" in key and ":" in key and request.POST[key] == "on":
+                    username, hostname = key.split('@')
+                    hostname, port = hostname.split(':')
                     try:
-                        usercreds.get(username=username, cluster__hostname=hostname).delete()
+                        usercreds.get(
+                                    username=username,
+                                    cluster__hostname=hostname,
+                                    cluster__port=int(port)).delete()
                     except:
                         pass
         else:
