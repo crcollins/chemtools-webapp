@@ -126,7 +126,7 @@ def credential_settings(request, username):
         "state": state,
         "form": form,
         })
-    return render(request, "account/credential_settings.html", c)
+    return render(request, "cluster/credential_settings.html", c)
 
 
 @login_required
@@ -151,4 +151,4 @@ def cluster_settings(request, username):
         "form": form,
         "clusters": Cluster.objects.all(),
         })
-    return render(request, "account/cluster_settings.html", c)
+    return render(request, "cluster/cluster_settings.html", c)
