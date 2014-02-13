@@ -8,7 +8,7 @@ from project.utils import StringIO, SSHClient, SFTPClient
 from models import Credential
 
 
-def get_ssh_connection(obj):
+def get_ssh_connection_obj(obj):
     if isinstance(obj, Credential):
         try:
             return obj.get_ssh_connection()
@@ -20,7 +20,7 @@ def get_ssh_connection(obj):
         raise TypeError
 
 
-def get_sftp_connection(obj):
+def get_sftp_connection_obj(obj):
     if isinstance(obj, Credential):
         try:
             return obj.get_sftp_connection()

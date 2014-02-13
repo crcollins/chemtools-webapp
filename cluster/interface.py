@@ -7,12 +7,12 @@ from chemtools import fileparser
 from chemtools.mol_name import name_expansion
 
 from models import Job
-from utils import get_ssh_connection, get_sftp_connection, _run_job, _get_jobs, get_compressed_file
+from utils import get_ssh_connection_obj, get_sftp_connection_obj, _run_job, _get_jobs, get_compressed_file
 
 
 def run_job(credential, gjfstring, jobstring=None, **kwargs):
-    ssh = get_ssh_connection(credential)
-    sftp = get_sftp_connection(credential)
+    ssh = get_ssh_connection_obj(credential)
+    sftp = get_sftp_connection_obj(credential)
 
     results = {"jobid": None, "error": None, "cluster": credential.cluster.name}
     if not credential.user.is_staff:
