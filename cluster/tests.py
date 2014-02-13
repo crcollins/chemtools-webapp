@@ -12,7 +12,7 @@ from account.views import account_page
 from project.utils import get_sftp_connection, get_ssh_connection, AESCipher
 
 
-class SSHPageTestCases(TestCase):
+class SSHPageTestCase(TestCase):
     def setUp(self):
         user = User.objects.create_user("testerman", email="test@test.com", password="S0m3thing")
         user.save()
@@ -42,7 +42,7 @@ class SSHPageTestCases(TestCase):
         self.assertTrue(data["is_authenticated"])
 
 
-class SSHSettings(TestCase):
+class SSHSettingsTestCase(TestCase):
     user = {
         "username": "testerman",
         "email": "test@test.com",
