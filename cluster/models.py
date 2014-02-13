@@ -92,11 +92,13 @@ class CredentialForm(forms.ModelForm):
         try:
             if cleaned_data.get("use_password"):
                 password = cleaned_data.get("password")
-                get_ssh_connection(cluster.hostname, username, password=password, port=cluster.port)
+                with get_ssh_connection(cluster.hostname, username, password=password, port=cluster.port):
+                    pass
             else:
                 profile = self.user.get_profile()
                 private = StringIO(profile.private_key)
-                get_ssh_connection(cluster.hostname, username, key=private, port=cluster.port)
+                with get_ssh_connection(cluster.hostname, username, key=private, port=cluster.port):
+                    pass
         except Exception:
             raise forms.ValidationError("Those credentials did not work.")
         return cleaned_data
