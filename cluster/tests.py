@@ -13,8 +13,15 @@ from project.utils import get_sftp_connection, get_ssh_connection, AESCipher
 
 
 class SSHPageTestCase(TestCase):
+    user = {
+        "username": "testerman",
+        "email": "test@test.com",
+        "password": "S0m3thing",
+    }
     def setUp(self):
-        user = User.objects.create_user("testerman", email="test@test.com", password="S0m3thing")
+        user = User.objects.create_user(self.user["username"],
+                                        email=self.user["email"],
+                                        password=self.user["password"])
         user.save()
         self.client = Client()
 
@@ -22,7 +29,7 @@ class SSHPageTestCase(TestCase):
         response = self.client.get(reverse(views.job_index))
         self.assertEqual(response.status_code, 302)
 
-        r = self.client.login(username="testerman", password="S0m3thing")
+        r = self.client.login(username=self.user["username"], password=self.user["password"])
         self.assertTrue(r)
         response = self.client.get(reverse(views.job_index))
         self.assertEqual(response.status_code, 200)
@@ -32,8 +39,7 @@ class SSHPageTestCase(TestCase):
         self.assertEqual(response.status_code, 302)
 
     def test_get_job_list_auth(self):
-        user = User.objects.get(username="testerman")
-        r = self.client.login(username="testerman", password="S0m3thing")
+        r = self.client.login(username=self.user["username"], password=self.user["password"])
         self.assertTrue(r)
 
         response = self.client.get(reverse(views.get_job_list))
