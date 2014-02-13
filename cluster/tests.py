@@ -7,6 +7,7 @@ from django.contrib.auth.models import User
 from django.utils import simplejson
 
 import views
+import models
 from account.views import account_page
 from project.utils import get_sftp_connection, get_ssh_connection, AESCipher
 
@@ -47,9 +48,55 @@ class SSHSettings(TestCase):
         "email": "test@test.com",
         "password": "S0m3thing",
     }
+    cluster = {
+            "name": "test-machine",
+            "hostname": "localhost",
+            "port": 2222,
+        }
+    credential = {
+        "username": "vagrant",
+        "password": "vagrant",
+        "password2": "vagrant",
+        "use_password": True,
+    }
+    credential2 = {
+        "username": "vagrant",
+        "use_password": False,
+    }
     def setUp(self):
-        user = User.objects.create_user(self.user["username"], email=self.user["email"], password=self.user["password"])
+        user = User.objects.create_user(self.user["username"],
+                                        email=self.user["email"],
+                                        password=self.user["password"])
         user.save()
+        profile = user.get_profile()
+        with open(os.path.join(settings.MEDIA_ROOT, "tests", "id_rsa.pub"), 'r') as f:
+            profile.public_key = f.read()
+        with open(os.path.join(settings.MEDIA_ROOT, "tests", "id_rsa"), 'r') as f:
+            profile.private_key = f.read()
+        profile.save()
+
+        cluster = models.Cluster(
+                                name=self.cluster["name"],
+                                hostname=self.cluster["hostname"],
+                                port=self.cluster["port"])
+        cluster.save()
+        self.cluster = cluster
+        credential = models.Credential(
+                                        user=user,
+                                        cluster=cluster,
+                                        username=self.credential["username"],
+                                        password=self.credential["password"],
+                                        use_password=True)
+        credential.save()
+        self.credential = credential
+        credential2 = models.Credential(
+                                        user=user,
+                                        cluster=cluster,
+                                        username=self.credential2["username"],
+                                        password='',
+                                        use_password=False)
+        credential2.save()
+        self.credential2 = credential2
         self.client = Client()
 
     def test_add_cluster(self):
@@ -67,12 +114,85 @@ class SSHSettings(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn("Settings Successfully Saved", response.content)
 
-    def test_add_credential(self):
+    def test_add_credential_invalid(self):
         r = self.client.login(username=self.user["username"], password=self.user["password"])
         self.assertTrue(r)
+
+        data = {
+            "username": "vagrant",
+            "password": "incorrect",
+            "password2": "incorrect",
+            "cluster": self.cluster.id,
+            "use_password": True,
+        }
+        response = self.client.post(reverse(account_page, args=(self.user["username"], "credentials")), data)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Those credentials did not work.", response.content)
+
+    def test_add_credential_password(self):
+        r = self.client.login(username=self.user["username"], password=self.user["password"])
+        self.assertTrue(r)
+
         response = self.client.get(reverse(account_page, args=(self.user["username"], "credentials")))
         self.assertEqual(response.status_code, 200)
-        # lacks a test to actually add a credential because it would require an external server
+
+        data = {
+            "username": "vagrant",
+            "password": "vagrant",
+            "password2": "vagrant",
+            "cluster": self.cluster.id,
+            "use_password": True,
+        }
+        response = self.client.post(reverse(account_page, args=(self.user["username"], "credentials")), data)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Settings Successfully Saved", response.content)
+
+    def test_add_credential_invalid_password(self):
+        r = self.client.login(username=self.user["username"], password=self.user["password"])
+        self.assertTrue(r)
+
+        response = self.client.get(reverse(account_page, args=(self.user["username"], "credentials")))
+        self.assertEqual(response.status_code, 200)
+
+        data = {
+            "username": "vagrant",
+            "password": "incorrect",
+            "password2": "password",
+            "cluster": self.cluster.id,
+            "use_password": True,
+        }
+        response = self.client.post(reverse(account_page, args=(self.user["username"], "credentials")), data)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Your passwords do not match", response.content)
+
+    def test_add_credential_key(self):
+        r = self.client.login(username=self.user["username"], password=self.user["password"])
+        self.assertTrue(r)
+
+        response = self.client.get(reverse(account_page, args=(self.user["username"], "credentials")))
+        self.assertEqual(response.status_code, 200)
+
+        data = {
+            "username": "vagrant",
+            "cluster": self.cluster.id,
+            "use_password": False,
+        }
+        response = self.client.post(reverse(account_page, args=(self.user["username"], "credentials")), data)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Settings Successfully Saved", response.content)
+
+    def test_credential_ssh(self):
+        with self.credential.get_ssh_connection():
+            pass
+        with self.credential2.get_ssh_connection():
+            pass
+
+    def test_credential_sftp(self):
+        with self.credential.get_sftp_connection():
+            pass
+        with self.credential2.get_sftp_connection():
+            pass
+
 
 class UtilsTestCase(TestCase):
     def test_get_sftp_password(self):
