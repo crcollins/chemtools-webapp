@@ -608,6 +608,20 @@ class MLTestCase(TestCase):
         name = "A**_TON_A**_A**_n1_m1_x1_y1_z1"
         self.assertEqual(ml.get_feature_vector(name), expected)
 
+    def test_get_name_from_feature_vector(self):
+        names = ["A**_TON_A**_A**_n1_m1_x1_y1_z1", "A**_CON_A**_A**_n1_m1_x1_y1_z1"]
+        for name in names:
+            vector = ml.get_feature_vector(name)
+            actual = ml.get_name_from_feature_vector(vector)
+            self.assertEqual(actual, name)
+
+    def test_get_name_from_weighted_feature_vector(self):
+        names = ["A**_TON_A**_A**_n1_m1_x1_y1_z1", "A**_CON_A**_A**_n1_m1_x1_y1_z1"]
+        for name in names:
+            vector = ml.get_feature_vector(name)
+            actual = ml.get_name_from_weighted_feature_vector(vector)
+            self.assertEqual(actual, name)
+
     def test_get_feature_vector2(self):
         expected = [
             1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0,
