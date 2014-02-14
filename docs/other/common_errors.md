@@ -58,7 +58,7 @@ ___________________________________________________________
 
 ### Error ###
 
-he supercomputer sent an email with a status code that
+The supercomputer sent an email with a status code that
 
     which: no g09 in (/opt/gaussian/g09:/opt/gnu/bin:/opt/gnu/gcc/bin:/opt/mvapich2/intel/ib/bin:/opt/intel/composer_xe_2013.1.117/bin/intel64:/usr/lib64/qt-3.3/bin:/usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin:/usr/java/latest/bin:/opt/maui/bin:/opt/torque/bin:/opt/torque/sbin:/opt/torque/bin:/opt/torque/sbin:/state/partition1/catalina/bin:/opt/pdsh/bin:/opt/rocks/bin:/opt/rocks/sbin:/home/servers/gordon/bin:/home/dlwhee93/bin:/opt/maui/bin:/opt/torque/bin:/opt/torque/sbin:/opt/torque/bin:/opt/torque/sbin:/state/partition1/catalina/bin:/home/servers/gordon/bin:/home/dlwhee93/bin)
 
