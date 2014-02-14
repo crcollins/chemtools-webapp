@@ -214,7 +214,8 @@ class UtilsTestCase(TestCase):
 
     def test_get_sftp_error(self):
         with self.assertRaises(Exception):
-            get_sftp_connection("localhost", "username")
+            with get_sftp_connection("localhost", "username"):
+                pass
 
     def test_get_ssh_password(self):
         ssh = get_ssh_connection("localhost", "vagrant", password="vagrant", port=2222)
