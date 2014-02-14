@@ -639,6 +639,23 @@ class MLTestCase(TestCase):
         name = "A**_TON_A**_A**_n1_m1_x1_y1_z1"
         self.assertEqual(ml.get_feature_vector2(name), expected)
 
+    def test_get_feature_vector3(self):
+        expected = [
+            1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 1.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            1.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1.0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 1.0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 1.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 1.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 1.0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 1.0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 1.0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1
+            ]
+        name = "A**_TON_A**_A**_n1_m1_x1_y1_z1"
+        self.assertEqual(ml.get_feature_vector3(name), expected)
+
 
 class MoleculeTestCase(TestCase):
     def test_atom_print(self):
