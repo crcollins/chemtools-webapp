@@ -1,4 +1,4 @@
-### Troubleshooting Steps ###
+## Troubleshooting Steps ##
 
 1. Check the end of the log file (`tail $FILENAME.log`)
 2. Check the $FILENAME.err and $FILENAME.out files (`cat $FILENAME.{out,err}`)
@@ -13,10 +13,11 @@
 6. If there is a still a problem, triple check all the files involved ($FILENAME.log, $FILENAME.gjf, $FILENAME.err, $FILENAME.job, $FILENAME.out) and look for anything that seems odd.
 7. If all else fails, try restarting from the begining (rebuild the molecule, job, etc)
 
+___________________________________________________________
 
 
-### Errors ###
-#### Error ####
+## Errors ##
+### Error ###
 
     qsub: submit filter returned an error code, aborting job submission.
       Running job as user dlwhee93
@@ -34,9 +35,9 @@ This means that one of two things has happened.
 1. Request to get added to the allocation.
 2. Use another allocation that has not been used up.
 
+___________________________________________________________
 
-
-#### Error ####
+### Error ###
 
 When submitting a job the following error is returned.
 
@@ -52,9 +53,10 @@ This problem can be fixed by adding that option to the job file. This can either
 
     sed -i $JOBFILE -e s/nodes=1/nodes=1:ppn=16/'
 
+___________________________________________________________
 
 
-#### Error ####
+### Error ###
 
 he supercomputer sent an email with a status code that
 
@@ -68,9 +70,10 @@ Gaussian requires that you accept their terms of service before you will be able
 
 You will need to fill out the required forms for that supercomputer to get access. For example, [here](http://www.psc.edu/index.php/gaussian/598) is the link for the Blacklight form.
 
+___________________________________________________________
 
 
-#### Error ####
+### Error ###
 
     %chk=C:\Users\research\Documents\My SugarSync\gjfs\oct_010_2.chk
     ntrex1
@@ -83,9 +86,10 @@ The `%chk` specification in the gjf is not correct. The path that is specified t
 
 Change the `%chk` to be a proper path (remove the `C:\Users\...` part and leave the $FILENAME.chk part)
 
+___________________________________________________________
 
 
-#### Error ####
+### Error ###
 
     Post job file processing error; job 1590474.trestles-fe1.sdsc.edu on host trestles-9-10/15+trestles-9-10/14+trestles-9-10/13+trestles-9-10/12+trestles-9-10/11+trestles-9-10/10+trestles-9-10/9+trestles-9-10/8+trestles-9-10/7+trestles-9-10/6+trestles-9-10/5+trestles-9-10/4+trestles-9-10/3+trestles-9-10/2+trestles-9-10/1+trestles-9-10/0Unknown resource type  REJHOST=trestles-9-10.local MSG=invalid home directory '/home/ccollins' specified, errno=2 (No such file or directory)
 
@@ -99,9 +103,10 @@ This problem can also be caused by a bad job file.
 
 Wait and see if XSEDE sends out an email saying that the supercomputer has been fixed. Or if it is the other problem, then check and make sure all the paths/filenames are correct in the job file.
 
+___________________________________________________________
 
 
-#### Error ####
+### Error ###
 
     galloc:  could not allocate memory.
 
@@ -115,9 +120,10 @@ There are two possible fixes for this problem:
 1. Try rerunning the job (this might have to be done multiple times). It seems that sometimes the supercomputer is just unable to allocate memory. This problem can seem to pop up at random.
 2. Try lowering the `%mem` option in the gjf file to a lower number.
 
+___________________________________________________________
 
 
-#### Error ####
+### Error ###
 
 Empty log file
 
@@ -129,9 +135,10 @@ This means that the job had an error before the execution of Gaussian. To get an
 
 Fixes for these kind of problems will be completely dependent on what is seen in your email, the `$FILENAME.err` file, or the `$FILENAME.out` file.
 
+___________________________________________________________
 
 
-#### Error ####
+### Error ###
 
     Aborted by PBS Server
     Job exceeded its walltime limit. Job was aborted
@@ -163,9 +170,10 @@ This can also be confirmed by checking your email for for the walltime error mes
 
 Move the incomplete log files back to your computer from the supercomputer and load them in Gaussian. Then from there save them as new gjfs and resubmit those on the supercomputer.
 
+___________________________________________________________
 
 
-#### Error ####
+### Error ###
 
     Error termination via Lnk1e in /opt/gaussian/g09/l401.exe
 
@@ -179,9 +187,10 @@ Run the dos2unix utility to fix all the line endings.
 
     dos2unix $FILENAME
 
+___________________________________________________________
 
 
-#### Error ####
+### Error ###
 
     End of file in ZSymb.
     Error termination via Lnk1e in /home/diag/opt/gaussian/g09/l101.exe
@@ -194,9 +203,10 @@ Gaussian requires that all the gjf files end with a single blank line for whatev
 
 Add a newline to the end of the file.
 
+___________________________________________________________
 
 
-#### Error ####
+### Error ###
 
     Route card not found.
     Error termination via Lnk1e in /usr/local/Dist/g09/l1.exe at Thu Dec 19 17:38:29 2013.
@@ -209,6 +219,7 @@ Gaussian requires that all job files have the route card information line (the l
 
 Add the route card line with the proper parameters.
 
+___________________________________________________________
 
 
 ### Error ###
@@ -224,3 +235,4 @@ When running Gaussian, there are two kinds of ways the job can run for too long.
 
 Just like with a walltime error, move the incomplete log files back to your computer from the supercomputer and load them in Gaussian. Then from there save them as new gjfs and resubmit those on the supercomputer.
 
+___________________________________________________________
