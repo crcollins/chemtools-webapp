@@ -208,3 +208,19 @@ Gaussian requires that all job files have the route card information line (the l
 #### Fix ####
 
 Add the route card line with the proper parameters.
+
+
+
+### Error ###
+
+    Error termination request processed by link 9999.
+    Error termination via Lnk1e in /global/apps/gaussian/g03.e01/g03/l9999.exe
+
+### Problem ###
+
+When running Gaussian, there are two kinds of ways the job can run for too long. The first is a walltime, the second is when Gaussian reaches the max number of iterations. This is the latter case.
+
+### Fix ###
+
+Just like with a walltime error, move the incomplete log files back to your computer from the supercomputer and load them in Gaussian. Then from there save them as new gjfs and resubmit those on the supercomputer.
+
