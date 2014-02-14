@@ -1,3 +1,5 @@
+import math
+
 from numpy.linalg import norm
 
 from constants import *
@@ -66,7 +68,6 @@ def get_end_features2(left, center, right, power=1, H=1, lacunarity=1):
 
 
 def get_end_features3(left, center, right, power=1, H=1, lacunarity=1):
-
     lengths = []
     for name in ARYL:
         mol = Molecule(read_data(name))
@@ -169,7 +170,7 @@ def get_name_from_feature_vector(vector, limit=4):
                 break
         sides.append(name)
 
-    extra = "n%d_m%d_x%d_y%d_z%d" % tuple(vector)
+    extra = "n%d_m%d_x%d_y%d_z%d" % tuple(vector[:-1])
     return '_'.join([sides[0], core, sides[1], sides[2], extra])
 
 
