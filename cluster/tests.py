@@ -18,11 +18,36 @@ class SSHPageTestCase(TestCase):
         "email": "test@test.com",
         "password": "S0m3thing",
     }
+    cluster = {
+            "name": "test-machine",
+            "hostname": "localhost",
+            "port": 2222,
+        }
+    credential = {
+        "username": "vagrant",
+        "password": "vagrant",
+        "password2": "vagrant",
+        "use_password": True,
+    }
     def setUp(self):
         user = User.objects.create_user(self.user["username"],
                                         email=self.user["email"],
                                         password=self.user["password"])
         user.save()
+        cluster = models.Cluster(
+                                name=self.cluster["name"],
+                                hostname=self.cluster["hostname"],
+                                port=self.cluster["port"])
+        cluster.save()
+        self.cluster = cluster
+        credential = models.Credential(
+                                        user=user,
+                                        cluster=cluster,
+                                        username=self.credential["username"],
+                                        password=self.credential["password"],
+                                        use_password=True)
+        credential.save()
+        self.credential = credential
         self.client = Client()
 
     def test_job_index(self):
@@ -32,6 +57,16 @@ class SSHPageTestCase(TestCase):
         r = self.client.login(username=self.user["username"], password=self.user["password"])
         self.assertTrue(r)
         response = self.client.get(reverse(views.job_index))
+        self.assertEqual(response.status_code, 200)
+
+    def test_cluster_job_index(self):
+        url = reverse(views.cluster_job_index, args=(self.cluster.name, ))
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 302)
+
+        r = self.client.login(username=self.user["username"], password=self.user["password"])
+        self.assertTrue(r)
+        response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
     def test_get_job_list(self):
@@ -46,6 +81,7 @@ class SSHPageTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         data = simplejson.loads(response.content)
         self.assertTrue(data["is_authenticated"])
+
 
 
 class SSHSettingsTestCase(TestCase):
