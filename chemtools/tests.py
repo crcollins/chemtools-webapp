@@ -1,6 +1,9 @@
+import os
 from itertools import product, permutations
+import csv
 
 from django.test import TestCase
+from django.conf import settings
 
 import gjfwriter
 import utils
@@ -9,6 +12,8 @@ import extractor
 import mol_name
 import ml
 import molecule
+import fileparser
+from project.utils import StringIO
 
 
 class GJFWriterTestCase(TestCase):
@@ -661,3 +666,25 @@ class MoleculeTestCase(TestCase):
     def test_atom_print(self):
         atom = molecule.Atom(0, 0, 0, "C")
         self.assertEqual(str(atom), "C 0.000000 0.000000 0.000000")
+
+
+class FileParserTestCase(TestCase):
+    def test_parse_files(self):
+        base = os.path.join(settings.MEDIA_ROOT, "tests")
+        files = ["A_TON_A_A.log", "A_TON_A_A_TD.log", "A_CON_A_A_TDDFT.log"]
+        paths = [os.path.join(base, x) for x in files]
+        logset = fileparser.LogSet()
+        logset.parse_files(paths)
+
+        with StringIO(logset.format_output(errors=False)) as f:
+            reader = csv.reader(f, delimiter=',', quotechar='"')
+            expected = [
+                ["A_TON_A_A","A_TON_A_A_n1_m1_x1_y1_z1","opt B3LYP/6-31g(d) geom=connectivity",
+                    "-6.46079886952","-1.31975211714","41","0.0006","-567.1965205","---","0.35"],
+                ["A_TON_A_A","A_TON_A_A_n1_m1_x1_y1_z1","td B3LYP/6-31g(d)","-6.46079886952",
+                    "-1.31975211714","41","0.0001","-567.1965205","4.8068","0.15"],
+                ["A_CON_A_A","A_CON_A_A_n1_m1_x1_y1_z1","td B3LYP/6-31g(d)","-6.59495099194",
+                    "-1.19594032058","41","2.1565","-567.1958243","4.7914","0.15"],
+                ]
+            lines = [x[1:3] + x[4:] for i, x in enumerate(reader) if i]
+            self.assertEqual(expected, lines)
