@@ -701,3 +701,17 @@ class FileParserTestCase(TestCase):
                 ]
             lines = [x[1:3] + x[4:] for x in reader]
             self.assertEqual(expected, lines)
+
+    def test_parse_nonbenzo(self):
+        path = os.path.join(settings.MEDIA_ROOT, "tests", "1_04_0.log")
+        log = fileparser.Log(path)
+
+        with StringIO(log.format_data()) as f:
+            reader = csv.reader(f, delimiter=',', quotechar='"')
+            expected = ['1_04_0', '---', '[]',
+                    'opt b3lyp/6-31g(d) geom=connectivity', '-4.28307181933',
+                    '-1.27539756145', '257', '0.0666', '-4507.6791248', '---',
+                    '1.43333333333']
+            for line in reader:
+                pass
+            self.assertEqual(expected, line[1:])
