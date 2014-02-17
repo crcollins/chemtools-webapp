@@ -688,3 +688,16 @@ class FileParserTestCase(TestCase):
                 ]
             lines = [x[1:3] + x[4:] for i, x in enumerate(reader) if i]
             self.assertEqual(expected, lines)
+
+    def test_parse_log_open(self):
+        path = os.path.join(settings.MEDIA_ROOT, "tests", "A_TON_A_A.log")
+        log = fileparser.Log(path)
+
+        with StringIO(log.format_data()) as f:
+            reader = csv.reader(f, delimiter=',', quotechar='"')
+            expected = [
+                ["A_TON_A_A","A_TON_A_A_n1_m1_x1_y1_z1","opt B3LYP/6-31g(d) geom=connectivity",
+                    "-6.46079886952","-1.31975211714","41","0.0006","-567.1965205","---","0.35"],
+                ]
+            lines = [x[1:3] + x[4:] for x in reader]
+            self.assertEqual(expected, lines)
