@@ -27,8 +27,8 @@ def run_job(credential, gjfstring, jobstring=None, **kwargs):
 
 
 def run_jobs(credential, names, gjfstrings, jobstring=None, **kwargs):
-    ssh = get_ssh_connection(credential)
-    sftp = get_sftp_connection(credential)
+    ssh = get_ssh_connection_obj(credential)
+    sftp = get_sftp_connection_obj(credential)
 
     results = {
         "worked": [],
