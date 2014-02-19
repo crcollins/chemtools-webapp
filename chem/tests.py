@@ -1,3 +1,4 @@
+import os
 import zipfile
 import itertools
 import urllib
@@ -6,11 +7,14 @@ from django.test import Client, TestCase
 from django.core.urlresolvers import reverse
 from django.utils import simplejson
 from django.contrib.auth.models import User
+from django.conf import settings
 
 from project.utils import StringIO
 from data.models import DataPoint
+from cluster.models import Cluster, Credential
 from chemtools.constants import KEYWORDS
 import views
+
 from models import ErrorReport
 
 
@@ -346,3 +350,129 @@ class MainPageTestCase(TestCase):
 
                 obj = ErrorReport.objects.get(molecule=name)
                 obj.delete()
+
+
+class PostsTestCase(TestCase):
+    names = ["24a_TON", "24b_TSP_24a_24a", "CON_24a", "A_TON_A_A"]
+    cluster = {
+            "name": "test-machine",
+            "hostname": "localhost",
+            "port": 2222,
+        }
+    credential = {
+        "username": "vagrant",
+        "password": "vagrant",
+        "password2": "vagrant",
+        "use_password": True,
+    }
+
+    def setUp(self):
+        self.client = Client()
+        self.user = {
+            "username": "user1",
+            "email": "user1@test.com",
+            "password": "mypass",
+        }
+        new_user = User.objects.create_user(self.user["username"], self.user["email"], self.user["password"])
+        new_user.save()
+        new_data = DataPoint(name="A_TON_A_A", exact_name="A_TON_A_A_n1_m1_x1_y1_z1",
+                            options="td B3LYP/6-31g(d) geom=connectivity", homo=-6.460873931,
+                            lumo=-1.31976745, homo_orbital=41, dipole=0.0006,
+                            energy=-567.1965205, band_gap=4.8068)
+        new_data.save()
+        cluster = Cluster(
+                        name=self.cluster["name"],
+                        hostname=self.cluster["hostname"],
+                        port=self.cluster["port"])
+        cluster.save()
+        self.cluster = cluster
+        credential = Credential(
+                                user=new_user,
+                                cluster=cluster,
+                                username=self.credential["username"],
+                                password=self.credential["password"],
+                                use_password=True)
+        credential.save()
+        self.credential = credential
+
+    def test_post_single_perm_fail(self):
+        options = {
+            "email": "test@test.com",
+            "nodes": 1,
+            "walltime": 48,
+            "allocation": "TG-CHE120081",
+            "cluster": 'g',
+            "template": "{{ name }} {{ email }} {{ nodes }} {{ time }} {{ allocation }}",
+            "credential": 1,
+        }
+        r = self.client.login(username=self.user["username"], password=self.user["password"])
+        self.assertTrue(r)
+        for name in self.names:
+            options["name"] = name
+            response = self.client.get(reverse(views.molecule_detail, args=(name, )))
+            self.assertEqual(response.status_code, 200)
+            url = reverse(views.molecule_detail, args=(name, )) + '?' + urllib.urlencode(options)
+            response = self.client.post(url)
+            expected = {
+                        "cluster": "test-machine",
+                        "error": "You must be a staff user to submit a job.",
+                        "jobid": None
+                        }
+            self.assertEqual(simplejson.loads(response.content), expected)
+
+    def test_post_multi_perm_fail(self):
+        options = {
+            "email": "test@test.com",
+            "nodes": 1,
+            "walltime": 48,
+            "allocation": "TG-CHE120081",
+            "cluster": 'g',
+            "template": "{{ name }} {{ email }} {{ nodes }} {{ time }} {{ allocation }}",
+            "credential": 1,
+        }
+        r = self.client.login(username=self.user["username"], password=self.user["password"])
+        self.assertTrue(r)
+        name = ','.join(self.names)
+        options["name"] = name
+        response = self.client.get(reverse(views.multi_molecule, args=(name, )))
+        self.assertEqual(response.status_code, 200)
+        url = reverse(views.multi_molecule, args=(name, )) + '?' + urllib.urlencode(options)
+        response = self.client.post(url)
+        expected = {
+                    "cluster": "test-machine",
+                    "error": "You must be a staff user to submit a job.",
+                    "failed": [],
+                    "worked": []
+                    }
+        self.assertEqual(simplejson.loads(response.content), expected)
+
+    def test_post_multi_job_perm_fail(self):
+        files = []
+        base = os.path.join(settings.MEDIA_ROOT, "tests")
+        for filename in ["A_TON_A_A", "A_TON_A_A_TD"]:
+            path = os.path.join(base, filename + ".gjf")
+            files.append(open(path, 'r'))
+        options = {
+            "email": "test@test.com",
+            "nodes": 1,
+            "walltime": 48,
+            "allocation": "TG-CHE120081",
+            "cluster": 'g',
+            "template": "{{ name }} {{ email }} {{ nodes }} {{ time }} {{ allocation }}",
+            "credential": 1,
+            "myfiles": files,
+            "name": "{{ name }}",
+        }
+        r = self.client.login(username=self.user["username"], password=self.user["password"])
+        self.assertTrue(r)
+        response = self.client.get(reverse(views.multi_job))
+        self.assertEqual(response.status_code, 200)
+        url = reverse(views.multi_job) + '?' + urllib.urlencode(options)
+        response = self.client.post(url)
+        expected = {
+                    "cluster": "test-machine",
+                    "error": "You must be a staff user to submit a job.",
+                    "failed": [],
+                    "worked": []
+                    }
+        self.assertEqual(simplejson.loads(response.content), expected)
