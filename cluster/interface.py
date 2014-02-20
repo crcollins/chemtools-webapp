@@ -159,6 +159,9 @@ def get_all_jobs(user, cluster=None):
 
 
 def recover_output(user, name):
+    ssh = get_ssh_connection_obj(credential)
+    sftp = get_sftp_connection_obj(credential)
+
     with ssh, sftp:
         _, stdout, stderr = ssh.exec_command("ls done/%s.*" % name)
         files = [x.replace("\n", "").lstrip("done/") for x in stdout.readlines()]
@@ -182,6 +185,9 @@ def reset_output(user, name):
     and it will leave the old backup file. Otherwise, it will return to the
     original state.
     '''
+    ssh = get_ssh_connection_obj(credential)
+    sftp = get_sftp_connection_obj(credential)
+
     with ssh, sftp:
         fpath = ''.join([os.path.join("test", name), '.log'])
         jobpath = ''.join([os.path.join("test", name), '.gjob'])
