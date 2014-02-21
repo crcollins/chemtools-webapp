@@ -69,3 +69,15 @@ This assumes you have already made it through the setup.
     $ sudo supervisorctl update
     $ sudo supervisorctl start chemtools
     Go to http://yourdomain.com/ with your browser
+
+
+Vagrant Deploy
+--------------
+
+This assumes that you already have vagrant and virtualbox installed.
+
+    $ cd chemtools-webapp/vagrant
+    $ vagrant up
+    Go to http://localhost:4567/
+
+
