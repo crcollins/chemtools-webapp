@@ -4,3 +4,4 @@ scratch
 project/secret_key.py
 chemtools/mol2/*
 .coverage*
+vagrant/.vagrant/*
