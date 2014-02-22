@@ -184,3 +184,10 @@ with open(os.path.join(DATAPATH, "feat1lumo.pkl"), "rb") as f:
     LUMO_CLF = cPickle.load(f)
 with open(os.path.join(DATAPATH, "feat1gap.pkl"), "rb") as f:
     GAP_CLF = cPickle.load(f)
+
+with open(os.path.join(DATAPATH, "decaypredhomo.pkl"), "rb") as f:
+    PRED_HOMO_CLF = cPickle.load(f)
+with open(os.path.join(DATAPATH, "decaypredlumo.pkl"), "rb") as f:
+    PRED_LUMO_CLF = cPickle.load(f)
+with open(os.path.join(DATAPATH, "decaypredgap.pkl"), "rb") as f:
+    PRED_GAP_CLF = cPickle.load(f)

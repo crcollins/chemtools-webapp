@@ -283,3 +283,16 @@ def get_properties_from_feature_vector2(feature):
     lumo = LUMO_CLF.predict(feature)
     gap = GAP_CLF.predict(feature)
     return homo[0], lumo[0], gap[0]
+
+
+def get_properties_from_decay_with_predictions(feature):
+    homo, lumo, gap = get_properties_from_feature_vector2(feature)
+
+    feature_gap = numpy.concatenate([feature, [homo, lumo]])
+    feature_homo = numpy.concatenate([feature, [lumo, gap]])
+    feature_lumo = numpy.concatenate([feature, [gap, homo]])
+
+    gap = PRED_GAP_CLF.predict(feature_gap)
+    homo = PRED_HOMO_CLF.predict(feature_homo)
+    lumo = PRED_LUMO_CLF.predict(feature_lumo)
+    return homo[0], lumo[0], gap[0]

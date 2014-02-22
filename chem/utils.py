@@ -4,7 +4,7 @@ from models import ErrorReport
 
 from chemtools import gjfwriter
 from chemtools.constants import KEYWORDS
-from chemtools.ml import get_properties_from_feature_vector2, get_feature_vector, get_feature_vector2
+from chemtools.ml import get_properties_from_decay_with_predictions, get_feature_vector, get_feature_vector2
 from chemtools.mol_name import name_expansion, get_exact_name
 from data.models import DataPoint
 
@@ -43,7 +43,7 @@ def get_molecule_info(request, molecule):
         exactspacer = get_exact_name(molecule, spacers=True)
         exactname = exactspacer.replace('*', '')
         features = [get_feature_vector(exactspacer), get_feature_vector2(exactspacer)]
-        homo, lumo, gap = get_properties_from_feature_vector2(features[1])
+        homo, lumo, gap = get_properties_from_decay_with_predictions(features[1])
         temp = DataPoint.objects.filter(exact_name=exactname, band_gap__isnull=False).values()
         if temp:
             datapoint = temp[0]
