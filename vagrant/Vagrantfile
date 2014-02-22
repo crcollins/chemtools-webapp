@@ -9,7 +9,7 @@ id_rsa_ssh_key_pub = File.read(File.join(path, "id_rsa.pub"))
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.box = "precise32"
 
-  config.vm.provision :shell, :inline => "echo 'Copying public Key to VM auth_keys...' && echo '#{id_rsa_ssh_key_pub }' > /home/vagrant/.ssh/authorized_keys && chmod 600 /home/vagrant/.ssh/authorized_keys"
+  config.vm.provision :shell, :inline => "echo 'Copying public Key to VM auth_keys...' && mkdir -p /home/vagrant/.ssh && echo '#{id_rsa_ssh_key_pub }' >> /home/vagrant/.ssh/authorized_keys && chmod 600 /home/vagrant/.ssh/authorized_keys"
 
   config.vm.provision :shell, :path => "aptget.sh", :privileged => false
   config.vm.provision :shell, :path => "virtualenv.sh", :privileged => false
