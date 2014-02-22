@@ -10,7 +10,7 @@ from django.core.urlresolvers import reverse
 from django.utils import simplejson
 
 from models import ErrorReport, ErrorReportForm, JobForm
-from utils import get_molecule_warnings, get_molecule_info
+from utils import get_multi_molecule_warnings, get_molecule_info
 
 from chemtools import gjfwriter
 from chemtools.utils import write_job
@@ -76,7 +76,7 @@ def molecule_check(request, string):
         "error": None,
     }
     try:
-        molecules, warnings, errors = get_molecule_warnings(string)
+        molecules, warnings, errors = get_multi_molecule_warnings(string)
         a["molecules"] = zip(molecules, warnings, errors)
     except ValueError:
         a["error"] = "The operation timed out."
@@ -145,7 +145,7 @@ def multi_molecule_zip(request, string):
     keywords = request.GET.get("keywords")
 
     try:
-        molecules, warnings, errors = get_molecule_warnings(string)
+        molecules, warnings, errors = get_multi_molecule_warnings(string)
     except ValueError:
         c = Context({
             "error": "The operation timed out."

@@ -9,29 +9,37 @@ from chemtools.mol_name import name_expansion, get_exact_name
 from data.models import DataPoint
 
 
-def get_molecule_warnings(string):
+def get_molecule_warnings(name):
+    try:
+        gjfwriter.parse_name(name)
+        error = None
+    except Exception as e:
+        error = str(e)
+    warn = ErrorReport.objects.filter(molecule=name)
+    warning = True if warn else None
+    return warning, error
+
+
+def get_multi_molecule_warnings(string):
     errors = []
     warnings = []
     molecules = name_expansion(string)
+
     start = time.time()
-    for mol in molecules:
+    for name in molecules:
         if time.time() - start > 1:
             raise ValueError("The operation has timed out.")
-        try:
-            gjfwriter.parse_name(mol)
-            errors.append(None)
-        except Exception as e:
-            errors.append(str(e))
-        warn = ErrorReport.objects.filter(molecule=mol)
-        warnings.append(True if warn else None)
+        warning, error = get_molecule_warnings(name)
+        warnings.append(warning)
+        errors.append(error)
     return molecules, warnings, errors
 
 
 def get_molecule_info(request, molecule):
-    _, warnings, errors = get_molecule_warnings(molecule)
+    warning, error = get_molecule_warnings(molecule)
     keywords = request.REQUEST.get("keywords", KEYWORDS)
 
-    if not errors[0]:
+    if not error:
         exactspacer = get_exact_name(molecule, spacers=True)
         exactname = exactspacer.replace('*', '')
         features = [get_feature_vector(exactspacer), get_feature_vector2(exactspacer)]
@@ -57,8 +65,8 @@ def get_molecule_info(request, molecule):
         "homo": homo,
         "lumo": lumo,
         "band_gap": gap,
-        "known_errors": warnings[0],
-        "error_message": errors[0],
+        "known_errors": warning,
+        "error_message": error,
         "keywords": keywords,
         }
     return a
