@@ -566,7 +566,7 @@ class MLTestCase(TestCase):
             print errors
             raise errors[0][2]
 
-    def test_get_feature_vector(self):
+    def test_get_naive_feature_vector(self):
         expected = [
              1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0,
              0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -611,23 +611,23 @@ class MLTestCase(TestCase):
              0, 1, 1, 1, 1, 1, 1
          ]
         name = "A**_TON_A**_A**_n1_m1_x1_y1_z1"
-        self.assertEqual(ml.get_feature_vector(name), expected)
+        self.assertEqual(ml.get_naive_feature_vector(name), expected)
 
-    def test_get_name_from_feature_vector(self):
+    def test_get_name_from_naive_feature_vector(self):
         names = ["A**_TON_A**_A**_n1_m1_x1_y1_z1", "A**_CON_A**_A**_n1_m1_x1_y1_z1"]
         for name in names:
-            vector = ml.get_feature_vector(name)
-            actual = ml.get_name_from_feature_vector(vector)
+            vector = ml.get_naive_feature_vector(name)
+            actual = ml.get_name_from_naive_feature_vector(vector)
             self.assertEqual(actual, name)
 
-    def test_get_name_from_weighted_feature_vector(self):
+    def test_get_name_from_weighted_naive_feature_vector(self):
         names = ["A**_TON_A**_A**_n1_m1_x1_y1_z1", "A**_CON_A**_A**_n1_m1_x1_y1_z1"]
         for name in names:
-            vector = ml.get_feature_vector(name)
-            actual = ml.get_name_from_weighted_feature_vector(vector)
+            vector = ml.get_naive_feature_vector(name)
+            actual = ml.get_name_from_weighted_naive_feature_vector(vector)
             self.assertEqual(actual, name)
 
-    def test_get_feature_vector2(self):
+    def test_get_decay_feature_vector(self):
         expected = [
             1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 1.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -642,9 +642,9 @@ class MLTestCase(TestCase):
             0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1
         ]
         name = "A**_TON_A**_A**_n1_m1_x1_y1_z1"
-        self.assertEqual(ml.get_feature_vector2(name), expected)
+        self.assertEqual(ml.get_decay_feature_vector(name), expected)
 
-    def test_get_feature_vector3(self):
+    def test_get_decay_distance_correction_feature_vector(self):
         expected = [
             1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 1.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -659,7 +659,7 @@ class MLTestCase(TestCase):
             0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1
             ]
         name = "A**_TON_A**_A**_n1_m1_x1_y1_z1"
-        self.assertEqual(ml.get_feature_vector3(name), expected)
+        self.assertEqual(ml.get_decay_distance_correction_feature_vector(name), expected)
 
 
 class MoleculeTestCase(TestCase):

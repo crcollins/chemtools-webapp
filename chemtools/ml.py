@@ -107,7 +107,7 @@ def get_end_features3(left, center, right, power=1, H=1, lacunarity=1):
     return endfeatures
 
 
-def get_feature_vector(exactname, limit=4):
+def get_naive_feature_vector(exactname, limit=4):
     left, core, center, right, n, m, x, y, z = exactname.split('_')
     endfeatures = get_end_features(left, center, right, limit=limit)
     corefeatures = get_core_features(core)
@@ -115,7 +115,7 @@ def get_feature_vector(exactname, limit=4):
     return corefeatures + endfeatures + extrafeatures + [1]
 
 
-def get_feature_vector2(exactname, power=1, H=1, lacunarity=1):
+def get_decay_feature_vector(exactname, power=1, H=1, lacunarity=1):
     left, core, center, right, n, m, x, y, z = exactname.split('_')
     endfeatures = get_end_features2(left, center, right, power=power, H=H, lacunarity=lacunarity)
     corefeatures = get_core_features(core)
@@ -123,7 +123,7 @@ def get_feature_vector2(exactname, power=1, H=1, lacunarity=1):
     return corefeatures + endfeatures + extrafeatures + [1]
 
 
-def get_feature_vector3(exactname, power=1, H=1, lacunarity=1):
+def get_decay_distance_correction_feature_vector(exactname, power=1, H=1, lacunarity=1):
     left, core, center, right, n, m, x, y, z = exactname.split('_')
     endfeatures = get_end_features3(left, center, right, power=power, H=H, lacunarity=lacunarity)
     corefeatures = get_core_features(core)
@@ -135,7 +135,7 @@ def decay_function(distance, power=1, H=1, lacunarity=1):
     return (lacunarity * (distance ** -H)) ** power
 
 
-def get_name_from_feature_vector(vector, limit=4):
+def get_name_from_naive_feature_vector(vector, limit=4):
     core = ''
     if vector[0]:
         core += 'T'
@@ -186,7 +186,7 @@ def consume(vector, options):
     return options[idx]
 
 
-def get_name_from_weighted_feature_vector(vector, limit=4):
+def get_name_from_weighted_naive_feature_vector(vector, limit=4):
     core = ''
     if vector[0] > 0:
         core += 'T'
@@ -251,7 +251,7 @@ def get_name_from_weighted_feature_vector(vector, limit=4):
     return '_'.join([sides[0], core, sides[1], sides[2], extra])
 
 
-def get_vector_for_specific_gap_value(gap):
+def get_naive_vector_for_gap_value(gap):
     # a := relation between (lumo - homo) and gap (~.9)
     # gap = a * (lumo - homo)
     # 1/a * gap = lumo - homo
@@ -271,14 +271,14 @@ def get_vector_for_specific_gap_value(gap):
     return (WL * value).T.tolist()[0]
 
 
-def get_properties_from_feature_vector(feature):
+def get_properties_from_decay_vector_linear(feature):
     homo = feature * WH
     lumo = feature * WL
     gap = feature * WG
     return homo[0,0], lumo[0,0], gap[0,0]
 
 
-def get_properties_from_feature_vector2(feature):
+def get_properties_from_decay_vector_svm(feature):
     homo = HOMO_CLF.predict(feature)
     lumo = LUMO_CLF.predict(feature)
     gap = GAP_CLF.predict(feature)
@@ -286,7 +286,7 @@ def get_properties_from_feature_vector2(feature):
 
 
 def get_properties_from_decay_with_predictions(feature):
-    homo, lumo, gap = get_properties_from_feature_vector2(feature)
+    homo, lumo, gap = get_properties_from_decay_vector_svm(feature)
 
     feature_gap = numpy.concatenate([feature, [homo, lumo]])
     feature_homo = numpy.concatenate([feature, [lumo, gap]])
