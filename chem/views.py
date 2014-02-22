@@ -1,7 +1,6 @@
 from cStringIO import StringIO
 import os
 import urllib
-import time
 
 from django.shortcuts import render, redirect
 from django.template import Context
@@ -11,15 +10,13 @@ from django.core.urlresolvers import reverse
 from django.utils import simplejson
 
 from models import ErrorReport, ErrorReportForm, JobForm
+from utils import get_molecule_warnings, get_molecule_info
 
 from chemtools import gjfwriter
 from chemtools.utils import write_job
-from chemtools.ml import get_properties_from_feature_vector, get_properties_from_feature_vector2, get_feature_vector, get_feature_vector2
-from chemtools.mol_name import name_expansion, get_exact_name
 from chemtools.constants import KEYWORDS
 from chemtools.interface import get_multi_molecule, get_multi_job
 import cluster.interface
-from data.models import DataPoint
 
 
 def index(request):
@@ -44,61 +41,6 @@ def index(request):
 # Generation Stuff
 ###########################################################
 ###########################################################
-
-def _get_molecule_warnings(string):
-    errors = []
-    warnings = []
-    molecules = name_expansion(string)
-    start = time.time()
-    for mol in molecules:
-        if time.time() - start > 1:
-            raise ValueError("The operation has timed out.")
-        try:
-            gjfwriter.parse_name(mol)
-            errors.append(None)
-        except Exception as e:
-            errors.append(str(e))
-        warn = ErrorReport.objects.filter(molecule=mol)
-        warnings.append(True if warn else None)
-    return molecules, warnings, errors
-
-
-def _get_molecule_info(request, molecule):
-    _, warnings, errors = _get_molecule_warnings(molecule)
-    keywords = request.REQUEST.get("keywords", KEYWORDS)
-
-    if not errors[0]:
-        exactspacer = get_exact_name(molecule, spacers=True)
-        exactname = exactspacer.replace('*', '')
-        features = [get_feature_vector(exactspacer), get_feature_vector2(exactspacer)]
-        homo, lumo, gap = get_properties_from_feature_vector2(features[1])
-        temp = DataPoint.objects.filter(exact_name=exactname, band_gap__isnull=False).values()
-        if temp:
-            datapoint = temp[0]
-        else:
-            datapoint = None
-    else:
-        exactname = ''
-        exactspacer = ''
-        features = ['', '']
-        homo, lumo, gap = None, None, None
-        datapoint = None
-
-    a = {
-        "molecule": molecule,
-        "exact_name": exactname,
-        "exact_name_spacers": exactspacer,
-        "features": features,
-        "datapoint": datapoint,
-        "homo": homo,
-        "lumo": lumo,
-        "band_gap": gap,
-        "known_errors": warnings[0],
-        "error_message": errors[0],
-        "keywords": keywords,
-        }
-    return a
-
 
 def multi_job(request):
     form = JobForm.get_form(request, "{{ name }}")
@@ -132,10 +74,9 @@ def multi_job(request):
 def molecule_check(request, string):
     a = {
         "error": None,
-        "molecules": [[x] for x in name_expansion(string)]
     }
     try:
-        molecules, warnings, errors = _get_molecule_warnings(string)
+        molecules, warnings, errors = get_molecule_warnings(string)
         a["molecules"] = zip(molecules, warnings, errors)
     except ValueError:
         a["error"] = "The operation timed out."
@@ -159,14 +100,14 @@ def molecule_detail(request, molecule):
             cred = d.pop("credential")
             a = cluster.interface.run_standard_job(cred, molecule, **d)
             return HttpResponse(simplejson.dumps(a), mimetype="application/json")
-    a = _get_molecule_info(request, molecule)
+    a = get_molecule_info(request, molecule)
     a["form"] = form
     c = Context(a)
     return render(request, "chem/molecule_detail.html", c)
 
 
 def molecule_detail_json(request, molecule):
-    a = _get_molecule_info(request, molecule)
+    a = get_molecule_info(request, molecule)
     return HttpResponse(simplejson.dumps(a), mimetype="application/json")
 
 
@@ -204,7 +145,7 @@ def multi_molecule_zip(request, string):
     keywords = request.GET.get("keywords")
 
     try:
-        molecules, warnings, errors = _get_molecule_warnings(string)
+        molecules, warnings, errors = get_molecule_warnings(string)
     except ValueError:
         c = Context({
             "error": "The operation timed out."
