@@ -78,6 +78,7 @@ This assumes that you already have vagrant and virtualbox installed.
 
     $ cd chemtools-webapp/vagrant
     $ vagrant up
+    # Warning: This includes the test key from project/media/tests by default. This key MUST be removed before opening this server up to the internet.
     Go to http://localhost:4567/
 
 
