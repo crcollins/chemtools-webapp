@@ -49,6 +49,10 @@ class Credential(models.Model):
         if self.use_password:
             return get_ssh_connection(self.cluster.hostname, self.username, password=self.password, port=self.cluster.port)
         else:
+            try:
+                del self.user._profile_cache
+            except:
+                pass
             profile = self.user.get_profile()
             private = StringIO(profile.private_key)
             return get_ssh_connection(self.cluster.hostname, self.username, key=private, port=self.cluster.port)
@@ -57,6 +61,10 @@ class Credential(models.Model):
         if self.use_password:
             return get_sftp_connection(self.cluster.hostname, self.username, password=self.password, port=self.cluster.port)
         else:
+            try:
+                del self.user._profile_cache
+            except:
+                pass
             profile = self.user.get_profile()
             private = StringIO(profile.private_key)
             return get_sftp_connection(self.cluster.hostname, self.username, key=private, port=self.cluster.port)
