@@ -98,15 +98,6 @@ class RegistrationTestCase(TestCase):
 
 
 class SettingsTestCase(TestCase):
-    cluster = {
-            "name": "test-machine",
-            "hostname": "localhost",
-            "port": 2222,
-        }
-    credential = {
-        "username": "vagrant",
-        "use_password": False,
-    }
     users = [{
         "username": "vagrant",
         "email": "user1@test.com",
@@ -124,35 +115,6 @@ class SettingsTestCase(TestCase):
         for user in self.users:
             new_user = User.objects.create_user(user["username"], user["email"], user["new_password1"])
             new_user.save()
-
-        user = User.objects.all()[0]
-        profile = user.get_profile()
-        with open(os.path.join(settings.MEDIA_ROOT, "tests", "id_rsa.pub"), 'r') as f:
-            profile.public_key = f.read()
-        with open(os.path.join(settings.MEDIA_ROOT, "tests", "id_rsa"), 'r') as f:
-            profile.private_key = f.read()
-        profile.save()
-
-        cluster = Cluster(
-                        name=self.cluster["name"],
-                        hostname=self.cluster["hostname"],
-                        port=self.cluster["port"])
-        cluster.save()
-        self.cluster = cluster
-        credential = Credential(
-                                user=user,
-                                cluster=cluster,
-                                username=self.credential["username"],
-                                password='',
-                                use_password=False)
-        credential.save()
-        self.credential = credential
-        with self.credential.get_ssh_connection() as ssh:
-            ssh.exec_command("cp ~/.ssh/authorized_keys ~/.ssh/authorized_keys.chemtools.bak")
-
-    def tearDown(self):
-        with self.credential.get_ssh_connection() as ssh:
-            ssh.exec_command("cp ~/.ssh/authorized_keys.chemtools.bak ~/.ssh/authorized_keys")
 
     def test_get_public_key(self):
         for user in self.users:
@@ -220,6 +182,102 @@ class SettingsTestCase(TestCase):
             profile = User.objects.get(username=user["username"]).get_profile()
             self.assertEqual(profile.xsede_username, user["username"])
 
+    def test_change_password(self):
+        for user in self.users:
+            r = self.client.login(username=user["username"], password=user["new_password1"])
+            self.assertTrue(r)
+
+            response = self.client.get(reverse(views.account_page, args=(user["username"], "password")))
+            self.assertEqual(response.status_code, 200)
+            data = {
+                "old_password": user["new_password1"],
+                "new_password1": user["new_password1"] + 'a',
+                "new_password2": user["new_password2"] + 'a',
+                }
+            response = self.client.post(reverse(views.account_page, args=(user["username"], "password")), data)
+            self.assertEqual(response.status_code, 200)
+            self.assertIn("Settings Successfully Saved", response.content)
+            self.client.logout()
+
+            r = self.client.login(username=user["username"], password=user["new_password1"] + 'a')
+            self.assertTrue(r)
+            User.objects.get(username=user["username"]).set_password(user["new_password1"])
+
+    def test_change_password_fail(self):
+        for user in self.users:
+            r = self.client.login(username=user["username"], password=user["new_password1"])
+            self.assertTrue(r)
+
+            response = self.client.get(reverse(views.account_page, args=(user["username"], "password")))
+            self.assertEqual(response.status_code, 200)
+            data = {
+                "old_password": user["new_password1"],
+                "new_password1": user["new_password1"] + 'a',
+                "new_password2": user["new_password2"],
+                }
+            self.assertNotIn("The two password fields", response.content)
+            response = self.client.post(reverse(views.account_page, args=(user["username"], "password")), data)
+            self.assertEqual(response.status_code, 200)
+            self.assertIn("The two password fields", response.content)
+
+
+class SSHKeyTestCase(TestCase):
+    cluster = {
+            "name": "test-machine",
+            "hostname": "localhost",
+            "port": 2222,
+        }
+    credential = {
+        "username": "vagrant",
+        "use_password": False,
+    }
+    users = [{
+        "username": "vagrant",
+        "email": "user1@test.com",
+        "new_password1": "mypass",
+        "new_password2": "mypass",
+    }, {
+        "username": "user2",
+        "email": "user2@test.com",
+        "new_password1": "mypass",
+        "new_password2": "mypass",
+    }]
+
+    def setUp(self):
+        self.client = Client()
+        for user in self.users:
+            new_user = User.objects.create_user(user["username"], user["email"], user["new_password1"])
+            new_user.save()
+
+        user = User.objects.all()[0]
+        profile = user.get_profile()
+        with open(os.path.join(settings.MEDIA_ROOT, "tests", "id_rsa.pub"), 'r') as f:
+            profile.public_key = f.read()
+        with open(os.path.join(settings.MEDIA_ROOT, "tests", "id_rsa"), 'r') as f:
+            profile.private_key = f.read()
+        profile.save()
+
+        cluster = Cluster(
+                        name=self.cluster["name"],
+                        hostname=self.cluster["hostname"],
+                        port=self.cluster["port"])
+        cluster.save()
+        self.cluster = cluster
+        credential = Credential(
+                                user=user,
+                                cluster=cluster,
+                                username=self.credential["username"],
+                                password='',
+                                use_password=False)
+        credential.save()
+        self.credential = credential
+        with self.credential.get_ssh_connection() as ssh:
+            ssh.exec_command("cp ~/.ssh/authorized_keys ~/.ssh/authorized_keys.chemtools.bak")
+
+    def tearDown(self):
+        with self.credential.get_ssh_connection() as ssh:
+            ssh.exec_command("cp ~/.ssh/authorized_keys.chemtools.bak ~/.ssh/authorized_keys")
+
     def test_change_ssh_key(self):
         user = self.users[1]
         profile = User.objects.get(username=user["username"]).get_profile()
@@ -253,45 +311,6 @@ class SettingsTestCase(TestCase):
         profile = User.objects.get(username=user["username"]).get_profile()
         self.assertNotEqual(profile.public_key, initial)
         self.credential.get_ssh_connection()
-
-    def test_change_password(self):
-        for user in self.users:
-            r = self.client.login(username=user["username"], password=user["new_password1"])
-            self.assertTrue(r)
-
-            response = self.client.get(reverse(views.account_page, args=(user["username"], "password")))
-            self.assertEqual(response.status_code, 200)
-            data = {
-                "old_password": user["new_password1"],
-                "new_password1": user["new_password1"] + 'a',
-                "new_password2": user["new_password2"] + 'a',
-                }
-            response = self.client.post(reverse(views.account_page, args=(user["username"], "password")), data)
-            self.assertEqual(response.status_code, 200)
-            self.assertIn("Settings Successfully Saved", response.content)
-            self.client.logout()
-
-            r = self.client.login(username=user["username"], password=user["new_password1"] + 'a')
-            self.assertTrue(r)
-            User.objects.get(username=user["username"]).set_password(user["new_password1"])
-
-
-    def test_change_password_fail(self):
-        for user in self.users:
-            r = self.client.login(username=user["username"], password=user["new_password1"])
-            self.assertTrue(r)
-
-            response = self.client.get(reverse(views.account_page, args=(user["username"], "password")))
-            self.assertEqual(response.status_code, 200)
-            data = {
-                "old_password": user["new_password1"],
-                "new_password1": user["new_password1"] + 'a',
-                "new_password2": user["new_password2"],
-                }
-            self.assertNotIn("The two password fields", response.content)
-            response = self.client.post(reverse(views.account_page, args=(user["username"], "password")), data)
-            self.assertEqual(response.status_code, 200)
-            self.assertIn("The two password fields", response.content)
 
 
 class LoginTestCase(TestCase):
