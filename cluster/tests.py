@@ -223,6 +223,52 @@ class SSHSettingsTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn("Settings Successfully Saved", response.content)
 
+    def test_delete_credential(self):
+        r = self.client.login(username=self.user["username"], password=self.user["password"])
+        self.assertTrue(r)
+
+        response = self.client.get(reverse(account_page, args=(self.user["username"], "credentials")))
+        self.assertEqual(response.status_code, 200)
+
+        data = {
+            "delete": "on",
+            "vagrant@localhost:2222-1": "on",
+        }
+        response = self.client.post(reverse(account_page, args=(self.user["username"], "credentials")), data)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Settings Successfully Saved", response.content)
+
+    def test_delete_credential_invalid(self):
+        r = self.client.login(username=self.user["username"], password=self.user["password"])
+        self.assertTrue(r)
+
+        response = self.client.get(reverse(account_page, args=(self.user["username"], "credentials")))
+        self.assertEqual(response.status_code, 200)
+
+        data = {
+            "delete": "on",
+            "sd@meh:22-1": "on",
+        }
+        response = self.client.post(reverse(account_page, args=(self.user["username"], "credentials")), data)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Settings Successfully Saved", response.content)
+
+    def test_delete_multi_credential(self):
+        r = self.client.login(username=self.user["username"], password=self.user["password"])
+        self.assertTrue(r)
+
+        response = self.client.get(reverse(account_page, args=(self.user["username"], "credentials")))
+        self.assertEqual(response.status_code, 200)
+
+        data = {
+            "delete": "on",
+            "vagrant@localhost:2222-1": "on",
+            "vagrant@localhost:2222-2": "on",
+        }
+        response = self.client.post(reverse(account_page, args=(self.user["username"], "credentials")), data)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Settings Successfully Saved", response.content)
+
     def test_credential_ssh(self):
         with self.credential.get_ssh_connection():
             pass
