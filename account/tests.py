@@ -1,12 +1,16 @@
+import os
 import binascii
 
 from django.test import Client, TestCase
+from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from Crypto.PublicKey import RSA
 
 import views
 import utils
+
+from cluster.models import Cluster, Credential
 
 
 def _register(client, data):
@@ -94,22 +98,61 @@ class RegistrationTestCase(TestCase):
 
 
 class SettingsTestCase(TestCase):
+    cluster = {
+            "name": "test-machine",
+            "hostname": "localhost",
+            "port": 2222,
+        }
+    credential = {
+        "username": "vagrant",
+        "use_password": False,
+    }
+    users = [{
+        "username": "vagrant",
+        "email": "user1@test.com",
+        "new_password1": "mypass",
+        "new_password2": "mypass",
+    }, {
+        "username": "user2",
+        "email": "user2@test.com",
+        "new_password1": "mypass",
+        "new_password2": "mypass",
+    }]
+
     def setUp(self):
         self.client = Client()
-        self.users = [{
-            "username": "user1",
-            "email": "user1@test.com",
-            "new_password1": "mypass",
-            "new_password2": "mypass",
-        }, {
-            "username": "user2",
-            "email": "user2@test.com",
-            "new_password1": "mypass",
-            "new_password2": "mypass",
-        }]
         for user in self.users:
             new_user = User.objects.create_user(user["username"], user["email"], user["new_password1"])
             new_user.save()
+
+        user = User.objects.all()[0]
+        profile = user.get_profile()
+        with open(os.path.join(settings.MEDIA_ROOT, "tests", "id_rsa.pub"), 'r') as f:
+            profile.public_key = f.read()
+        with open(os.path.join(settings.MEDIA_ROOT, "tests", "id_rsa"), 'r') as f:
+            profile.private_key = f.read()
+        profile.save()
+
+        cluster = Cluster(
+                        name=self.cluster["name"],
+                        hostname=self.cluster["hostname"],
+                        port=self.cluster["port"])
+        cluster.save()
+        self.cluster = cluster
+        credential = Credential(
+                                user=user,
+                                cluster=cluster,
+                                username=self.credential["username"],
+                                password='',
+                                use_password=False)
+        credential.save()
+        self.credential = credential
+        with self.credential.get_ssh_connection() as ssh:
+            ssh.exec_command("cp ~/.ssh/authorized_keys ~/.ssh/authorized_keys.chemtools.bak")
+
+    def tearDown(self):
+        with self.credential.get_ssh_connection() as ssh:
+            ssh.exec_command("cp ~/.ssh/authorized_keys.chemtools.bak ~/.ssh/authorized_keys")
 
     def test_get_public_key(self):
         for user in self.users:
@@ -193,6 +236,23 @@ class SettingsTestCase(TestCase):
 
             profile = User.objects.get(username=user["username"]).get_profile()
             self.assertNotEqual(profile.public_key, initial)
+
+    def test_update_ssh_keys(self):
+        user = self.users[0]
+        profile = User.objects.get(username=user["username"]).get_profile()
+        r = self.client.login(username=user["username"], password=user["new_password1"])
+        self.assertTrue(r)
+
+        response = self.client.get(reverse(views.account_page, args=(user["username"], "settings")))
+        self.assertEqual(response.status_code, 200)
+
+        initial = profile.public_key
+        data = {"new_ssh_keypair": "on", "email": user["email"]}
+        response = self.client.post(reverse(views.account_page, args=(user["username"], "settings")), data)
+        self.assertIn("Settings Successfully Saved", response.content)
+        profile = User.objects.get(username=user["username"]).get_profile()
+        self.assertNotEqual(profile.public_key, initial)
+        self.credential.get_ssh_connection()
 
     def test_change_password(self):
         for user in self.users:
