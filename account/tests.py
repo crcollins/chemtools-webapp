@@ -221,21 +221,21 @@ class SettingsTestCase(TestCase):
             self.assertEqual(profile.xsede_username, user["username"])
 
     def test_change_ssh_key(self):
-        for user in self.users:
-            profile = User.objects.get(username=user["username"]).get_profile()
-            r = self.client.login(username=user["username"], password=user["new_password1"])
-            self.assertTrue(r)
+        user = self.users[1]
+        profile = User.objects.get(username=user["username"]).get_profile()
+        r = self.client.login(username=user["username"], password=user["new_password1"])
+        self.assertTrue(r)
 
-            response = self.client.get(reverse(views.account_page, args=(user["username"], "settings")))
-            self.assertEqual(response.status_code, 200)
+        response = self.client.get(reverse(views.account_page, args=(user["username"], "settings")))
+        self.assertEqual(response.status_code, 200)
 
-            initial = profile.public_key
-            data = {"new_ssh_keypair": "on", "email": user["email"]}
-            response = self.client.post(reverse(views.account_page, args=(user["username"], "settings")), data)
-            self.assertIn("Settings Successfully Saved", response.content)
+        initial = profile.public_key
+        data = {"new_ssh_keypair": "on", "email": user["email"]}
+        response = self.client.post(reverse(views.account_page, args=(user["username"], "settings")), data)
+        self.assertIn("Settings Successfully Saved", response.content)
 
-            profile = User.objects.get(username=user["username"]).get_profile()
-            self.assertNotEqual(profile.public_key, initial)
+        profile = User.objects.get(username=user["username"]).get_profile()
+        self.assertNotEqual(profile.public_key, initial)
 
     def test_update_ssh_keys(self):
         user = self.users[0]
@@ -274,6 +274,7 @@ class SettingsTestCase(TestCase):
             r = self.client.login(username=user["username"], password=user["new_password1"] + 'a')
             self.assertTrue(r)
             User.objects.get(username=user["username"]).set_password(user["new_password1"])
+
 
     def test_change_password_fail(self):
         for user in self.users:
