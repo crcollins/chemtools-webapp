@@ -56,22 +56,6 @@ def job_detail(request, cluster, jobid):
 
 
 @login_required
-def reset_job(request, jobid):
-    """Used to restart jobs that have hit the time limit."""
-    if not request.user.is_staff:
-        return HttpResponse("You must be a staff user to reset a job.")
-
-    if request.method == "POST":
-        e = None
-        name = Job.objects.filter(jobid=jobid).name
-        njobid, e = interface.reset_output(request.user, name)
-        if e is None:
-            return HttpResponse("It worked. Your new job id is: %d" % njobid)
-        else:
-            return HttpResponse(e)
-
-
-@login_required
 def kill_job(request, cluster):
     if not request.user.is_staff:
         return HttpResponse("You must be a staff user to kill a job.")

@@ -128,38 +128,3 @@ def _get_jobs(cred, i, results):
     except Exception as e:
         print e
         results[i] = {"name": cred.cluster.name, "columns": wantedcols, "jobs": []}
-
-
-def wait_for_compression(ssh, zippath):
-    done = False
-    while not done:
-        _, stdout, _ = ssh.exec_command("ls -lah %s" % zippath)
-        # check that the size is not 0
-        if stdout.readlines()[0].split()[4] != "0":
-            done = True
-        else:
-            time.sleep(.01)
-
-
-def get_compressed_file(ssh, sftp, path):
-    dirname, fname = os.path.split(path)
-    fbakpath = path + ".bak"
-
-    ext = int(time.time())
-    zipname = "temp%s.bz2" % ext
-    zippath = os.path.join(dirname, zipname)
-
-    s = "bzip2 -c < {0} > {1}; cp {0} {2}".format(path, zippath, fbakpath)
-    _, _, err = ssh.exec_command(s)
-    err = err.readlines()
-
-    if err:
-        s = "rm {0}; mv {1} {2}".format(zippath, fbakpath, path)
-        ssh.exec_command(s)
-        return None, err, None
-
-    wait_for_compression(ssh, zippath)
-
-    decompresser = bz2.BZ2Decompressor()
-    ftemp = sftp.open(zippath, "rb").read()
-    return StringIO(decompresser.decompress(ftemp)), None, zippath

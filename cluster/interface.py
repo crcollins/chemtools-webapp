@@ -7,7 +7,7 @@ from chemtools import fileparser
 from chemtools.mol_name import name_expansion
 
 from models import Job
-from utils import get_ssh_connection_obj, get_sftp_connection_obj, _run_job, _get_jobs, get_compressed_file
+from utils import get_ssh_connection_obj, get_sftp_connection_obj, _run_job, _get_jobs
 
 
 def run_job(credential, gjfstring, jobstring=None, **kwargs):
@@ -156,64 +156,3 @@ def get_all_jobs(user, cluster=None):
     for t in threads:
         t.join(20)
     return [x for x in results if x]
-
-
-def recover_output(user, name):
-    ssh = get_ssh_connection_obj(credential)
-    sftp = get_sftp_connection_obj(credential)
-
-    with ssh, sftp:
-        _, stdout, stderr = ssh.exec_command("ls done/%s.*" % name)
-        files = [x.replace("\n", "").lstrip("done/") for x in stdout.readlines()]
-
-        err = stderr.readlines()
-        if err:
-            return err
-
-        for fname in files:
-            if fname.endswith(".log"):  # only download log files for now
-                path = os.path.join("done/", fname)
-                f, err, zippath = get_compressed_file(ssh, sftp, path)
-                with open(fname, "w") as f2, f:
-                    for line in f:
-                        f2.write(line)
-                ssh.exec_command("rm %s %s" % (zippath, path + ".bak"))
-
-
-def reset_output(user, name):
-    '''If successful this is successful, it will start the file that was reset,
-    and it will leave the old backup file. Otherwise, it will return to the
-    original state.
-    '''
-    ssh = get_ssh_connection_obj(credential)
-    sftp = get_sftp_connection_obj(credential)
-
-    with ssh, sftp:
-        fpath = ''.join([os.path.join("test", name), '.log'])
-        jobpath = ''.join([os.path.join("test", name), '.gjob'])
-        fbakpath = fpath + ".bak"
-
-        f, err, zippath = get_compressed_file(ssh, sftp, fpath)
-        if f:
-            with f:
-                parser = fileparser.LogReset(f, fpath)
-                ssh.exec_command("rm %s" % zippath)
-        else:
-            return None, err
-
-        f2 = sftp.open(fpath, "w")
-        f2.write(parser.format_output(errors=False))
-        f2.close()
-
-        _, stdout, stderr = ssh.exec_command("qsub %s" % jobpath)
-        err = stderr.readlines()
-        if err:
-            ssh.exec_command("mv {0} {1}".format(fbakpath, fpath))
-            return None, err
-
-        e = None
-        try:
-            jobid = stdout.readlines()[0].split('.')[0]
-        except Exception as e:
-            jobid = None
-    return jobid, e
