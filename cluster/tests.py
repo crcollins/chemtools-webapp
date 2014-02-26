@@ -82,6 +82,16 @@ class SSHPageTestCase(TestCase):
     #     data = simplejson.loads(response.content)
     #     self.assertTrue(data["is_authenticated"])
 
+    def test_kill_job_perm_fail(self):
+        url = reverse(views.kill_job, args=("test-machine", ))
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 302)
+
+        r = self.client.login(username=self.user["username"], password=self.user["password"])
+        self.assertTrue(r)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, "You must be a staff user to kill a job.")
 
 
 class SSHSettingsTestCase(TestCase):
