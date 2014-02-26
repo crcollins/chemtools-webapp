@@ -28,7 +28,8 @@ def index(request):
 
         params = {"keywords": request.GET.get("keywords", None)}
         if params["keywords"] != KEYWORDS:
-            url = "%s?%s" % (reverse(func, args=(request.GET.get("molecule"), )),
+            url = "%s?%s" % (reverse(func,
+                                    args=(request.GET.get("molecule"), )),
                 urllib.urlencode(params))
             return HttpResponseRedirect(url)
         else:
@@ -93,13 +94,15 @@ def molecule_detail(request, molecule):
         d = dict(form.cleaned_data)
         if request.method == "GET":
             response = HttpResponse(write_job(**d), content_type="text/plain")
-            response['Content-Disposition'] = add + 'filename=%s.job' % molecule
+            filename = '%s.job' % molecule
+            response['Content-Disposition'] = add + 'filename=' + filename
             return response
         elif request.method == "POST":
             d["keywords"] = keywords
             cred = d.pop("credential")
             a = cluster.interface.run_standard_job(cred, molecule, **d)
-            return HttpResponse(simplejson.dumps(a), mimetype="application/json")
+            return HttpResponse(simplejson.dumps(a),
+                                mimetype="application/json")
     a = get_molecule_info(request, molecule)
     a["form"] = form
     c = Context(a)
@@ -121,21 +124,24 @@ def multi_molecule(request, string):
             molecule = request.REQUEST.get("molname", "")
             d = form.get_single_data(molecule)
             response = HttpResponse(write_job(**d), content_type="text/plain")
-            response['Content-Disposition'] = add + 'filename=%s.job' % molecule
+            filename = '%s.job' % molecule
+            response['Content-Disposition'] = add + 'filename=' + filename
             return response
 
         elif request.method == "POST":
             d["keywords"] = request.REQUEST.get("keywords", None)
             cred = d.pop("credential")
             a = cluster.interface.run_standard_jobs(cred, string, **d)
-            return HttpResponse(simplejson.dumps(a), mimetype="application/json")
+            return HttpResponse(simplejson.dumps(a),
+                                mimetype="application/json")
 
     keywords = request.REQUEST.get("keywords", "")
+    encoded_keywords = '?' + urllib.urlencode({"keywords": keywords})
     c = Context({
         "pagename": string,
         "form": form,
         "gjf": "checked",
-        "encoded_keywords": '?' + urllib.urlencode({"keywords": keywords}) if keywords else '',
+        "encoded_keywords": encoded_keywords if keywords else '',
         "keywords": keywords,
         })
     return render(request, "chem/multi_molecule.html", c)
@@ -158,6 +164,7 @@ def multi_molecule_zip(request, string):
             keywords = request.GET.get("keywords")
             f = lambda x: 'checked' if request.GET.get(x) else ''
 
+            encoded_keywords = '?' + urllib.urlencode({"keywords": keywords})
             c = Context({
                 "molecules": zip(molecules, errors, warnings),
                 "pagename": string,
@@ -166,13 +173,14 @@ def multi_molecule_zip(request, string):
                 "mol2": f("mol2"),
                 "image": f("image"),
                 "job": f("job"),
-                "keywords": '?' + urllib.urlencode({"keywords": keywords}) if keywords else '',
+                "encoded_keywords": encoded_keywords if keywords else '',
                 })
             return render(request, "chem/multi_molecule.html", c)
     else:
         form = None
 
-    options = [x for x in ("image", "mol2", "job", "gjf") if request.GET.get(x)]
+    selection = ("image", "mol2", "job", "gjf")
+    options = [x for x in selection if request.GET.get(x)]
     ret_zip = get_multi_molecule(molecules, keywords, options, form)
 
     response = HttpResponse(ret_zip, mimetype="application/zip")

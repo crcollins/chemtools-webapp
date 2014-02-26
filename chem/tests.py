@@ -20,6 +20,17 @@ from models import ErrorReport
 
 class MainPageTestCase(TestCase):
     names = ["24a_TON", "24b_TSP_24a_24a", "CON_24a", "A_TON_A_A"]
+    options = {
+        "job": True,
+        "name": "{{ name }}",
+        "email": "test@test.com",
+        "nodes": 1,
+        "walltime": 48,
+        "allocation": "TG-CHE120081",
+        "cluster": 'g',
+        "template":
+            "{{ name }} {{ email }} {{ nodes }} {{ time }} {{ allocation }}",
+    }
 
     def setUp(self):
         self.client = Client()
@@ -28,12 +39,19 @@ class MainPageTestCase(TestCase):
             "email": "user1@test.com",
             "password": "mypass",
         }
-        new_user = User.objects.create_user(self.user["username"], self.user["email"], self.user["password"])
+        new_user = User.objects.create_user(self.user["username"],
+                                            self.user["email"],
+                                            self.user["password"])
         new_user.save()
-        new_data = DataPoint(name="A_TON_A_A", exact_name="A_TON_A_A_n1_m1_x1_y1_z1",
-                            options="td B3LYP/6-31g(d) geom=connectivity", homo=-6.460873931,
-                            lumo=-1.31976745, homo_orbital=41, dipole=0.0006,
-                            energy=-567.1965205, band_gap=4.8068)
+        new_data = DataPoint(name="A_TON_A_A",
+                            exact_name="A_TON_A_A_n1_m1_x1_y1_z1",
+                            options="td B3LYP/6-31g(d) geom=connectivity",
+                            homo=-6.460873931,
+                            lumo=-1.31976745,
+                            homo_orbital=41,
+                            dipole=0.0006,
+                            energy=-567.1965205,
+                            band_gap=4.8068)
         new_data.save()
 
     def test_index(self):
@@ -50,44 +68,42 @@ class MainPageTestCase(TestCase):
 
     def test_molecule_detail(self):
         for name in self.names:
-            response = self.client.get(reverse(views.molecule_detail, args=(name, )))
+            response = self.client.get(reverse(views.molecule_detail,
+                                                args=(name, )))
             self.assertEqual(response.status_code, 200)
 
     def test_molecule_detail_invalid(self):
         for name in ["bad_name", "2nota_BEN"]:
-            response = self.client.get(reverse(views.molecule_detail, args=(name, )))
+            response = self.client.get(reverse(views.molecule_detail,
+                                                args=(name, )))
             self.assertEqual(response.status_code, 200)
 
     def test_molecule_detail_json(self):
         for name in self.names:
-            response = self.client.get(reverse(views.molecule_detail_json, args=(name, )))
+            response = self.client.get(reverse(views.molecule_detail_json,
+                                                args=(name, )))
             self.assertEqual(response.status_code, 200)
 
     def test_multi_molecule(self):
         names = ','.join(self.names)
-        response = self.client.get(reverse(views.multi_molecule, args=(names, )))
+        response = self.client.get(reverse(views.multi_molecule,
+                                            args=(names, )))
         self.assertEqual(response.status_code, 200)
-        options = {
-            "job": True,
-            "name": "{{ name }}",
-            "email": "test@test.com",
-            "nodes": 1,
-            "walltime": 48,
-            "allocation": "TG-CHE120081",
-            "cluster": 'g',
-            "template": "{{ name }} {{ email }} {{ nodes }} {{ time }} {{ allocation }}",
-            "molname": "24a_TON",
-        }
-        url = reverse(views.multi_molecule, args=(names, )) + "?" + urllib.urlencode(options)
-        response = self.client.get(url)
+
+        options = self.options.copy()
+        options["molname"] = "24a_TON"
+        url = reverse(views.multi_molecule, args=(names, ))
+        encoded_options = "?" + urllib.urlencode(options)
+        response = self.client.get(url + encoded_options)
         self.assertEqual(response.status_code, 200)
-        string = "{molname} {email} {nodes} {walltime}:00:00 {allocation}".format(**options)
-        self.assertEqual(response.content, string)
+        string = "{molname} {email} {nodes} {walltime}:00:00 {allocation}"
+        self.assertEqual(response.content, string.format(**options))
 
     def test_multi_molecule_zip(self):
         names = ",".join(self.names)
         gjfnames = set([name + ".gjf" for name in self.names])
-        response = self.client.get(reverse(views.multi_molecule_zip, args=(names, )))
+        response = self.client.get(reverse(views.multi_molecule_zip,
+                                            args=(names, )))
         self.assertEqual(response.status_code, 200)
         with StringIO(response.content) as f:
             with zipfile.ZipFile(f, "r") as zfile:
@@ -102,7 +118,8 @@ class MainPageTestCase(TestCase):
             "": set(),
         }
 
-        for group in itertools.product(["gjf", ""], ["image", ""], ["mol2", ""]):
+        pairs = zip(["gjf", "image", "mol2"], [''] * 3)
+        for group in itertools.product(*pairs):
             params = '?' + '&'.join([x + "=true" for x in group if x])
             if params == '?':  # remove the blank case
                 continue
@@ -118,58 +135,47 @@ class MainPageTestCase(TestCase):
                     self.assertEqual(set(zfile.namelist()), comparenames)
 
     def test_multi_molecule_zip_job(self):
-        options = {
-            "job": True,
-            "name": "{{ name }}",
-            "email": "test@test.com",
-            "nodes": 1,
-            "walltime": 48,
-            "allocation": "TG-CHE120081",
-            "cluster": 'g',
-            "template": "{{ name }} {{ email }} {{ nodes }} {{ time }} {{ allocation }}",
-        }
+        options = self.options.copy()
         names = ",".join(self.names)
         jobnames = set([name + ".job" for name in self.names])
-        url = reverse(views.multi_molecule_zip, args=(names, )) + "?" + urllib.urlencode(options)
-        response = self.client.get(url)
+        url = reverse(views.multi_molecule_zip, args=(names, ))
+        encoded_options = "?" + urllib.urlencode(options)
+        response = self.client.get(url + encoded_options)
+
+        string = "{name} {email} {nodes} {walltime}:00:00 {allocation}"
         self.assertEqual(response.status_code, 200)
         with StringIO(response.content) as f:
-            with zipfile.ZipFile(f, "r") as zfile:
-                self.assertEqual(set(zfile.namelist()), jobnames)
-                for name in [x for x in zfile.namelist() if not x.endswith("/")]:
-                    with zfile.open(name) as f2:
+            with zipfile.ZipFile(f, "r") as zf:
+                self.assertEqual(set(zf.namelist()), jobnames)
+                for name in [x for x in zf.namelist() if not x.endswith("/")]:
+                    with zf.open(name) as f2:
                         options["name"] = name.strip(".job")
-                        string = "{name} {email} {nodes} {walltime}:00:00 {allocation}".format(**options)
-                        self.assertEqual(f2.read(), string)
+                        self.assertEqual(f2.read(), string.format(**options))
 
     def test_multi_molecule_zip_job_bad(self):
-        options = {
-            "job": True,
-            "name": "{{ name }}",
-            "email": "test.com",
-            "nodes": 1,
-            "walltime": 48,
-            "allocation": "TG-CHE120081",
-            "cluster": 'g',
-            "template": "{{ name }} {{ email }} {{ nodes }} {{ time }} {{ allocation }}",
-        }
+        options = self.options.copy()
+        options["email"] = "test.com"
         names = ",".join(self.names)
         jobnames = set([name + ".job" for name in self.names])
-        url = reverse(views.multi_molecule_zip, args=(names, )) + "?" + urllib.urlencode(options)
-        response = self.client.get(url)
+        url = reverse(views.multi_molecule_zip, args=(names, ))
+        encoded_options = '?' + urllib.urlencode(options)
+        response = self.client.get(url + encoded_options)
         self.assertEqual(response.status_code, 200)
         self.assertIn("has-error", response.content)
 
     def test_write_gjf(self):
+        string = "%%nprocshared=16\n%%mem=59GB\n%%chk=%s.chk"
+        string += "\n# opt B3LYP/6-31g(d) geom=connectivity"
         for name in self.names:
             response = self.client.get(reverse(views.write_gjf, args=(name, )))
             self.assertEqual(response.status_code, 200)
             self.assertEqual(response.get('Content-Disposition'),
                 "attachment; filename=%s.gjf" % name)
-            string = "%%nprocshared=16\n%%mem=59GB\n%%chk=%s.chk\n# opt B3LYP/6-31g(d) geom=connectivity"
             self.assertTrue(response.content.startswith(string % name))
 
     def test_write_gjf_keywords(self):
+        string = "%%nprocshared=16\n%%mem=59GB\n"
+        string += "%%chk=%s.chk\n# %s geom=connectivity"
         for name in self.names:
             for keywords in ["opt HF/6-31g(d)", "td b3lyp/6-31g(d)"]:
                 params = "?keywords=%s" % keywords
@@ -178,12 +184,13 @@ class MainPageTestCase(TestCase):
                 self.assertEqual(response.status_code, 200)
                 self.assertEqual(response.get('Content-Disposition'),
                     "attachment; filename=%s.gjf" % name)
-                string = "%%nprocshared=16\n%%mem=59GB\n%%chk=%s.chk\n# %s geom=connectivity"
-                self.assertTrue(response.content.startswith(string % (name, keywords)))
+                temp_string = string % (name, keywords)
+                self.assertTrue(response.content.startswith(temp_string))
 
     def test_write_mol2(self):
         for name in self.names:
-            response = self.client.get(reverse(views.write_mol2, args=(name, )))
+            response = self.client.get(reverse(views.write_mol2,
+                                            args=(name, )))
             self.assertEqual(response.status_code, 200)
             self.assertEqual(response.get('Content-Disposition'),
                 "attachment; filename=%s.mol2" % name)
@@ -192,92 +199,90 @@ class MainPageTestCase(TestCase):
 
     def test_write_png(self):
         for name in self.names:
-            response = self.client.get(reverse(views.write_png, args=(name, )))
+            response = self.client.get(reverse(views.write_png,
+                                            args=(name, )))
             self.assertEqual(response.status_code, 200)
 
     def test_write_job(self):
-        options = {
-            "email": "test@test.com",
-            "nodes": 1,
-            "walltime": 48,
-            "allocation": "TG-CHE120081",
-            "cluster": 'g',
-            "template": "{{ name }} {{ email }} {{ nodes }} {{ time }} {{ allocation }}",
-        }
+        options = self.options.copy()
+        del options["job"]
+        del options["name"]
         for name in self.names:
             options["name"] = name
-            response = self.client.get(reverse(views.molecule_detail, args=(name, )))
+            response = self.client.get(reverse(views.molecule_detail,
+                                            args=(name, )))
             self.assertEqual(response.status_code, 200)
-            url = reverse(views.molecule_detail, args=(name, )) + '?' + urllib.urlencode(options)
-            response = self.client.get(url)
+            url = reverse(views.molecule_detail, args=(name, ))
+            encoded_options = '?' + urllib.urlencode(options)
+            response = self.client.get(url + encoded_options)
             self.assertEqual(response.status_code, 200)
-            string = "{name} {email} {nodes} {walltime}:00:00 {allocation}".format(**options)
-            self.assertEqual(response.content, string)
+            string = "{name} {email} {nodes} {walltime}:00:00 {allocation}"
+            self.assertEqual(response.content, string.format(**options))
 
     def test_write_job_after_login(self):
-        options = {
-            "nodes": 1,
-            "walltime": 48,
-            "allocation": "TG-CHE120081",
-            "cluster": 'g',
-            "template": "{{ name }} {{ email }} {{ nodes }} {{ time }} {{ allocation }}",
-        }
+        options = self.options.copy()
+        del options["email"]
+        del options["job"]
+        del options["name"]
+
         for name in self.names:
-            r = self.client.login(username=self.user["username"], password=self.user["password"])
+            r = self.client.login(username=self.user["username"],
+                                password=self.user["password"])
             self.assertTrue(r)
 
             options["name"] = name
             options["email"] = self.user["email"]
-            response = self.client.get(reverse(views.molecule_detail, args=(name, )))
+            response = self.client.get(reverse(views.molecule_detail,
+                                                args=(name, )))
             self.assertEqual(response.status_code, 200)
-            url = reverse(views.molecule_detail, args=(name, )) + '?' + urllib.urlencode(options)
-            response = self.client.get(url)
+            url = reverse(views.molecule_detail, args=(name, ))
+            encoded_options = "?" + urllib.urlencode(options)
+            response = self.client.get(url + encoded_options)
             self.assertEqual(response.status_code, 200)
-            string = "{name} {email} {nodes} {walltime}:00:00 {allocation}".format(**options)
-            self.assertEqual(response.content, string)
+            string = "{name} {email} {nodes} {walltime}:00:00 {allocation}"
+            self.assertEqual(response.content, string.format(**options))
 
     def test_multi_job(self):
         response = self.client.get(reverse(views.multi_job))
         self.assertEqual(response.status_code, 200)
-        options = {
-            "filenames": '\n'.join(self.names),
-            "name": "{{ name }}",
-            "email": "test@test.com",
-            "nodes": 1,
-            "walltime": 48,
-            "allocation": "TG-CHE120081",
-            "cluster": 'g',
-            "template": "{{ name }} {{ email }} {{ nodes }} {{ time }} {{ allocation }}",
-        }
+
+        options = self.options.copy()
+        options["filenames"] = '\n'.join(self.names)
+        del options["job"]
+
         url = reverse(views.multi_job) + '?' + urllib.urlencode(options)
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
+
+        string = "{name} {email} {nodes} {walltime}:00:00 {allocation}"
         with StringIO(response.content) as f:
-            with zipfile.ZipFile(f, "r") as zfile:
-                for name in [x for x in zfile.namelist() if not x.endswith("/")]:
-                    with zfile.open(name) as f2:
+            with zipfile.ZipFile(f, "r") as zf:
+                for name in [x for x in zf.namelist() if not x.endswith("/")]:
+                    with zf.open(name) as f2:
                         d = options.copy()
                         d["name"] = name.split('.')[0]
-                        string = "{name} {email} {nodes} {walltime}:00:00 {allocation}".format(**d)
-                        self.assertEqual(f2.read(), string)
+                        self.assertEqual(f2.read(), string.format(**d))
                 names = set([x + ".gjob" for x in self.names])
-                self.assertEqual(set(zfile.namelist()), names)
+                self.assertEqual(set(zf.namelist()), names)
 
     def test_molecule_check(self):
         for name in self.names:
-            response = self.client.get(reverse(views.molecule_check, args=(name, )))
+            response = self.client.get(reverse(views.molecule_check,
+                                            args=(name, )))
             self.assertEqual(response.status_code, 200)
 
     def test_molecule_check_timeout(self):
         string = "{$ARYL2}{$RGROUPS}{$RGROUPS}{$XGROUPS}_TON"
-        response = self.client.get(reverse(views.molecule_check, args=(string, )))
+        response = self.client.get(reverse(views.molecule_check,
+                                        args=(string, )))
         self.assertEqual(response.status_code, 200)
         value = simplejson.loads(response.content)["error"]
         self.assertEqual(value, "The operation timed out.")
 
     def test_multi_molecule_zip_timeout(self):
         string = "{$ARYL2}{$RGROUPS}{$RGROUPS}{$XGROUPS}_TON"
-        response = self.client.get(reverse(views.multi_molecule_zip, args=(string, )))
+        response = self.client.get(reverse(views.multi_molecule_zip,
+                                        args=(string, )))
         self.assertEqual(response.status_code, 200)
         self.assertIn("The operation timed out.", response.content)
 
@@ -288,7 +293,8 @@ class MainPageTestCase(TestCase):
             ("A_TOO", "(1, 'Bad Core Name')"),
         ]
         for name, error in names:
-            response = self.client.get(reverse(views.molecule_check, args=(name, )))
+            response = self.client.get(reverse(views.molecule_check,
+                                            args=(name, )))
             values = simplejson.loads(response.content)["molecules"]
             self.assertEqual(values[0][2], error)
 
@@ -305,17 +311,21 @@ class MainPageTestCase(TestCase):
         for name in names:
             for i in xrange(3):
                 data["urgency"] = i
-                response = self.client.get(reverse(views.molecule_check, args=(name, )))
+                response = self.client.get(reverse(views.molecule_check,
+                                                    args=(name, )))
                 values = simplejson.loads(response.content)["molecules"]
                 self.assertFalse(values[0][1])
 
-                response = self.client.get(reverse(views.report, args=(name, )))
+                response = self.client.get(reverse(views.report,
+                                                    args=(name, )))
                 self.assertEqual(response.status_code, 200)
 
-                response = self.client.post(reverse(views.report, args=(name, )), data)
+                response = self.client.post(reverse(views.report,
+                                                    args=(name, )), data)
                 self.assertEqual(response.status_code, 302)
 
-                response = self.client.get(reverse(views.molecule_check, args=(name, )))
+                response = self.client.get(reverse(views.molecule_check,
+                                                    args=(name, )))
                 values = simplejson.loads(response.content)["molecules"]
                 self.assertTrue(values[0][1])
 
@@ -331,20 +341,24 @@ class MainPageTestCase(TestCase):
         data = {
             "message": "something something something something"
         }
-        r = self.client.login(username=self.user["username"], password=self.user["password"])
+        r = self.client.login(username=self.user["username"],
+                            password=self.user["password"])
         self.assertTrue(r)
         for name in names:
             data["email"] = self.user["email"]
             for i in xrange(3):
                 data["urgency"] = i
-                response = self.client.get(reverse(views.molecule_check, args=(name, )))
+                response = self.client.get(reverse(views.molecule_check,
+                                                args=(name, )))
                 values = simplejson.loads(response.content)["molecules"]
                 self.assertFalse(values[0][1])
 
-                response = self.client.post(reverse(views.report, args=(name, )), data)
+                response = self.client.post(reverse(views.report,
+                                                args=(name, )), data)
                 self.assertEqual(response.status_code, 302)
 
-                response = self.client.get(reverse(views.molecule_check, args=(name, )))
+                response = self.client.get(reverse(views.molecule_check,
+                                                args=(name, )))
                 values = simplejson.loads(response.content)["molecules"]
                 self.assertTrue(values[0][1])
 
@@ -365,6 +379,16 @@ class PostsTestCase(TestCase):
         "password2": "vagrant",
         "use_password": True,
     }
+    options = {
+        "email": "test@test.com",
+        "nodes": 1,
+        "walltime": 48,
+        "allocation": "TG-CHE120081",
+        "cluster": 'g',
+        "template":
+            "{{ name }} {{ email }} {{ nodes }} {{ time }} {{ allocation }}",
+        "credential": 1,
+    }
 
     def setUp(self):
         self.client = Client()
@@ -373,12 +397,19 @@ class PostsTestCase(TestCase):
             "email": "user1@test.com",
             "password": "mypass",
         }
-        new_user = User.objects.create_user(self.user["username"], self.user["email"], self.user["password"])
+        new_user = User.objects.create_user(self.user["username"],
+                                            self.user["email"],
+                                            self.user["password"])
         new_user.save()
-        new_data = DataPoint(name="A_TON_A_A", exact_name="A_TON_A_A_n1_m1_x1_y1_z1",
-                            options="td B3LYP/6-31g(d) geom=connectivity", homo=-6.460873931,
-                            lumo=-1.31976745, homo_orbital=41, dipole=0.0006,
-                            energy=-567.1965205, band_gap=4.8068)
+        new_data = DataPoint(name="A_TON_A_A",
+                            exact_name="A_TON_A_A_n1_m1_x1_y1_z1",
+                            options="td B3LYP/6-31g(d) geom=connectivity",
+                            homo=-6.460873931,
+                            lumo=-1.31976745,
+                            homo_orbital=41,
+                            dipole=0.0006,
+                            energy=-567.1965205,
+                            band_gap=4.8068)
         new_data.save()
         cluster = Cluster(
                         name=self.cluster["name"],
@@ -396,23 +427,18 @@ class PostsTestCase(TestCase):
         self.credential = credential
 
     def test_post_single_perm_fail(self):
-        options = {
-            "email": "test@test.com",
-            "nodes": 1,
-            "walltime": 48,
-            "allocation": "TG-CHE120081",
-            "cluster": 'g',
-            "template": "{{ name }} {{ email }} {{ nodes }} {{ time }} {{ allocation }}",
-            "credential": 1,
-        }
-        r = self.client.login(username=self.user["username"], password=self.user["password"])
+        r = self.client.login(username=self.user["username"],
+                            password=self.user["password"])
         self.assertTrue(r)
+        options = self.options
         for name in self.names:
             options["name"] = name
-            response = self.client.get(reverse(views.molecule_detail, args=(name, )))
+            response = self.client.get(reverse(views.molecule_detail,
+                                                args=(name, )))
             self.assertEqual(response.status_code, 200)
-            url = reverse(views.molecule_detail, args=(name, )) + '?' + urllib.urlencode(options)
-            response = self.client.post(url)
+            url = reverse(views.molecule_detail, args=(name, ))
+            encoded_options = '?' + urllib.urlencode(options)
+            response = self.client.post(url + encoded_options)
             expected = {
                         "cluster": "test-machine",
                         "error": "You must be a staff user to submit a job.",
@@ -421,23 +447,19 @@ class PostsTestCase(TestCase):
             self.assertEqual(simplejson.loads(response.content), expected)
 
     def test_post_multi_perm_fail(self):
-        options = {
-            "email": "test@test.com",
-            "nodes": 1,
-            "walltime": 48,
-            "allocation": "TG-CHE120081",
-            "cluster": 'g',
-            "template": "{{ name }} {{ email }} {{ nodes }} {{ time }} {{ allocation }}",
-            "credential": 1,
-        }
-        r = self.client.login(username=self.user["username"], password=self.user["password"])
+        r = self.client.login(username=self.user["username"],
+                            password=self.user["password"])
         self.assertTrue(r)
+
         name = ','.join(self.names)
+        options = self.options
         options["name"] = name
-        response = self.client.get(reverse(views.multi_molecule, args=(name, )))
+        response = self.client.get(reverse(views.multi_molecule,
+                                        args=(name, )))
         self.assertEqual(response.status_code, 200)
-        url = reverse(views.multi_molecule, args=(name, )) + '?' + urllib.urlencode(options)
-        response = self.client.post(url)
+        url = reverse(views.multi_molecule, args=(name, ))
+        encoded_options = '?' + urllib.urlencode(options)
+        response = self.client.post(url + encoded_options)
         expected = {
                     "cluster": "test-machine",
                     "error": "You must be a staff user to submit a job.",
@@ -452,18 +474,12 @@ class PostsTestCase(TestCase):
         for filename in ["A_TON_A_A", "A_TON_A_A_TD"]:
             path = os.path.join(base, filename + ".gjf")
             files.append(open(path, 'r'))
-        options = {
-            "email": "test@test.com",
-            "nodes": 1,
-            "walltime": 48,
-            "allocation": "TG-CHE120081",
-            "cluster": 'g',
-            "template": "{{ name }} {{ email }} {{ nodes }} {{ time }} {{ allocation }}",
-            "credential": 1,
-            "myfiles": files,
-            "name": "{{ name }}",
-        }
-        r = self.client.login(username=self.user["username"], password=self.user["password"])
+
+        options = self.options.copy()
+        options["myfiles"] = files
+        options["name"] = "{{ name }}"
+        r = self.client.login(username=self.user["username"],
+                            password=self.user["password"])
         self.assertTrue(r)
         response = self.client.get(reverse(views.multi_job))
         self.assertEqual(response.status_code, 200)
