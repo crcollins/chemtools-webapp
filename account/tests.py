@@ -43,7 +43,9 @@ class RegistrationTestCase(TestCase):
             "new_password2": "mypass",
         }]
         for user in self.users:
-            new_user = User.objects.create_user(user["username"], user["email"], user["new_password1"])
+            new_user = User.objects.create_user(user["username"],
+                                                user["email"],
+                                                user["new_password1"])
             new_user.save()
 
     def test_register_page(self):
@@ -80,7 +82,9 @@ class RegistrationTestCase(TestCase):
 
     def test_register_after_login(self):
         for user in self.users:
-            r = self.client.login(username=user["username"], password=user["new_password1"])
+            r = self.client.login(
+                                username=user["username"],
+                                password=user["new_password1"])
             self.assertTrue(r)
             response = self.client.get(reverse(views.register_user))
             self.assertEqual(response.status_code, 302)
@@ -113,53 +117,74 @@ class SettingsTestCase(TestCase):
     def setUp(self):
         self.client = Client()
         for user in self.users:
-            new_user = User.objects.create_user(user["username"], user["email"], user["new_password1"])
+            new_user = User.objects.create_user(user["username"],
+                                                user["email"],
+                                                user["new_password1"])
             new_user.save()
 
     def test_get_public_key(self):
         for user in self.users:
-            response = self.client.get(reverse(views.get_public_key, args=(user["username"], )))
+            response = self.client.get(reverse(views.get_public_key,
+                                                args=(user["username"], )))
             self.assertEqual(response.status_code, 200)
             profile = User.objects.get(username=user["username"]).get_profile()
             self.assertEqual(response.content.strip(), profile.public_key)
 
     def test_get_public_key_invalid(self):
-        response = self.client.get(reverse(views.get_public_key, args=("notauser", )))
+        response = self.client.get(reverse(views.get_public_key,
+                                                args=("notauser", )))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content.strip(), '')
 
     def test_settings_redirect_page(self):
         for user in self.users:
-            r = self.client.login(username=user["username"], password=user["new_password1"])
+            r = self.client.login(
+                                username=user["username"],
+                                password=user["new_password1"])
             self.assertTrue(r)
-            response = self.client.get(reverse(views.user_settings, args=(user["username"], )))
+            response = self.client.get(reverse(views.user_settings,
+                                                args=(user["username"], )))
             self.assertEqual(response.status_code, 302)
 
     def test_change_settings_page(self):
         for user in self.users:
-            r = self.client.login(username=user["username"], password=user["new_password1"])
+            r = self.client.login(
+                                username=user["username"],
+                                password=user["new_password1"])
             self.assertTrue(r)
-            response = self.client.get(reverse(views.account_page, args=(user["username"], "settings")))
+            response = self.client.get(reverse(views.account_page,
+                                            args=(user["username"],
+                                                "settings")))
             self.assertEqual(response.status_code, 200)
 
     def test_change_settings_redirect(self):
         for i, user in enumerate(self.users):
-            r = self.client.login(username=user["username"], password=user["new_password1"])
+            r = self.client.login(
+                                username=user["username"],
+                                password=user["new_password1"])
             self.assertTrue(r)
             opposite = self.users[not i]["username"]
-            response = self.client.get(reverse(views.account_page, args=(opposite, "settings")))
+            response = self.client.get(reverse(views.account_page,
+                                                args=(opposite, "settings")))
             self.assertEqual(response.status_code, 302)
 
     def test_change_email(self):
         for user in self.users:
-            r = self.client.login(username=user["username"], password=user["new_password1"])
+            r = self.client.login(
+                                username=user["username"],
+                                password=user["new_password1"])
             self.assertTrue(r)
 
-            response = self.client.get(reverse(views.account_page, args=(user["username"], "settings")))
+            response = self.client.get(reverse(views.account_page,
+                                                args=(user["username"],
+                                                    "settings")))
             self.assertEqual(response.status_code, 200)
 
             data = {"email": 'a' + user["email"]}
-            response = self.client.post(reverse(views.account_page, args=(user["username"], "settings")), data)
+            response = self.client.post(reverse(views.account_page,
+                                                args=(user["username"],
+                                                    "settings")),
+                                        data)
             self.assertIn("Settings Successfully Saved", response.content)
 
             u = User.objects.get(username=user["username"])
@@ -169,14 +194,18 @@ class SettingsTestCase(TestCase):
 
     def test_change_xsede_username(self):
         for user in self.users:
-            r = self.client.login(username=user["username"], password=user["new_password1"])
+            r = self.client.login(username=user["username"],
+                                password=user["new_password1"])
             self.assertTrue(r)
 
-            response = self.client.get(reverse(views.account_page, args=(user["username"], "settings")))
+            response = self.client.get(reverse(views.account_page,
+                                                args=(user["username"],
+                                                    "settings")))
             self.assertEqual(response.status_code, 200)
 
             data = {"xsede_username": user["username"], "email": user["email"]}
-            response = self.client.post(reverse(views.account_page, args=(user["username"], "settings")), data)
+            response = self.client.post(reverse(views.account_page,
+                                args=(user["username"], "settings")), data)
             self.assertIn("Settings Successfully Saved", response.content)
 
             profile = User.objects.get(username=user["username"]).get_profile()
@@ -184,31 +213,42 @@ class SettingsTestCase(TestCase):
 
     def test_change_password(self):
         for user in self.users:
-            r = self.client.login(username=user["username"], password=user["new_password1"])
+            r = self.client.login(username=user["username"],
+                                password=user["new_password1"])
             self.assertTrue(r)
 
-            response = self.client.get(reverse(views.account_page, args=(user["username"], "password")))
+            response = self.client.get(reverse(views.account_page,
+                                                args=(user["username"],
+                                                    "password")))
             self.assertEqual(response.status_code, 200)
             data = {
                 "old_password": user["new_password1"],
                 "new_password1": user["new_password1"] + 'a',
                 "new_password2": user["new_password2"] + 'a',
                 }
-            response = self.client.post(reverse(views.account_page, args=(user["username"], "password")), data)
+            response = self.client.post(reverse(views.account_page,
+                                                args=(user["username"],
+                                                    "password")),
+                                        data)
             self.assertEqual(response.status_code, 200)
             self.assertIn("Settings Successfully Saved", response.content)
             self.client.logout()
 
-            r = self.client.login(username=user["username"], password=user["new_password1"] + 'a')
+            r = self.client.login(username=user["username"],
+                                password=user["new_password1"] + 'a')
             self.assertTrue(r)
-            User.objects.get(username=user["username"]).set_password(user["new_password1"])
+            temp_user = User.objects.get(username=user["username"])
+            temp_user.set_password(user["new_password1"])
 
     def test_change_password_fail(self):
         for user in self.users:
-            r = self.client.login(username=user["username"], password=user["new_password1"])
+            r = self.client.login(username=user["username"],
+                                password=user["new_password1"])
             self.assertTrue(r)
 
-            response = self.client.get(reverse(views.account_page, args=(user["username"], "password")))
+            response = self.client.get(reverse(views.account_page,
+                                                args=(user["username"],
+                                                    "password")))
             self.assertEqual(response.status_code, 200)
             data = {
                 "old_password": user["new_password1"],
@@ -216,7 +256,10 @@ class SettingsTestCase(TestCase):
                 "new_password2": user["new_password2"],
                 }
             self.assertNotIn("The two password fields", response.content)
-            response = self.client.post(reverse(views.account_page, args=(user["username"], "password")), data)
+            response = self.client.post(reverse(views.account_page,
+                                                args=(user["username"],
+                                                    "password")),
+                                        data)
             self.assertEqual(response.status_code, 200)
             self.assertIn("The two password fields", response.content)
 
@@ -246,14 +289,17 @@ class SSHKeyTestCase(TestCase):
     def setUp(self):
         self.client = Client()
         for user in self.users:
-            new_user = User.objects.create_user(user["username"], user["email"], user["new_password1"])
+            new_user = User.objects.create_user(user["username"],
+                                                user["email"],
+                                                user["new_password1"])
             new_user.save()
 
         user = User.objects.all()[0]
         profile = user.get_profile()
-        with open(os.path.join(settings.MEDIA_ROOT, "tests", "id_rsa.pub"), 'r') as f:
+        test_path = os.path.join(settings.MEDIA_ROOT, "tests")
+        with open(os.path.join(test_path, "id_rsa.pub"), 'r') as f:
             profile.public_key = f.read()
-        with open(os.path.join(settings.MEDIA_ROOT, "tests", "id_rsa"), 'r') as f:
+        with open(os.path.join(test_path, "id_rsa"), 'r') as f:
             profile.private_key = f.read()
         profile.save()
 
@@ -271,25 +317,34 @@ class SSHKeyTestCase(TestCase):
                                 use_password=False)
         credential.save()
         self.credential = credential
+
+        s = "cp ~/.ssh/authorized_keys ~/.ssh/authorized_keys.chemtools.bak"
         with self.credential.get_ssh_connection() as ssh:
-            ssh.exec_command("cp ~/.ssh/authorized_keys ~/.ssh/authorized_keys.chemtools.bak")
+            ssh.exec_command(s)
 
     def tearDown(self):
+        s = "cp ~/.ssh/authorized_keys.chemtools.bak ~/.ssh/authorized_keys"
         with self.credential.get_ssh_connection() as ssh:
-            ssh.exec_command("cp ~/.ssh/authorized_keys.chemtools.bak ~/.ssh/authorized_keys")
+            ssh.exec_command(s)
 
     def test_change_ssh_key(self):
         user = self.users[1]
         profile = User.objects.get(username=user["username"]).get_profile()
-        r = self.client.login(username=user["username"], password=user["new_password1"])
+        r = self.client.login(username=user["username"],
+                            password=user["new_password1"])
         self.assertTrue(r)
 
-        response = self.client.get(reverse(views.account_page, args=(user["username"], "settings")))
+        response = self.client.get(reverse(views.account_page,
+                                    args=(user["username"],
+                                        "settings")))
         self.assertEqual(response.status_code, 200)
 
         initial = profile.public_key
         data = {"new_ssh_keypair": "on", "email": user["email"]}
-        response = self.client.post(reverse(views.account_page, args=(user["username"], "settings")), data)
+        response = self.client.post(reverse(views.account_page,
+                                            args=(user["username"],
+                                                "settings")),
+                                    data)
         self.assertIn("Settings Successfully Saved", response.content)
 
         profile = User.objects.get(username=user["username"]).get_profile()
@@ -298,15 +353,21 @@ class SSHKeyTestCase(TestCase):
     def test_update_ssh_keys(self):
         user = self.users[0]
         profile = User.objects.get(username=user["username"]).get_profile()
-        r = self.client.login(username=user["username"], password=user["new_password1"])
+        r = self.client.login(username=user["username"],
+                            password=user["new_password1"])
         self.assertTrue(r)
 
-        response = self.client.get(reverse(views.account_page, args=(user["username"], "settings")))
+        response = self.client.get(reverse(views.account_page,
+                                            args=(user["username"],
+                                                "settings")))
         self.assertEqual(response.status_code, 200)
 
         initial = profile.public_key
         data = {"new_ssh_keypair": "on", "email": user["email"]}
-        response = self.client.post(reverse(views.account_page, args=(user["username"], "settings")), data)
+        response = self.client.post(reverse(views.account_page,
+                                            args=(user["username"],
+                                                "settings")),
+                                    data)
         self.assertIn("Settings Successfully Saved", response.content)
         profile = User.objects.get(username=user["username"]).get_profile()
         self.assertNotEqual(profile.public_key, initial)
@@ -328,7 +389,9 @@ class LoginTestCase(TestCase):
             "new_password2": "mypass",
         }]
         for user in self.users:
-            new_user = User.objects.create_user(user["username"], user["email"], user["new_password1"])
+            new_user = User.objects.create_user(user["username"],
+                                                user["email"],
+                                                user["new_password1"])
             new_user.save()
 
     def test_login(self):
@@ -371,7 +434,8 @@ class LoginTestCase(TestCase):
 
     def test_logout(self):
         for user in self.users:
-            r = self.client.login(username=user["username"], password=user["new_password1"])
+            r = self.client.login(username=user["username"],
+                                password=user["new_password1"])
             self.assertTrue(r)
 
             data = {

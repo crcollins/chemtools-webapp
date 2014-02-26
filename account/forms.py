@@ -8,19 +8,23 @@ attributes = {"class": "required"}
 
 
 class RegistrationForm(forms.Form):
-    username = forms.RegexField(regex=r'^[\w.@+-]+$',
-                                max_length=30,
-                                widget=forms.TextInput(attrs=attributes),
-                                label="Username",
-                                error_message={'invalid': "This value may contain only letters, numbers and @.+- characters."}
-                                )
+    username = forms.RegexField(
+                regex=r'^[\w.@+-]+$',
+                max_length=30,
+                widget=forms.TextInput(attrs=attributes),
+                label="Username",
+                error_message={
+                'invalid': "This value may contain only \
+                            letters, numbers and @.+- characters."}
+                )
     email = forms.EmailField()
 
     def clean_username(self):
         username = self.cleaned_data["username"]
         existing = User.objects.filter(username__iexact=username)
         if existing.exists():
-            raise forms.ValidationError("A user with that username already exists.")
+            raise forms.ValidationError("A user with that \
+                                        username already exists.")
         else:
             return self.cleaned_data["username"]
 
@@ -39,4 +43,5 @@ class UserProfileForm(forms.ModelForm):
 
     class Meta:
         model = UserProfile
-        fields = ("xsede_username", "public_key", "activation_key", "password_reset_key", "reset_expires")
+        fields = ("xsede_username", "public_key", "activation_key",
+                    "password_reset_key", "reset_expires")

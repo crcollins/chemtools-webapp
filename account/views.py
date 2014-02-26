@@ -24,9 +24,13 @@ def register_user(request):
     temp1 = reg_form.is_valid()     # prevent short circuit
     temp2 = pass_form.is_valid()    # prevent short circuit
     if temp1 and temp2:
-        d = dict(reg_form.cleaned_data.items() + pass_form.cleaned_data.items())
+        d = dict(
+            reg_form.cleaned_data.items() + pass_form.cleaned_data.items()
+            )
 
-        new_user = User.objects.create_user(d["username"], d["email"], d["new_password1"])
+        new_user = User.objects.create_user(d["username"],
+                                            d["email"],
+                                            d["new_password1"])
         new_user.is_active = False
 
         activation_key = utils.generate_key(d["username"])
@@ -77,6 +81,7 @@ def account_page(request, username, page):
     if request.user.username != username:
         return redirect(account_page, request.user.username, page)
     return utils.PAGES[page](request, username)
+
 
 @login_required
 def user_settings(request, username):
@@ -145,7 +150,6 @@ def password_settings(request, username):
             request.user.set_password(d.get("new_password1"))
             changed = True
 
-
     if changed:
         request.user.save()
         user_profile.save()
@@ -158,5 +162,3 @@ def password_settings(request, username):
         "form": pass_form,
     })
     return render(request, "account/password_settings.html", c)
-
-

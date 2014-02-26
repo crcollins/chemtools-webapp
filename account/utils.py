@@ -26,13 +26,16 @@ def generate_key_pair(username=None):
 def update_all_ssh_keys(user, new_public):
     for cred in Credential.objects.filter(user=user, use_password=False):
         with cred.get_ssh_connection() as ssh:
-            _, _, err = ssh.exec_command("cp ~/.ssh/authorized_keys ~/.ssh/authorized_keys.bak")
+            s = "cp ~/.ssh/authorized_keys ~/.ssh/authorized_keys.bak"
+            _, _, err = ssh.exec_command(s)
             a = err.readlines()
             if a:
                 raise Exception(str(a))
+
             # _ is used because ssh keys can have / in them
-            s = "sed ~/.ssh/authorized_keys.bak -e 's_ssh-rsa .* %s@chemtools-webapp_%s_' > ~/.ssh/authorized_keys"
-            _, _, err = ssh.exec_command(s % (user.username, new_public))
+            s1 = "sed ~/.ssh/authorized_keys.bak -e 's_ssh-rsa "
+            s2 = ".* %s@chemtools-webapp_%s_' > ~/.ssh/authorized_keys"
+            _, _, err = ssh.exec_command(s1 + s2 % (user.username, new_public))
             a = err.readlines()
             if a:
                 raise Exception(str(a))
@@ -46,14 +49,19 @@ def generate_key(text):
 class Pages(object):
     def __init__(self):
         self.__registry = dict()
+
     def __getitem__(self, name):
         return self.__registry[name]
+
     def __setitem__(self, name, value):
         self.__registry[name] = value
+
     def __iter__(self):
         return iter(sorted(self.__registry.keys()))
 
+
 PAGES = Pages()
+
 
 def add_account_page(url):
     def decorator(f):
