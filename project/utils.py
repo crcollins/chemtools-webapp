@@ -49,6 +49,7 @@ def get_sftp_connection(hostname, username, key=None, password=None, port=22):
         raise Exception("no key or password")
 
     transport = paramiko.Transport((hostname, port))
+    transport.use_compression(compress=True)
     if key:
         pkey = paramiko.RSAKey.from_private_key(key)
         transport.connect(username=username, pkey=pkey)
@@ -64,9 +65,9 @@ def get_ssh_connection(hostname, username, key=None, password=None, port=22):
     client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     if key:
         pkey = paramiko.RSAKey.from_private_key(key)
-        client.connect(hostname, username=username, pkey=pkey, port=port, allow_agent=False, look_for_keys=False)
+        client.connect(hostname, username=username, pkey=pkey, port=port, allow_agent=False, look_for_keys=False, compress=True)
     else:
-        client.connect(hostname, username=username, password=password, port=port, allow_agent=False, look_for_keys=False)
+        client.connect(hostname, username=username, password=password, port=port, allow_agent=False, look_for_keys=False, compress=True)
     bases = [". ~/.bash_profile; ", "source .login; ", ". ~/.bashrc; "]
     for base in bases:
         _, _, err = client.exec_command(base)
