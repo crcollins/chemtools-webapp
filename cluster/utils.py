@@ -92,7 +92,7 @@ def _get_columns(lines):
     return bottomrow
 
 
-def _get_jobs(cred, i, results):
+def _get_jobs(cred, cluster, i, results):
     wantedcols = ["Job ID", "Username", "Jobname", "Req'd Memory", "Req'd Time", 'Elap Time', 'S']
     try:
         ssh = cred.get_ssh_connection()
@@ -124,7 +124,7 @@ def _get_jobs(cred, i, results):
                     temp.append(t[idx])
                 temp[0] = temp[0].split('.')[0]
                 jobs.append(temp)
-        results[i] = {"name": cred.cluster.name, "columns": wantedcols, "jobs": jobs}
+        results[i] = {"name": cluster, "columns": wantedcols, "jobs": jobs}
     except Exception as e:
         print e
-        results[i] = {"name": cred.cluster.name, "columns": wantedcols, "jobs": []}
+        results[i] = {"name": cluster, "columns": wantedcols, "jobs": []}

@@ -73,14 +73,14 @@ class SSHPageTestCase(TestCase):
         response = self.client.get(reverse(views.get_job_list))
         self.assertEqual(response.status_code, 302)
 
-    # def test_get_job_list_auth(self):
-    #     r = self.client.login(username=self.user["username"], password=self.user["password"])
-    #     self.assertTrue(r)
+    def test_get_job_list_auth(self):
+        r = self.client.login(username=self.user["username"], password=self.user["password"])
+        self.assertTrue(r)
 
-    #     response = self.client.get(reverse(views.get_job_list))
-    #     self.assertEqual(response.status_code, 200)
-    #     data = simplejson.loads(response.content)
-    #     self.assertTrue(data["is_authenticated"])
+        response = self.client.get(reverse(views.get_job_list))
+        self.assertEqual(response.status_code, 200)
+        data = simplejson.loads(response.content)
+        self.assertTrue(data["is_authenticated"])
 
     def test_kill_job_perm_fail(self):
         url = reverse(views.kill_job, args=("test-machine", ))

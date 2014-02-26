@@ -149,7 +149,7 @@ def get_all_jobs(user, cluster=None):
     # this method is used in lieu of messing with multiple processes
     results = [None] * len(creds)
     for i, cred in enumerate(creds):
-        t = threading.Thread(target=_get_jobs, args=(cred, i, results))
+        t = threading.Thread(target=_get_jobs, args=(cred, cred.cluster.name, i, results))
         t.start()
         threads.append(t)
 
