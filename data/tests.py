@@ -8,7 +8,7 @@ from django.core.urlresolvers import reverse
 import views
 import models
 import load_data
-from chemtools.utils import RGROUPS, XGROUPS, ARYL, CLUSTERS
+from chemtools.constants import RGROUPS, XGROUPS, ARYL, CLUSTERS
 
 
 class FragmentTestCase(TestCase):

@@ -1,11 +1,11 @@
-import itertools
+from itertools import product
 import string
 
 import numpy
 
 atom_combinations = (['O', 'S', 'N', 'P', 'C'], ['N', 'P', 'C'])
-SCORES = [''.join(x) for x in itertools.product(['E', 'Z'], *atom_combinations)]
-DCORES = [''.join(x) for x in itertools.product(['C', 'T'], *atom_combinations)]
+SCORES = [''.join(x) for x in product(['E', 'Z'], *atom_combinations)]
+DCORES = [''.join(x) for x in product(['C', 'T'], *atom_combinations)]
 CORES = SCORES + DCORES
 XGROUPS = list(string.uppercase[:12])
 RGROUPS = list(string.lowercase[:12])
@@ -43,6 +43,7 @@ COLORS = {
     'Si': (128, 170, 128),
 }
 
+SLOPE = .9
 WL = numpy.matrix(
         [
         -2.27029423e-02, -1.94743213e-01, -1.97768404e-01,  3.18052261e-01,

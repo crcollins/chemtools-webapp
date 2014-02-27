@@ -1,8 +1,14 @@
 import math
 
 from numpy.linalg import norm
+import numpy
 
-from constants import *
+from constants import atom_combinations, \
+                    ARYL, ARYL2, XGROUPS, RGROUPS, NEEDSPACE, \
+                    SLOPE, WH, WL, WG, \
+                    HOMO_CLF, LUMO_CLF, GAP_CLF, \
+                    PRED_GAP_CLF, PRED_HOMO_CLF, PRED_LUMO_CLF
+
 from gjfwriter import Molecule, read_data
 
 

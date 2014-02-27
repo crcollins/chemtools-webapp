@@ -3,7 +3,7 @@ import re
 from django.db import models
 from django import forms
 
-from chemtools.utils import CLUSTER_TUPLES
+from chemtools.constants import CLUSTER_TUPLES
 from cluster.models import Credential
 
 

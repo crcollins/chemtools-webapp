@@ -1,6 +1,6 @@
 from django.template import Template, Context
 
-from constants import *
+from constants import CLUSTERS
 
 
 def catch(fn):

@@ -5,7 +5,7 @@ from django.template import Context
 from django.http import HttpResponse
 from django.core.servers.basehttp import FileWrapper
 
-from chemtools.utils import CLUSTERS, CLUSTER_TUPLES
+from chemtools.constants import CLUSTERS, CLUSTER_TUPLES
 from chemtools.extractor import CORES, RGROUPS, ARYL
 
 

@@ -1,6 +1,8 @@
 import re
+import itertools
 
-from constants import *
+from constants import SCORES, DCORES, CORES, RGROUPS, XGROUPS, ARYL, ARYL0, \
+                    ARYL2, ALL, NEEDSPACE
 
 
 def name_expansion(string):

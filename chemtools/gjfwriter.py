@@ -4,7 +4,7 @@ import os
 from cStringIO import StringIO
 
 from molecule import Atom, Bond, Molecule
-from constants import *
+from constants import KEYWORDS, ARYL, XGROUPS
 from mol_name import name_expansion, get_exact_name, parse_name
 
 
