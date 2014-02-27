@@ -93,13 +93,15 @@ def _get_columns(lines):
 
 
 def _get_jobs(cred, cluster, i, results):
-    wantedcols = ["Job ID", "Username", "Jobname", "Req'd Memory", "Req'd Time", 'Elap Time', 'S']
+    wantedcols = ["Job ID", "Username", "Jobname", "Req'd Memory",
+                "Req'd Time", 'Elap Time', 'S']
     try:
         ssh = cred.get_ssh_connection()
 
         with ssh:
             _, stdout, stderr = ssh.exec_command("qstat -u %s" % cred.username)
-            stderr.readlines()  # seems to need this slight delay to display the jobs
+            # seems to need this slight delay to display the jobs
+            stderr.readlines()
 
             jobs = []
             lines = stdout.readlines()
@@ -115,7 +117,8 @@ def _get_jobs(cred, cluster, i, results):
             for job in lines[5:]:
                 t = job.split()
                 # empty line implies a split in the table
-                # this is seen on blacklight with the "Total cpus requested from running jobs" line at the end.
+                # this is seen on blacklight with the "Total cpus requested
+                # from running jobs" line at the end.
                 if t == []:
                     break
 

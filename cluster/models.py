@@ -2,7 +2,8 @@ from django.contrib.auth.models import User
 from django.db import models
 from django import forms
 
-from project.utils import get_ssh_connection, get_sftp_connection, StringIO, AESCipher
+from project.utils import get_ssh_connection, get_sftp_connection, StringIO, \
+                        AESCipher
 
 
 class Cluster(models.Model):
@@ -43,11 +44,15 @@ class Credential(models.Model):
     use_password = models.BooleanField(default=False)
 
     def __unicode__(self):
-        return "%s@%s:%d" % (self.username, self.cluster.hostname, self.cluster.port)
+        return "%s@%s:%d" % (self.username, self.cluster.hostname,
+                            self.cluster.port)
 
     def get_ssh_connection(self):
         if self.use_password:
-            return get_ssh_connection(self.cluster.hostname, self.username, password=self.password, port=self.cluster.port)
+            return get_ssh_connection(self.cluster.hostname,
+                                    self.username,
+                                    password=self.password,
+                                    port=self.cluster.port)
         else:
             try:
                 del self.user._profile_cache
@@ -55,11 +60,17 @@ class Credential(models.Model):
                 pass
             profile = self.user.get_profile()
             private = StringIO(profile.private_key)
-            return get_ssh_connection(self.cluster.hostname, self.username, key=private, port=self.cluster.port)
+            return get_ssh_connection(self.cluster.hostname,
+                                    self.username,
+                                    key=private,
+                                    port=self.cluster.port)
 
     def get_sftp_connection(self):
         if self.use_password:
-            return get_sftp_connection(self.cluster.hostname, self.username, password=self.password, port=self.cluster.port)
+            return get_sftp_connection(self.cluster.hostname,
+                                    self.username,
+                                    password=self.password,
+                                    port=self.cluster.port)
         else:
             try:
                 del self.user._profile_cache
@@ -67,16 +78,22 @@ class Credential(models.Model):
                 pass
             profile = self.user.get_profile()
             private = StringIO(profile.private_key)
-            return get_sftp_connection(self.cluster.hostname, self.username, key=private, port=self.cluster.port)
+            return get_sftp_connection(self.cluster.hostname,
+                                    self.username,
+                                    key=private,
+                                    port=self.cluster.port)
 
 
 class CredentialForm(forms.ModelForm):
-    password = forms.CharField(max_length=50, required=False, widget=forms.PasswordInput)
-    password2 = forms.CharField(max_length=50, required=False, widget=forms.PasswordInput)
+    password = forms.CharField(max_length=50, required=False,
+                            widget=forms.PasswordInput)
+    password2 = forms.CharField(max_length=50, required=False,
+                            widget=forms.PasswordInput)
 
     class Meta:
         model = Credential
-        fields = ("cluster", "username", "password", "password2", "use_password")
+        fields = ("cluster", "username", "password",
+                "password2", "use_password")
 
     def __init__(self, user, *args, **kwargs):
         super(CredentialForm, self).__init__(*args, **kwargs)
@@ -100,12 +117,14 @@ class CredentialForm(forms.ModelForm):
         try:
             if cleaned_data.get("use_password"):
                 password = cleaned_data.get("password")
-                with get_ssh_connection(cluster.hostname, username, password=password, port=cluster.port):
+                with get_ssh_connection(cluster.hostname, username,
+                                        password=password, port=cluster.port):
                     pass
             else:
                 profile = self.user.get_profile()
                 private = StringIO(profile.private_key)
-                with get_ssh_connection(cluster.hostname, username, key=private, port=cluster.port):
+                with get_ssh_connection(cluster.hostname, username,
+                                        key=private, port=cluster.port):
                     pass
         except Exception:
             raise forms.ValidationError("Those credentials did not work.")

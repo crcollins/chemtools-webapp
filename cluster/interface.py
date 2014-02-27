@@ -7,14 +7,19 @@ from chemtools import fileparser
 from chemtools.mol_name import name_expansion
 
 from models import Job
-from utils import get_ssh_connection_obj, get_sftp_connection_obj, _run_job, _get_jobs
+from utils import get_ssh_connection_obj, get_sftp_connection_obj, _run_job, \
+                _get_jobs
 
 
 def run_job(credential, gjfstring, jobstring=None, **kwargs):
     ssh = get_ssh_connection_obj(credential)
     sftp = get_sftp_connection_obj(credential)
 
-    results = {"jobid": None, "error": None, "cluster": credential.cluster.name}
+    results = {
+        "jobid": None,
+        "error": None,
+        "cluster": credential.cluster.name
+    }
     if not credential.user.is_staff:
         results["error"] = "You must be a staff user to submit a job."
         return results
@@ -53,7 +58,11 @@ def run_jobs(credential, names, gjfstrings, jobstring=None, **kwargs):
 
 
 def run_standard_job(credential, molecule, **kwargs):
-    results = {"jobid": None, "error": None, "cluster": credential.cluster.name}
+    results = {
+        "jobid": None,
+        "error": None,
+        "cluster": credential.cluster.name
+    }
     try:
         out = gjfwriter.GJFWriter(molecule, kwargs.get("keywords", None))
     except Exception as e:
@@ -121,7 +130,8 @@ def kill_jobs(user, cluster, jobids):
         jobs = [x[0] for x in a[0]["jobs"]]
         for jobid in jobids:
             if jobid not in jobs:
-                results["failed"].append((jobid, "That job number is not running."))
+                pair = (jobid, "That job number is not running.")
+                results["failed"].append(pair)
                 continue
 
             _, _, stderr = ssh.exec_command("qdel %s" % jobid)
@@ -145,11 +155,13 @@ def get_all_jobs(user, cluster=None):
         creds = user.credentials.all()
 
     threads = []
-    # results is a mutable object, so as the threads complete they save their results into this object
-    # this method is used in lieu of messing with multiple processes
+    # results is a mutable object, so as the threads complete they save their
+    # results into this object. This method is used in lieu of messing with
+    # multiple processes
     results = [None] * len(creds)
     for i, cred in enumerate(creds):
-        t = threading.Thread(target=_get_jobs, args=(cred, cred.cluster.name, i, results))
+        t = threading.Thread(target=_get_jobs,
+                            args=(cred, cred.cluster.name, i, results))
         t.start()
         threads.append(t)
 
