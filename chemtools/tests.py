@@ -28,12 +28,17 @@ class GJFWriterTestCase(TestCase):
     ]
     cores = constants.CORES
     invalid_cores = ["cao", "bo", "CONA", "asD"]
-    valid_polymer_sides = ['2', '4b', '22', '24', '4bc', '44bc', '4b4', '5-', '5-5', '55-', '5-a', '5-ab4-']
+    valid_polymer_sides = ['2', '4b', '22', '24', '4bc', '44bc', '4b4',
+                        '5-', '5-5', '55-', '5-a', '5-ab4-']
     invalid_polymer_sides = ['B', '2B']
     valid_sides = valid_polymer_sides + invalid_polymer_sides
-    invalid_sides = ['~', 'b', 'c', 'BB', 'TON', 'Dc', '4aaa', '24C2', 'awr', 'A-', '5B-', '2a', '4abc']
-    valid_polymer_options = ['_n1', '_n2', '_n3', '_m1', '_m2', '_m3', '_n1_m1']
-    invalid_polymer_options = ['_n2_m2', '_n3_m3', '_m2_n2', '_m3_n3', '_n0', '_m0', '_n0_m0']
+    invalid_sides = ['~', 'b', 'c', 'BB', 'TON', 'Dc', '4aaa',
+                    '24C2', 'awr', 'A-', '5B-', '2a', '4abc']
+    valid_polymer_options = ['_n1', '_n2', '_n3',
+                            '_m1', '_m2', '_m3',
+                            '_n1_m1']
+    invalid_polymer_options = ['_n2_m2', '_n3_m3', '_m2_n2', '_m3_n3',
+                            '_n0', '_m0', '_n0_m0']
 
     def setUp(self):
         pass
@@ -222,10 +227,14 @@ class GJFWriterTestCase(TestCase):
     def test_spot_check_invalid(self):
         errors = []
         pairs = [
-            ("B_TON_n2", "(9, 'can not do nm expansion with xgroup on left')"),
-            ("TON_B__m2", "(9, 'can not do nm expansion with xgroup on middle')"),
-            ("TON__B_n2", "(9, 'can not do nm expansion with xgroup on right')"),
-            ("TON_TON_m2", "(8, 'Can not do m expansion and have multiple cores')"),
+            ("B_TON_n2",
+                "(9, 'can not do nm expansion with xgroup on left')"),
+            ("TON_B__m2",
+                "(9, 'can not do nm expansion with xgroup on middle')"),
+            ("TON__B_n2",
+                "(9, 'can not do nm expansion with xgroup on right')"),
+            ("TON_TON_m2",
+                "(8, 'Can not do m expansion and have multiple cores')"),
         ]
         for name, message in pairs:
             try:
@@ -315,11 +324,16 @@ class MolNameTestCase(TestCase):
         ('TON_4bc_TON_4bc', 'A**_TON_A**_4bc_TON_A**_4bcA**'),
         ('TON_44bc_TON_44bc', 'A**_TON_A**_4aa4bc_TON_A**_4aa4bcA**'),
 
-        ('TON_2_TON_2_TON_2', 'A**_TON_A**_2**_TON_A**_2**_TON_A**_2**A**'),
-        ('TON_4_TON_4_TON_4', 'A**_TON_A**_4aa_TON_A**_4aa_TON_A**_4aaA**'),
-        ('TON_4b_TON_4b_TON_4b', 'A**_TON_A**_4bb_TON_A**_4bb_TON_A**_4bbA**'),
-        ('TON_4bc_TON_4bc_TON_4bc', 'A**_TON_A**_4bc_TON_A**_4bc_TON_A**_4bcA**'),
-        ('TON_44bc_TON_44bc_TON_44bc', 'A**_TON_A**_4aa4bc_TON_A**_4aa4bc_TON_A**_4aa4bcA**'),
+        ('TON_2_TON_2_TON_2',
+            'A**_TON_A**_2**_TON_A**_2**_TON_A**_2**A**'),
+        ('TON_4_TON_4_TON_4',
+            'A**_TON_A**_4aa_TON_A**_4aa_TON_A**_4aaA**'),
+        ('TON_4b_TON_4b_TON_4b',
+            'A**_TON_A**_4bb_TON_A**_4bb_TON_A**_4bbA**'),
+        ('TON_4bc_TON_4bc_TON_4bc',
+            'A**_TON_A**_4bc_TON_A**_4bc_TON_A**_4bcA**'),
+        ('TON_44bc_TON_44bc_TON_44bc',
+            'A**_TON_A**_4aa4bc_TON_A**_4aa4bc_TON_A**_4aa4bcA**'),
 
         ('TON_2__TON_2_', 'A**_TON_2**A**__TON_2**A**_A**'),
         ('TON_4__TON_4_', 'A**_TON_4aaA**__TON_4aaA**_A**'),
@@ -355,11 +369,16 @@ class MolNameTestCase(TestCase):
             ('TON_4bc_TON_4bc_n2', '_TON_A**_4bc_TON_A**_4bc_n2_m1'),
             ('TON_44bc_TON_44bc_n2', '_TON_A**_4aa4bc_TON_A**_4aa4bc_n2_m1'),
 
-            ('TON_2_TON_2_TON_2_n2', '_TON_A**_2**_TON_A**_2**_TON_A**_2**_n2_m1'),
-            ('TON_4_TON_4_TON_4_n2', '_TON_A**_4aa_TON_A**_4aa_TON_A**_4aa_n2_m1'),
-            ('TON_4b_TON_4b_TON_4b_n2', '_TON_A**_4bb_TON_A**_4bb_TON_A**_4bb_n2_m1'),
-            ('TON_4bc_TON_4bc_TON_4bc_n2', '_TON_A**_4bc_TON_A**_4bc_TON_A**_4bc_n2_m1'),
-            ('TON_44bc_TON_44bc_TON_44bc_n2', '_TON_A**_4aa4bc_TON_A**_4aa4bc_TON_A**_4aa4bc_n2_m1'),
+            ('TON_2_TON_2_TON_2_n2',
+                '_TON_A**_2**_TON_A**_2**_TON_A**_2**_n2_m1'),
+            ('TON_4_TON_4_TON_4_n2',
+                '_TON_A**_4aa_TON_A**_4aa_TON_A**_4aa_n2_m1'),
+            ('TON_4b_TON_4b_TON_4b_n2',
+                '_TON_A**_4bb_TON_A**_4bb_TON_A**_4bb_n2_m1'),
+            ('TON_4bc_TON_4bc_TON_4bc_n2',
+                '_TON_A**_4bc_TON_A**_4bc_TON_A**_4bc_n2_m1'),
+            ('TON_44bc_TON_44bc_TON_44bc_n2',
+                '_TON_A**_4aa4bc_TON_A**_4aa4bc_TON_A**_4aa4bc_n2_m1'),
 
             ('TON_2__TON_2__n2', '_TON_2**A**__TON_2**A**__n2_m1'),
             ('TON_4__TON_4__n2', '_TON_4aaA**__TON_4aaA**__n2_m1'),
@@ -401,7 +420,8 @@ class MolNameTestCase(TestCase):
             ("e{a,b}{c,d}", ["eac", "ebc", "ead", "ebd"]),
             ("{a,b}e{c,d}", ["aec", "bec", "aed", "bed"]),
             ("{a,b}{c,d}e", ["ace", "bce", "ade", "bde"]),
-            ("{a,b}{c,d}{e,f}", ["ace", "acf", "ade", "adf", "bce", "bcf", "bde", "bdf"]),
+            ("{a,b}{c,d}{e,f}", ["ace", "acf", "ade", "adf",
+                                "bce", "bcf", "bde", "bdf"]),
         ]
         for name, result in names:
             self.assertEqual(set(mol_name.name_expansion(name)), set(result))
@@ -424,7 +444,7 @@ class MolNameTestCase(TestCase):
             ("{$ARYL2}", constants.ARYL2),
             ("{$ARYL}", constants.ARYL),
             ("{$a}", ['']),
-            ("{$a,$ARYL}", ['']+constants.ARYL),
+            ("{$a,$ARYL}", [''] + constants.ARYL),
         ]
         for name, result in names:
             self.assertEqual(set(mol_name.name_expansion(name)), set(result))
@@ -442,9 +462,15 @@ class MolNameTestCase(TestCase):
 
     def test_name_expansion(self):
         names = [
-            ("24{$RGROUPS}_{$CORES}", ["24" + '_'.join(x) for x in product(constants.RGROUPS, constants.CORES)]),
-            ("24{$XGROUPS}_{$CORES}", ["24" + '_'.join(x) for x in product(constants.XGROUPS, constants.CORES)]),
-            ("24{$ARYL}_{$CORES}", ["24" + '_'.join(x) for x in product(constants.ARYL, constants.CORES)]),
+            ("24{$RGROUPS}_{$CORES}",
+                ["24" + '_'.join(x) for x in product(constants.RGROUPS,
+                                                    constants.CORES)]),
+            ("24{$XGROUPS}_{$CORES}",
+                ["24" + '_'.join(x) for x in product(constants.XGROUPS,
+                                                    constants.CORES)]),
+            ("24{$ARYL}_{$CORES}",
+                ["24" + '_'.join(x) for x in product(constants.ARYL,
+                                                    constants.CORES)]),
         ]
         for name, result in names:
             self.assertEqual(set(mol_name.name_expansion(name)), set(result))
@@ -471,7 +497,7 @@ class MolNameTestCase(TestCase):
             try:
                 a = mol_name.get_exact_name(name)
                 expected = expected + "_n1_m1_x1_y1_z1"
-                assert a == expected.replace('*','')
+                assert a == expected.replace('*', '')
             except Exception as e:
                 print e
                 errors.append((a, expected, e))
@@ -526,6 +552,7 @@ class ExtractorTestCase(TestCase):
     def test_run_all(self):
         extractor.run_all()
 
+
 class MLTestCase(TestCase):
     def test_get_core_features(self):
         errors = []
@@ -556,7 +583,7 @@ class MLTestCase(TestCase):
         names = "nmxyz"
         for numbers in product(values, values, values, values, values):
             try:
-                use = [n+str(v) for n,v in zip(names, numbers)]
+                use = [n + str(v) for n, v in zip(names, numbers)]
                 vector = ml.get_extra_features(*use)
                 self.assertEqual(vector, list(numbers))
             except Exception as e:
@@ -614,14 +641,16 @@ class MLTestCase(TestCase):
         self.assertEqual(ml.get_naive_feature_vector(name), expected)
 
     def test_get_name_from_naive_feature_vector(self):
-        names = ["A**_TON_A**_A**_n1_m1_x1_y1_z1", "A**_CON_A**_A**_n1_m1_x1_y1_z1"]
+        names = ["A**_TON_A**_A**_n1_m1_x1_y1_z1",
+                "A**_CON_A**_A**_n1_m1_x1_y1_z1"]
         for name in names:
             vector = ml.get_naive_feature_vector(name)
             actual = ml.get_name_from_naive_feature_vector(vector)
             self.assertEqual(actual, name)
 
     def test_get_name_from_weighted_naive_feature_vector(self):
-        names = ["A**_TON_A**_A**_n1_m1_x1_y1_z1", "A**_CON_A**_A**_n1_m1_x1_y1_z1"]
+        names = ["A**_TON_A**_A**_n1_m1_x1_y1_z1",
+                "A**_CON_A**_A**_n1_m1_x1_y1_z1"]
         for name in names:
             vector = ml.get_naive_feature_vector(name)
             actual = ml.get_name_from_weighted_naive_feature_vector(vector)
@@ -659,7 +688,8 @@ class MLTestCase(TestCase):
             0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1
             ]
         name = "A**_TON_A**_A**_n1_m1_x1_y1_z1"
-        self.assertEqual(ml.get_decay_distance_correction_feature_vector(name), expected)
+        self.assertEqual(ml.get_decay_distance_correction_feature_vector(name),
+                        expected)
 
 
 class MoleculeTestCase(TestCase):
@@ -679,12 +709,18 @@ class FileParserTestCase(TestCase):
         with StringIO(logset.format_output(errors=False)) as f:
             reader = csv.reader(f, delimiter=',', quotechar='"')
             expected = [
-                ["A_TON_A_A","A_TON_A_A_n1_m1_x1_y1_z1","opt B3LYP/6-31g(d) geom=connectivity",
-                    "-6.46079886952","-1.31975211714","41","0.0006","-567.1965205","---","0.35"],
-                ["A_TON_A_A","A_TON_A_A_n1_m1_x1_y1_z1","td B3LYP/6-31g(d)","-6.46079886952",
-                    "-1.31975211714","41","0.0001","-567.1965205","4.8068","0.15"],
-                ["A_CON_A_A","A_CON_A_A_n1_m1_x1_y1_z1","td B3LYP/6-31g(d)","-6.59495099194",
-                    "-1.19594032058","41","2.1565","-567.1958243","4.7914","0.15"],
+                        ["A_TON_A_A", "A_TON_A_A_n1_m1_x1_y1_z1",
+                        "opt B3LYP/6-31g(d) geom=connectivity",
+                        "-6.46079886952", "-1.31975211714", "41",
+                        "0.0006", "-567.1965205", "---", "0.35"],
+                        ["A_TON_A_A", "A_TON_A_A_n1_m1_x1_y1_z1",
+                        "td B3LYP/6-31g(d)", "-6.46079886952",
+                        "-1.31975211714", "41", "0.0001",
+                        "-567.1965205", "4.8068", "0.15"],
+                        ["A_CON_A_A", "A_CON_A_A_n1_m1_x1_y1_z1",
+                        "td B3LYP/6-31g(d)", "-6.59495099194",
+                        "-1.19594032058", "41", "2.1565",
+                        "-567.1958243", "4.7914", "0.15"],
                 ]
             lines = [x[1:3] + x[4:] for i, x in enumerate(reader) if i]
             self.assertEqual(expected, lines)
@@ -696,8 +732,10 @@ class FileParserTestCase(TestCase):
         with StringIO(log.format_data()) as f:
             reader = csv.reader(f, delimiter=',', quotechar='"')
             expected = [
-                ["A_TON_A_A","A_TON_A_A_n1_m1_x1_y1_z1","opt B3LYP/6-31g(d) geom=connectivity",
-                    "-6.46079886952","-1.31975211714","41","0.0006","-567.1965205","---","0.35"],
+                ["A_TON_A_A", "A_TON_A_A_n1_m1_x1_y1_z1",
+                "opt B3LYP/6-31g(d) geom=connectivity",
+                "-6.46079886952", "-1.31975211714", "41",
+                "0.0006", "-567.1965205", "---", "0.35"],
                 ]
             lines = [x[1:3] + x[4:] for x in reader]
             self.assertEqual(expected, lines)

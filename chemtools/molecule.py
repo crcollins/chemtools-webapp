@@ -27,7 +27,9 @@ class Atom(object):
 
     @property
     def mol2(self):
-        return "{0} {1}{0} {2} {3} {4} {1}".format(self.id, self.element, *self.xyz_tuple)
+        return "{0} {1}{0} {2} {3} {4} {1}".format(self.id,
+                                                self.element,
+                                                *self.xyz_tuple)
 
     @property
     def gjf_atoms(self):
@@ -39,7 +41,8 @@ class Atom(object):
         for bond in self.bonds:
             if bond.atoms[0] == self:
                 x = bond.atoms[1]
-                s += ' ' + str(x.id) + ' ' + (bond.type + ".0" if bond.type != "Ar" else "1.5")
+                bond_type = (bond.type + ".0" if bond.type != "Ar" else "1.5")
+                s += ' ' + str(x.id) + ' ' + bond_type
         return s
 
     def __str__(self):
@@ -89,7 +92,10 @@ class Bond(object):
 
     @property
     def mol2(self):
-        return "%d %d %d %s" % (self.id, self.atoms[0].id, self.atoms[1].id, self.type)
+        return "%d %d %d %s" % (self.id,
+                                self.atoms[0].id,
+                                self.atoms[1].id,
+                                self.type)
 
 
 class Molecule(object):
@@ -138,7 +144,7 @@ class Molecule(object):
 
         for atom in self.atoms:
             vdotn = normal.T * atom.xyz
-            atom.xyz -= 2 * (vdotn / ndotn)[0,0] * normal
+            atom.xyz -= 2 * (vdotn / ndotn)[0, 0] * normal
 
     def reflect_ends(self):
         bonds = self.open_ends('~')
@@ -148,25 +154,25 @@ class Molecule(object):
     def bounding_box(self):
         '''Returns the bounding box of the molecule.'''
         coords = numpy.concatenate([x.xyz for x in self.atoms], 1)
-        mins = numpy.min(coords ,1)
+        mins = numpy.min(coords, 1)
         maxs = numpy.max(coords, 1)
         return mins, maxs
 
     def get_full_rotation_matrix(self, vector, azimuth, altitude):
-        xyaxis = vector[:2,0]
-        zaxis = numpy.matrix([0,0,1]).T
+        xyaxis = vector[:2, 0]
+        zaxis = numpy.matrix([0, 0,  1]).T
         raxis = numpy.cross(zaxis.T, xyaxis.T)
         rotz = self.get_axis_rotation_matrix(numpy.matrix(raxis).T, altitude)
         rotxy = self.get_axis_rotation_matrix(-zaxis, azimuth)
-        return rotxy*rotz
+        return rotxy * rotz
 
     def get_angles(self, vector):
-        x = vector[0,0]
-        y = vector[1,0]
-        z = vector[2,0]
+        x = vector[0, 0]
+        y = vector[1, 0]
+        z = vector[2, 0]
         r = numpy.linalg.norm(vector)
-        azimuth = math.atan2(y,x)
-        altitude = math.asin(z/r)
+        azimuth = math.atan2(y, x)
+        altitude = math.asin(z / r)
         return azimuth, altitude
 
     def get_axis_rotation_matrix(self, axis, theta):
@@ -175,10 +181,10 @@ class Molecule(object):
         nct = 1 - ct
         st = math.sin(theta)
         r = numpy.linalg.norm(axis)
-        ux = axis[0,0] / r
-        uy = axis[1,0] / r
-        uz = axis[2,0] / r
-        rot = numpy.matrix([
+        ux = axis[0, 0] / r
+        uy = axis[1, 0] / r
+        uz = axis[2, 0] / r
+        rot = numpy. matrix([
             [ct+ux**2*nct, ux*uy*nct-uz*st, ux*uz*nct+uy*st],
             [uy*ux*nct+uz*st, ct+uy**2*nct, uy*uz*nct-ux*st],
             [uz*ux*nct-uy*st, uz*uy*nct+ux*st, ct+uz**2*nct],
@@ -208,7 +214,8 @@ class Molecule(object):
             #check the second bond type
             for x in conn:
                 for bond in bonds:
-                    if x in [atom.element[1] for atom in bond.atoms if len(atom.element) > 1]:
+                    if x in [atom.element[1] for atom in bond.atoms
+                                                    if len(atom.element) > 1]:
                         return bond
         except:
             pass
@@ -223,21 +230,22 @@ class Molecule(object):
         '''Draws a basic image of the molecule.'''
         mins, maxs = self.bounding_box()
         res = (scale * numpy.abs(mins - maxs)).astype(int) + int(.5 * scale)
-        xres = res[0,0]
-        yres = res[1,0]
+        xres = res[0, 0]
+        yres = res[1, 0]
 
         img = Image.new("RGB", (xres, yres))
         draw = ImageDraw.Draw(img)
         s = int(scale * .25)
         for bond in self.bonds:
             pts = [(x.xyz[:2] - mins[:2]) * scale + s for x in bond.atoms]
-            ends = (pts[0][0,0], pts[0][1,0], pts[1][0,0], pts[1][1,0])
+            ends = (pts[0][0, 0], pts[0][1, 0], pts[1][0, 0], pts[1][1, 0])
             draw.line(ends, fill=COLORS[bond.type], width=scale / 10)
             for x in xrange(2):
                 if bond.atoms[x].element not in "C":
                     lower = pts[x] - s
                     higher = pts[x] + s
-                    circle = (lower[0,0], lower[1,0], higher[0,0], higher[1,0])
+                    circle = (lower[0, 0], lower[1, 0],
+                            higher[0, 0], higher[1, 0])
                     draw.ellipse(circle, fill=COLORS[bond.atoms[x].element])
         #rotate to standard view
         return img.rotate(-90)
@@ -245,7 +253,9 @@ class Molecule(object):
     @property
     def mol2(self):
         '''Returns a string with the in the proper .mol2 format.'''
-        string = """@<TRIPOS>MOLECULE\nMolecule Name\n%d %d\nSMALL\nNO_CHARGES\n\n@<TRIPOS>ATOM\n""" % (len(self.atoms), len(self.bonds))
+        string = "@<TRIPOS>MOLECULE\nMolecule Name\n"
+        string += "%d %d" % (len(self.atoms), len(self.bonds))
+        string += "\nSMALL\nNO_CHARGES\n\n@<TRIPOS>ATOM\n"
         string += "\n".join([x.mol2 for x in self.atoms] +
                         ["@<TRIPOS>BOND", ] +
                         [x.mol2 for x in self.bonds])
@@ -283,9 +293,11 @@ class Molecule(object):
         vec2 = C2.xyz - R2.xyz
 
         # diff = [azimuth, altitude]
-        diff = numpy.matrix(self.get_angles(vec1)) - numpy.matrix(self.get_angles(vec2))
+        vec1_angles = numpy.matrix(self.get_angles(vec1))
+        vec2_angles = numpy.matrix(self.get_angles(vec2))
+        diff = vec1_angles - vec2_angles
         #angle of 1 - angle of 2 = angle to rotate
-        rot = self.get_full_rotation_matrix(vec2, -diff[0,0], -diff[0,1])
+        rot = self.get_full_rotation_matrix(vec2, -diff[0, 0], -diff[0, 1])
         frag.rotate_3d(rot, R2xyz, C1xyz)
 
         if bond1.atoms[0].element[0] in "~*+":
@@ -307,7 +319,7 @@ class Molecule(object):
             prevbond = molecules[i][1][2]
             curbond = ends[3]
             previdx = molecules[i][0].bonds.index(prevbond)
-            curidx = molecules[i+1][0].bonds.index(curbond)
+            curidx = molecules[i + 1][0].bonds.index(curbond)
 
             frags[i].merge(frags[i].bonds[previdx], mol.bonds[curidx], mol)
             frags.append(mol)

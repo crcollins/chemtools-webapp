@@ -53,7 +53,8 @@ def get_multi_job(string, form):
             continue
         name, _ = os.path.splitext(name)
         dnew = form.get_single_data(name)
-        zfile.writestr("%s.%sjob" % (name, dnew.get("cluster")), utils.write_job(**dnew))
+        zfile.writestr("%s.%sjob" % (name, dnew.get("cluster")),
+                        utils.write_job(**dnew))
 
     zfile.close()
     buff.flush()

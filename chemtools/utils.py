@@ -2,6 +2,7 @@ from django.template import Template, Context
 
 from constants import *
 
+
 def catch(fn):
     '''Decorator to catch all exceptions and log them.'''
     def wrapper(self, *args, **kwargs):

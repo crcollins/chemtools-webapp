@@ -2,6 +2,7 @@ import re
 
 from constants import *
 
+
 def name_expansion(string):
     braceparse = re.compile(r"""(\{[^\{\}]*\})""")
     varparse = re.compile(r"\$\w*")
@@ -46,7 +47,7 @@ def name_expansion(string):
 
     def expand(items):
         swapped = [re.sub(varparse, get_var, x) for x in items]
-        withbrace = swapped[1::2] # every other one has {}
+        withbrace = swapped[1::2]  # every other one has {}
         withoutbrace = swapped[::2]
 
         # remove {} from x and split
@@ -74,7 +75,8 @@ def name_expansion(string):
                 currentvalues.append(x)
             out.append(currentvalues)
 
-        return [''.join(sum(zip(withoutbrace, x), ()) + (swapped[-1], )) for x in out]
+        return [''.join(sum(zip(withoutbrace, x), ()) + (swapped[-1], ))
+                                                                for x in out]
 
     braces = []
     for part in split_molecules(string):
@@ -157,16 +159,19 @@ def parse_name(name):
             except IndexError:
                 middle = None
                 right = right[0]
-        parsedsides = tuple(parse_end_name(x) if x else None for x in (left, middle, right))
 
-        for xside, idx, name in zip(parsedsides, [0, 1, 0], ["left", "middle", "right"]):
+        sides = (left, middle, right)
+        parsedsides = tuple(parse_end_name(x) if x else None for x in sides)
+
+        side_names = ["left", "middle", "right"]
+        for xside, idx, name in zip(parsedsides, [0, 1, 0], side_names):
             if xside and xside[-1][0] in XGROUPS:
                 if nm[idx] > 1:
                     raise Exception(9, "can not do nm expansion with xgroup on %s" % name)
                 elif len(partsets) > 1 and name == "right" and (len(partsets) - 1) != num:
                     raise Exception(11, "can not add core to xgroup on %s" % name)
-
         output.append((core, parsedsides))
+
     if len(output) > 1 and nm[1] > 1:
         raise Exception(8, "Can not do m expansion and have multiple cores")
     return output, nm, xyz
@@ -280,7 +285,8 @@ def get_exact_name(name, spacers=False):
 
             endname = endname.replace("J", "4aaA")
             if spacers:
-                endname = ''.join([char + "**" if char in NEEDSPACE else char for char in endname])
+                endname = ''.join([char + "**" if char in NEEDSPACE else char
+                                                         for char in endname])
             parts.append(endname)
 
         # only first set will have left sides
@@ -291,4 +297,3 @@ def get_exact_name(name, spacers=False):
 
         sets.append(coreset)
     return '_'.join(sets) + '_n%d_m%d' % nm + '_x%d_y%d_z%d' % xyz
-

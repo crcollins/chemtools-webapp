@@ -91,7 +91,8 @@ class GJFWriter(object):
         return Molecule(out)
 
     def build(self, name):
-        '''Returns a closed molecule based on the input of each of the edge names.'''
+        '''Returns a closed molecule based on the input of each of the edge
+        names.'''
         coresets, nm, xyz = parse_name(name)
 
         molecules = []
@@ -244,17 +245,28 @@ if __name__ == "__main__":
                         print repr(x)
 
     parser = argparse.ArgumentParser(description="This program writes Gaussian .gjf files from molecule names.")
-    parser.add_argument('names', metavar='name', type=str, nargs='*', default=list(), help='The name of the molecule to create.')
-    parser.add_argument('-i', metavar='list_file', action="store", nargs='*', default=list(), dest="listfiles", type=str, help='A file with a listing of molecules to make.')
-    parser.add_argument('-f', metavar='folder', action="store", default=".", dest="folder", type=str, help='A folder to output the files.')
-    parser.add_argument('-k', action="store", dest="keywords", default=KEYWORDS, help="The keywords to use for the calculation. (%s by default)" % KEYWORDS)
-    parser.add_argument('-d', type=int, action="store", default=0, help="Used to scale an output image. (0 by default, meaning no picture)")
+    parser.add_argument('names', metavar='name', type=str, nargs='*',
+                        default=list(), help='The name of the molecule to create.')
+    parser.add_argument('-i', metavar='list_file', action="store", nargs='*',
+                        default=list(), dest="listfiles", type=str,
+                        help='A file with a listing of molecules to make.')
+    parser.add_argument('-f', metavar='folder', action="store", default=".",
+                        dest="folder", type=str, help='A folder to output the files.')
+    parser.add_argument('-k', action="store", dest="keywords",
+                        default=KEYWORDS, help="The keywords to use for the calculation. (%s by default)" % KEYWORDS)
+    parser.add_argument('-d', type=int, action="store", default=0,
+                        help="Used to scale an output image. (0 by default, meaning no picture)")
 
-    parser.add_argument('-E', action="store_true", dest="error", default=False, help='Toggles showing error messages.')
-    parser.add_argument('-V', action="store_true", dest="verbose", default=False, help='Toggles showing all messages.')
-    parser.add_argument('-L', action="store_true", dest="longname", default=False, help='Toggles showing the long name.')
-    parser.add_argument('-G', action="store_true", dest="gjf", default=False, help='Toggles writing gjf.')
-    parser.add_argument('-M', action="store_true", dest="mol2", default=False, help='Toggles writing mol2.')
+    parser.add_argument('-E', action="store_true", dest="error", default=False,
+                        help='Toggles showing error messages.')
+    parser.add_argument('-V', action="store_true", dest="verbose",
+                        default=False, help='Toggles showing all messages.')
+    parser.add_argument('-L', action="store_true", dest="longname",
+                        default=False, help='Toggles showing the long name.')
+    parser.add_argument('-G', action="store_true", dest="gjf", default=False,
+                        help='Toggles writing gjf.')
+    parser.add_argument('-M', action="store_true", dest="mol2", default=False,
+                        help='Toggles writing mol2.')
 
     if len(sys.argv) > 1:
         args = sys.argv[1:]

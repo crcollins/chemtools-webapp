@@ -62,7 +62,7 @@ def get_end_features2(left, center, right, power=1, H=1, lacunarity=1):
             idx = both.index(char)
             if char in second and part == 2:
                 idx = both.index(char, idx + 1)
-            partfeatures[idx] += decay_function(count+1, power=power, H=H, lacunarity=lacunarity)
+            partfeatures[idx] += decay_function(count + 1, power=power, H=H, lacunarity=lacunarity)
         endfeatures.extend(partfeatures)
     return endfeatures
 
@@ -75,7 +75,7 @@ def get_end_features3(left, center, right, power=1, H=1, lacunarity=1):
         lengths.append(norm(atoms[0].xyz - atoms[1].xyz))
     lengths = numpy.matrix(lengths)
     minlen = lengths.argmin()
-    ratio_matrix = lengths/lengths.T
+    ratio_matrix = lengths / lengths.T
 
     first = ARYL + XGROUPS
     second = ['*'] + RGROUPS
@@ -93,7 +93,7 @@ def get_end_features3(left, center, right, power=1, H=1, lacunarity=1):
             part = i % 3
             idx = both.index(char)
             if char in second and part == 2:
-                idx = both.index(char, idx + 1) # go to the second rgroup
+                idx = both.index(char, idx + 1)  # go to the second rgroup
             if char in ARYL:
                 distance = ratio_matrix[arylparts[-1], arylparts].sum()
             elif char in XGROUPS + second:
@@ -166,7 +166,7 @@ def get_name_from_naive_feature_vector(vector, limit=4):
                 vector = vector[len(second):]
                 count += 1
             except IndexError:
-                vector = vector[length*(limit - count):]
+                vector = vector[length * (limit - count):]
                 break
         sides.append(name)
 
@@ -175,7 +175,7 @@ def get_name_from_naive_feature_vector(vector, limit=4):
 
 
 def argmax(vector):
-    return max(enumerate(vector), key=lambda x:x[1])[0]
+    return max(enumerate(vector), key=lambda x: x[1])[0]
 
 
 def consume(vector, options):
@@ -214,11 +214,11 @@ def get_name_from_weighted_naive_feature_vector(vector, limit=4):
             temp = []
             try:
                 for group in [first, second, second]:
-                    temp.append(sorted([(x,group[i]) for i, x in enumerate(vector[:len(group)])], reverse=True))
+                    temp.append(sorted([(x, group[i]) for i, x in enumerate(vector[:len(group)])], reverse=True))
                     vector = vector[len(group):]
                     fraction += len(group)
             except IndexError:
-                vector = vector[length*(limit - count)+(length-fraction):]
+                vector = vector[length * (limit - count) + (length - fraction):]
                 break
 
             single = []
@@ -267,7 +267,7 @@ def get_naive_vector_for_gap_value(gap):
     # 1/a * gap = x - ((WL.I * x) * WH)
     # 1/a * gap = x * (1 - WL.I * WH)
     # 1/a * gap / (1 - WL.I * WH) = x
-    value = (1/SLOPE) * gap / (1 - WL.I * WH)
+    value = (1 / SLOPE) * gap / (1 - WL.I * WH)
     return (WL * value).T.tolist()[0]
 
 
@@ -275,7 +275,7 @@ def get_properties_from_decay_vector_linear(feature):
     homo = feature * WH
     lumo = feature * WL
     gap = feature * WG
-    return homo[0,0], lumo[0,0], gap[0,0]
+    return homo[0, 0], lumo[0, 0], gap[0, 0]
 
 
 def get_properties_from_decay_vector_svm(feature):

@@ -2,14 +2,17 @@ import os
 from cStringIO import StringIO
 import multiprocessing
 
-from scipy import constants
+from scipy.constants import physical_constants
 
 from utils import Output, catch
 from mol_name import get_exact_name
-from ml import get_naive_feature_vector, get_decay_feature_vector, get_decay_distance_correction_feature_vector
+from ml import get_naive_feature_vector, get_decay_feature_vector, \
+                get_decay_distance_correction_feature_vector
 
 
-HARTREETOEV = 1/constants.physical_constants["electron volt-hartree relationship"][0]
+EVTOHARTREE = physical_constants["electron volt-hartree relationship"][0]
+HARTREETOEV = 1 / EVTOHARTREE
+
 
 class Log(object):
     PARSERS = dict()
@@ -25,7 +28,8 @@ class Log(object):
             for k, v in Log.PARSERS.items():
                 self.parsers[k] = v()
 
-            self.order = ["Options", "HOMO", "LUMO", "HomoOrbital", "Dipole", "Energy", "BandGap", "Time"]
+            self.order = ["Options", "HOMO", "LUMO", "HomoOrbital",
+                        "Dipole", "Energy", "BandGap", "Time"]
 
             for i, line in enumerate(f):
                 for k, parser in self.parsers.items():
@@ -33,7 +37,8 @@ class Log(object):
 
             # major memory saver by deleting all the line parser objects
             for parser in self.parsers:
-                self.parsers[parser] = (self.parsers[parser].value, self.parsers[parser].done)
+                self.parsers[parser] = (self.parsers[parser].value,
+                                        self.parsers[parser].done)
 
     @classmethod
     def add_parser(cls, parser):
@@ -69,7 +74,8 @@ class Log(object):
         filename = self.fname
         name = os.path.basename(filename).replace(".log", "")
         if name.lower().endswith("_td"):
-            name = name[:-3]  # rstrip does not work because some names end with a "d"
+            # rstrip does not work because some names end with a "d"
+            name = name[:-3]
         elif name.lower().endswith("_tddft"):
             name = name[:-6]
         try:
@@ -86,7 +92,8 @@ class Log(object):
         return ','.join([filename, name, exactname, features] + values)
 
     def format_header(self):
-        return ','.join(["Filename", "Name", "ExactName", "Features"] + self.order)
+        nonparsed = ["Filename", "Name", "ExactName", "Features"]
+        return ','.join(nonparsed + self.order)
 
 
 class LogSet(Output):
@@ -144,8 +151,7 @@ class LineParser(object):
 
     def __str__(self):
         return str(self.value)
-    # def header(self):
-    #     return " ".join(re.split("([A-Z][^A-Z]*)", self.__class__.__name__)[1::2])
+
 
 ##############################################################################
 ##############################################################################
@@ -260,8 +266,8 @@ class HOMO(LineParser):
 
     @is_done
     def parse(self, line):
-         # " Alpha  occ. eigenvalues --   -0.27354  -0.26346  -0.25649  -0.21987  -0.21885"
-         # " Alpha virt. eigenvalues --   -0.00138   0.03643   0.07104   0.08148   0.08460"
+        # " Alpha  occ. eigenvalues --   -0.27354  -0.26346  -0.25649  -0.21987  -0.21885"
+        # " Alpha virt. eigenvalues --   -0.00138   0.03643   0.07104   0.08148   0.08460"
         if "occ. eigenvalues" in line:
             self.prevline = line
         elif "virt. eigenvalues" in line and self.prevline:
@@ -277,8 +283,8 @@ class LUMO(LineParser):
 
     @is_done
     def parse(self, line):
-         # " Alpha  occ. eigenvalues --   -0.27354  -0.26346  -0.25649  -0.21987  -0.21885"
-         # " Alpha virt. eigenvalues --   -0.00138   0.03643   0.07104   0.08148   0.08460"
+        # " Alpha  occ. eigenvalues --   -0.27354  -0.26346  -0.25649  -0.21987  -0.21885"
+        # " Alpha virt. eigenvalues --   -0.00138   0.03643   0.07104   0.08148   0.08460"
         if "occ. eigenvalues" in line:
             self.prevline = line
         elif "virt. eigenvalues" in line and self.prevline:
@@ -406,15 +412,19 @@ if __name__ == "__main__":
                 return []
 
         def convert_folders(self, folders):
-            if folders:
-                files = []
-                for folder in folders:
-                    if os.path.isdir(folder):
-                        path = os.path.relpath(folder) if self.rel else os.path.abspath(folder)
-                        files += [os.path.join(path, x) for x in os.listdir(folder) if os.path.isfile(os.path.join(path, x))]
-                return files
-            else:
+            if not folders:
                 return []
+
+            files = []
+            for folder in folders:
+                if not os.path.isdir(folder):
+                    continue
+                abspath = os.path.abspath(folder)
+                relpath = os.path.relpath(folder)
+                path = relpath if self.rel else abspath
+                paths = [os.path.join(path, x) for x in os.listdir(folder)]
+                files += [x for x in paths if os.path.isfile(x)]
+            return files
 
         def write_file(self):
             logs = LogSet()
@@ -439,17 +449,30 @@ if __name__ == "__main__":
                 else:
                     print logs.format_output(errors=self.error)
 
-    parser = argparse.ArgumentParser(description="This program extracts data from Gaussian log files.")
-    parser.add_argument('files', metavar='file', type=str, nargs='*', help='The name of single file.')
-    parser.add_argument('-i', metavar='list_file', action="store", nargs='*', dest="listfiles", type=str, help='A file with a listing of other files.')
-    parser.add_argument('-f', metavar='folder', action="store", nargs='*', dest="folders", type=str, help='A folder with a collection of files.')
-    parser.add_argument('-o', metavar='output', action="store", dest="outputfile", type=str, help='The output file.')
-    parser.add_argument('-E', action="store_true", dest="error", default=False, help='Toggles showing error messages.')
-    parser.add_argument('-P', action="store_true", dest="paths", default=False, help='Toggles showing paths to files.')
-    parser.add_argument('-R', action="store_true", dest="rel", default=False, help='Toggles showing relative paths.')
-    parser.add_argument('-V', action="store_true", dest="verbose", default=False, help='Toggles showing all messages.')
-    parser.add_argument('-G', action="store_true", dest="gjf", default=False, help='Toggles writing gjf file from log.')
-    parser.add_argument('-T', action="store_true", dest="td", default=False, help='Toggles writing TD gjf file from log.')
+    parser = argparse.ArgumentParser(
+            description="This program extracts data from Gaussian log files.")
+    parser.add_argument('files', metavar='file', type=str, nargs='*',
+                        help='The name of single file.')
+    parser.add_argument('-i', metavar='list_file', action="store", nargs='*',
+                        dest="listfiles", type=str,
+                        help='A file with a listing of other files.')
+    parser.add_argument('-f', metavar='folder', action="store", nargs='*',
+                        dest="folders", type=str,
+                        help='A folder with a collection of files.')
+    parser.add_argument('-o', metavar='output', action="store",
+                        dest="outputfile", type=str, help='The output file.')
+    parser.add_argument('-E', action="store_true", dest="error", default=False,
+                        help='Toggles showing error messages.')
+    parser.add_argument('-P', action="store_true", dest="paths", default=False,
+                        help='Toggles showing paths to files.')
+    parser.add_argument('-R', action="store_true", dest="rel", default=False,
+                        help='Toggles showing relative paths.')
+    parser.add_argument('-V', action="store_true", dest="verbose",
+                        default=False, help='Toggles showing all messages.')
+    parser.add_argument('-G', action="store_true", dest="gjf", default=False,
+                        help='Toggles writing gjf file from log.')
+    parser.add_argument('-T', action="store_true", dest="td", default=False,
+                        help='Toggles writing TD gjf file from log.')
 
     if len(sys.argv) > 1:
         args = sys.argv[1:]
