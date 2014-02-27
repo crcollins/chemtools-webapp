@@ -8,9 +8,10 @@ from django.utils import simplejson
 
 import views
 import models
+import utils
 from account.views import account_page
-from project.utils import get_sftp_connection, get_ssh_connection, AESCipher
-
+from project.utils import get_sftp_connection, get_ssh_connection, AESCipher, \
+                        SSHClient, SFTPClient
 
 class SSHPageTestCase(TestCase):
     user = {
@@ -300,6 +301,34 @@ class SSHSettingsTestCase(TestCase):
             pass
         with self.credential2.get_sftp_connection():
             pass
+
+    def test_get_ssh_connection_obj(self):
+        ssh = self.credential.get_ssh_connection()
+        obj = utils.get_ssh_connection_obj(self.credential)
+        self.assertTrue(isinstance(obj, SSHClient))
+
+    def test_get_ssh_connection_obj_SSHClient(self):
+        ssh = self.credential.get_ssh_connection()
+        self.assertEqual(utils.get_ssh_connection_obj(ssh), ssh)
+
+    def test_get_ssh_connection_obj_fail(self):
+        obj = []
+        with self.assertRaises(TypeError):
+            utils.get_ssh_connection_obj(obj)
+
+    def test_get_sftp_connection_obj(self):
+        sftp = self.credential.get_sftp_connection()
+        obj = utils.get_sftp_connection_obj(self.credential)
+        self.assertTrue(isinstance(obj, SFTPClient))
+
+    def test_get_sftp_connection_obj_SFTPClient(self):
+        sftp = self.credential.get_sftp_connection()
+        self.assertEqual(utils.get_sftp_connection_obj(sftp), sftp)
+
+    def test_get_sftp_connection_obj_fail(self):
+        obj = []
+        with self.assertRaises(TypeError):
+            utils.get_sftp_connection_obj(obj)
 
 
 class UtilsTestCase(TestCase):
