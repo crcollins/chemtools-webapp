@@ -14,11 +14,12 @@ try:
     from secret_key import SECRET_KEY, AES_KEY
 except ImportError:
     path = os.path.join(ROOT_PATH, "project/secret_key.py")
-    key = ''.join([random.choice("abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)") for i in xrange(64)])
+    letters = "abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)"
+    key = ''.join([random.choice(letters) for i in xrange(64)])
     aes_key = Random.new().read(AES.block_size)
     with open(path, "w") as f:
         f.write("SECRET_KEY = '%s'\n" % key)
-        f.write("AES_KEY = b"+ repr(aes_key) + "\n")
+        f.write("AES_KEY = b" + repr(aes_key) + '\n')
     from secret_key import SECRET_KEY, AES_KEY
 
 DEBUG = True
@@ -32,12 +33,12 @@ MANAGERS = ADMINS
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': os.path.join(ROOT_PATH, 'database'),                      # Or path to database file if using sqlite3.
-        'USER': '',                      # Not used with sqlite3.
-        'PASSWORD': '',                  # Not used with sqlite3.
-        'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(ROOT_PATH, 'database'),
+        'USER': '',
+        'PASSWORD': '',
+        'HOST': '',
+        'PORT': '',
     }
 }
 
@@ -130,7 +131,6 @@ WSGI_APPLICATION = 'project.wsgi.application'
 
 TEMPLATE_DIRS = (
     os.path.join(ROOT_PATH, "project/templates"),
-    # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
 )

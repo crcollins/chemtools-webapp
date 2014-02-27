@@ -16,7 +16,8 @@ urlpatterns = patterns('',
 )
 
 urlpatterns += patterns('django.contrib.auth.views',
-    url(r"^login/$", "login", {'template_name': 'account/login.html'}, name="login"),
+    url(r"^login/$", "login", {'template_name': 'account/login.html'},
+        name="login"),
     url(r"^logout/$", "logout", name="logout"),
     url(r'^reset/$', 'password_reset',
         {
@@ -33,7 +34,7 @@ urlpatterns += patterns('django.contrib.auth.views',
         'password_reset_confirm',
         {
             'template_name': 'account/password_reset_confirm.html',
-            'post_reset_redirect' : '/reset/done/',
+            'post_reset_redirect': '/reset/done/',
         }),
     url(r'^reset/done/$',
         'password_reset_complete',
@@ -44,8 +45,10 @@ urlpatterns += patterns('django.contrib.auth.views',
 
 urlpatterns += patterns('account.views',
     url(r"^register/$", "register_user", name="register"),
-    url(r"^register/(?P<activation_key>[a-f0-9]*)$", "activate_user", name="activate"),
+    url(r"^register/(?P<activation_key>[a-f0-9]*)$", "activate_user",
+        name="activate"),
 )
 
 if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(settings.MEDIA_URL,
+                        document_root=settings.MEDIA_ROOT)
