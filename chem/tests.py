@@ -420,7 +420,7 @@ class PostsTestCase(TestCase):
         r = self.client.login(username=self.user["username"],
                             password=self.user["password"])
         self.assertTrue(r)
-        options = self.options
+        options = self.options.copy()
         for name in self.names:
             options["name"] = name
             response = self.client.get(reverse(views.molecule_detail,
@@ -441,7 +441,7 @@ class PostsTestCase(TestCase):
         self.assertTrue(r)
 
         name = ','.join(self.names)
-        options = self.options
+        options = self.options.copy()
         options["name"] = name
         response = self.client.get(reverse(views.multi_molecule,
                                         args=(name, )))
