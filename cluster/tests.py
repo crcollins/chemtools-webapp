@@ -9,6 +9,7 @@ from django.utils import simplejson
 import views
 import models
 import utils
+import interface
 from account.views import account_page
 from project.utils import get_sftp_connection, get_ssh_connection, AESCipher, \
                         SSHClient, SFTPClient
@@ -20,6 +21,11 @@ class SSHPageTestCase(TestCase):
         "email": "test@test.com",
         "password": "S0m3thing",
     }
+    super_user = {
+        "username": "admin",
+        "email": "admin@test.com",
+        "password": "cantstopmenow",
+    }
     cluster = {
             "name": "test-machine",
             "hostname": "localhost",
@@ -30,14 +36,20 @@ class SSHPageTestCase(TestCase):
         "password": "vagrant",
         "password2": "vagrant",
         "use_password": True,
-
+    }
+    credential2 = {
+        "username": "vagrant",
+        "password": "vagrant",
+        "password2": "vagrant",
+        "use_password": True,
     }
 
     def setUp(self):
-        user = User.objects.create_user(self.user["username"],
-                                        email=self.user["email"],
-                                        password=self.user["password"])
+        user = User.objects.create_user(**self.user)
         user.save()
+        super_user = User.objects.create_superuser(**self.super_user)
+        super_user.save()
+
         cluster = models.Cluster(
                                 name=self.cluster["name"],
                                 hostname=self.cluster["hostname"],
@@ -52,6 +64,16 @@ class SSHPageTestCase(TestCase):
                                         use_password=True)
         credential.save()
         self.credential = credential
+
+        credential2 = models.Credential(
+                                        user=super_user,
+                                        cluster=cluster,
+                                        username=self.credential2["username"],
+                                        password=self.credential2["password"],
+                                        use_password=True)
+        credential2.save()
+        self.credential2 = credential2
+
         self.client = Client()
 
     def test_job_index(self):
@@ -112,6 +134,25 @@ class SSHPageTestCase(TestCase):
         data = simplejson.loads(response.content)
         self.assertTrue(data["is_authenticated"])
 
+    def test_kill_job(self):
+        url = reverse(views.kill_job, args=("test-machine", ))
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 302)
+
+        r = self.client.login(username=self.super_user["username"],
+                            password=self.super_user["password"])
+        self.assertTrue(r)
+
+        gjfstring = "EMPTY"
+        jobstring = "sleep 60"
+        results = interface.run_job(self.credential2, gjfstring, jobstring)
+        self.assertIsNone(results["error"])
+        jobid = results["jobid"]
+        data = {
+            results["jobid"]: "on",
+        }
+        response = self.client.post(url, data)
+
     def test_kill_job_perm_fail(self):
         url = reverse(views.kill_job, args=("test-machine", ))
         response = self.client.get(url)
@@ -124,6 +165,7 @@ class SSHPageTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content,
                         "You must be a staff user to kill a job.")
+
 
 
 class SSHSettingsTestCase(TestCase):
