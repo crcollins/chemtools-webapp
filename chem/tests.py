@@ -366,7 +366,7 @@ class MainPageTestCase(TestCase):
                 obj.delete()
 
 
-class PostsTestCase(TestCase):
+class PostsFailTestCase(TestCase):
     names = ["24a_TON", "24b_TSP_24a_24a", "CON_24a", "A_TON_A_A"]
     cluster = {
             "name": "test-machine",
@@ -480,3 +480,153 @@ class PostsTestCase(TestCase):
                     "worked": []
                     }
         self.assertEqual(simplejson.loads(response.content), expected)
+
+
+class PostsTestCase(TestCase):
+    names = ["24a_TON", "24b_TSP_24a_24a", "CON_24a", "A_TON_A_A"]
+    bad_names = [
+        ("2a_TON_CC", "no rgroups allowed"),
+        ("ASADA", "(1, 'Bad Core Name')"),
+        ("TON_CC_CC", "can not attach to end"),
+    ]
+    cluster = {
+            "name": "test-machine",
+            "hostname": "localhost",
+            "port": 2222,
+        }
+    credential = {
+        "username": "vagrant",
+        "password": "vagrant",
+        "password2": "vagrant",
+        "use_password": True,
+    }
+    options = {
+        "email": "test@test.com",
+        "nodes": 1,
+        "walltime": 48,
+        "allocation": "TG-CHE120081",
+        "cluster": 'g',
+        "template":
+            "{{ name }} {{ email }} {{ nodes }} {{ time }} {{ allocation }}",
+        "credential": 1,
+    }
+    user = {
+        "username": "admin",
+        "email": "admin@test.com",
+        "password": "mypass",
+    }
+
+    def setUp(self):
+        self.client = Client()
+        new_user = User.objects.create_superuser(**self.user)
+        new_user.save()
+        cluster = Cluster(
+                        name=self.cluster["name"],
+                        hostname=self.cluster["hostname"],
+                        port=self.cluster["port"])
+        cluster.save()
+        self.cluster = cluster
+        credential = Credential(
+                                user=new_user,
+                                cluster=cluster,
+                                username=self.credential["username"],
+                                password=self.credential["password"],
+                                use_password=True)
+        credential.save()
+        self.credential = credential
+
+    def test_post_single(self):
+        r = self.client.login(username=self.user["username"],
+                            password=self.user["password"])
+        self.assertTrue(r)
+        options = self.options.copy()
+        for name in self.names:
+            options["name"] = name
+            response = self.client.get(reverse(views.molecule_detail,
+                                                args=(name, )))
+            self.assertEqual(response.status_code, 200)
+            url = reverse(views.molecule_detail, args=(name, ))
+            response = self.client.post(url, options)
+
+            results = simplejson.loads(response.content)
+            self.assertIsNone(results["error"])
+            self.assertIsNotNone(results["jobid"])
+
+    def test_post_single_fail(self):
+        r = self.client.login(username=self.user["username"],
+                            password=self.user["password"])
+        self.assertTrue(r)
+        options = self.options.copy()
+        for name, error in self.bad_names:
+            options["name"] = name
+            response = self.client.get(reverse(views.molecule_detail,
+                                                args=(name, )))
+            self.assertEqual(response.status_code, 200)
+            url = reverse(views.molecule_detail, args=(name, ))
+            response = self.client.post(url, options)
+
+            results = simplejson.loads(response.content)
+            self.assertEqual(results["error"], error)
+            self.assertIsNone(results["jobid"])
+
+    def test_post_multi(self):
+        r = self.client.login(username=self.user["username"],
+                            password=self.user["password"])
+        self.assertTrue(r)
+
+        name = ','.join(self.names)
+        options = self.options.copy()
+        options["name"] = "{{ name }}"
+        response = self.client.get(reverse(views.multi_molecule,
+                                        args=(name, )))
+        self.assertEqual(response.status_code, 200)
+        url = reverse(views.multi_molecule, args=(name, ))
+        response = self.client.post(url, options)
+
+        results = simplejson.loads(response.content)
+        self.assertIsNone(results["error"])
+        self.assertEqual(len(results["worked"]), len(self.names))
+        self.assertEqual(len(results["failed"]), 0)
+
+    def test_post_multi_fail(self):
+        r = self.client.login(username=self.user["username"],
+                            password=self.user["password"])
+        self.assertTrue(r)
+
+        names, errors = zip(*self.bad_names)
+        string = ','.join(names)
+        options = self.options.copy()
+        options["name"] = "{{ name }}"
+        response = self.client.get(reverse(views.multi_molecule,
+                                        args=(string, )))
+        self.assertEqual(response.status_code, 200)
+        url = reverse(views.multi_molecule, args=(string, ))
+        response = self.client.post(url, options)
+
+        results = simplejson.loads(response.content)
+        self.assertIsNone(results["error"])
+        self.assertEqual(len(results["worked"]), 0)
+        self.assertEqual(len(results["failed"]), len(names))
+
+    def test_post_multi_job(self):
+        files = []
+        base = os.path.join(settings.MEDIA_ROOT, "tests")
+        for filename in ["A_TON_A_A", "A_TON_A_A_TD"]:
+            path = os.path.join(base, filename + ".gjf")
+            files.append(open(path, 'r'))
+
+        options = self.options.copy()
+        options["files"] = files
+        options["name"] = "{{ name }}"
+        r = self.client.login(username=self.user["username"],
+                            password=self.user["password"])
+        self.assertTrue(r)
+        response = self.client.get(reverse(views.multi_job))
+        self.assertEqual(response.status_code, 200)
+        url = reverse(views.multi_job)
+        response = self.client.post(url, options)
+
+        results = simplejson.loads(response.content)
+        self.assertIsNone(results["error"])
+        self.assertEqual(len(results["worked"]), len(files))
+        self.assertEqual(len(results["failed"]), 0)
