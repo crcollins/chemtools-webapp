@@ -40,9 +40,6 @@ class GJFWriterTestCase(TestCase):
     invalid_polymer_options = ['_n2_m2', '_n3_m3', '_m2_n2', '_m3_n3',
                             '_n0', '_m0', '_n0_m0']
 
-    def setUp(self):
-        pass
-
     def test_cores(self):
         for core in self.cores:
             gjfwriter.GJFWriter(core)
@@ -51,28 +48,20 @@ class GJFWriterTestCase(TestCase):
         for core in self.invalid_cores:
             try:
                 gjfwriter.GJFWriter(core)
-                raise ValueError
+                self.fail(core)
             except:
                 pass
 
     def test_sides(self):
-        errors = []
         sets = [
             self.templates,
             self.valid_sides,
         ]
         for template, group in product(*sets):
             name = template.format(group)
-            try:
-                gjfwriter.GJFWriter(name)
-            except Exception as e:
-                errors.append((name, e))
-        if errors:
-            print errors
-            raise errors[0][1]
+            gjfwriter.GJFWriter(name)
 
     def test_invalid_sides(self):
-        errors = []
         sets = [
             self.templates,
             self.invalid_sides,
@@ -82,15 +71,11 @@ class GJFWriterTestCase(TestCase):
             try:
                 gjfwriter.GJFWriter(name)
                 if group != "TON" and name != "CON_BB":
-                    errors.append(name)
+                    self.fail(name)
             except Exception:
                 pass
-        if errors:
-            print errors
-            raise ValueError
 
     def test_polymer(self):
-        errors = []
         sets = [
             self.templates,
             self.valid_polymer_sides,
@@ -98,16 +83,9 @@ class GJFWriterTestCase(TestCase):
         ]
         for template, group, option in product(*sets):
             name = template.format(group) + option
-            try:
-                gjfwriter.GJFWriter(name)
-            except Exception as e:
-                errors.append((name, e))
-        if errors:
-            print errors
-            raise errors[0][1]
+            gjfwriter.GJFWriter(name)
 
     def test_invalid_polymer(self):
-        errors = []
         sets = [
             self.templates,
             self.valid_sides,
@@ -117,15 +95,11 @@ class GJFWriterTestCase(TestCase):
             name = template.format(group) + option
             try:
                 gjfwriter.GJFWriter(name)
-                errors.append(name)
+                self.fail(name)
             except Exception:
                 pass
-        if errors:
-            print errors
-            raise ValueError
 
     def test_single_axis_expand(self):
-        errors = []
         sets = [
             self.valid_sides,
             ['x', 'y', 'z'],
@@ -133,16 +107,9 @@ class GJFWriterTestCase(TestCase):
         ]
         for group, axis, num  in product(*sets):
             name = self.templates[0].format(group) + '_' + axis + num
-            try:
-                gjfwriter.GJFWriter(name)
-            except Exception as e:
-                errors.append((name, e))
-        if errors:
-            print errors
-            raise errors[0][1]
+            gjfwriter.GJFWriter(name)
 
     def test_multi_axis_expand(self):
-        errors = []
         sets = [
             self.valid_sides,
             ['_x1', '_x2', '_x3'],
@@ -151,15 +118,9 @@ class GJFWriterTestCase(TestCase):
         ]
         for group, x, y, z in product(*sets):
             name = self.templates[0].format(group) + x + z + z
-            try:
-                gjfwriter.GJFWriter(name)
-            except Exception as e:
-                errors.append((name, e))
-        if errors:
-            raise errors[0][1]
+            gjfwriter.GJFWriter(name)
 
     def test_manual_polymer(self):
-        errors = []
         sets = [
             self.templates[1:-1],
             self.valid_polymer_sides,
@@ -167,16 +128,9 @@ class GJFWriterTestCase(TestCase):
         ]
         for template, group, num in product(*sets):
             name = '_'.join([template.format(group)] * num)
-            try:
-                gjfwriter.GJFWriter(name)
-            except Exception as e:
-                errors.append((name, e))
-        if errors:
-            print errors
-            raise errors[0][1]
+            gjfwriter.GJFWriter(name)
 
     def test_invalid_manual_polymer(self):
-        errors = []
         sets = [
             self.templates,
             self.invalid_polymer_sides,
@@ -190,15 +144,11 @@ class GJFWriterTestCase(TestCase):
                     continue
                 if any(x.endswith("B") for x in name.split("_TON_")):
                     continue
-                errors.append(name)
+                self.fail(name)
             except Exception:
                 pass
-        if errors:
-            print errors
-            raise ValueError
 
     def test_spot_check(self):
-        errors = []
         names = [
             '5ba_TON_5ba55_TON_345495_2_TON_n6',
             '24a_TON_35b_24c',
@@ -216,16 +166,9 @@ class GJFWriterTestCase(TestCase):
             '5_TON_n13',
         ]
         for name in names:
-            try:
-                gjfwriter.GJFWriter(name)
-            except Exception as e:
-                errors.append((name, e))
-        if errors:
-            print errors
-            raise errors[0][1]
+            gjfwriter.GJFWriter(name)
 
     def test_spot_check_invalid(self):
-        errors = []
         pairs = [
             ("B_TON_n2",
                 "(9, 'can not do nm expansion with xgroup on left')"),
@@ -239,60 +182,39 @@ class GJFWriterTestCase(TestCase):
         for name, message in pairs:
             try:
                 gjfwriter.GJFWriter(name)
-                raise ValueError
+                self.fail((name, message))
             except Exception as e:
                 self.assertEqual(message, str(e))
 
     def test_png(self):
-        errors = []
         sets = [
             self.templates,
             self.valid_sides,
         ]
         for template, group in product(*sets):
             name = template.format(group)
-            try:
-                obj = gjfwriter.GJFWriter(name)
-                obj.get_png()
-            except Exception as e:
-                errors.append((name, e))
-        if errors:
-            print errors
-            raise errors[0][1]
+            obj = gjfwriter.GJFWriter(name)
+            obj.get_png()
 
     def test_gjf(self):
-        errors = []
         sets = [
             self.templates,
             self.valid_sides,
         ]
         for template, group in product(*sets):
             name = template.format(group)
-            try:
-                obj = gjfwriter.GJFWriter(name)
-                obj.get_gjf()
-            except Exception as e:
-                errors.append((name, e))
-        if errors:
-            print errors
-            raise errors[0][1]
+            obj = gjfwriter.GJFWriter(name)
+            obj.get_gjf()
 
     def test_mol2(self):
-        errors = []
         sets = [
             self.templates,
             self.valid_sides,
         ]
         for template, group in product(*sets):
             name = template.format(group)
-            try:
-                obj = gjfwriter.GJFWriter(name)
-                obj.get_mol2()
-            except Exception as e:
-                errors.append((name, e))
-        if errors:
-            print errors
-            raise errors[0][1]
+            obj = gjfwriter.GJFWriter(name)
+            obj.get_mol2()
 
 
 class MolNameTestCase(TestCase):
@@ -492,60 +414,28 @@ class MolNameTestCase(TestCase):
             self.assertEqual(set(mol_name.name_expansion(name)), set(result))
 
     def test_get_exact_name(self):
-        errors = []
         for name, expected in self.pairs:
-            try:
-                a = mol_name.get_exact_name(name)
-                expected = expected + "_n1_m1_x1_y1_z1"
-                assert a == expected.replace('*', '')
-            except Exception as e:
-                print e
-                errors.append((a, expected, e))
-        if errors:
-            print errors
-            raise errors[0][1]
+            a = mol_name.get_exact_name(name)
+            expected = expected + "_n1_m1_x1_y1_z1"
+            self.assertEqual(a, expected.replace('*', ''))
 
     def test_get_exact_name_polymer(self):
-        errors = []
         for name, expected in self.polymer_pairs:
-            try:
-                a = mol_name.get_exact_name(name)
-                expected = expected + "_x1_y1_z1"
-                assert a == expected.replace('*', '')
-            except Exception as e:
-                print e
-                errors.append((a, expected, e))
-        if errors:
-            print errors
-            raise errors[0][2]
+            a = mol_name.get_exact_name(name)
+            expected = expected + "_x1_y1_z1"
+            self.assertEqual(a, expected.replace('*', ''))
 
     def test_get_exact_name_spacers(self):
-        errors = []
         for name, expected in self.pairs:
-            try:
-                a = mol_name.get_exact_name(name, spacers=True)
-                expected = expected + "_n1_m1_x1_y1_z1"
-                assert a == expected
-            except Exception as e:
-                print e
-                errors.append((a, expected, e))
-        if errors:
-            print errors
-            raise errors[0][1]
+            a = mol_name.get_exact_name(name, spacers=True)
+            expected = expected + "_n1_m1_x1_y1_z1"
+            self.assertEqual(a, expected)
 
     def test_get_exact_name_polymer_spacers(self):
-        errors = []
         for name, expected in self.polymer_pairs:
-            try:
-                a = mol_name.get_exact_name(name, spacers=True)
-                expected = expected + "_x1_y1_z1"
-                assert a == expected
-            except Exception as e:
-                print e
-                errors.append((a, expected, e))
-        if errors:
-            print errors
-            raise errors[0][2]
+            a = mol_name.get_exact_name(name, spacers=True)
+            expected = expected + "_x1_y1_z1"
+            self.assertEqual(a, expected)
 
 
 class ExtractorTestCase(TestCase):
@@ -555,7 +445,6 @@ class ExtractorTestCase(TestCase):
 
 class MLTestCase(TestCase):
     def test_get_core_features(self):
-        errors = []
         cores = [
             ("TON", [1, 1, 0, 0, 0, 0, 1, 0, 0]),
             ("CON", [0, 1, 0, 0, 0, 0, 1, 0, 0]),
@@ -567,31 +456,16 @@ class MLTestCase(TestCase):
             ("CCC", [0, 0, 0, 0, 0, 1, 0, 0, 1]),
         ]
         for core, expected in cores:
-            try:
-                vector = ml.get_core_features(core)
-                self.assertEqual(vector, expected)
-            except Exception as e:
-                print e
-                errors.append((vector, expected, e))
-        if errors:
-            print errors
-            raise errors[0][2]
+            vector = ml.get_core_features(core)
+            self.assertEqual(vector, expected)
 
     def test_get_extra_features(self):
-        errors = []
         values = [0, 2, 12]
         names = "nmxyz"
         for numbers in product(values, values, values, values, values):
-            try:
-                use = [n + str(v) for n, v in zip(names, numbers)]
-                vector = ml.get_extra_features(*use)
-                self.assertEqual(vector, list(numbers))
-            except Exception as e:
-                print e
-                errors.append((vector, numbers, e))
-        if errors:
-            print errors
-            raise errors[0][2]
+            use = [n + str(v) for n, v in zip(names, numbers)]
+            vector = ml.get_extra_features(*use)
+            self.assertEqual(vector, list(numbers))
 
     def test_get_naive_feature_vector(self):
         expected = [
