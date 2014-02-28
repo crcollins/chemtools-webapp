@@ -401,16 +401,6 @@ class PostsTestCase(TestCase):
                                             self.user["email"],
                                             self.user["password"])
         new_user.save()
-        new_data = DataPoint(name="A_TON_A_A",
-                            exact_name="A_TON_A_A_n1_m1_x1_y1_z1",
-                            options="td B3LYP/6-31g(d) geom=connectivity",
-                            homo=-6.460873931,
-                            lumo=-1.31976745,
-                            homo_orbital=41,
-                            dipole=0.0006,
-                            energy=-567.1965205,
-                            band_gap=4.8068)
-        new_data.save()
         cluster = Cluster(
                         name=self.cluster["name"],
                         hostname=self.cluster["hostname"],
