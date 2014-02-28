@@ -19,7 +19,8 @@ class MainPageTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_log_parse(self):
-        with open(os.path.join(settings.MEDIA_ROOT, "tests", "A_TON_A_A.log"), 'r') as f:
+        test_path = os.path.join(settings.MEDIA_ROOT, "tests")
+        with open(os.path.join(test_path, "A_TON_A_A.log"), 'r') as f:
             data = {
                 "myfiles": f,
                 "option": "logparse",
@@ -28,10 +29,16 @@ class MainPageTestCase(TestCase):
             self.assertEqual(response.status_code, 200)
             with StringIO(response.content) as f:
                 reader = csv.reader(f, delimiter=',', quotechar='"')
-                expected = ["A_TON_A_A.log", "A_TON_A_A", "A_TON_A_A_n1_m1_x1_y1_z1",
-                            "opt B3LYP/6-31g(d) geom=connectivity", "-6.46079886952",
-                            "-1.31975211714", "41", "0.0006", "-567.1965205",
-                            "---", "0.35"]
+                expected = ["A_TON_A_A.log", "A_TON_A_A",
+                            "A_TON_A_A_n1_m1_x1_y1_z1",
+                            "opt B3LYP/6-31g(d) geom=connectivity",
+                            "-6.46079886952",
+                            "-1.31975211714",
+                            "41",
+                            "0.0006",
+                            "-567.1965205",
+                            "---",
+                            "0.35"]
                 lines = [x for x in reader]
                 results = lines[1][:3] + lines[1][4:]
                 self.assertEqual(results, expected)
@@ -52,7 +59,9 @@ class MainPageTestCase(TestCase):
 
     def test_gjf_reset_td(self):
         base = os.path.join(settings.MEDIA_ROOT, "tests", "A_TON_A_A")
-        with open(base + ".log", 'r') as log, open(base + "_TD.gjf", 'r') as gjf:
+        log_path = base + ".log"
+        gjf_path = base + "_TD.gjf"
+        with open(log_path, 'r') as log, open(gjf_path, 'r') as gjf:
             data = {
                 "myfiles": log,
                 "option": "gjfreset",
@@ -77,7 +86,8 @@ class MainPageTestCase(TestCase):
             with StringIO(response.content) as f:
                 with zipfile.ZipFile(f, "r") as zfile:
                     with zfile.open("errors.txt") as f2:
-                        self.assertEqual(f2.read(), "A_TON_A_A - The log file was invalid")
+                        msg = "A_TON_A_A - The log file was invalid"
+                        self.assertEqual(f2.read(), msg)
 
     def test_data_parse(self):
         datatxt = os.path.join(settings.MEDIA_ROOT, "tests", "data.txt")
@@ -89,10 +99,10 @@ class MainPageTestCase(TestCase):
             }
             response = self.client.post(reverse(views.upload_data), data)
             self.assertEqual(response.status_code, 200)
-            with StringIO(response.content) as f, open(outputtxt, 'r') as output:
+            with StringIO(response.content) as f, open(outputtxt, 'r') as out:
                 with zipfile.ZipFile(f, "r") as zfile:
                     with zfile.open("output.txt") as f2:
-                        self.assertEqual(f2.read(), output.read())
+                        self.assertEqual(f2.read(), out.read())
 
     def test_data_parse_set(self):
         for filename in ["CON.tar.gz", "TON.tar.bz2"]:
@@ -121,12 +131,12 @@ class MainPageTestCase(TestCase):
             with StringIO(response.content) as f:
                 with zipfile.ZipFile(f, "r") as zfile2:
                     for folder in ["CON__TD/", "TON__TD/"]:
-                        with zfile2.open(folder+"output.txt") as f2:
+                        with zfile2.open(folder + "output.txt") as f2:
                             self.assertIn("Errors (0)", f2.read())
 
-
     def test_data_parse_log(self):
-        with open(os.path.join(settings.MEDIA_ROOT, "tests", "A_TON_A_A.log"), 'r') as f:
+        test_path = os.path.join(settings.MEDIA_ROOT, "tests")
+        with open(os.path.join(test_path, "A_TON_A_A.log"), 'r') as f:
             data = {
                 "myfiles": f,
                 "option": "dataparse",
@@ -141,4 +151,3 @@ class MainPageTestCase(TestCase):
         }
         response = self.client.post(reverse(views.upload_data), data)
         self.assertEqual(response.status_code, 200)
-

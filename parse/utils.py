@@ -6,11 +6,13 @@ import re
 from chemtools import fileparser
 from project.utils import StringIO
 
+
 def parse_file_list(files):
     for f in files:
         if f.name.endswith(".zip"):
             with zipfile.ZipFile(f, "r") as zfile:
-                for name in [x for x in zfile.namelist() if not x.endswith("/")]:
+                names = [x for x in zfile.namelist() if not x.endswith("/")]
+                for name in names:
                     newfile = StringIO(zfile.open(name).read(), name=name)
                     yield newfile
         elif f.name.endswith(".tar.bz2") or f.name.endswith(".tar.gz"):
@@ -18,7 +20,8 @@ def parse_file_list(files):
             with tarfile.open(fileobj=f, mode='r:' + end) as tfile:
                 for name in tfile.getnames():
                     if tfile.getmember(name).isfile():
-                        newfile = StringIO(tfile.extractfile(name).read(), name=name)
+                        newfile = StringIO(tfile.extractfile(name).read(),
+                                            name=name)
                         yield newfile
         else:
             yield f
