@@ -427,8 +427,7 @@ class PostsTestCase(TestCase):
                                                 args=(name, )))
             self.assertEqual(response.status_code, 200)
             url = reverse(views.molecule_detail, args=(name, ))
-            encoded_options = '?' + urllib.urlencode(options)
-            response = self.client.post(url + encoded_options)
+            response = self.client.post(url, options)
             expected = {
                         "cluster": "test-machine",
                         "error": "You must be a staff user to submit a job.",
@@ -448,8 +447,7 @@ class PostsTestCase(TestCase):
                                         args=(name, )))
         self.assertEqual(response.status_code, 200)
         url = reverse(views.multi_molecule, args=(name, ))
-        encoded_options = '?' + urllib.urlencode(options)
-        response = self.client.post(url + encoded_options)
+        response = self.client.post(url, options)
         expected = {
                     "cluster": "test-machine",
                     "error": "You must be a staff user to submit a job.",
@@ -473,8 +471,8 @@ class PostsTestCase(TestCase):
         self.assertTrue(r)
         response = self.client.get(reverse(views.multi_job))
         self.assertEqual(response.status_code, 200)
-        url = reverse(views.multi_job) + '?' + urllib.urlencode(options)
-        response = self.client.post(url)
+        url = reverse(views.multi_job)
+        response = self.client.post(url, options)
         expected = {
                     "cluster": "test-machine",
                     "error": "You must be a staff user to submit a job.",
