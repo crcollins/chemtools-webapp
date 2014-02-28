@@ -3,6 +3,7 @@ import csv
 from chemtools.mol_name import get_exact_name
 from models import DataPoint
 
+
 def main(path):
     with open(path, "r") as csvfile:
         reader = csv.reader(csvfile, delimiter=',', quotechar='"')

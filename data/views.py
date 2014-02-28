@@ -10,8 +10,10 @@ from chemtools.extractor import CORES, RGROUPS, ARYL
 
 
 def frag_index(request):
-    xrnames = ["H", "Cl", "Br", "CN", "CCH", "OH", "SH", "NH_2", "CH_3", "phenyl", "TMS", "OCH_3"]
-    arylnames = ["double bond", "triple bond", "phenyl", "thiophene", "pyridine", "carbazole", "TZ", "EDOT"]
+    xrnames = ["H", "Cl", "Br", "CN", "CCH", "OH",
+            "SH", "NH_2", "CH_3", "phenyl", "TMS", "OCH_3"]
+    arylnames = ["double bond", "triple bond", "phenyl",
+                "thiophene", "pyridine", "carbazole", "TZ", "EDOT"]
     data = (
         ["Cores", CORES],
         ["X/R Groups", zip(RGROUPS, xrnames)],
