@@ -49,18 +49,20 @@ def _run_job(ssh, sftp, gjfstring, jobstring=None, **kwargs):
 
         name = kwargs.get("name", "chemtoolsjob")
         cluster = kwargs.get("cluster", '')
+        gjfname = "chemtools/%s.gjf" % name
+        jobname = "chemtools/%s.%sjob" % (name, cluster)
 
-        f = sftp.open("chemtools/%s.gjf" % name, 'w')
+        f = sftp.open(gjfname, 'w')
         f.write(gjfstring)
         f.close()
 
         if jobstring is None:
             jobstring = write_job(internal=True, **kwargs)
-        f2 = sftp.open("chemtools/%s.%sjob" % (name, cluster), 'w')
+        f2 = sftp.open(jobname, 'w')
         f2.write(jobstring)
         f2.close()
 
-        s = "qsub chemtools/%s.%sjob" % (name, cluster)
+        s = "qsub " + jobname
         _, stdout, stderr = ssh.exec_command(s)
         stderr = stderr.readlines()
         if stderr:
