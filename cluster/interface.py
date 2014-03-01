@@ -116,7 +116,7 @@ def kill_jobs(user, cluster, jobids):
         "cluster": cred.cluster.name,
     }
     if not user.is_staff:
-        results["error"] = "You must be a staff user to submit a job."
+        results["error"] = "You must be a staff user to kill a job."
         return results
 
     ssh = cred.get_ssh_connection()
