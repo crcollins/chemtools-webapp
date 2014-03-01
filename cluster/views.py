@@ -57,24 +57,21 @@ def job_detail(request, cluster, jobid):
 
 @login_required
 def kill_job(request, cluster):
-    if not request.user.is_staff:
-        return HttpResponse("You must be a staff user to kill a job.")
-
-    if request.method == "POST":
-        jobids = []
-        for key in request.POST:
-            try:
-                int(key)
-                jobids.append(key)
-            except ValueError:
-                pass
-        result = interface.kill_jobs(request.user, cluster, jobids)
-        if result["error"] is None:
-            return redirect(job_index)
-        else:
-            return HttpResponse(e)
-    else:
+    if request.method != "POST":
         return redirect(job_index)
+
+    jobids = []
+    for key in request.POST:
+        try:
+            int(key)
+            jobids.append(key)
+        except ValueError:
+            pass
+    result = interface.kill_jobs(request.user, cluster, jobids)
+    if result["error"] is None:
+        return redirect(job_index)
+    else:
+        return HttpResponse(result["error"])
 
 
 @login_required
