@@ -44,13 +44,19 @@ def get_molecule_info(request, molecule):
     if not error:
         exactspacer = get_exact_name(molecule, spacers=True)
         exactname = exactspacer.replace('*', '')
-        features = [
-                    get_naive_feature_vector(exactspacer),
-                    get_decay_feature_vector(exactspacer)
-                ]
-        homo, lumo, gap = get_properties_from_decay_with_predictions(
-                                                            features[1]
-                                                            )
+        try:
+
+            features = [
+                        get_naive_feature_vector(exactspacer),
+                        get_decay_feature_vector(exactspacer)
+                    ]
+            homo, lumo, gap = get_properties_from_decay_with_predictions(
+                                                                features[1]
+                                                                )
+        except ValueError:  # multi core and other non-ML structures
+            features = ['', '']
+            homo, lumo, gap = None, None, None
+
         temp = DataPoint.objects.filter(exact_name=exactname,
                                         band_gap__isnull=False).values()
         if temp:

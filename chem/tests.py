@@ -19,7 +19,7 @@ from models import ErrorReport
 
 
 class MainPageTestCase(TestCase):
-    names = ["24a_TON", "24b_TSP_24a_24a", "CON_24a", "A_TON_A_A"]
+    names = ["24a_TON", "24b_TSP_24a_24a", "CON_24a", "A_TON_A_A", "TON_CCC"]
     options = {
         "job": True,
         "name": "{{ name }}",
