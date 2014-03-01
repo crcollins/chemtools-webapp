@@ -121,22 +121,16 @@ def kill_jobs(user, cluster, jobids):
 
     ssh = cred.get_ssh_connection()
     with ssh:
-        a = get_all_jobs(user, cluster)
-
-        if not a:
-            results["error"] = "There are no jobs running."
+        specfic_results = get_specifc_jobs(user, cluster, jobids)
+        if specfic_results["error"]:
+            results["error"] = specfic_results["error"]
             return results
 
-        jobs = [x[0] for x in a[0]["jobs"]]
-        for jobid in jobids:
-            if jobid not in jobs:
-                pair = (jobid, "That job number is not running.")
-                results["failed"].append(pair)
-                continue
-
+        results["failed"] = specfic_results["failed"]
+        for (jobid, job_data) in specfic_results["worked"]:
             _, _, stderr = ssh.exec_command("qdel %s" % jobid)
             b = stderr.readlines()
-            if not b:
+            if b:
                 results["failed"].append((jobid, str(b)))
                 continue
 
@@ -145,6 +139,7 @@ def kill_jobs(user, cluster, jobids):
                 job.delete()
             except IndexError:
                 pass
+            results["worked"].append(jobid)
     return results
 
 
@@ -168,3 +163,34 @@ def get_all_jobs(user, cluster=None):
     for t in threads:
         t.join(20)
     return [x for x in results if x]
+
+
+def get_specifc_jobs(user, cluster, jobids):
+    cred = user.credentials.filter(cluster__name=cluster)[0]
+    results = {
+        "worked": [],
+        "failed": [],
+        "error": None,
+        "cluster": cred.cluster.name,
+    }
+    if jobids is None:
+        return results
+
+    all_jobs = get_all_jobs(user, cluster)
+
+    if not all_jobs:
+        results["error"] = "There are no jobs running."
+        return results
+
+    running_jobs = all_jobs[0]["jobs"]
+    running_jobids = [x[0] for x in all_jobs[0]["jobs"]]
+
+    for job in jobids:
+        if job not in running_jobids:
+            pair = (job, "That job number is not running.")
+            results["failed"].append(pair)
+            continue
+        else:
+            pair = (job, running_jobs[running_jobids.index(job)])
+            results["worked"].append(pair)
+    return results

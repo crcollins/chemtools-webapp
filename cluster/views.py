@@ -38,14 +38,16 @@ def get_job_list(request):
 
 @login_required
 def job_detail(request, cluster, jobid):
-    e = None
-    jobs = interface.get_all_jobs(request.user, cluster)[0]
-    for job in jobs["jobs"]:
-        if job[0] == jobid:
-            break
-    else:
+    results = interface.get_specifc_jobs(request.user, cluster, [jobid])
+    if results["error"]:
+        e = results["error"]
         job = None
-        e = "That job number is not running."
+    elif results["failed"]:
+        e = results["failed"][0][1]
+        job = None
+    else:
+        job = results["worked"][0][1]
+        e = None
     c = Context({
         "job": job,
         "cluster": cluster,
