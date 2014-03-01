@@ -12,7 +12,7 @@ def get_ssh_connection_obj(obj):
     if isinstance(obj, Credential):
         try:
             return obj.get_ssh_connection()
-        except:  # sometimes this timesout
+        except:  # sometimes this times out
             return obj.get_ssh_connection()
     elif isinstance(obj, SSHClient):
         return obj
@@ -24,7 +24,7 @@ def get_sftp_connection_obj(obj):
     if isinstance(obj, Credential):
         try:
             return obj.get_sftp_connection()
-        except:  # sometimes this timesout
+        except:  # sometimes this times out
             return obj.get_sftp_connection()
     elif isinstance(obj, SFTPClient):
         return obj
