@@ -4,6 +4,7 @@ import csv
 
 from django.test import TestCase
 from django.conf import settings
+from django.core.management import call_command
 import numpy
 
 import gjfwriter
@@ -442,6 +443,9 @@ class MolNameTestCase(TestCase):
 class ExtractorTestCase(TestCase):
     def test_run_all(self):
         extractor.run_all()
+
+    def test_extract_command(self):
+        call_command('extract')
 
 
 class MLTestCase(TestCase):
