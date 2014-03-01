@@ -681,3 +681,26 @@ class FileParserTestCase(TestCase):
             for line in reader:
                 pass
             self.assertEqual(expected, line[1:])
+
+
+class UtilsTestCase(TestCase):
+    def test_Output_newline(self):
+        out = utils.Output()
+        string = "Some message"
+        out.write(string, newline=False)
+        result = out.format_output(errors=False)
+        self.assertEqual(result, string + '\n')
+
+    def test_write_job(self):
+        self.assertEqual(utils.write_job(), '')
+
+    def test_catch(self):
+        class TestIt(utils.Output):
+            @utils.catch
+            def get_fail(self):
+                raise ValueError("some string")
+
+        test = TestIt()
+        test.get_fail()
+        expected = "\n---- Errors (1) ----\nValueError('some string',)\n"
+        self.assertEqual(test.format_output(errors=True), expected)
