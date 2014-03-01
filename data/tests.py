@@ -4,6 +4,7 @@ import os
 from django.conf import settings
 from django.test import Client, TestCase
 from django.core.urlresolvers import reverse
+from django.core.management import call_command
 
 import views
 import models
@@ -79,3 +80,7 @@ class LoadDataTestCase(TestCase):
     def test_load_data(self):
         path = os.path.join(settings.MEDIA_ROOT, "tests", "data.csv")
         load_data.main(path)
+
+    def test_load_data_command(self):
+        path = os.path.join(settings.MEDIA_ROOT, "tests", "data.csv")
+        call_command('load_data', path)
