@@ -604,6 +604,18 @@ class MLTestCase(TestCase):
         results = ml.get_naive_vector_for_gap_value(value)
         numpy.testing.assert_almost_equal(results, expected, 6)
 
+    def test_get_properties_from_decay_vector_linear(self):
+        name = "2**4abC**_TON_6aa6aa3**A**_D**_n1_m1_x1_y1_z1"
+        vector = ml.get_decay_feature_vector(name)
+        expected = (
+            -6.1961624094183341,
+            -3.9151018608500001,
+            2.1166126453433329
+        )
+        results = ml.get_properties_from_decay_vector_linear(vector)
+        self.assertEqual(results, expected)
+
+
 class MoleculeTestCase(TestCase):
     def test_atom_print(self):
         atom = molecule.Atom(0, 0, 0, "C")
