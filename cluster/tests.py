@@ -98,7 +98,10 @@ class SSHPageTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_job_detail(self):
-        url = reverse(views.job_detail, args=(self.cluster.name, 1))
+        user = User.objects.get(username=self.user["username"])
+        results = interface.get_all_jobs(user, self.cluster.name)
+        jobid = results[0]["jobs"][0][0]
+        url = reverse(views.job_detail, args=(self.cluster.name, jobid))
         response = self.client.get(url)
         self.assertEqual(response.status_code, 302)
 
