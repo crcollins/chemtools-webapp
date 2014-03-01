@@ -27,7 +27,6 @@ def get_job_list(request):
     try:
         cluster = request.REQUEST.get("cluster", "")
         jobs = interface.get_all_jobs(request.user, cluster)
-        e = None
     except Exception as e:
         jobs = []
     a = {
