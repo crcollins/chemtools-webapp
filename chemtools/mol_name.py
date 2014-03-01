@@ -129,8 +129,43 @@ def parse_name(name):
     '''Parses a molecule name and returns the edge part names.
 
     >>> parse_name('4a_TON_4b_4c')
-    ([('TON', (('4', -1), ('a', 0), ('a', 0)), (('4', -1), ('b', 0), ('b', 0)),
-    (('4', -1), ('c', 0), ('c', 0))], (0, 0), (0, 0, 0))
+    (
+        [
+            (
+                'TON',
+                (
+                    [('4', -1, False), ('a', 0, False), ('a', 0, False)],
+                    [('4', -1, False), ('b', 0, False), ('b', 0, False)],
+                    [('4', -1, False), ('c', 0, False), ('c', 0, False)]
+                )
+            )
+        ],
+        (1, 1),
+        (1, 1, 1)
+    )
+    >>> parse_name('4a_TON_5-b_CON_4cd')
+    (
+        [
+            (
+                'TON',
+                (
+                    [('4', 0, False), ('a', 1, False), ('a', 1, False)],
+                    None,
+                    [('5', -1, True), ('b', 0, False), ('b', 0, False)]
+                )
+            ),
+            (
+                'CON',
+                (
+                    None,
+                    None,
+                    [('4', 0, False), ('c', 1, False), ('d', 1, False)]
+                )
+            )
+        ],
+        (1, 1),
+        (1, 1, 1)
+    )
     '''
     parts = name.split("_")
 
