@@ -170,6 +170,17 @@ class SSHPageTestCase(TestCase):
         self.assertEqual(response.content,
                         "You must be a staff user to kill a job.")
 
+    def test_kill_job_redirect(self):
+        url = reverse(views.kill_job, args=("test-machine", ))
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 302)
+
+        r = self.client.login(username=self.user["username"],
+                            password=self.user["password"])
+        self.assertTrue(r)
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 302)
 
 
 class SSHSettingsTestCase(TestCase):
