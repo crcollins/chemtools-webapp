@@ -161,7 +161,11 @@ class SSHPageTestCase(TestCase):
         r = self.client.login(username=self.user["username"],
                             password=self.user["password"])
         self.assertTrue(r)
-        response = self.client.get(url)
+        data = {
+            "123": "on",
+            "234": "on",
+        }
+        response = self.client.post(url, data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content,
                         "You must be a staff user to kill a job.")
