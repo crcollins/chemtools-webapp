@@ -184,6 +184,8 @@ class GJFWriterTestCase(TestCase):
                 "(9, 'can not do nm expansion with xgroup on right')"),
             ("TON_TON_m2",
                 "(8, 'Can not do m expansion and have multiple cores')"),
+            ("TON__B_TON",
+                "(11, 'can not add core to xgroup on right')")
         ]
         for name, message in pairs:
             try:

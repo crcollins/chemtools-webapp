@@ -211,7 +211,7 @@ def parse_end_name(name):
     return parts
 
 
-def check_sides(parsedsides, numsets, nm):
+def check_sides(parsedsides, numsets, idx, nm):
     side_names = ["left", "middle", "right"]
     m_bool = [0, 1, 0]
     for xside, idx, name in zip(parsedsides, m_bool , side_names):
@@ -219,7 +219,7 @@ def check_sides(parsedsides, numsets, nm):
             if nm[idx] > 1:
                 msg = "can not do nm expansion with xgroup on %s" % name
                 raise Exception(9, msg)
-            elif numsets > 1 and name == "right" and (numsets - 1) != num:
+            elif numsets > 1 and name == "right" and (numsets - 1) != idx:
                 raise Exception(11, "can not add core to xgroup on %s" % name)
 
 
@@ -296,13 +296,13 @@ def parse_name(name):
     partsets = parse_cores(parts)
 
     output = []
-    for num, (core, parts) in enumerate(partsets):
+    for idx, (core, parts) in enumerate(partsets):
         core_idx = parts.index(core)
         sides = get_sides(parts, core_idx)
 
         parsedsides = tuple(parse_end_name(x) if x else None for x in sides)
 
-        check_sides(parsedsides, len(partsets), nm)
+        check_sides(parsedsides, len(partsets), idx, nm)
         output.append((core, parsedsides))
 
     if len(output) > 1 and nm[1] > 1:
