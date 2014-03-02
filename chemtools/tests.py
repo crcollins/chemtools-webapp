@@ -42,6 +42,10 @@ class GJFWriterTestCase(TestCase):
     invalid_polymer_options = ['_n2_m2', '_n3_m3', '_m2_n2', '_m3_n3',
                             '_n0', '_m0', '_n0_m0']
 
+    def test_load_data_invalid(self):
+        with self.assertRaises(Exception):
+            gjfwriter.read_data("filename")
+
     def test_cores(self):
         for core in self.cores:
             gjfwriter.GJFWriter(core)
