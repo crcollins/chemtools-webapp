@@ -211,6 +211,18 @@ def parse_end_name(name):
     return parts
 
 
+def check_sides(parsedsides, numsets, nm):
+    side_names = ["left", "middle", "right"]
+    m_bool = [0, 1, 0]
+    for xside, idx, name in zip(parsedsides, m_bool , side_names):
+        if xside and xside[-1][0] in XGROUPS:
+            if nm[idx] > 1:
+                msg = "can not do nm expansion with xgroup on %s" % name
+                raise Exception(9, msg)
+            elif numsets > 1 and name == "right" and (numsets - 1) != num:
+                raise Exception(11, "can not add core to xgroup on %s" % name)
+
+
 def parse_name(name):
     '''Parses a molecule name and returns the edge part names.
 
@@ -286,13 +298,7 @@ def parse_name(name):
         sides = (left, middle, right)
         parsedsides = tuple(parse_end_name(x) if x else None for x in sides)
 
-        side_names = ["left", "middle", "right"]
-        for xside, idx, name in zip(parsedsides, [0, 1, 0], side_names):
-            if xside and xside[-1][0] in XGROUPS:
-                if nm[idx] > 1:
-                    raise Exception(9, "can not do nm expansion with xgroup on %s" % name)
-                elif len(partsets) > 1 and name == "right" and (len(partsets) - 1) != num:
-                    raise Exception(11, "can not add core to xgroup on %s" % name)
+        check_sides(parsedsides, len(partsets), nm)
         output.append((core, parsedsides))
 
     if len(output) > 1 and nm[1] > 1:
