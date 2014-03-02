@@ -223,6 +223,31 @@ def check_sides(parsedsides, numsets, nm):
                 raise Exception(11, "can not add core to xgroup on %s" % name)
 
 
+def get_sides(parts, core_idx):
+    left = parts[:core_idx][0] if parts[:core_idx] else None
+    right = parts[core_idx + 1:]
+
+    if not right:
+        right = None
+        middle = None
+    elif len(right) > 1:
+        middle = right[0]
+        right = right[1]
+    else:
+        try:
+            letter = right[0][0]
+            if letter.lower() in ALL and letter.lower() != letter:
+                middle = letter
+                right = right[0][1:]
+            else:
+                middle = None
+                right = right[0]
+        except IndexError:
+            middle = None
+            right = right[0]
+    return (left, middle, right)
+
+
 def parse_name(name):
     '''Parses a molecule name and returns the edge part names.
 
@@ -272,30 +297,9 @@ def parse_name(name):
 
     output = []
     for num, (core, parts) in enumerate(partsets):
-        i = parts.index(core)
-        left = parts[:i][0] if parts[:i] else None
-        right = parts[i + 1:]
+        core_idx = parts.index(core)
+        sides = get_sides(parts, core_idx)
 
-        if not right:
-            right = None
-            middle = None
-        elif len(right) > 1:
-            middle = right[0]
-            right = right[1]
-        else:
-            try:
-                letter = right[0][0]
-                if letter.lower() in ALL and letter.lower() != letter:
-                    middle = letter
-                    right = right[0][1:]
-                else:
-                    middle = None
-                    right = right[0]
-            except IndexError:
-                middle = None
-                right = right[0]
-
-        sides = (left, middle, right)
         parsedsides = tuple(parse_end_name(x) if x else None for x in sides)
 
         check_sides(parsedsides, len(partsets), nm)
