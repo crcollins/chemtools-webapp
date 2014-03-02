@@ -474,6 +474,19 @@ class UtilsTestCase(TestCase):
         with self.assertRaises(Exception):
             get_ssh_connection("localhost", "username")
 
+    def test__get_jobs_fail(self):
+        results = [None]
+        utils._get_jobs(None, None, 0, results)
+        expected = [
+            {
+            'jobs': [],
+            'name': None,
+            'columns': ['Job ID', 'Username', 'Jobname',
+                        "Req'd Memory", "Req'd Time", 'Elap Time', 'S']
+            }
+        ]
+        self.assertEqual(results, expected)
+
     def test_AES(self):
         cipher = AESCipher()
         string = "The quick brown fox jumps over the lazy dog."
