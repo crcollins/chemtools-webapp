@@ -85,6 +85,14 @@ $(function() {
             <td>{{ lumo|floatformat:2 }} (± 0.08)</td>
             <td>{{ band_gap|floatformat:2 }} (± 0.10)</td>
         </tr>
+        {% for direction, values in limits.items %}
+        <tr>
+            <th>Predicted {{ direction }} Limit</td>
+            {% for value in values %}
+                <td>{{ value|floatformat:2 }}</td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
         {% if datapoint %}
         <tr>
             <th>Calculated</td>

@@ -8,6 +8,7 @@ from chemtools.ml import get_properties_from_decay_with_predictions, \
                         get_naive_feature_vector, \
                         get_decay_feature_vector
 from chemtools.mol_name import name_expansion, get_exact_name
+from chemtools.interface import get_property_limits
 from data.models import DataPoint
 
 
@@ -69,6 +70,7 @@ def get_molecule_info(request, molecule):
         features = ['', '']
         homo, lumo, gap = None, None, None
         datapoint = None
+    limits = get_property_limits(molecule)
 
     a = {
         "molecule": molecule,
@@ -82,5 +84,6 @@ def get_molecule_info(request, molecule):
         "known_errors": warning,
         "error_message": error,
         "keywords": keywords,
+        "limits": limits,
         }
     return a
