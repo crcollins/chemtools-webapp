@@ -131,5 +131,4 @@ def _get_jobs(cred, cluster, i, results):
                 jobs.append(temp)
         results[i] = {"name": cluster, "columns": wantedcols, "jobs": jobs}
     except Exception as e:
-        print e
         results[i] = {"name": cluster, "columns": wantedcols, "jobs": []}
