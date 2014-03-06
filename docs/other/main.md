@@ -179,6 +179,7 @@ All of the following forms of output are possible for all of the molecules gener
 - gjf - a standard Gaussian Cartesian connectivity molecule file
 - mol2 - a standard Cartesian-style molecule file format
 - png - this is just a very rough rendering of the structure of the molecule.
+- json - this returns a json object with all of the properties of a molecule.
 - Job - there also is a job form on each molecule page that will allow generation of job files for any of the clusters given a few parameters.
 
 In addition to the files, the page for each structure also includes the exact name, the feature vector, and estimates for the HOMO, LUMO, and Band Gap energies. These estimates are calculated using the weights from a 567 dimensional linear regression on the feature vector. The linear regression was trained on ~1000 benzobisazole structures.
@@ -337,6 +338,42 @@ The whole thing is very hackish and is just intended to allow a preview of the m
 
 ![/chem/7k_TON_7k_7k.png](/chem/7k_TON_7k_7k.png)
 
+#### Molecule JSON Data ####
+If you want a simple machine readable collection of the properties of a given name you can use the molecule JSON interface. Many of the values that are returned by this are dependent on the name of the molecule and if the calculated values of the molecule are already in the database. `lumo`, `homo`, and `band_gap` will only be available for names that fit the subset of the naming scheme that the machine learning was done (single core). The `limits` values will be available if the name fits the subset of the naming scheme and if that respective direction can be polymerized (ie, no X-Groups capping expansion in that direction). `datapoint` will only be seen in structures that already have calculated values stored in the database.
+
+[/chem/4a_TON.json](/chem/4a_TON.json)
+
+    {
+        "features": [
+            [ <NAIVE FEATURE VECTOR> ],
+            [ <DECAY FEATURE VECTOR> ],
+        ],
+        "molecule": "4a_TON",
+        "lumo": -1.6922736317511982,
+        "homo": -6.0272586106408301,
+        "exact_name":"4aaA_TON_A_A_n1_m1_x1_y1_z1",
+        "keywords": "opt B3LYP/6-31g(d)",
+        "band_gap": 3.9585367995371712,
+        "limits": {
+            "m": [-5.7452556884445283, -2.29758310520688, 2.8838972872018624],
+            "n": [-5.8333558187221861, -2.9287786769624411, 2.457959486049158]
+        },
+        "known_errors": null,
+        "error_message": null,
+        "datapoint": {
+            "band_gap": 4.0578,
+            "name": "4_TON_A_A",
+            "energy": -798.2647132,
+            "homo_orbital": 61,
+            "id": 1882,
+            "lumo": -1.68737791307,
+            "homo": -5.99983802696,
+            "exact_name": "4aaA_TON_A_A_n1_m1_x1_y1_z1",
+            "dipole": 1.3283,
+            "options": "td B3LYP/6-31g(d)"},
+            "exact_name_spacers": "4aaA**_TON_A**_A**_n1_m1_x1_y1_z1"
+        }
+    }
 
 #### Jobs ####
 
