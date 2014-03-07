@@ -23,10 +23,14 @@ def get_molecule_warnings(name):
     return warning, error
 
 
-def get_multi_molecule_warnings(string):
+def get_multi_molecule_warnings(string, unique=False):
     errors = []
     warnings = []
-    molecules = name_expansion(string)
+
+    if unique:
+        molecules = get_unique_molecules(string)
+    else:
+        molecules = name_expansion(string)
 
     start = time.time()
     for name in molecules:
@@ -36,6 +40,16 @@ def get_multi_molecule_warnings(string):
         warnings.append(warning)
         errors.append(error)
     return molecules, warnings, errors
+
+
+def get_unique_molecules(string):
+    unique = []
+    for mol in name_expansion(string):
+        name = get_exact_name(mol)
+        if unique and DataPoint.objects.filter(exact_name=name).exists():
+            continue
+        unique.append(mol)
+    return unique
 
 
 def get_molecule_info(request, molecule):

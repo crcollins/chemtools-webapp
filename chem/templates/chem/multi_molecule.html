@@ -62,10 +62,11 @@ $("#id_zip_download").click(function() {
     if ($('#id_job').val() === 'on'){
         a += '&' + $('#newform').serialize()
     }
+    a += "{{ encoded_zip }}".slice(1);
     window.location = "/chem/{{ pagename }}.zip?{0}".format(a);
 })
 
-$.getJSON('check/', function(data) {
+$.getJSON('check/', {"unique": "{{ unique }}" }, function(data) {
     var table = $("table.table");
     var text = '';
     for (var i=0; i < data.molecules.length; i++) {
@@ -164,7 +165,7 @@ $.getJSON('check/', function(data) {
     </div>
 </div>
 <div class="btn-group">
-    <a class="btn" href='../{{ pagename }}.zip{{ encoded_keywords }}' id="id_zip_download">Download All</a>
+    <a class="btn" href='../{{ pagename }}.zip{{ encoded_zip }}' id="id_zip_download">Download All</a>
 </div>
 
 

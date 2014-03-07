@@ -73,11 +73,13 @@ def multi_job(request):
 
 
 def molecule_check(request, string):
+    unique = request.REQUEST.get("unique", False)
     a = {
         "error": None,
     }
     try:
-        molecules, warnings, errors = get_multi_molecule_warnings(string)
+        molecules, warnings, errors = get_multi_molecule_warnings(string,
+                                                                unique=unique)
         a["molecules"] = zip(molecules, warnings, errors)
     except ValueError:
         a["error"] = "The operation timed out."
@@ -136,22 +138,29 @@ def multi_molecule(request, string):
                                 mimetype="application/json")
 
     keywords = request.REQUEST.get("keywords", "")
+    unique = request.GET.get("unique", False)
     encoded_keywords = '?' + urllib.urlencode({"keywords": keywords})
+    encoded_zip = '?' + urllib.urlencode({"keywords": keywords,
+                                        "unique": unique})
     c = Context({
         "pagename": string,
         "form": form,
         "gjf": "checked",
         "encoded_keywords": encoded_keywords if keywords else '',
         "keywords": keywords,
+        "unique": unique,
+        "encoded_zip": encoded_zip,
         })
     return render(request, "chem/multi_molecule.html", c)
 
 
 def multi_molecule_zip(request, string):
     keywords = request.GET.get("keywords")
+    unique = request.GET.get("unique", False)
 
     try:
-        molecules, warnings, errors = get_multi_molecule_warnings(string)
+        molecules, warnings, errors = get_multi_molecule_warnings(string,
+                                                                unique=unique)
     except ValueError:
         c = Context({
             "error": "The operation timed out."
