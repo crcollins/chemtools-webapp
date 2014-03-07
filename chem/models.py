@@ -44,7 +44,10 @@ class JobForm(forms.Form):
         req = request.REQUEST
         a = dict(req)
 
-        if a and a.keys() != ["keywords"]:
+        keys = set(JobForm.base_fields.keys())
+        # Only raise form errors if there are values in the request that match
+        # any of the field names for the form
+        if a and set(a.keys()) & keys:
             form = JobForm(req, initial=a)
         else:
             if request.user.is_authenticated():
