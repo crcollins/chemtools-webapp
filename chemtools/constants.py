@@ -3,9 +3,9 @@ import string
 
 import numpy
 
-atom_combinations = (['O', 'S', 'N', 'P', 'C'], ['N', 'P', 'C'])
-SCORES = [''.join(x) for x in product(['E', 'Z'], *atom_combinations)]
-DCORES = [''.join(x) for x in product(['C', 'T'], *atom_combinations)]
+CORE_COMBO = (['O', 'S', 'N', 'P', 'C'], ['N', 'P', 'C'])
+SCORES = [''.join(x) for x in product(['E', 'Z'], *CORE_COMBO)]
+DCORES = [''.join(x) for x in product(['C', 'T'], *CORE_COMBO)]
 CORES = SCORES + DCORES
 XGROUPS = list(string.uppercase[:12])
 RGROUPS = list(string.lowercase[:12])

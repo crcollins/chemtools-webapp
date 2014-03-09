@@ -3,7 +3,7 @@ import math
 from numpy.linalg import norm
 import numpy
 
-from constants import atom_combinations, \
+from constants import CORE_COMBO, \
                     ARYL, ARYL2, XGROUPS, RGROUPS, NEEDSPACE, \
                     SLOPE, WH, WL, WG, \
                     HOMO_CLF, LUMO_CLF, GAP_CLF, \
@@ -17,7 +17,7 @@ def get_core_features(core):
         corefeatures = [1]
     else:
         corefeatures = [0]
-    for base, char in zip(atom_combinations, core[1:]):
+    for base, char in zip(CORE_COMBO, core[1:]):
         temp = [0] * len(base)
         temp[base.index(char)] = 1
         corefeatures.extend(temp)
@@ -149,7 +149,7 @@ def get_name_from_naive_feature_vector(vector, limit=4):
         core += 'C'
     vector = vector[1:]
 
-    first, second = atom_combinations
+    first, second = CORE_COMBO
     core += first[vector.index(1)]
     vector = vector[len(first):]
     core += second[vector.index(1)]
@@ -200,7 +200,7 @@ def get_name_from_weighted_naive_feature_vector(vector, limit=4):
         core += 'C'
     vector = vector[1:]
 
-    first, second = atom_combinations
+    first, second = CORE_COMBO
     core += consume(vector, first)
     vector = vector[len(first):]
     core += consume(vector, second)
