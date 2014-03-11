@@ -81,8 +81,8 @@ def molecule_check(request, string):
         molecules, warnings, errors = get_multi_molecule_warnings(string,
                                                                 unique=unique)
         a["molecules"] = zip(molecules, warnings, errors)
-    except ValueError:
-        a["error"] = "The operation timed out."
+    except ValueError as e:
+        a["error"] = str(e)
         a["molecules"] = None
     return HttpResponse(simplejson.dumps(a), mimetype="application/json")
 
@@ -161,9 +161,9 @@ def multi_molecule_zip(request, string):
     try:
         molecules, warnings, errors = get_multi_molecule_warnings(string,
                                                                 unique=unique)
-    except ValueError:
+    except ValueError as e:
         c = Context({
-            "error": "The operation timed out."
+            "error": str(e)
             })
         return render(request, "chem/multi_molecule.html", c)
 

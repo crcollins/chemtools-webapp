@@ -277,14 +277,14 @@ class MainPageTestCase(TestCase):
                                         args=(string, )))
         self.assertEqual(response.status_code, 200)
         value = simplejson.loads(response.content)["error"]
-        self.assertEqual(value, "The operation timed out.")
+        self.assertEqual(value, "The operation has timed out.")
 
     def test_multi_molecule_zip_timeout(self):
         string = "{$ARYL2}{$RGROUPS}{$RGROUPS}{$XGROUPS}_TON"
         response = self.client.get(reverse(views.multi_molecule_zip,
                                         args=(string, )))
         self.assertEqual(response.status_code, 200)
-        self.assertIn("The operation timed out.", response.content)
+        self.assertIn("The operation has timed out.", response.content)
 
     def test_molecule_check_specific(self):
         names = [
