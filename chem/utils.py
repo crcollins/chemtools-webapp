@@ -55,9 +55,8 @@ def get_unique_molecules(string):
     return unique
 
 
-def get_molecule_info(request, molecule):
+def get_molecule_info(molecule, keywords=KEYWORDS):
     warning, error = get_molecule_warnings(molecule)
-    keywords = request.REQUEST.get("keywords", KEYWORDS)
 
     if not error:
         exactspacer = get_exact_name(molecule, spacers=True)

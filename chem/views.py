@@ -106,14 +106,17 @@ def molecule_detail(request, molecule):
             a = cluster.interface.run_standard_job(cred, molecule, **d)
             return HttpResponse(simplejson.dumps(a),
                                 mimetype="application/json")
-    a = get_molecule_info(request, molecule)
+
+    keywords2 = request.REQUEST.get("keywords", KEYWORDS)
+    a = get_molecule_info(molecule, keywords2)
     a["form"] = form
     c = Context(a)
     return render(request, "chem/molecule_detail.html", c)
 
 
 def molecule_detail_json(request, molecule):
-    a = get_molecule_info(request, molecule)
+    keywords = request.REQUEST.get("keywords", KEYWORDS)
+    a = get_molecule_info(request, keywords)
     return HttpResponse(simplejson.dumps(a), mimetype="application/json")
 
 
