@@ -73,7 +73,8 @@ def multi_job(request):
 
 
 def molecule_check(request, string):
-    unique = request.REQUEST.get("unique", False)
+    unique = request.REQUEST.get("unique", '')
+
     a = {
         "error": None,
     }
@@ -138,7 +139,7 @@ def multi_molecule(request, string):
                                 mimetype="application/json")
 
     keywords = request.REQUEST.get("keywords", "")
-    unique = request.GET.get("unique", False)
+    unique = request.GET.get("unique", '')
     encoded_keywords = '?' + urllib.urlencode({"keywords": keywords})
     encoded_zip = '?' + urllib.urlencode({"keywords": keywords,
                                         "unique": unique})
@@ -156,7 +157,7 @@ def multi_molecule(request, string):
 
 def multi_molecule_zip(request, string):
     keywords = request.GET.get("keywords")
-    unique = request.GET.get("unique", False)
+    unique = request.GET.get("unique", '')
 
     try:
         molecules, warnings, errors = get_multi_molecule_warnings(string,
