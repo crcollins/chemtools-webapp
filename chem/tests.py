@@ -14,6 +14,7 @@ from data.models import DataPoint
 from cluster.models import Cluster, Credential
 from chemtools.constants import KEYWORDS
 import views
+import utils
 
 from models import ErrorReport
 
@@ -630,3 +631,73 @@ class PostsTestCase(TestCase):
         self.assertIsNone(results["error"])
         self.assertEqual(len(results["worked"]), len(files))
         self.assertEqual(len(results["failed"]), 0)
+
+
+class UtilsTestCase(TestCase):
+    names = ["24a_TON", "BAD_NAME", "CON_24a", "A_TON_A_A"]
+
+    def setUp(self):
+        new_data = DataPoint(name="A_TON_A_A",
+                            exact_name="A_TON_A_A_n1_m1_x1_y1_z1",
+                            options="td B3LYP/6-31g(d) geom=connectivity",
+                            homo=-6.460873931,
+                            lumo=-1.31976745,
+                            homo_orbital=41,
+                            dipole=0.0006,
+                            energy=-567.1965205,
+                            band_gap=4.8068)
+        new_data.save()
+        new_error = ErrorReport(molecule="CON_24a",
+                                email="test@test.com",
+                                urgency=1,
+                                message="This is a message")
+        new_error.save()
+
+    def test_get_multi_molecule_warnings(self):
+        string = ','.join(self.names)
+        results = utils.get_multi_molecule_warnings(string)
+        expected = (
+                    self.names,
+                    [None, None, True, None],
+                    [None, "(1, 'Bad Core Name')", None, None],
+                )
+        self.assertEqual(results, expected)
+
+    def test_get_multi_molecule_warnings_unique(self):
+        names = ["24a_TON", "BAD_NAME", "CON_24a"]
+        string = ','.join(self.names)
+        results = utils.get_multi_molecule_warnings(string, unique=True)
+        expected = (
+                    names,
+                    [None, None, True],
+                    [None, "(1, 'Bad Core Name')", None],
+                )
+        self.assertEqual(results, expected)
+
+    def test_get_molecule_info(self):
+        name = "24a_TON"
+        results = utils.get_molecule_info(name)
+        del results["features"]
+        expected = {
+            'molecule': '24a_TON',
+            'lumo': -1.8018644353251334,
+            'homo': -6.0349352189700411,
+            'exact_name': '24aaA_TON_A_A_n1_m1_x1_y1_z1',
+            'keywords': 'opt B3LYP/6-31g(d)',
+            'band_gap': 3.9119664787437074,
+            'limits': {
+                'm': [
+                    -5.7791157248205742,
+                    -2.3610428502402536,
+                    2.8213594294564546],
+                'n': [
+                    -5.7347154609610094,
+                    -3.3180621721837378,
+                    1.8808350405523875]
+                },
+            'known_errors': None,
+            'error_message': None,
+            'datapoint': None,
+            'exact_name_spacers': '2**4aaA**_TON_A**_A**_n1_m1_x1_y1_z1'
+        }
+        self.assertEqual(results, expected)
