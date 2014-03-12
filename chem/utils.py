@@ -45,9 +45,12 @@ def get_multi_molecule_warnings(string, unique=False):
 def get_unique_molecules(string):
     unique = []
     for mol in name_expansion(string):
-        name = get_exact_name(mol)
-        if unique and DataPoint.objects.filter(exact_name=name).exists():
-            continue
+        try:
+            name = get_exact_name(mol)
+            if DataPoint.objects.filter(exact_name=name).exists():
+                continue
+        except:
+            pass
         unique.append(mol)
     return unique
 
