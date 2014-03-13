@@ -309,29 +309,26 @@ class MainPageTestCase(TestCase):
             "email": "something@test.com",
             "message": "something something something something"
         }
-        for name in self.warn_names:
-            for i in xrange(3):
-                data["urgency"] = i
-                response = self.client.get(reverse(views.molecule_check,
-                                                    args=(name, )))
-                values = simplejson.loads(response.content)["molecules"]
-                self.assertFalse(values[0][1])
+        for i, name in enumerate(self.warn_names):
+            data["urgency"] = i
+            response = self.client.get(reverse(views.molecule_check,
+                                                args=(name, )))
+            values = simplejson.loads(response.content)["molecules"]
+            self.assertFalse(values[0][1])
 
-                response = self.client.get(reverse(views.report,
-                                                    args=(name, )))
-                self.assertEqual(response.status_code, 200)
+            response = self.client.get(reverse(views.report,
+                                                args=(name, )))
+            self.assertEqual(response.status_code, 200)
 
-                response = self.client.post(reverse(views.report,
-                                                    args=(name, )), data)
-                self.assertEqual(response.status_code, 302)
+            response = self.client.post(reverse(views.report,
+                                                args=(name, )), data)
+            self.assertEqual(response.status_code, 302)
 
-                response = self.client.get(reverse(views.molecule_check,
-                                                    args=(name, )))
-                values = simplejson.loads(response.content)["molecules"]
-                self.assertTrue(values[0][1])
+            response = self.client.get(reverse(views.molecule_check,
+                                                args=(name, )))
+            values = simplejson.loads(response.content)["molecules"]
+            self.assertTrue(values[0][1])
 
-                obj = ErrorReport.objects.get(molecule=name)
-                obj.delete()
 
     def test_report_molecule_after_login(self):
         data = {
@@ -340,26 +337,22 @@ class MainPageTestCase(TestCase):
         r = self.client.login(username=self.user["username"],
                             password=self.user["password"])
         self.assertTrue(r)
-        for name in self.warn_names:
+        for i, name in enumerate(self.warn_names):
             data["email"] = self.user["email"]
-            for i in xrange(3):
-                data["urgency"] = i
-                response = self.client.get(reverse(views.molecule_check,
-                                                args=(name, )))
-                values = simplejson.loads(response.content)["molecules"]
-                self.assertFalse(values[0][1])
+            data["urgency"] = i
+            response = self.client.get(reverse(views.molecule_check,
+                                            args=(name, )))
+            values = simplejson.loads(response.content)["molecules"]
+            self.assertFalse(values[0][1])
 
-                response = self.client.post(reverse(views.report,
-                                                args=(name, )), data)
-                self.assertEqual(response.status_code, 302)
+            response = self.client.post(reverse(views.report,
+                                            args=(name, )), data)
+            self.assertEqual(response.status_code, 302)
 
-                response = self.client.get(reverse(views.molecule_check,
-                                                args=(name, )))
-                values = simplejson.loads(response.content)["molecules"]
-                self.assertTrue(values[0][1])
-
-                obj = ErrorReport.objects.get(molecule=name)
-                obj.delete()
+            response = self.client.get(reverse(views.molecule_check,
+                                            args=(name, )))
+            values = simplejson.loads(response.content)["molecules"]
+            self.assertTrue(values[0][1])
 
 
 class PostsFailTestCase(TestCase):
