@@ -21,6 +21,11 @@ from models import ErrorReport
 
 class MainPageTestCase(TestCase):
     names = ["24a_TON", "24b_TSP_24a_24a", "CON_24a", "A_TON_A_A", "TON_CCC"]
+    warn_names = [
+            "24242424242a_TON",
+            "25252525252a_TON",
+            "26262626262a_TON",
+    ]
     options = {
         "job": True,
         "name": "{{ name }}",
@@ -300,16 +305,11 @@ class MainPageTestCase(TestCase):
             self.assertEqual(values[0][2], error)
 
     def test_report_molecule(self):
-        names = [
-            "24242424242a_TON",
-            "25252525252a_TON",
-            "26262626262a_TON",
-        ]
         data = {
             "email": "something@test.com",
             "message": "something something something something"
         }
-        for name in names:
+        for name in self.warn_names:
             for i in xrange(3):
                 data["urgency"] = i
                 response = self.client.get(reverse(views.molecule_check,
@@ -334,18 +334,13 @@ class MainPageTestCase(TestCase):
                 obj.delete()
 
     def test_report_molecule_after_login(self):
-        names = [
-            "24242424242a_TON",
-            "25252525252a_TON",
-            "26262626262a_TON",
-        ]
         data = {
             "message": "something something something something"
         }
         r = self.client.login(username=self.user["username"],
                             password=self.user["password"])
         self.assertTrue(r)
-        for name in names:
+        for name in self.warn_names:
             data["email"] = self.user["email"]
             for i in xrange(3):
                 data["urgency"] = i
