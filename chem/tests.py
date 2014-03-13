@@ -701,3 +701,9 @@ class UtilsTestCase(TestCase):
             'exact_name_spacers': '2**4aaA**_TON_A**_A**_n1_m1_x1_y1_z1'
         }
         self.assertEqual(results, expected)
+
+    def test_get_unique_molecules(self):
+        string = ','.join(self.names)
+        results = utils.get_unique_molecules(string)
+        expected = ['24a_TON', 'BAD_NAME', 'CON_24a']
+        self.assertEqual(results, expected)
