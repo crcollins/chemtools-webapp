@@ -20,13 +20,18 @@ from models import ErrorReport
 
 
 NAMES = ["24a_TON", "24b_TSP_24a_24a", "CON_24a", "A_TON_A_A", "TON_CCC"]
-BAD_NAMES = ["bad_name", "2nota_BEN"]
+BAD_NAMES = [
+        ("2a_TON_CC", "no rgroups allowed"),
+        ("ASADA", "(1, 'Bad Core Name')"),
+        ("TON_CC_CC", "can not attach to end"),
+]
+TEST_NAMES = ["A_TON_A_A", "A_TON_A_A_TD"]
 MULTI_NAMES = ["24{a,b}_TON"]
 WARN_NAMES = [
             "24242424242a_TON",
             "25252525252a_TON",
             "26262626262a_TON",
-    ]
+]
 OPTIONS = {
         "job": True,
         "name": "{{ name }}",
@@ -60,6 +65,28 @@ del USER_LOGIN["email"]
 JOB_STRING = "{name} {email} {nodes} {walltime}:00:00 {allocation}"
 TIMEOUT_NAMES = "{$ARYL2}{$RGROUPS}{$RGROUPS}{$XGROUPS}_TON"
 
+CLUSTER = {
+        "name": "test-machine",
+        "hostname": "localhost",
+        "port": 2222,
+}
+CREDENTIAL = {
+    "username": "vagrant",
+    "password": "vagrant",
+    "use_password": True,
+}
+
+SUB_OPTIONS = {
+    "email": "test@test.com",
+    "nodes": 1,
+    "walltime": 48,
+    "allocation": "TG-CHE120081",
+    "cluster": 'g',
+    "template":
+        "{{ name }} {{ email }} {{ nodes }} {{ time }} {{ allocation }}",
+    "credential": 1,
+}
+
 
 class MainPageTestCase(TestCase):
     def setUp(self):
@@ -89,7 +116,7 @@ class MainPageTestCase(TestCase):
             self.assertEqual(response.status_code, 200)
 
     def test_molecule_detail_invalid(self):
-        for name in BAD_NAMES:
+        for name, reason in BAD_NAMES:
             response = self.client.get(reverse(views.molecule_detail,
                                                 args=(name, )))
             self.assertEqual(response.status_code, 200)
@@ -381,61 +408,24 @@ class MainPageTestCase(TestCase):
 
 
 class PostsFailTestCase(TestCase):
-    names = ["24a_TON", "24b_TSP_24a_24a", "CON_24a", "A_TON_A_A"]
-    cluster = {
-            "name": "test-machine",
-            "hostname": "localhost",
-            "port": 2222,
-        }
-    credential = {
-        "username": "vagrant",
-        "password": "vagrant",
-        "password2": "vagrant",
-        "use_password": True,
-    }
-    options = {
-        "email": "test@test.com",
-        "nodes": 1,
-        "walltime": 48,
-        "allocation": "TG-CHE120081",
-        "cluster": 'g',
-        "template":
-            "{{ name }} {{ email }} {{ nodes }} {{ time }} {{ allocation }}",
-        "credential": 1,
-    }
-
     def setUp(self):
         self.client = Client()
-        self.user = {
-            "username": "user1",
-            "email": "user1@test.com",
-            "password": "mypass",
-        }
-        new_user = User.objects.create_user(self.user["username"],
-                                            self.user["email"],
-                                            self.user["password"])
+        new_user = User.objects.create_user(**USER)
         new_user.save()
-        cluster = Cluster(
-                        name=self.cluster["name"],
-                        hostname=self.cluster["hostname"],
-                        port=self.cluster["port"])
+        cluster = Cluster(**CLUSTER)
         cluster.save()
         self.cluster = cluster
-        credential = Credential(
-                                user=new_user,
+        credential = Credential(user=new_user,
                                 cluster=cluster,
-                                username=self.credential["username"],
-                                password=self.credential["password"],
-                                use_password=True)
+                                **CREDENTIAL)
         credential.save()
         self.credential = credential
 
     def test_post_single_perm_fail(self):
-        r = self.client.login(username=self.user["username"],
-                            password=self.user["password"])
+        r = self.client.login(**USER_LOGIN)
         self.assertTrue(r)
-        options = self.options.copy()
-        for name in self.names:
+        options = SUB_OPTIONS.copy()
+        for name in NAMES:
             options["name"] = name
             response = self.client.get(reverse(views.molecule_detail,
                                                 args=(name, )))
@@ -450,17 +440,16 @@ class PostsFailTestCase(TestCase):
             self.assertEqual(simplejson.loads(response.content), expected)
 
     def test_post_multi_perm_fail(self):
-        r = self.client.login(username=self.user["username"],
-                            password=self.user["password"])
+        r = self.client.login(**USER_LOGIN)
         self.assertTrue(r)
 
-        name = ','.join(self.names)
-        options = self.options.copy()
-        options["name"] = name
+        string = ','.join(NAMES)
+        options = SUB_OPTIONS.copy()
+        options["name"] = string
         response = self.client.get(reverse(views.multi_molecule,
-                                        args=(name, )))
+                                        args=(string, )))
         self.assertEqual(response.status_code, 200)
-        url = reverse(views.multi_molecule, args=(name, ))
+        url = reverse(views.multi_molecule, args=(string, ))
         response = self.client.post(url, options)
         expected = {
                     "cluster": "test-machine",
@@ -473,15 +462,14 @@ class PostsFailTestCase(TestCase):
     def test_post_multi_job_perm_fail(self):
         files = []
         base = os.path.join(settings.MEDIA_ROOT, "tests")
-        for filename in ["A_TON_A_A", "A_TON_A_A_TD"]:
+        for filename in TEST_NAMES:
             path = os.path.join(base, filename + ".gjf")
             files.append(open(path, 'r'))
 
-        options = self.options.copy()
+        options = SUB_OPTIONS.copy()
         options["myfiles"] = files
         options["name"] = "{{ name }}"
-        r = self.client.login(username=self.user["username"],
-                            password=self.user["password"])
+        r = self.client.login(**USER_LOGIN)
         self.assertTrue(r)
         response = self.client.get(reverse(views.multi_job))
         self.assertEqual(response.status_code, 200)
@@ -524,37 +512,26 @@ class PostsTestCase(TestCase):
             "{{ name }} {{ email }} {{ nodes }} {{ time }} {{ allocation }}",
         "credential": 1,
     }
-    user = {
-        "username": "admin",
-        "email": "admin@test.com",
-        "password": "mypass",
-    }
 
     def setUp(self):
         self.client = Client()
-        new_user = User.objects.create_superuser(**self.user)
+        new_user = User.objects.create_superuser(**USER)
         new_user.save()
-        cluster = Cluster(
-                        name=self.cluster["name"],
-                        hostname=self.cluster["hostname"],
-                        port=self.cluster["port"])
+        cluster = Cluster(**CLUSTER)
         cluster.save()
         self.cluster = cluster
         credential = Credential(
                                 user=new_user,
                                 cluster=cluster,
-                                username=self.credential["username"],
-                                password=self.credential["password"],
-                                use_password=True)
+                                **CREDENTIAL)
         credential.save()
         self.credential = credential
 
     def test_post_single(self):
-        r = self.client.login(username=self.user["username"],
-                            password=self.user["password"])
+        r = self.client.login(**USER_LOGIN)
         self.assertTrue(r)
-        options = self.options.copy()
-        for name in self.names:
+        options = SUB_OPTIONS.copy()
+        for name in NAMES:
             options["name"] = name
             response = self.client.get(reverse(views.molecule_detail,
                                                 args=(name, )))
@@ -567,11 +544,10 @@ class PostsTestCase(TestCase):
             self.assertIsNotNone(results["jobid"])
 
     def test_post_single_fail(self):
-        r = self.client.login(username=self.user["username"],
-                            password=self.user["password"])
+        r = self.client.login(**USER_LOGIN)
         self.assertTrue(r)
-        options = self.options.copy()
-        for name, error in self.bad_names:
+        options = SUB_OPTIONS.copy()
+        for name, error in BAD_NAMES:
             options["name"] = name
             response = self.client.get(reverse(views.molecule_detail,
                                                 args=(name, )))
@@ -584,12 +560,11 @@ class PostsTestCase(TestCase):
             self.assertIsNone(results["jobid"])
 
     def test_post_multi(self):
-        r = self.client.login(username=self.user["username"],
-                            password=self.user["password"])
+        r = self.client.login(**USER_LOGIN)
         self.assertTrue(r)
 
-        name = ','.join(self.names)
-        options = self.options.copy()
+        name = ','.join(NAMES)
+        options = SUB_OPTIONS.copy()
         options["name"] = "{{ name }}"
         response = self.client.get(reverse(views.multi_molecule,
                                         args=(name, )))
@@ -599,17 +574,16 @@ class PostsTestCase(TestCase):
 
         results = simplejson.loads(response.content)
         self.assertIsNone(results["error"])
-        self.assertEqual(len(results["worked"]), len(self.names))
+        self.assertEqual(len(results["worked"]), len(NAMES))
         self.assertEqual(len(results["failed"]), 0)
 
     def test_post_multi_fail(self):
-        r = self.client.login(username=self.user["username"],
-                            password=self.user["password"])
+        r = self.client.login(**USER_LOGIN)
         self.assertTrue(r)
 
-        names, errors = zip(*self.bad_names)
+        names, errors = zip(*BAD_NAMES)
         string = ','.join(names)
-        options = self.options.copy()
+        options = SUB_OPTIONS.copy()
         options["name"] = "{{ name }}"
         response = self.client.get(reverse(views.multi_molecule,
                                         args=(string, )))
@@ -625,15 +599,14 @@ class PostsTestCase(TestCase):
     def test_post_multi_job(self):
         files = []
         base = os.path.join(settings.MEDIA_ROOT, "tests")
-        for filename in ["A_TON_A_A", "A_TON_A_A_TD"]:
+        for filename in TEST_NAMES:
             path = os.path.join(base, filename + ".gjf")
             files.append(open(path, 'r'))
 
-        options = self.options.copy()
+        options = SUB_OPTIONS.copy()
         options["files"] = files
         options["name"] = "{{ name }}"
-        r = self.client.login(username=self.user["username"],
-                            password=self.user["password"])
+        r = self.client.login(**USER_LOGIN)
         self.assertTrue(r)
         response = self.client.get(reverse(views.multi_job))
         self.assertEqual(response.status_code, 200)
@@ -650,15 +623,7 @@ class UtilsTestCase(TestCase):
     names = ["24a_TON", "BAD_NAME", "CON_24a", "A_TON_A_A"]
 
     def setUp(self):
-        new_data = DataPoint(name="A_TON_A_A",
-                            exact_name="A_TON_A_A_n1_m1_x1_y1_z1",
-                            options="td B3LYP/6-31g(d) geom=connectivity",
-                            homo=-6.460873931,
-                            lumo=-1.31976745,
-                            homo_orbital=41,
-                            dipole=0.0006,
-                            energy=-567.1965205,
-                            band_gap=4.8068)
+        new_data = DataPoint(**DATA_POINT)
         new_data.save()
         new_error = ErrorReport(molecule="CON_24a",
                                 email="test@test.com",
