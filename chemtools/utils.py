@@ -161,4 +161,17 @@ def get_cycles(links, tree):
         common_set = first.get_common_set(parent, second)
         temp = [x.value.id for x in common_set]
         cycles.append(temp)
-    return cycles
+    return cycles, [x.value.id for x in link_nodes]
+
+def prune_cycles(cycles, link_nodes):
+    link_set = set(link_nodes)
+    final = []
+    for cycle in cycles:
+        temp = [x in link_set for x in cycle]
+        if sum(temp) <= 2:
+            final.append(cycle)
+            continue
+        start = temp[1:].index(True) + 1 + 1
+        end = temp[::-1][1:].index(True) + 1 + 1
+        final.append(cycle[:start] + cycle[-end:])
+    return final
