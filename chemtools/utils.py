@@ -171,7 +171,10 @@ def prune_cycles(cycles, link_nodes):
         if sum(temp) <= 2:
             final.append(cycle)
             continue
-        start = temp[1:].index(True) + 1 + 1
-        end = temp[::-1][1:].index(True) + 1 + 1
+
+        # [Link1, 0, Link2, 1, 2, Link2, Link1]
+        # goes to [Link1, 0, Link2, Link2, Link1]
+        start = temp.index(True, 1) + 1     # +1 include the second True value
+        end = temp[::-1].index(True, 1) + 1
         final.append(cycle[:start] + cycle[-end:])
     return final
