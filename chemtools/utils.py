@@ -179,3 +179,24 @@ def prune_cycles(cycles, link_nodes):
         end = temp[::-1].index(True, 1) + 1
         final.append(cycle[:start] + cycle[-end:])
     return final
+
+
+def get_fused_cycles(cycles):
+    cycle_sets = [set([x.value.id for x in y]) for y in cycles]
+    sets = []
+    used = []
+    for i, cycle1 in enumerate(cycle_sets):
+        temp = [i]
+        if i in used:
+            continue
+        full_cycle = cycle1
+        for j, cycle2 in enumerate(cycle_sets):
+            if i >= j:
+                continue
+            if full_cycle & cycle2:
+                full_cycle |= cycle2
+                temp.append(j)
+        if len(temp) > 1:
+            sets.append(temp)
+            used.extend(temp)
+    return [cycles[x] for x in y] for y in sets]
