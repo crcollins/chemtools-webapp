@@ -150,3 +150,32 @@ def get_fused_cycles(cycles):
     temp1 = [[cycles[x] for x in y] for y in sets]
     temp2 = [[cycles[x]] for x in notused]
     return temp1 + temp2
+
+
+def sort_fused_cycles(cycles):
+    sorted_cycles = []
+    for fused_cycle in cycles:
+        means = []
+        if len(fused_cycle) == 1:
+            sorted_cycles.append(fused_cycle)
+            continue
+
+        # max of three rings, maybe generallize later
+        sets = [set([x.value.id for x in ring]) for ring in fused_cycle]
+
+        if len(sets) == 2:
+            if len(sets[0]) >= len(sets[1]):
+                ordering = [0, 1]
+            else:
+                ordering = [1, 0]
+        else:
+            if not (sets[0] & sets[1]):
+                ordering = [0, 2, 1]
+            elif len(sets[0]) >= len(sets[1]):
+                ordering = [1, 0, 2]
+            else:
+                ordering = [0, 1, 2]
+        temp = [fused_cycle[i] for i in ordering]
+        sorted_cycles.append(temp)
+    return sorted_cycles
+
