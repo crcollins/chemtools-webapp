@@ -171,11 +171,11 @@ def sort_fused_cycles(cycles):
         else:
             if not (sets[0] & sets[1]):
                 ordering = [0, 2, 1]
-            elif len(sets[0]) >= len(sets[1]):
-                ordering = [1, 0, 2]
             else:
-                ordering = [0, 1, 2]
+                if len(sets[0]) == len(sets[2]):
+                    ordering = [0, 1, 2]
+                else:
+                    ordering  = [2, 0, 1]
         temp = [fused_cycle[i] for i in ordering]
         sorted_cycles.append(temp)
     return sorted_cycles
-
