@@ -179,3 +179,24 @@ def sort_fused_cycles(cycles):
         temp = [fused_cycle[i] for i in ordering]
         sorted_cycles.append(temp)
     return sorted_cycles
+
+def identify_cycle_types(cycles):
+    types = []
+    for fused_cycle in cycles:
+        lengths = [len(x) for x in fused_cycle]
+        if len(lengths) == 3:
+            if lengths == [5, 6, 5]:
+                types.append("DCORE")
+            elif lengths == [6, 5, 6]:
+                types.append("7")
+            else:
+                print lengths
+                types.append("10")
+        elif len(lengths) == 2:
+            if lengths == [6, 5]:
+                types.append("SCORE")
+            else:
+                types.append("9")
+        else:
+            types.append("4568")
+    return types
