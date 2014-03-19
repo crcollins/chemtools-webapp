@@ -180,6 +180,7 @@ def sort_fused_cycles(cycles):
         sorted_cycles.append(temp)
     return sorted_cycles
 
+
 def identify_cycle_types(cycles):
     types = []
     for fused_cycle in cycles:
@@ -190,7 +191,6 @@ def identify_cycle_types(cycles):
             elif lengths == [6, 5, 6]:
                 types.append("7")
             else:
-                print lengths
                 types.append("10")
         elif len(lengths) == 2:
             if lengths == [6, 5]:
