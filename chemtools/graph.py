@@ -226,9 +226,10 @@ def identify_core(fused_cycle):
             start = 'T'
         else:
             raise ValueError("left and right sides of core do not match")
-        side = side2
+        side = side1
     print start + side
     return start + side
+
 
 def identify_core_side(pairs):
     core_elements = set(sum(CORE_COMBO, []))
