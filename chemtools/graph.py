@@ -1,3 +1,4 @@
+from constants import CORE_COMBO, CORE_FREE
 
 class Tree(object):
     def __init__(self, value, parent=None):
@@ -187,6 +188,7 @@ def identify_cycle_types(cycles):
         lengths = [len(x) for x in fused_cycle]
         if len(lengths) == 3:
             if lengths == [5, 6, 5]:
+                identify_core(fused_cycle)
                 types.append("DCORE")
             elif lengths == [6, 5, 6]:
                 types.append("7")
@@ -194,9 +196,53 @@ def identify_cycle_types(cycles):
                 types.append("10")
         elif len(lengths) == 2:
             if lengths == [6, 5]:
+                identify_core(fused_cycle)
                 types.append("SCORE")
             else:
                 types.append("9")
         else:
             types.append("4568")
     return types
+
+
+def identify_core(fused_cycle):
+    pairs = []
+    for ring in fused_cycle:
+        temp = []
+        for node in ring:
+            ele = node.value.element
+            children = [x for x in node.children if x.value.element == "H"]
+            temp.append((ele, len(children)))
+        pairs.append(temp)
+    if len(pairs) == 2:
+        side = identify_core_side(pairs[1])
+        start = "E/Z"
+    else:
+        side1 = identify_core_side(pairs[0])
+        side2 = identify_core_side(pairs[2])
+        if side1 == side2:
+            start = 'C'
+        elif side1 != side2 and not set(side1) ^ set(side2):
+            start = 'T'
+        else:
+            raise ValueError("left and right sides of core do not match")
+        side = side2
+    print start + side
+    return start + side
+
+def identify_core_side(pairs):
+    core_elements = set(sum(CORE_COMBO, []))
+    lower, upper = [zip(x,y) for x, y in zip(CORE_COMBO, CORE_FREE)]
+
+    results = []
+    for pair in pairs:
+        if pair[0] not in core_elements:
+            raise ValueError("element not in possible core elements")
+        if pair in lower:
+            results.append(("LOWER", pair))
+        elif pair in upper:
+            results.append(("UPPER", pair))
+
+    if len(results) > 2:
+        results.remove(("UPPER", ("C", 1)))
+    return ''.join([x[1][0] for x in results])
