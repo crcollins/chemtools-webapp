@@ -4,6 +4,8 @@ import string
 import numpy
 
 CORE_COMBO = (['O', 'S', 'N', 'P', 'C'], ['N', 'P', 'C'])
+CORE_FREE = ([0, 0, 1, 1, 2], [0, 0, 1])
+
 SCORES = [''.join(x) for x in product(['E', 'Z'], *CORE_COMBO)]
 DCORES = [''.join(x) for x in product(['C', 'T'], *CORE_COMBO)]
 CORES = SCORES + DCORES
