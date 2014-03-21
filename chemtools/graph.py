@@ -184,24 +184,26 @@ def sort_fused_cycles(cycles):
 
 def identify_cycle_types(cycles):
     types = []
-    for fused_cycle in cycles:
-        lengths = [len(x) for x in fused_cycle]
+    for cycle_group in cycles:
+        lengths = [len(x) for x in cycle_group]
         if len(lengths) == 3:
             if lengths == [5, 6, 5]:
-                identify_core(fused_cycle)
-                types.append("DCORE")
+                core = identify_core(cycle_group)
+                types.append(core)
             elif lengths == [6, 5, 6]:
                 types.append("7")
             else:
+                raise ValueError("Ring of type 10 is not valid")
                 types.append("10")
         elif len(lengths) == 2:
             if lengths == [6, 5]:
-                identify_core(fused_cycle)
-                types.append("SCORE")
+                core = identify_core(cycle_group)
+                types.append(core)
             else:
                 types.append("9")
         else:
-            types.append("4568")
+            ring_type = identify_single_ring(cycle_group[0])
+            types.append(ring_type)
     return types
 
 
@@ -227,7 +229,6 @@ def identify_core(fused_cycle):
         else:
             raise ValueError("left and right sides of core do not match")
         side = side1
-    print start + side
     return start + side
 
 
@@ -247,3 +248,16 @@ def identify_core_side(pairs):
     if len(results) > 2:
         results.remove(("UPPER", ("C", 1)))
     return ''.join([x[1][0] for x in results])
+
+
+def identify_single_ring(ring):
+    elements = [x.value.element for x in ring]
+    ring_type = '4'
+    if 'S' in elements:
+        ring_type = '5'
+    elif 'N' in elements:
+        if elements.count('N') > 1:
+            ring_type = '8'
+        else:
+            ring_type = '6'
+    return ring_type
