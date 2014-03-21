@@ -55,6 +55,13 @@ class Tree(object):
 
         return nodes + [parent] + temp_nodes[::-1]
 
+    def __str__(self, level=0):
+        ret = "    " * level + str((self.value.id, self.value.element)) + '\n'
+        for child in self.children:
+            ret += child.__str__(level+1)
+        return ret
+
+
 
 def breadth_first_search(molecule):
     point = molecule.atoms[0]
