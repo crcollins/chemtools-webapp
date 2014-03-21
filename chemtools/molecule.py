@@ -97,6 +97,9 @@ class Bond(object):
                                 self.atoms[1].id,
                                 self.type)
 
+    def __repr__(self):
+        return self.mol2
+
 
 class Molecule(object):
     def __init__(self, fragments):
