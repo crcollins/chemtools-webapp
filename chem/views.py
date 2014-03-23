@@ -126,6 +126,7 @@ def multi_molecule(request, string):
     form = JobForm.get_form(request, "{{ name }}")
     add = "" if request.GET.get("view") else "attachment; "
 
+
     if form.is_valid():
         d = dict(form.cleaned_data)
         if request.method == "GET":
@@ -139,9 +140,17 @@ def multi_molecule(request, string):
         elif request.method == "POST":
             d["keywords"] = request.REQUEST.get("keywords", None)
             cred = d.pop("credential")
+            try:
+                do_html = d.pop("html")
+            except KeyError:
+                do_html = False
             a = cluster.interface.run_standard_jobs(cred, string, **d)
-            html = render_to_string("chem/multi_submit.html", a)
-            return HttpResponse(html)
+            if do_html:
+                html = render_to_string("chem/multi_submit.html", a)
+                return HttpResponse(html)
+            else:
+                return HttpResponse(simplejson.dumps(a),
+                                    mimetype="application/json")
 
     keywords = request.REQUEST.get("keywords", "")
     unique = request.GET.get("unique", '')

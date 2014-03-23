@@ -5,24 +5,24 @@
 
 {% block script %}
 <script>
-    {% autoescape on %}
-    function submitForm(name) {
-        $("form input#id_molname").val(name);
-        $("form#newform").submit();
-    }
+{% autoescape on %}
+function submitForm(name) {
+    $("form input#id_molname").val(name);
+    $("form#newform").submit();
+}
 
-    $(function() {
-        $("#id_post").click(function() {
-            event.preventDefault();
-            var a = $('#newform').serialize();
-
-            $.post('', a, function(data) {
-                var dialog = $("#resultsModal .modal-body");
-                dialog.html(data);
-                $('#resultsModal').modal();
-                }
-            );
-        });
+$(function() {
+    $("#id_post").click(function() {
+        event.preventDefault();
+        var a = $('#newform').serialize();
+        a += "&html=true";
+        $.post('', a, function(data) {
+            var dialog = $("#resultsModal .modal-body");
+            dialog.html(data);
+            $('#resultsModal').modal();
+            }
+        );
+    });
 
 $("#id_zip_download").click(function() {
     event.preventDefault();
