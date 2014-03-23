@@ -34,33 +34,9 @@ $("#id_zip_download").click(function() {
     window.location = "/chem/{{ pagename }}.zip?{0}".format(a);
 })
 
-$.getJSON('check/', {"unique": "{{ unique }}" }, function(data) {
+$.get('check/', {"unique": "{{ unique }}", "html": true}, function(data) {
     var table = $("table.table");
-    var text = '';
-    for (var i=0; i < data.molecules.length; i++) {
-        var name = data.molecules[i][0];
-        var warning = data.molecules[i][1];
-        var error = data.molecules[i][2];
-        var message = '';
-        if (error) message = 'class="danger"';
-        else if (warning) message = 'class="warning"';
-
-        text += '<tr {0}>'.format(message);
-        text += '<td><a href="../{0}/{{ encoded_keywords }}">{0}</a></td>'.format(name);
-
-        if (!(error)) {
-            text += '<td><a href="../{0}.gjf{{ encoded_keywords }}">gjf</a></td>'.format(name);
-            text += '<td><a href="../{0}.mol2{{ encoded_keywords }}">mol2</a></td>'.format(name);
-            text += '<td><a data-toggle="collapse" href="#{0}">Image<div id="{0}" class="collapse"><img src="../{0}.png"></img></div></a></td>'.format(name);
-            text += '<td><a href="#" onClick="submitForm(\'{0}\')">Job</a></td>'.format(name);
-        }
-        else {
-            text += '<td colspan="4">{0}</td>'.format(error);
-        }
-        text += '<td><a href="../{0}/report/">Report</a></td>'.format(name);
-        text += '</tr>';
-    }
-    table.append(text);
+    table.append(data);
 })
 });
 

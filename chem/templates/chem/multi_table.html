@@ -1,0 +1,27 @@
+{% if error %}
+    {{ error }}
+{% else %}
+    {% for name, warning, error in molecules %}
+        <tr {% if warning %}class="warning"{% elif error %}class="danger"{% endif %}>
+            <td>
+                <a href="../{{ name }}/{{ encoded_keywords }}">{{ name }}</a>
+            </td>
+            {% if not error %}
+                <td><a href="../{{ name }}.gjf{{ encoded_keywords }}">gjf</a></td>
+                <td><a href="../{{ name }}.mol2{{ encoded_keywords }}">mol2</a></td>
+                <td>
+                    <a data-toggle="collapse" href="#{{ name }}">
+                        Image
+                        <div id="{0}" class="collapse">
+                            <img src="../{0}.png"></img>
+                        </div>
+                    </a>
+                </td>
+                <td><a href="#" onClick="submitForm('{{ name }}')">Job</a></td>
+            {% else %}
+                <td colspan="4">{{ error }}</td>
+            {% endif %}
+            <td><a href="../{{ name }}/report/">Report</a></td>
+        </tr>
+    {% endfor %}
+{% endif %}

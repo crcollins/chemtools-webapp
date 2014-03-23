@@ -82,7 +82,12 @@ def molecule_check(request, string):
     except ValueError as e:
         a["error"] = str(e)
         a["molecules"] = None
-    return HttpResponse(simplejson.dumps(a), mimetype="application/json")
+    if request.REQUEST.get("html", ''):
+        html = render_to_string("chem/multi_table.html", a)
+        print html
+        return HttpResponse(html)
+    else:
+        return HttpResponse(simplejson.dumps(a), mimetype="application/json")
 
 
 def molecule_detail(request, molecule):
