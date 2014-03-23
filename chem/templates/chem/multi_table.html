@@ -12,8 +12,8 @@
                 <td>
                     <a data-toggle="collapse" href="#{{ name }}">
                         Image
-                        <div id="{0}" class="collapse">
-                            <img src="../{0}.png"></img>
+                        <div id="{{ name }}" class="collapse">
+                            <img src="../{{ name }}.png"></img>
                         </div>
                     </a>
                 </td>
@@ -25,3 +25,4 @@
         </tr>
     {% endfor %}
 {% endif %}
+
