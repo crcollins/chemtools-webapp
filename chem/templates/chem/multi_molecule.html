@@ -49,7 +49,6 @@
                 text += "<br><a href='/chem/jobs/'>Go to jobs list.</a>";
                 var dialog = $("#resultsModal .modal-body");
                 dialog.html(text);
-                var newdialog = $('<div id="id_results">{0}</div>'.format(text));
                 $('#resultsModal').modal();
             },
             'json'
