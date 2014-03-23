@@ -166,6 +166,7 @@ INSTALLED_APPS = (
     'data',
     'cluster',
     'crispy_forms',
+    'sslserver',
  )
 
 CRISPY_TEMPLATE_PACK = 'bootstrap3'

@@ -6,3 +6,4 @@ pycrypto==2.6
 scipy==0.14.0
 django-crispy-forms==1.4.0
 scikit-learn==0.14.1
+django-sslserver==0.12
