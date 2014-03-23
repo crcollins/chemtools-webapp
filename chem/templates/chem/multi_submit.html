@@ -1,0 +1,30 @@
+{% if error %}
+    {{ error }}
+{% else %}
+    <h3>{{ cluster }}</h3>
+    <div class="panel panel-success">
+        <div class="panel-heading">
+            <h3 class="panel-title">Worked</h3>
+        </div>
+        <div class="panel-body">
+            {% for name, id in worked %}
+                <a class='list-group-item' href='/chem/jobs/{{ cluster }}/{{ id }}'>
+                    {{ name }} &mdash; {{ id }}
+                </a>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="panel panel-danger">
+        <div class="panel-heading">
+            <h3 class="panel-title">Failed</h3>
+        </div>
+        <div class="panel-body">
+            {% for name, message in failed %}
+                <li class='list-group-item'>{{ name }} &mdash; {{ message }}</li>
+            {% endfor %}
+            <a href='/chem/{{ failed_mols }}/{{ encoded_keywords }}'>Link to failed molecules.</a>
+        </div>
+    </div>
+{% endif %}
+<br>
+<a href='/chem/jobs/'>Go to jobs list.</a>

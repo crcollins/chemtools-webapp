@@ -4,6 +4,7 @@ import urllib
 
 from django.shortcuts import render, redirect
 from django.template import Context
+from django.template.loader import render_to_string
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.servers.basehttp import FileWrapper
 from django.core.urlresolvers import reverse
@@ -134,8 +135,8 @@ def multi_molecule(request, string):
             d["keywords"] = request.REQUEST.get("keywords", None)
             cred = d.pop("credential")
             a = cluster.interface.run_standard_jobs(cred, string, **d)
-            return HttpResponse(simplejson.dumps(a),
-                                mimetype="application/json")
+            html = render_to_string("chem/multi_submit.html", a)
+            return HttpResponse(html)
 
     keywords = request.REQUEST.get("keywords", "")
     unique = request.GET.get("unique", '')
