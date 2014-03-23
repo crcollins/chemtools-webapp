@@ -36,7 +36,9 @@ $("#id_zip_download").click(function() {
 
 $.get('check/', {"unique": "{{ unique }}", "html": true}, function(data) {
     var table = $("table.table");
-    table.append(data);
+    html = table.html();
+    html += data;
+    table.html(html);
 })
 });
 
