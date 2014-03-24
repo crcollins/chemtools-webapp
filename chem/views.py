@@ -84,7 +84,6 @@ def molecule_check(request, string):
         a["molecules"] = None
     if request.REQUEST.get("html", ''):
         html = render_to_string("chem/multi_table.html", a)
-        print html
         return HttpResponse(html)
     else:
         return HttpResponse(simplejson.dumps(a), mimetype="application/json")
