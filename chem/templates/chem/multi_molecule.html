@@ -24,25 +24,29 @@ $(function() {
         );
     });
 
-$("#id_zip_download").click(function() {
-    event.preventDefault();
-    var a = $('#headerform').serialize();
-    if ($('#id_job').val() === 'on'){
-        a += '&' + $('#newform').serialize()
-    }
-    a += "{{ encoded_zip }}".slice(1);
-    window.location = "/chem/{{ pagename }}.zip?{0}".format(a);
-})
+    $("#id_zip_download").click(function() {
+        event.preventDefault();
+        var a = $('#headerform').serialize();
+        if ($('#id_job').val() === 'on'){
+            a += '&' + $('#newform').serialize()
+        }
+        a += "{{ encoded_zip }}".slice(1);
+        window.location = "/chem/{{ pagename }}.zip?{0}".format(a);
+    });
 
-$.get('check/', {"unique": "{{ unique }}", "html": true}, function(data) {
-    var table = $("table.table");
-    html = table.html();
-    html += data;
-    table.html(html);
-})
+    $.get('check/', {"unique": "{{ unique }}", "html": true}, function(data) {
+        var table = $("table.table");
+        html = table.html();
+        html += data;
+        table.html(html);
+        $('.delayimage').click(function() {
+            img = $($(this).find("img"));
+            if (!img.attr('src')) {
+                img.attr('src', img.attr('data-src'));
+            }
+        });
+    });
 });
-
-
 {% endautoescape %}
 </script>
 {% endblock %}
