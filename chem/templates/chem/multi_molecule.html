@@ -27,8 +27,11 @@ $(function() {
     $("#id_zip_download").click(function() {
         event.preventDefault();
         var a = $('#headerform').serialize();
-        if ($('#id_job').val() === 'on'){
-            a += '&' + $('#newform').serialize()
+        if ($('#id_job').val() === 'on') {
+            a += '&' + $('#newform').serialize();
+        }
+        if ($("#id_unique").is(':checked')) {
+            a += '&unique=on';
         }
         a += "{{ encoded_zip }}".slice(1);
         window.location = "/chem/{{ pagename }}.zip?{0}".format(a);
@@ -132,7 +135,7 @@ $(function() {
     </div>
 </div>
 <div class="btn-group">
-    <a class="btn" href='../{{ pagename }}.zip{{ encoded_zip }}' id="id_zip_download">Download All</a>
+    <a class="btn" href='../{{ pagename }}.zip' id="id_zip_download">Download All</a>
 </div>
 
 
