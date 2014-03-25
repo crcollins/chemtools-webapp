@@ -638,17 +638,18 @@ class UtilsTestCase(TestCase):
                     self.names,
                     [None, None, True, None],
                     [None, "(1, 'Bad Core Name')", None, None],
+                    [True, True, True, False],
                 )
         self.assertEqual(results, expected)
 
     def test_get_multi_molecule_warnings_unique(self):
-        names = ["24a_TON", "BAD_NAME", "CON_24a"]
         string = ','.join(self.names)
-        results = utils.get_multi_molecule_warnings(string, unique=True)
+        results = utils.get_multi_molecule_warnings(string)
         expected = (
-                    names,
-                    [None, None, True],
-                    [None, "(1, 'Bad Core Name')", None],
+                    self.names,
+                    [None, None, True, None],
+                    [None, "(1, 'Bad Core Name')", None, None],
+                    [True, True, True, False]
                 )
         self.assertEqual(results, expected)
 
@@ -676,12 +677,8 @@ class UtilsTestCase(TestCase):
             'known_errors': None,
             'error_message': None,
             'datapoint': None,
+            'unique': True,
             'exact_name_spacers': '2**4aaA**_TON_A**_A**_n1_m1_x1_y1_z1'
         }
         self.assertEqual(results, expected)
 
-    def test_get_unique_molecules(self):
-        string = ','.join(self.names)
-        results = utils.get_unique_molecules(string)
-        expected = ['24a_TON', 'BAD_NAME', 'CON_24a']
-        self.assertEqual(results, expected)

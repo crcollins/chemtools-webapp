@@ -14,49 +14,37 @@ from data.models import DataPoint
 
 def get_molecule_warnings(name):
     try:
-        gjfwriter.parse_name(name)
+        exact_name = get_exact_name(name)
         error = None
     except Exception as e:
+        exact_name = ''
         error = str(e)
     warn = ErrorReport.objects.filter(molecule=name)
     warning = True if warn else None
-    return warning, error
+    unique = not DataPoint.objects.filter(exact_name=exact_name).exists()
+    return warning, error, unique
 
 
-def get_multi_molecule_warnings(string, unique=False):
+def get_multi_molecule_warnings(string):
     errors = []
     warnings = []
+    uniques = []
 
-    if unique:
-        molecules = get_unique_molecules(string)
-    else:
-        molecules = name_expansion(string)
+    molecules = name_expansion(string)
 
     start = time.time()
     for name in molecules:
         if time.time() - start > 1:
             raise ValueError("The operation has timed out.")
-        warning, error = get_molecule_warnings(name)
+        warning, error, unique = get_molecule_warnings(name)
         warnings.append(warning)
         errors.append(error)
-    return molecules, warnings, errors
-
-
-def get_unique_molecules(string):
-    unique = []
-    for mol in name_expansion(string):
-        try:
-            name = get_exact_name(mol)
-            if DataPoint.objects.filter(exact_name=name).exists():
-                continue
-        except:
-            pass
-        unique.append(mol)
-    return unique
+        uniques.append(unique)
+    return molecules, warnings, errors, uniques
 
 
 def get_molecule_info(molecule, keywords=KEYWORDS):
-    warning, error = get_molecule_warnings(molecule)
+    warning, error, unique = get_molecule_warnings(molecule)
 
     if not error:
         exactspacer = get_exact_name(molecule, spacers=True)
@@ -97,6 +85,7 @@ def get_molecule_info(molecule, keywords=KEYWORDS):
         "homo": homo,
         "lumo": lumo,
         "band_gap": gap,
+        "unique": unique,
         "known_errors": warning,
         "error_message": error,
         "keywords": keywords,

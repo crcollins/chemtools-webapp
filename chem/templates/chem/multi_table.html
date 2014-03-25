@@ -1,7 +1,7 @@
 {% if error %}
     {{ error }}
 {% else %}
-    {% for name, warning, error in molecules %}
+    {% for name, warning, error, unique in molecules %}
         <tr {% if warning %}class="warning"{% elif error %}class="danger"{% endif %}>
             <td>
                 <a href="../{{ name }}/{{ encoded_keywords }}">{{ name }}</a>

@@ -70,19 +70,18 @@ def multi_job(request):
 
 
 def molecule_check(request, string):
-    unique = request.REQUEST.get("unique", '')
-
     a = {
         "error": None,
     }
     try:
-        molecules, warnings, errors = get_multi_molecule_warnings(string,
-                                                                unique=unique)
-        a["molecules"] = zip(molecules, warnings, errors)
+        molecules, warnings, errors, uniques = get_multi_molecule_warnings(
+                                                                        string)
+        a["molecules"] = zip(molecules, warnings, errors, uniques)
     except ValueError as e:
         a["error"] = str(e)
         a["molecules"] = None
     if request.REQUEST.get("html", ''):
+
         html = render_to_string("chem/multi_table.html", a)
         return HttpResponse(html)
     else:
@@ -125,7 +124,6 @@ def multi_molecule(request, string):
     form = JobForm.get_form(request, "{{ name }}")
     add = "" if request.GET.get("view") else "attachment; "
 
-
     if form.is_valid():
         d = dict(form.cleaned_data)
         if request.method == "GET":
@@ -152,17 +150,14 @@ def multi_molecule(request, string):
                                     mimetype="application/json")
 
     keywords = request.REQUEST.get("keywords", "")
-    unique = request.GET.get("unique", '')
     encoded_keywords = '?' + urllib.urlencode({"keywords": keywords})
-    encoded_zip = '?' + urllib.urlencode({"keywords": keywords,
-                                        "unique": unique})
+    encoded_zip = '?' + urllib.urlencode({"keywords": keywords})
     c = Context({
         "pagename": string,
         "form": form,
         "gjf": "checked",
         "encoded_keywords": encoded_keywords if keywords else '',
         "keywords": keywords,
-        "unique": unique,
         "encoded_zip": encoded_zip,
         })
     return render(request, "chem/multi_molecule.html", c)
@@ -173,8 +168,8 @@ def multi_molecule_zip(request, string):
     unique = request.GET.get("unique", '')
 
     try:
-        molecules, warnings, errors = get_multi_molecule_warnings(string,
-                                                                unique=unique)
+        molecules, warnings, errors, uniques = get_multi_molecule_warnings(
+                                                                        string)
     except ValueError as e:
         c = Context({
             "error": str(e)
@@ -189,7 +184,7 @@ def multi_molecule_zip(request, string):
 
             encoded_keywords = '?' + urllib.urlencode({"keywords": keywords})
             c = Context({
-                "molecules": zip(molecules, errors, warnings),
+                "molecules": zip(molecules, errors, warnings, uniques),
                 "pagename": string,
                 "form": form,
                 "gjf": f("gjf"),
@@ -204,6 +199,8 @@ def multi_molecule_zip(request, string):
 
     selection = ("image", "mol2", "job", "gjf")
     options = [x for x in selection if request.GET.get(x)]
+    if unique:
+        molecules = [x for i, x in enumerate(molecules) if uniques[i]]
     ret_zip = get_multi_molecule(molecules, keywords, options, form)
 
     response = HttpResponse(ret_zip, mimetype="application/zip")
