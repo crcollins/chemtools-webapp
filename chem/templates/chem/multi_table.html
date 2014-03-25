@@ -1,8 +1,9 @@
+<tbody>
 {% if error %}
     {{ error }}
 {% else %}
     {% for name, warning, error, unique in molecules %}
-        <tr {% if warning %}class="warning"{% elif error %}class="danger"{% endif %}>
+        <tr {% if unique %}data-unique="true"{% endif %} {% if warning %}class="warning"{% elif error %}class="danger"{% endif %}>
             <td>
                 <a href="../{{ name }}/{{ encoded_keywords }}">{{ name }}</a>
             </td>
@@ -25,4 +26,4 @@
         </tr>
     {% endfor %}
 {% endif %}
-
+</tbody>

@@ -34,6 +34,16 @@ $(function() {
         window.location = "/chem/{{ pagename }}.zip?{0}".format(a);
     });
 
+    $("#id_unique").change(function () {
+            $.each($("table tbody tr"), function(idx, value) {
+                var on = $("#id_unique").is(':checked');
+                if (!$(value).data()["unique"]) {
+                    on ? $(value).hide() : $(value).show()
+                }
+            });
+        }
+    );
+
     $.get('check/', {"unique": "{{ unique }}", "html": true}, function(data) {
         var table = $("table.table");
         html = table.html();
@@ -57,37 +67,44 @@ $(function() {
 {% else %}
 <h1>{{ pagename }}</h1>
 
+<div class="checkbox">
+    <input type="checkbox" id="id_unique" name="unique" />
+    <label for="id_unique">Only Show Unique</label>
+</div>
+
 <table class="table table-striped">
-    <tr>
-        <form id="headerform">
-            <th>Name</th>
-            <th>
-                <div class="checkbox">
-                    <input type="checkbox" id="id_gjf" name="gjf" {{ gjf }}/>
-                    <label for="id_gjf">gjf</label>
-                </div>
-            </th>
-            <th>
-                <div class="checkbox">
-                    <input type="checkbox" id="id_mol2" name="mol2" {{ mol2 }}/>
-                    <label for="id_mol2">mol2</label>
-                </div>
-            </th>
-            <th>
-                <div class="checkbox">
-                    <input type="checkbox" id="id_image" name="image" {{ image }}/>
-                    <label for="id_image">Image</label>
-                </div>
-            </th>
-            <th>
-                <div class="checkbox">
-                    <input type="checkbox" id="id_job" name="job" {{ job }}/>
-                    <label for="id_job">Job</label>
-                </div>
-            </th>
-            <th></th>
-        </form>
-    </tr>
+    <thead>
+        <tr>
+            <form id="headerform">
+                <th>Name</th>
+                <th>
+                    <div class="checkbox">
+                        <input type="checkbox" id="id_gjf" name="gjf" {{ gjf }}/>
+                        <label for="id_gjf">gjf</label>
+                    </div>
+                </th>
+                <th>
+                    <div class="checkbox">
+                        <input type="checkbox" id="id_mol2" name="mol2" {{ mol2 }}/>
+                        <label for="id_mol2">mol2</label>
+                    </div>
+                </th>
+                <th>
+                    <div class="checkbox">
+                        <input type="checkbox" id="id_image" name="image" {{ image }}/>
+                        <label for="id_image">Image</label>
+                    </div>
+                </th>
+                <th>
+                    <div class="checkbox">
+                        <input type="checkbox" id="id_job" name="job" {{ job }}/>
+                        <label for="id_job">Job</label>
+                    </div>
+                </th>
+                <th></th>
+            </form>
+        </tr>
+    </thead>
 </table>
 
 <div class="container">
