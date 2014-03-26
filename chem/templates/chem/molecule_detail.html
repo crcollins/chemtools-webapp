@@ -73,38 +73,42 @@ $(function() {
     </table>
 
     <table class="table">
-        <tr>
-            <th></th>
-            <th>HOMO (eV)</th>
-            <th>LUMO (eV)</th>
-            <th>Band Gap (eV)</th>
-        </tr>
-        <tr>
-            <th>Predicted</td>
-            <td>{{ homo|floatformat:2 }} (± 0.09)</td>
-            <td>{{ lumo|floatformat:2 }} (± 0.08)</td>
-            <td>{{ band_gap|floatformat:2 }} (± 0.10)</td>
-        </tr>
-        {% if datapoint %}
-        <tr>
-            <th>Calculated</td>
-            <td>{{ datapoint.homo|floatformat:2 }}</td>
-            <td>{{ datapoint.lumo|floatformat:2 }}</td>
-            <td>{{ datapoint.band_gap|floatformat:2 }}</td>
-        </tr>
-        <tr>
-            <th>Calculation Options</th>
-            <td class="text-center" colspan="3">{{ datapoint.options }}</td>
-        </tr>
-        {% endif %}
-        {% for direction, values in limits.items %}
-        <tr>
-            <th>Predicted {{ direction }} Limit</td>
-            {% for value in values %}
-                <td>{{ value|floatformat:2 }}</td>
+        <thead>
+            <tr>
+                <th></th>
+                <th>HOMO (eV)</th>
+                <th>LUMO (eV)</th>
+                <th>Band Gap (eV)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <th>Predicted</th>
+                <td>{{ homo|floatformat:2 }} (± 0.09)</td>
+                <td>{{ lumo|floatformat:2 }} (± 0.08)</td>
+                <td>{{ band_gap|floatformat:2 }} (± 0.10)</td>
+            </tr>
+            {% if datapoint %}
+            <tr>
+                <th>Calculated</th>
+                <td>{{ datapoint.homo|floatformat:2 }}</td>
+                <td>{{ datapoint.lumo|floatformat:2 }}</td>
+                <td>{{ datapoint.band_gap|floatformat:2 }}</td>
+            </tr>
+            <tr>
+                <th>Calculation Options</th>
+                <td class="text-center" colspan="3">{{ datapoint.options }}</td>
+            </tr>
+            {% endif %}
+            {% for direction, values in limits.items %}
+            <tr>
+                <th>Predicted {{ direction }} Limit</th>
+                {% for value in values %}
+                    <td>{{ value|floatformat:2 }}</td>
+                {% endfor %}
             {% endfor %}
-        </tr>
-        {% endfor %}
+            </tr>
+        </tbody>
     </table>
     <hr>
     <div class="list-group">
