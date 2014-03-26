@@ -152,6 +152,18 @@ class MainPageTestCase(TestCase):
             with zipfile.ZipFile(f, "r") as zfile:
                 self.assertEqual(set(zfile.namelist()), gjf_names)
 
+    def test_multi_molecule_zip_unique(self):
+        string = ','.join(NAMES)
+        exists = DATA_POINT["name"]
+        gjf_names = set([name + ".gjf" for name in NAMES if name != exists])
+        url = reverse(views.multi_molecule_zip, args=(string, ))
+        params = "?unique=true"
+        response = self.client.get(url + params)
+        self.assertEqual(response.status_code, 200)
+        with StringIO(response.content) as f:
+            with zipfile.ZipFile(f, "r") as zfile:
+                self.assertEqual(set(zfile.namelist()), gjf_names)
+
     def test_multi_molecule_zip_options(self):
         string = ','.join(NAMES)
         sets = {
@@ -166,6 +178,33 @@ class MainPageTestCase(TestCase):
             params = '?' + '&'.join([x + "=true" for x in group if x])
             if params == '?':  # remove the blank case
                 continue
+            comparenames = set()
+            for x in group:
+                comparenames |= sets[x]
+            url = reverse(views.multi_molecule_zip, args=(string, )) + params
+
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 200)
+            with StringIO(response.content) as f:
+                with zipfile.ZipFile(f, "r") as zfile:
+                    self.assertEqual(set(zfile.namelist()), comparenames)
+
+    def test_multi_molecule_zip_options_unique(self):
+        string = ','.join(NAMES)
+        exists = DATA_POINT["name"]
+        sets = {
+            "gjf": set([name + ".gjf" for name in NAMES if name != exists]),
+            "image": set([name + ".png" for name in NAMES if name != exists]),
+            "mol2": set([name + ".mol2" for name in NAMES if name != exists]),
+            "": set(),
+        }
+
+        pairs = zip(["gjf", "image", "mol2"], [''] * 3)
+        for group in itertools.product(*pairs):
+            params = '?' + '&'.join([x + "=true" for x in group if x])
+            if params == '?':  # remove the blank case
+                continue
+            params += "&unique=true"
             comparenames = set()
             for x in group:
                 comparenames |= sets[x]
