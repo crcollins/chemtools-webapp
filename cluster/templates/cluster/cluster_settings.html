@@ -3,16 +3,20 @@
 
 {% block settingsbody %}
 <table class="table table-striped">
-    <tr>
-        <th>Name</th>
-        <th>Hostname</th>
-    </tr>
-    {% for cluster in clusters %}
-    <tr>
-        <td>{{ cluster.name }}</td>
-        <td>{{ cluster.hostname }}</td>
-    </tr>
-    {% endfor %}
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Hostname</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for cluster in clusters %}
+        <tr>
+            <td>{{ cluster.name }}</td>
+            <td>{{ cluster.hostname }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
 </table>
 
 <hr>
