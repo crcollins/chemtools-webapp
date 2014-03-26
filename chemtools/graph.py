@@ -80,6 +80,8 @@ def breadth_first_search(molecule):
             links.append((link, point))
     return links, tree
 
+def print_links(links):
+    return [[(f.id, f.element) for f in x] for x,y in links]
 
 def depth_first_search(molecule):
     # does not work with the cycle detection
