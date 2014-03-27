@@ -12,14 +12,20 @@ from utils import get_ssh_connection_obj, get_sftp_connection_obj, _run_job, \
 
 
 def run_job(credential, gjfstring, jobstring=None, **kwargs):
-    ssh = get_ssh_connection_obj(credential)
-    sftp = get_sftp_connection_obj(credential)
-
     results = {
         "jobid": None,
         "error": None,
-        "cluster": credential.cluster.name
     }
+    try:
+        results["cluster"] = credential.cluster.name
+    except:
+        results["error"] = "Invalid credential"
+        results["cluster"] = None
+        return results
+
+    ssh = get_ssh_connection_obj(credential)
+    sftp = get_sftp_connection_obj(credential)
+
     if not credential.user.is_staff:
         results["error"] = "You must be a staff user to submit a job."
         return results
@@ -32,15 +38,21 @@ def run_job(credential, gjfstring, jobstring=None, **kwargs):
 
 
 def run_jobs(credential, names, gjfstrings, jobstring=None, **kwargs):
-    ssh = get_ssh_connection_obj(credential)
-    sftp = get_sftp_connection_obj(credential)
-
     results = {
         "worked": [],
         "failed": [],
         "error": None,
-        "cluster": credential.cluster.name,
     }
+    try:
+        results["cluster"] = credential.cluster.name
+    except:
+        results["error"] = "Invalid credential"
+        results["cluster"] = None
+        return results
+
+    ssh = get_ssh_connection_obj(credential)
+    sftp = get_sftp_connection_obj(credential)
+
     if not credential.user.is_staff:
         results["error"] = "You must be a staff user to submit a job."
         return results
@@ -61,8 +73,14 @@ def run_standard_job(credential, molecule, **kwargs):
     results = {
         "jobid": None,
         "error": None,
-        "cluster": credential.cluster.name
     }
+    try:
+        results["cluster"] = credential.cluster.name
+    except:
+        results["error"] = "Invalid credential"
+        results["cluster"] = None
+        return results
+
     try:
         out = gjfwriter.GJFWriter(molecule, kwargs.get("keywords", None))
     except Exception as e:
@@ -82,8 +100,14 @@ def run_standard_jobs(credential, string, **kwargs):
         "worked": [],
         "failed": [],
         "error": None,
-        "cluster": credential.cluster.name,
     }
+    try:
+        results["cluster"] = credential.cluster.name
+    except :
+        results["error"] = "Invalid credential"
+        results["cluster"] = None
+        return results
+
     if not credential.user.is_staff:
         results["error"] = "You must be a staff user to submit a job."
         return results
