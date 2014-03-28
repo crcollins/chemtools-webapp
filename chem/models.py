@@ -72,6 +72,11 @@ class JobForm(forms.Form):
             f.queryset = Credential.objects.filter(user=request.user)
         return form
 
+    def is_valid(self, method=None):
+        if method == "POST":
+            self.fields['credential'].required = True
+        return super(JobForm, self).is_valid()
+
     def get_single_data(self, name):
         d = dict(self.cleaned_data)
         d["name"] = re.sub(r"{{\s*name\s*}}", name, d["name"])

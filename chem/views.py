@@ -50,7 +50,7 @@ def multi_job(request):
     c = Context({
         "form": form,
         })
-    if not form.is_valid():
+    if not form.is_valid(request.method):
         return render(request, "chem/multi_job.html", c)
 
     d = dict(form.cleaned_data)
@@ -93,7 +93,7 @@ def molecule_detail(request, molecule):
     keywords = request.REQUEST.get("keywords", '')
     add = "" if request.GET.get("view") else "attachment; "
 
-    if form.is_valid():
+    if form.is_valid(request.method):
         d = dict(form.cleaned_data)
         if request.method == "GET":
             response = HttpResponse(write_job(**d), content_type="text/plain")
@@ -124,7 +124,7 @@ def multi_molecule(request, string):
     form = JobForm.get_form(request, "{{ name }}")
     add = "" if request.GET.get("view") else "attachment; "
 
-    if form.is_valid():
+    if form.is_valid(request.method):
         d = dict(form.cleaned_data)
         if request.method == "GET":
             molecule = request.REQUEST.get("molname", "")
