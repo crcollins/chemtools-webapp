@@ -1,5 +1,5 @@
 {% extends "chem/base.html" %}
-{% load bootstrap %}
+{% load crispy_forms_tags %}
 {% load url from future %}
 
 {% block title %}Multi Job{% endblock %}
@@ -102,7 +102,7 @@ $(function() {
                 <textarea id="id_filenames" rows="26" cols="50" name="filenames" class=" form-control"></textarea>
             </div>
         </div>
-        {{ form|bootstrap }}
+        {{ form|crispy }}
         <div class="row">
             <div class="col-xs-4">
                 <button class="btn btn-lg btn-primary btn-block" type="submit">Build Jobs</button>

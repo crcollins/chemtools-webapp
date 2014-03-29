@@ -1,5 +1,5 @@
 {% extends "chem/base.html" %}
-{% load bootstrap %}
+{% load crispy_forms_tags %}
 
 {% block title %}{{ pagename }}{% endblock %}
 
@@ -117,7 +117,7 @@ $(function() {
 
     <div id="details" class="{% if form.errors %}in{% else %}collapse{% endif %}">
         <form id="newform" action="." method="get">
-            {{ form|bootstrap }}
+            {{ form|crispy }}
             {% if keywords %}<input type="hidden" name="keywords" value="{{ keywords }}">{% endif %}
             <input type="hidden" id="id_molname" name="molname" value="">
             <div class="row">

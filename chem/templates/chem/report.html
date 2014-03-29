@@ -1,5 +1,5 @@
 {% extends "chem/base.html" %}
-{% load bootstrap %}
+{% load crispy_forms_tags %}
 
 {% block title %}Report {{ molecule }}{% endblock %}
 
@@ -10,7 +10,7 @@
     {% endif %}
     <form action="." method="post">
         {% csrf_token %}
-        {{ form|bootstrap }}
+        {{ form|crispy }}
         <div class="row">
             <div class="col-xs-4">
                 <button class="btn btn-lg btn-primary btn-block" type="submit">Report</button>

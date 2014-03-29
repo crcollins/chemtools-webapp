@@ -1,5 +1,5 @@
 {% extends "account/base.html" %}
-{% load bootstrap %}
+{% load crispy_forms_tags %}
 
 {% block title %}Log In{% endblock %}
 
@@ -11,7 +11,7 @@
 <h3>{{ state }}</h3>
 <form action='' method="post">
     {% csrf_token %}
-    {{ form|bootstrap }}
+    {{ form|crispy }}
     <input class="btn btn-lg btn-primary btn-block" type="submit" value="Log In" />
 </form>
 <a href="/reset">Forgot your password?</a>

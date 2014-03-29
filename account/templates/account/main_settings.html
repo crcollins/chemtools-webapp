@@ -1,10 +1,10 @@
 {% extends "account/settings.html" %}
-{% load bootstrap %}
+{% load crispy_forms_tags %}
 
 {% block settingsbody %}
 <form action='' method="post">
     {% csrf_token %}
-    {{ form|bootstrap }}
+    {{ form|crispy }}
     <div class="form-group">
         <label class="control-label" for="id_public_key">Public Key</label>
         <div class="">

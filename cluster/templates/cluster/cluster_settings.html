@@ -1,5 +1,5 @@
 {% extends "account/settings.html" %}
-{% load bootstrap %}
+{% load crispy_forms_tags %}
 
 {% block settingsbody %}
 <table class="table table-striped">
@@ -23,7 +23,7 @@
 
 <form action="." method="post">
     {% csrf_token %}
-    {{ form|bootstrap }}
+    {{ form|crispy }}
     <div class="row">
         <div class="col-xs-6">
             <button class="btn btn-lg btn-primary btn-block" type="submit">Add Cluster</button>
