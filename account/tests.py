@@ -417,7 +417,7 @@ class LoginTestCase(TestCase):
                 }
             response = self.client.post("/login/", data)
             self.assertEqual(response.status_code, 200)
-            self.assertIn("alert alert-danger", response.content)
+            self.assertIn("alert-danger", response.content)
 
     def test_invalid_password(self):
         for user in self.users:
@@ -430,7 +430,7 @@ class LoginTestCase(TestCase):
                 }
             response = self.client.post("/login/", data)
             self.assertEqual(response.status_code, 200)
-            self.assertIn("alert alert-danger", response.content)
+            self.assertIn("alert-danger", response.content)
 
     def test_logout(self):
         for user in self.users:
