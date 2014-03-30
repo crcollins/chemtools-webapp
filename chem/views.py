@@ -3,12 +3,13 @@ import os
 import urllib
 
 from django.shortcuts import render, redirect
-from django.template import Context
+from django.template import Context, RequestContext
 from django.template.loader import render_to_string
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.servers.basehttp import FileWrapper
 from django.core.urlresolvers import reverse
 from django.utils import simplejson
+from crispy_forms.utils import render_crispy_form
 
 from models import ErrorReport, ErrorReportForm, JobForm
 from utils import get_multi_molecule_warnings, get_molecule_info
@@ -104,8 +105,13 @@ def molecule_detail(request, molecule):
             d["keywords"] = keywords
             cred = d.pop("credential")
             a = cluster.interface.run_standard_job(cred, molecule, **d)
+            a["success"] = True
             return HttpResponse(simplejson.dumps(a),
                                 mimetype="application/json")
+    elif request.is_ajax():
+        form_html = render_crispy_form(form, context=RequestContext(request))
+        a = {"success": False, "form_html": form_html}
+        return HttpResponse(simplejson.dumps(a), mimetype="application/json")
 
     keywords2 = request.REQUEST.get("keywords", KEYWORDS)
     a = get_molecule_info(molecule, keywords2)

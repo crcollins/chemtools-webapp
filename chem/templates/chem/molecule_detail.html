@@ -14,16 +14,20 @@ $(function() {
 
         $.post('', a, function(data) {
             var text = '';
-            if (data.error !== null ) {
-                text = data.error;
+            if (data.success) {
+                if (data.error !== null ) {
+                    text = data.error;
+                } else {
+                    var text = "<h3>{0}</h3>".format(data.cluster);
+                    text += "Your job id is <a href='/chem/jobs/{1}/{0}/'>{0}.</a>".format(data.jobid, data.cluster);
+                }
+                text += "<br><a href='/chem/jobs/'>Go to jobs list.</a>";
+                var dialog = $("#resultsModal .modal-body");
+                dialog.html(text);
+                $('#resultsModal').modal();
             } else {
-                var text = "<h3>{0}</h3>".format(data.cluster);
-                text += "Your job id is <a href='/chem/jobs/{1}/{0}/'>{0}.</a>".format(data.jobid, data.cluster);
+                $("#newform").replaceWith(data["form_html"]);
             }
-            text += "<br><a href='/chem/jobs/'>Go to jobs list.</a>";
-            var dialog = $("#resultsModal .modal-body");
-            dialog.html(text);
-            $('#resultsModal').modal();
             },
             'json'
             );
