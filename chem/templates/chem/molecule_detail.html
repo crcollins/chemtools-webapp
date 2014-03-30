@@ -26,7 +26,7 @@ $(function() {
                 dialog.html(text);
                 $('#resultsModal').modal();
             } else {
-                $("#id_job_form").replaceWith(data["form_html"]);
+                $("#id_job_form").html(data["form_html"]);
                 $("div.has-error").get(0).scrollIntoView();
             }
             },
@@ -123,7 +123,9 @@ $(function() {
     </div>
 
     <div id="details" class="{% if form.errors %}in{% else %}collapse{% endif %}">
-        {% crispy form %}
+        <form id="id_job_form" action='.' method="get">
+            {% crispy form %}
+        </form>
     </div>
 
     <div class="modal fade" id="resultsModal" tabindex="-1" role="dialog" aria-labelledby="resultsModalLabel" aria-hidden="true">

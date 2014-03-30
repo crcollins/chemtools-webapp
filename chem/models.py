@@ -47,9 +47,8 @@ class JobForm(forms.Form):
     def __init__(self,  *args, **kwargs):
         super(JobForm, self).__init__(*args, **kwargs)
         self.helper = FormHelper(self)
-        self.helper.form_id = "id_job_form"
-        self.helper.form_method = "GET"
-        self.helper.disable_csrf = False
+        self.helper.form_tag = False
+        self.helper.form_method = "POST"
         self.helper.layout = Layout(
                     Fieldset(
                         '',
