@@ -2,6 +2,9 @@ import re
 
 from django.db import models
 from django import forms
+from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Layout, Fieldset, ButtonHolder, Submit, Reset
+from crispy_forms.layout import Field
 
 from chemtools.constants import CLUSTER_TUPLES
 from cluster.models import Credential
@@ -24,6 +27,8 @@ class ErrorReportForm(forms.ModelForm):
 
 class JobForm(forms.Form):
     name = forms.CharField(max_length=400)
+    molname = forms.CharField(max_length=400, required=False)
+    keywords = forms.CharField(max_length=400, required=False)
     email = forms.EmailField()
     nodes = forms.IntegerField()
     walltime = forms.IntegerField()
@@ -38,6 +43,33 @@ class JobForm(forms.Form):
                         required=False,
                         widget=forms.HiddenInput(),
                         help_text="Only required if you are submitting a job.")
+
+    def __init__(self,  *args, **kwargs):
+        super(JobForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper(self)
+        self.helper.form_id = "id_job_form"
+        self.helper.form_method = "GET"
+        self.helper.disable_csrf = False
+        self.helper.layout = Layout(
+                    Fieldset(
+                        '',
+                        Field('keywords', type="hidden", value="{{ keywords }}"),
+                        Field('molname', type="hidden", value=""),
+                        'name',
+                        'email',
+                        'nodes',
+                        'walltime',
+                        'allocation',
+                        'cluster',
+                        'template',
+                        'credential',
+                    ),
+                    ButtonHolder(
+                        Submit('submit', 'Get Job'),
+                        Submit('submit', 'Submit Job', css_id="id_post"),
+                        Reset('reset', 'Reset')
+                    )
+                )
 
     @classmethod
     def get_form(cls, request, molecule):
