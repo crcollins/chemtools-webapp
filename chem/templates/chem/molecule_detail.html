@@ -27,6 +27,7 @@ $(function() {
                 $('#resultsModal').modal();
             } else {
                 $("#id_job_form").replaceWith(data["form_html"]);
+                $("div.has-error").get(0).scrollIntoView();
             }
             },
             'json'
