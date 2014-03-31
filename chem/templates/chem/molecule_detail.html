@@ -26,7 +26,7 @@ $(function() {
                 dialog.html(text);
                 $('#resultsModal').modal();
             } else {
-                $("#id_job_form").html(data["form_html"]);
+                $("#id_form_input").html(data["form_html"]);
                 $("#id_post").click(post_func);
                 $("div.has-error").get(0).scrollIntoView();
             }
@@ -124,8 +124,26 @@ $(function() {
     </div>
 
     <div id="details" class="{% if form.errors %}in{% else %}collapse{% endif %}">
-        <form id="id_job_form" action='.' method="get">
-            {% crispy form %}
+        <form id="id_job_form" action="." method="get">
+            <div id="id_form_input">
+                {{ form|crispy }}
+            </div>
+            {% if keywords %}<input type="hidden" name="keywords" value="{{ keywords }}">{% endif %}
+            <input type="hidden" id="id_molname" name="molname" value="">
+            <div class="row">
+                <div class="col-xs-4">
+                    <button class="btn btn-lg btn-primary btn-block" type="submit">Get Job</button>
+                </div>
+                {% if user.is_authenticated %}
+                <div class="col-xs-4">
+                    {% csrf_token %}
+                    <a id="id_post" class="btn btn-lg btn-primary btn-block">Submit Jobs</a>
+                </div>
+                {% endif %}
+                <div class="col-xs-4">
+                    <button class="btn btn-lg btn-block" type="reset">Reset</button>
+                </div>
+            </div>
         </form>
     </div>
 
