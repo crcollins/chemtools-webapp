@@ -8,7 +8,7 @@
 {% autoescape on %}
 
 $(function() {
-    $("#id_post").click(function() {
+    function post_func() {
         event.preventDefault();
         var a = $('#id_job_form').serialize();
 
@@ -27,13 +27,14 @@ $(function() {
                 $('#resultsModal').modal();
             } else {
                 $("#id_job_form").html(data["form_html"]);
+                $("#id_post").click(post_func);
                 $("div.has-error").get(0).scrollIntoView();
             }
             },
             'json'
-            );
-        }
-    );
+        );
+    }
+    $("#id_post").click(post_func);
 });
 {% endautoescape %}
 </script>
