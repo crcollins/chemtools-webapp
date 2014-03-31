@@ -12,17 +12,22 @@ function submitForm(name) {
 }
 
 $(function() {
-    $("#id_post").click(function() {
+    function post_func() {
         event.preventDefault();
-        var a = $('#newform').serialize();
+        var a = $('#id_job_form').serialize();
         a += "&html=true";
         $.post('', a, function(data) {
-            var dialog = $("#resultsModal .modal-body");
-            dialog.html(data);
-            $('#resultsModal').modal();
+            if (data.success) {
+                var dialog = $("#resultsModal .modal-body");
+                dialog.html(data.html);
+                $('#resultsModal').modal();
+            } else {
+                $("#id_form_input").html(data.form_html);
+                $("div.has-error").get(0).scrollIntoView();
             }
-        );
-    });
+        });
+    }
+    $("#id_post").click(post_func);
 
     $("#id_zip_download").click(function() {
         event.preventDefault();
@@ -116,8 +121,10 @@ $(function() {
     </div>
 
     <div id="details" class="{% if form.errors %}in{% else %}collapse{% endif %}">
-        <form id="newform" action="." method="get">
-            {{ form|crispy }}
+        <form id="id_job_form" action="." method="get">
+            <div id="id_form_input">
+                {{ form|crispy }}
+            </div>
             {% if keywords %}<input type="hidden" name="keywords" value="{{ keywords }}">{% endif %}
             <input type="hidden" id="id_molname" name="molname" value="">
             <div class="row">
