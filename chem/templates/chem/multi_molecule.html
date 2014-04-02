@@ -23,7 +23,10 @@ $(function() {
                 $('#resultsModal').modal();
             } else {
                 $("#id_form_input").html(data.form_html);
-                $("div.has-error").get(0).scrollIntoView();
+                var temp = $("div.has-error").get(0);
+                if (temp !== undefined) {
+                    temp.scrollIntoView();
+                }
             }
         });
     }
