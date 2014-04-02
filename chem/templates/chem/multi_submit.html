@@ -2,6 +2,7 @@
     {{ error }}
 {% else %}
     <h3>{{ cluster }}</h3>
+    {% if worked %}
     <div class="panel panel-success">
         <div class="panel-heading">
             <h3 class="panel-title">Worked</h3>
@@ -14,6 +15,8 @@
             {% endfor %}
         </div>
     </div>
+    {% endif %}
+    {% if failed %}
     <div class="panel panel-danger">
         <div class="panel-heading">
             <h3 class="panel-title">Failed</h3>
@@ -25,6 +28,7 @@
             <a href='/chem/{{ failed_mols }}/{{ encoded_keywords }}'>Link to failed molecules.</a>
         </div>
     </div>
+    {% endif %}
 {% endif %}
 <br>
 <a href='/chem/jobs/'>Go to jobs list.</a>
