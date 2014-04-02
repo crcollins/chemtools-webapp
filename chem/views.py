@@ -143,17 +143,20 @@ def multi_molecule(request, string):
         elif request.method == "POST":
             d["keywords"] = request.REQUEST.get("keywords", None)
             cred = d.pop("credential")
-            try:
-                do_html = d.pop("html")
-            except KeyError:
-                do_html = False
+            do_html = request.REQUEST.get("html", False)
             a = cluster.interface.run_standard_jobs(cred, string, **d)
             if do_html:
                 html = render_to_string("chem/multi_submit.html", a)
-                return HttpResponse(html)
+                temp = {"success": True, "html": html}
+                return HttpResponse(simplejson.dumps(temp),
+                                    mimetype="application/json")
             else:
                 return HttpResponse(simplejson.dumps(a),
                                     mimetype="application/json")
+    elif request.is_ajax():
+        form_html = render_crispy_form(form, context=RequestContext(request))
+        a = {"success": False, "form_html": form_html}
+        return HttpResponse(simplejson.dumps(a), mimetype="application/json")
 
     keywords = request.REQUEST.get("keywords", "")
     encoded_keywords = '?' + urllib.urlencode({"keywords": keywords})
