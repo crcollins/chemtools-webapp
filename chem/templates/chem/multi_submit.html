@@ -25,7 +25,9 @@
             {% for name, message in failed %}
                 <li class='list-group-item'>{{ name }} &mdash; {{ message }}</li>
             {% endfor %}
+            {% if failed_mols %}
             <a href='/chem/{{ failed_mols }}/{{ encoded_keywords }}'>Link to failed molecules.</a>
+            {% endif %}
         </div>
     </div>
     {% endif %}
