@@ -160,8 +160,9 @@ def multi_molecule(request, string):
             cred = d.pop("credential")
             do_html = request.REQUEST.get("html", False)
             a = cluster.interface.run_standard_jobs(cred, string, **d)
-            failed_names = zip(*a['failed'])[0]
-            a["failed_mols"] = ','.join(failed_names)
+            if a["failed"]:
+                failed_names = zip(*a['failed'])[0]
+                a["failed_mols"] = ','.join(failed_names)
             if do_html:
                 html = render_to_string("chem/multi_submit.html", a)
                 temp = {"success": True, "html": html}
