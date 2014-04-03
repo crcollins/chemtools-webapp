@@ -22,20 +22,20 @@ import cluster.interface
 
 
 def index(request):
-    if request.GET.get("molecule"):
+    if request.REQUEST.get("molecule"):
 
         func = molecule_detail
-        if set(",{}$") & set(request.GET.get("molecule")):
+        if set(",{}$") & set(request.REQUEST.get("molecule")):
             func = multi_molecule
 
-        params = {"keywords": request.GET.get("keywords", None)}
+        params = {"keywords": request.REQUEST.get("keywords", None)}
         if params["keywords"] != KEYWORDS:
             url = "%s?%s" % (reverse(func,
-                                    args=(request.GET.get("molecule"), )),
+                                    args=(request.REQUEST.get("molecule"), )),
                 urllib.urlencode(params))
             return HttpResponseRedirect(url)
         else:
-            return redirect(func, request.GET.get("molecule"))
+            return redirect(func, request.REQUEST.get("molecule"))
     return render(request, "chem/index.html")
 
 
@@ -107,7 +107,7 @@ def molecule_check(request, string):
 def molecule_detail(request, molecule):
     form = JobForm.get_form(request, molecule)
     keywords = request.REQUEST.get("keywords", '')
-    add = "" if request.GET.get("view") else "attachment; "
+    add = "" if request.REQUEST.get("view") else "attachment; "
 
     if form.is_valid(request.method):
         d = dict(form.cleaned_data)
@@ -143,7 +143,7 @@ def molecule_detail_json(request, molecule):
 
 def multi_molecule(request, string):
     form = JobForm.get_form(request, "{{ name }}")
-    add = "" if request.GET.get("view") else "attachment; "
+    add = "" if request.REQUEST.get("view") else "attachment; "
 
     if form.is_valid(request.method):
         d = dict(form.cleaned_data)
@@ -191,8 +191,8 @@ def multi_molecule(request, string):
 
 
 def multi_molecule_zip(request, string):
-    keywords = request.GET.get("keywords")
-    unique = request.GET.get("unique", '')
+    keywords = request.REQUEST.get("keywords")
+    unique = request.REQUEST.get("unique", '')
 
     try:
         molecules, warnings, errors, uniques = get_multi_molecule_warnings(
@@ -203,11 +203,11 @@ def multi_molecule_zip(request, string):
             })
         return render(request, "chem/multi_molecule.html", c)
 
-    if request.GET.get("job"):
+    if request.REQUEST.get("job"):
         form = JobForm.get_form(request, "{{ name }}")
         if not form.is_valid():
-            keywords = request.GET.get("keywords")
-            f = lambda x: 'checked' if request.GET.get(x) else ''
+            keywords = request.REQUEST.get("keywords")
+            f = lambda x: 'checked' if request.REQUEST.get(x) else ''
 
             encoded_keywords = '?' + urllib.urlencode({"keywords": keywords})
             c = Context({
@@ -225,7 +225,7 @@ def multi_molecule_zip(request, string):
         form = None
 
     selection = ("image", "mol2", "job", "gjf")
-    options = [x for x in selection if request.GET.get(x)]
+    options = [x for x in selection if request.REQUEST.get(x)]
     if unique:
         molecules = [x for i, x in enumerate(molecules) if uniques[i]]
     ret_zip = get_multi_molecule(molecules, keywords, options, form)
@@ -236,8 +236,8 @@ def multi_molecule_zip(request, string):
 
 
 def write_gjf(request, molecule):
-    keywords = request.GET.get("keywords")
-    add = "" if request.GET.get("view") else "attachment; "
+    keywords = request.REQUEST.get("keywords")
+    add = "" if request.REQUEST.get("view") else "attachment; "
 
     out = gjfwriter.GJFWriter(molecule, keywords)
     f = StringIO(out.get_gjf())
@@ -247,7 +247,7 @@ def write_gjf(request, molecule):
 
 
 def write_mol2(request, molecule):
-    add = "" if request.GET.get("view") else "attachment; "
+    add = "" if request.REQUEST.get("view") else "attachment; "
 
     out = gjfwriter.GJFWriter(molecule, '')
     f = StringIO(out.get_mol2())
@@ -257,7 +257,7 @@ def write_mol2(request, molecule):
 
 
 def write_png(request, molecule):
-    scale = request.GET.get("scale", 10)
+    scale = request.REQUEST.get("scale", 10)
 
     out = gjfwriter.GJFWriter(molecule, '')
     response = HttpResponse(content_type="image/png")
