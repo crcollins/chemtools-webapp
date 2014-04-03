@@ -18,7 +18,7 @@ Build/Run Requirements
 - Pillow 2.2.1
 - PyCrypto 2.26
 - Scipy 0.9.0
-- Django bootstrap form 3.0.0
+- Django Crispy Forms 1.4.0
 - Scikit-Learn 0.14.1
 
 
