@@ -474,7 +474,8 @@ class PostsFailTestCase(TestCase):
             expected = {
                         "cluster": "test-machine",
                         "error": "You must be a staff user to submit a job.",
-                        "jobid": None
+                        "jobid": None,
+                        'success': True
                         }
             self.assertEqual(simplejson.loads(response.content), expected)
 
