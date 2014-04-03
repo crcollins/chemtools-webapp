@@ -52,16 +52,31 @@ def multi_job(request):
         "form": form,
         })
     if not form.is_valid(request.method):
+        if request.is_ajax():
+            form_html = render_crispy_form(form,
+                                        context=RequestContext(request))
+            a = {"success": False, "form_html": form_html}
+            return HttpResponse(simplejson.dumps(a),
+                                mimetype="application/json")
         return render(request, "chem/multi_job.html", c)
 
     d = dict(form.cleaned_data)
     if request.method == "POST":
         cred = d.pop("credential")
+        d["keywords"] = request.REQUEST.get("keywords", None)
         files = request.FILES.getlist("files")
         strings = [''.join(f.readlines()) for f in files]
         names = [os.path.splitext(f.name)[0] for f in files]
         a = cluster.interface.run_jobs(cred, names, strings, **d)
-        return HttpResponse(simplejson.dumps(a), mimetype="application/json")
+        do_html = request.REQUEST.get("html", False)
+        if do_html:
+            html = render_to_string("chem/multi_submit.html", a)
+            temp = {"success": True, "html": html}
+            return HttpResponse(simplejson.dumps(temp),
+                                mimetype="application/json")
+        else:
+            return HttpResponse(simplejson.dumps(a),
+                                mimetype="application/json")
 
     string = request.REQUEST.get('filenames', '').replace('\n', ',')
     ret_zip = get_multi_job(string, form)
