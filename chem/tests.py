@@ -583,6 +583,22 @@ class PostsTestCase(TestCase):
             self.assertIsNone(results["error"])
             self.assertIsNotNone(results["jobid"])
 
+    def test_post_single_exception(self):
+        r = self.client.login(**USER_LOGIN)
+        self.assertTrue(r)
+        options = SUB_OPTIONS.copy()
+        for name in NAMES:
+            options["name"] = name
+            response = self.client.get(reverse(views.molecule_detail,
+                                                args=(name, )))
+            self.assertEqual(response.status_code, 200)
+            url = reverse(views.molecule_detail, args=(name, ))
+            response = self.client.post(url, options)
+
+            results = simplejson.loads(response.content)
+            self.assertIsNone(results["error"])
+            self.assertIsNotNone(results["jobid"])
+
     def test_post_single_fail(self):
         r = self.client.login(**USER_LOGIN)
         self.assertTrue(r)
