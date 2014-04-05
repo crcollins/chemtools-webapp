@@ -154,6 +154,27 @@ class MainPageTestCase(TestCase):
             with zipfile.ZipFile(f, "r") as zfile:
                 self.assertEqual(set(zfile.namelist()), gjf_names)
 
+    def test_multi_molecule_zip_keywords(self):
+        string = ','.join(NAMES)
+        gjf_names = set([name + ".gjf" for name in NAMES])
+        header = "%%nprocshared=16\n%%mem=59GB\n"
+        header += "%%chk=%s.chk\n# %s geom=connectivity"
+
+        for keywords in KEYWORDS_SET:
+            params = "?keywords=%s" % keywords
+            url = reverse(views.multi_molecule_zip, args=(string, )) + params
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 200)
+
+            with StringIO(response.content) as f:
+                with zipfile.ZipFile(f, "r") as zfile:
+                    for gjf_name in zfile.namelist():
+                        with zfile.open(gjf_name) as f1:
+                            name = gjf_name.replace(".gjf", '')
+                            temp_string = header % (name, keywords)
+                            t = [x + '\n' for x in temp_string.split('\n')]
+                            self.assertEqual(t, f1.readlines()[:4])
+
     def test_multi_molecule_zip_unique(self):
         string = ','.join(NAMES)
         exists = DATA_POINT["name"]
