@@ -87,6 +87,8 @@ SUB_OPTIONS = {
     "credential": 1,
 }
 
+KEYWORDS_SET = ["opt HF/6-31g(d)", "td b3lyp/6-31g(d)", KEYWORDS]
+
 
 class MainPageTestCase(TestCase):
     def setUp(self):
@@ -103,7 +105,7 @@ class MainPageTestCase(TestCase):
 
     def test_index_redirect(self):
         for name in NAMES + MULTI_NAMES:
-            for keywords in ["opt HF/6-31g(d)", "td b3lyp/6-31g(d)", KEYWORDS]:
+            for keywords in KEYWORDS_SET:
                 params = "?molecule=%s&keywords=%s" % (name, keywords)
                 url = reverse("chem_index") + params
                 response = self.client.get(url)
@@ -259,7 +261,7 @@ class MainPageTestCase(TestCase):
         string = "%%nprocshared=16\n%%mem=59GB\n"
         string += "%%chk=%s.chk\n# %s geom=connectivity"
         for name in NAMES:
-            for keywords in ["opt HF/6-31g(d)", "td b3lyp/6-31g(d)"]:
+            for keywords in KEYWORDS_SET:
                 params = "?keywords=%s" % keywords
                 url = reverse(views.write_gjf, args=(name, )) + params
                 response = self.client.get(url)
