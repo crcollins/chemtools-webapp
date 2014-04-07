@@ -83,11 +83,13 @@ class OptimizedCLF(object):
         return self.optimized_clf
 
 
-def fit_func(X, y, func=None, params=None):
-    if func is None:
-        func = svm.SVR
-    if params is None:
+def fit_func(X, y, clf=None):
+    func = svm.SVR
+    if clf is None:
         params = {"C": 10, "gamma": 0.05}
+    else:
+        params = {"C": clf.C, "gamma": clf.gamma}
+
     clf = OptimizedCLF(X, y, func, params).get_optimized_clf()
     train, test = test_clf_kfold(X, y, clf, folds=10)
     return clf, test
@@ -98,6 +100,7 @@ def get_first_layer(X, homo, lumo, gap):
     lumo_clf, lumo_err = fit_func(X, lumo)
     gap_clf, gap_err = fit_func(X, gap)
     return homo_clf, lumo_clf, gap_clf
+
 
 def get_second_layer(X, homo, lumo, gap, homo_clf, lumo_clf, gap_clf):
     homop = numpy.matrix(homo_clf.predict(X)).T
