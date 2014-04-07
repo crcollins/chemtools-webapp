@@ -10,7 +10,8 @@ from sklearn.metrics import mean_absolute_error
 def test_clf_kfold(X, y, clf, folds=10):
     train = numpy.zeros(folds)
     cross = numpy.zeros(folds)
-    for i, (train_idx, test_idx) in enumerate(cross_validation.KFold(y.shape[0], n_folds=folds)):
+    folds = cross_validation.KFold(y.shape[0], n_folds=folds)
+    for i, (train_idx, test_idx) in enumerate(folds):
         X_train = X[train_idx]
         X_test = X[test_idx]
         y_train = y[train_idx].T.tolist()[0]
@@ -89,8 +90,8 @@ def fit_func(X, y, func=None, params=None):
         params = {"C": 10, "gamma": 0.05}
     clf = OptimizedCLF(X, y, func, params).get_optimized_clf()
     train, test = test_clf_kfold(X, y, clf, folds=10)
-    print test
     return clf, test
+
 
 def get_first_layer(X, homo, lumo, gap):
     homo_clf, homo_err = fit_func(X, homo)
