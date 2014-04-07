@@ -2,8 +2,9 @@ from django.db import models
 
 
 class DataPoint(models.Model):
-    name = models.CharField(max_length=200)
-    exact_name = models.CharField(max_length=600, null=True, blank=True)
+    name = models.CharField(max_length=600)
+    exact_name = models.CharField(max_length=1000, null=True, blank=True)
+    decay_feature = models.CharField(max_length=1000, null=True, blank=True)
 
     options = models.CharField(max_length=100)
     homo = models.FloatField()
