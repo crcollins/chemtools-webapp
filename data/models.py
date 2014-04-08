@@ -1,3 +1,6 @@
+import numpy
+import ast
+
 from django.db import models
 
 
@@ -16,3 +19,21 @@ class DataPoint(models.Model):
 
     def __unicode__(self):
         return self.exact_name
+
+    @classmethod
+    def get_data(cls):
+        data = DataPoint.objects.filter(band_gap__isnull=False,
+                                        exact_name__isnull=False,
+                                        decay_feature__isnull=False)
+        M = len(data)
+        HOMO = numpy.zeros((M, 1))
+        LUMO = numpy.zeros((M, 1))
+        GAP = numpy.zeros((M, 1))
+        vectors = []
+        for i, x in enumerate(data):
+            HOMO[i] = x.homo
+            LUMO[i] = x.lumo
+            GAP[i] = x.band_gap
+            vectors.append(ast.literal_eval(x.decay_feature))
+        FEATURE = numpy.matrix(vectors)
+        return FEATURE, HOMO, LUMO, GAP
