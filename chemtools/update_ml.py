@@ -1,4 +1,5 @@
 import itertools
+import cPickle
 
 import numpy
 import scipy.optimize
@@ -126,7 +127,7 @@ def save(clfs, pred_clfs):
         with open("decay_%s.pkl" % prop, 'w') as f:
             cPickle.dump(clf, f, protocol=-1)
 
-    for clf, prop in zip(predclfs, props):
+    for clf, prop in zip(pred_clfs, props):
         with open("decay_pred_%s.pkl" % prop, 'w') as f:
             cPickle.dump(clf, f, protocol=-1)
 
