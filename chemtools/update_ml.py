@@ -102,7 +102,8 @@ def get_first_layer(X, homo, lumo, gap):
     return homo_clf, lumo_clf, gap_clf
 
 
-def get_second_layer(X, homo, lumo, gap, homo_clf, lumo_clf, gap_clf):
+def get_second_layer(X, homo, lumo, gap, clfs):
+    homo_clf, lumo_clf, gap_clf = clfs
     homop = numpy.matrix(homo_clf.predict(X)).T
     lumop = numpy.matrix(lumo_clf.predict(X)).T
     gapp = numpy.matrix(gap_clf.predict(X)).T
