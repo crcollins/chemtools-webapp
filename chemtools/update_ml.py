@@ -117,3 +117,14 @@ def get_second_layer(X, homo, lumo, gap, clfs):
     pred_gap_clf, pred_gap_err = fit_func(X_gap, gap)
     return pred_homo_clf, pred_lumo_clf, pred_gap_clf
 
+
+def save(clfs, pred_clfs):
+    props = ["homo", "lumo", "gap"]
+    for clf, prop in zip(clfs, props):
+        with open("decay_%s.pkl" % prop, 'w') as f:
+            cPickle.dump(clf, f, protocol=-1)
+
+    for clf, prop in zip(predclfs, props):
+        with open("decay_pred_%s.pkl" % prop, 'w') as f:
+            cPickle.dump(clf, f, protocol=-1)
+
