@@ -6,6 +6,8 @@ from sklearn import svm
 from sklearn import cross_validation
 from sklearn.metrics import mean_absolute_error
 
+from data.models import DataPoint
+
 
 def test_clf_kfold(X, y, clf, folds=10):
     train = numpy.zeros(folds)
@@ -128,3 +130,13 @@ def save(clfs, pred_clfs):
         with open("decay_pred_%s.pkl" % prop, 'w') as f:
             cPickle.dump(clf, f, protocol=-1)
 
+
+def run_all():
+    FEATURE, HOMO, LUMO, GAP = DataPoint.get_data()
+    clfs = get_first_layer(FEATURE, HOMO, LUMO, GAP)
+    pred_clfs = get_second_layer(FEATURE, HOMO, LUMO, GAP, clfs)
+    save(clfs, pred_clfs)
+
+
+if __name__ == "__main__":
+    run_all()
