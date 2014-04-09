@@ -133,7 +133,7 @@ def save(clfs, pred_clfs):
 
 
 def run_all():
-    FEATURE, HOMO, LUMO, GAP = DataPoint.get_data()
+    FEATURE, HOMO, LUMO, GAP = DataPoint.get_all_data()
     clfs = get_first_layer(FEATURE, HOMO, LUMO, GAP)
     pred_clfs = get_second_layer(FEATURE, HOMO, LUMO, GAP, clfs)
     save(clfs, pred_clfs)

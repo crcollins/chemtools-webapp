@@ -21,7 +21,7 @@ class DataPoint(models.Model):
         return self.exact_name
 
     @classmethod
-    def get_data(cls):
+    def get_all_data(cls):
         data = DataPoint.objects.filter(band_gap__isnull=False,
                                         exact_name__isnull=False,
                                         decay_feature__isnull=False)
