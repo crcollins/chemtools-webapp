@@ -121,7 +121,7 @@ def get_second_layer(X, homo, lumo, gap, clfs):
     return pred_homo_clf, pred_lumo_clf, pred_gap_clf
 
 
-def save(clfs, pred_clfs):
+def save_clfs(clfs, pred_clfs):
     props = ["homo", "lumo", "gap"]
     for clf, prop in zip(clfs, props):
         with open("decay_%s.pkl" % prop, 'w') as f:
@@ -153,7 +153,7 @@ def run_all():
     FEATURE, HOMO, LUMO, GAP = DataPoint.get_all_data()
     clfs = get_first_layer(FEATURE, HOMO, LUMO, GAP)
     pred_clfs = get_second_layer(FEATURE, HOMO, LUMO, GAP, clfs)
-    save(clfs, pred_clfs)
+    save_clfs(clfs, pred_clfs)
 
 
 if __name__ == "__main__":
