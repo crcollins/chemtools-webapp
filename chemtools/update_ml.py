@@ -131,6 +131,23 @@ def save(clfs, pred_clfs):
         with open("decay_pred_%s.pkl" % prop, 'w') as f:
             cPickle.dump(clf, f, protocol=-1)
 
+def load_clfs():
+    props = ["homo", "lumo", "gap"]
+    clfs = []
+    for clf, prop in zip(clfs, props):
+        with open("decay_%s.pkl" % prop, 'rb') as f:
+            clfs.append(cPickle.load(f))
+
+    pred_clfs = []
+    for clf, prop in zip(pred_clfs, props):
+        with open("decay_pred_%s.pkl" % prop, 'rb') as f:
+            pred_clfs.append(cPickle.load(f))
+
+    if len(clfs) < 3 or len(pred_clfs) < 3:
+        clfs = None
+        pred_clfs = None
+    return clfs, pred_clfs
+
 
 def run_all():
     FEATURE, HOMO, LUMO, GAP = DataPoint.get_all_data()
