@@ -39,7 +39,10 @@ def main(path):
                 point.clean_fields()
                 points.append(point)
                 count += 1
+                if len(points) > 50:
+                    DataPoint.objects.bulk_create(points)
+                    points = []
             except Exception as e:
                 pass
         DataPoint.objects.bulk_create(points)
-        print "Added %d datapoints." % count
+        print "Added %d datapoint(s)." % count
