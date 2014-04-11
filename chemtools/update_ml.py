@@ -98,14 +98,24 @@ def fit_func(X, y, clf=None):
     return clf, test
 
 
-def get_first_layer(X, homo, lumo, gap):
-    homo_clf, homo_err = fit_func(X, homo)
-    lumo_clf, lumo_err = fit_func(X, lumo)
-    gap_clf, gap_err = fit_func(X, gap)
+def get_first_layer(X, homo, lumo, gap, in_clfs=None):
+    if in_clfs is not None:
+        in_homo_clf, in_lumo_clf, in_gap_clf = in_clfs
+    else:
+        in_homo_clf, in_lumo_clf, in_gap_clf = [None] * 3
+
+    homo_clf, homo_err = fit_func(X, homo, clf=in_homo_clf)
+    lumo_clf, lumo_err = fit_func(X, lumo, clf=in_lumo_clf)
+    gap_clf, gap_err = fit_func(X, gap, clf=in_gap_clf)
     return homo_clf, lumo_clf, gap_clf
 
 
-def get_second_layer(X, homo, lumo, gap, clfs):
+def get_second_layer(X, homo, lumo, gap, clfs, in_pred_clfs=None):
+    if in_pred_clfs is not None:
+        in_pred_homo, in_pred_lumo, in_pred_gap = in_pred_clfs
+    else:
+        in_pred_homo, in_pred_lumo, in_pred_gap = [None] * 3
+
     homo_clf, lumo_clf, gap_clf = clfs
     homop = numpy.matrix(homo_clf.predict(X)).T
     lumop = numpy.matrix(lumo_clf.predict(X)).T
@@ -115,9 +125,9 @@ def get_second_layer(X, homo, lumo, gap, clfs):
     X_lumo = numpy.concatenate([X, gapp, homop], 1)
     X_gap = numpy.concatenate([X, homop, lumop], 1)
 
-    pred_homo_clf, pred_homo_err = fit_func(X_homo, homo)
-    pred_lumo_clf, pred_lumo_err = fit_func(X_lumo, lumo)
-    pred_gap_clf, pred_gap_err = fit_func(X_gap, gap)
+    pred_homo_clf, pred_homo_err = fit_func(X_homo, homo, clf=in_pred_homo)
+    pred_lumo_clf, pred_lumo_err = fit_func(X_lumo, lumo, clf=in_pred_lumo)
+    pred_gap_clf, pred_gap_err = fit_func(X_gap, gap, clf=in_pred_gap)
     return pred_homo_clf, pred_lumo_clf, pred_gap_clf
 
 
@@ -134,12 +144,12 @@ def save_clfs(clfs, pred_clfs):
 def load_clfs():
     props = ["homo", "lumo", "gap"]
     clfs = []
-    for clf, prop in zip(clfs, props):
+    for prop in props:
         with open("decay_%s.pkl" % prop, 'rb') as f:
             clfs.append(cPickle.load(f))
 
     pred_clfs = []
-    for clf, prop in zip(pred_clfs, props):
+    for prop in props:
         with open("decay_pred_%s.pkl" % prop, 'rb') as f:
             pred_clfs.append(cPickle.load(f))
 
@@ -151,8 +161,12 @@ def load_clfs():
 
 def run_all():
     FEATURE, HOMO, LUMO, GAP = DataPoint.get_all_data()
-    clfs = get_first_layer(FEATURE, HOMO, LUMO, GAP)
-    pred_clfs = get_second_layer(FEATURE, HOMO, LUMO, GAP, clfs)
+    if not "update":
+        return
+
+    in_clfs, in_pred_clfs = load_clfs()
+    clfs = get_first_layer(FEATURE, HOMO, LUMO, GAP, in_clfs)
+    pred_clfs = get_second_layer(FEATURE, HOMO, LUMO, GAP, clfs, in_pred_clfs)
     save_clfs(clfs, pred_clfs)
 
 
