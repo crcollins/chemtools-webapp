@@ -9,6 +9,7 @@ def main(path):
     with open(path, "r") as csvfile:
         reader = csv.reader(csvfile, delimiter=',', quotechar='"')
         points = []
+        count = 0
         for row in reader:
             if row == []:
                 continue
@@ -37,6 +38,8 @@ def main(path):
                         decay_feature=decay_feature)
                 point.clean_fields()
                 points.append(point)
+                count += 1
             except Exception as e:
                 pass
         DataPoint.objects.bulk_create(points)
+        print "Added %d datapoints." % count
