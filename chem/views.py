@@ -8,6 +8,7 @@ from django.template.loader import render_to_string
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.servers.basehttp import FileWrapper
 from django.core.urlresolvers import reverse
+from django.core.serializers.json import DjangoJSONEncoder
 from django.utils import simplejson
 from crispy_forms.utils import render_crispy_form
 
@@ -138,7 +139,7 @@ def molecule_detail(request, molecule):
 def molecule_detail_json(request, molecule):
     keywords = request.REQUEST.get("keywords", KEYWORDS)
     a = get_molecule_info(molecule, keywords)
-    return HttpResponse(simplejson.dumps(a), mimetype="application/json")
+    return HttpResponse(simplejson.dumps(a, cls=DjangoJSONEncoder), mimetype="application/json")
 
 
 def multi_molecule(request, string):
