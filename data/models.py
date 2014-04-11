@@ -8,6 +8,7 @@ class DataPoint(models.Model):
     name = models.CharField(max_length=600)
     exact_name = models.CharField(max_length=1000, null=True, blank=True)
     decay_feature = models.CharField(max_length=1000, null=True, blank=True)
+    created = models.DateTimeField(auto_now_add=True)
 
     options = models.CharField(max_length=100)
     homo = models.FloatField()
