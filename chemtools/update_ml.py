@@ -61,8 +61,10 @@ class OptimizedCLF(object):
             self.optimized_clf = self.func()
         if self.optimized_clf is not None:
             return self.optimized_clf
-        listparams = dict((k,v) for k,v in self.params.items() if type(v) in [list, tuple])
-        itemparams = dict((k,v) for k,v in self.params.items() if type(v) not in [list, tuple])
+        items = self.params.items()
+        types = set([list, tuple])
+        listparams = dict((k,v) for k,v in items if type(v) in types)
+        itemparams = dict((k,v) for k,v in items if type(v) not in types)
         listvalues = []
         itemvalues = []
         if listparams:
