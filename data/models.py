@@ -18,6 +18,9 @@ class DataPoint(models.Model):
     dipole = models.FloatField()
     band_gap = models.FloatField(null=True, blank=True)
 
+    class Meta:
+        get_latest_by = "created"
+
     def __unicode__(self):
         return unicode(self.name)
 
