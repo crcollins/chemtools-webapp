@@ -1,3 +1,4 @@
+import os
 import cStringIO
 import base64
 
@@ -89,6 +90,11 @@ def get_ssh_connection(hostname, username, key=None, password=None, port=22):
             client.base = base
             break
     return client
+
+
+def touch(path, times=None):
+    with open(path, 'a'):
+        os.utime(path, times)
 
 
 class AESCipher(object):
