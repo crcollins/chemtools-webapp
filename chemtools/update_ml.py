@@ -1,5 +1,8 @@
+import os
 import itertools
 import cPickle
+import datetime
+import pytz
 
 import numpy
 import scipy.optimize
@@ -8,6 +11,7 @@ from sklearn import cross_validation
 from sklearn.metrics import mean_absolute_error
 
 from data.models import DataPoint
+from project.utils import touch
 
 
 def test_clf_kfold(X, y, clf, folds=10):
@@ -163,13 +167,22 @@ def load_clfs():
 
 def run_all():
     FEATURE, HOMO, LUMO, GAP = DataPoint.get_all_data()
-    if not "update":
-        return
+    latest = DataPoint.objects.latest()
+    path = "last_ml_update"
+    try:
+        mtime = os.path.getmtime("last_ml_update")
+        temp = datetime.datetime.fromtimestamp(mtime)
+        last_update = pytz.utc.localize(temp)
+        if latest.created < last_update:
+            return
+    except OSError:
+        pass
 
     in_clfs, in_pred_clfs = load_clfs()
     clfs = get_first_layer(FEATURE, HOMO, LUMO, GAP, in_clfs)
     pred_clfs = get_second_layer(FEATURE, HOMO, LUMO, GAP, clfs, in_pred_clfs)
     save_clfs(clfs, pred_clfs)
+    touch(path)
 
 
 if __name__ == "__main__":
