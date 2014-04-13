@@ -19,7 +19,7 @@ class DataPoint(models.Model):
     band_gap = models.FloatField(null=True, blank=True)
 
     def __unicode__(self):
-        return self.exact_name
+        return unicode(self.name)
 
     @classmethod
     def get_all_data(cls):
