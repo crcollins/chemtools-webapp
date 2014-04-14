@@ -138,26 +138,21 @@ def get_second_layer(X, homo, lumo, gap, clfs, in_pred_clfs=None):
 
 
 def save_clfs(clfs, pred_clfs):
-    props = ["homo", "lumo", "gap"]
-    for clf, prop in zip(clfs, props):
-        with open("decay_%s.pkl" % prop, 'w') as f:
-            cPickle.dump(clf, f, protocol=-1)
+    with open("decay_predictors.pkl", 'w') as f:
+        cPickle.dump((clfs, pred_clfs), f, protocol=-1)
 
-    for clf, prop in zip(pred_clfs, props):
-        with open("decay_pred_%s.pkl" % prop, 'w') as f:
-            cPickle.dump(clf, f, protocol=-1)
 
 def load_clfs():
-    props = ["homo", "lumo", "gap"]
     clfs = []
-    for prop in props:
-        with open("decay_%s.pkl" % prop, 'rb') as f:
-            clfs.append(cPickle.load(f))
-
     pred_clfs = []
-    for prop in props:
-        with open("decay_pred_%s.pkl" % prop, 'rb') as f:
-            pred_clfs.append(cPickle.load(f))
+
+    try:
+        with open("decay_predictors.pkl", 'rb') as f:
+            clfs, pred_clfs = cPickle.load(f)
+    except OSError:
+        pass
+    except IOError:
+        pass
 
     if len(clfs) < 3 or len(pred_clfs) < 3:
         clfs = None
@@ -168,21 +163,22 @@ def load_clfs():
 def run_all():
     FEATURE, HOMO, LUMO, GAP = DataPoint.get_all_data()
     latest = DataPoint.objects.latest()
-    path = "last_ml_update"
+    path = "decay_predictors.pkl"
     try:
-        mtime = os.path.getmtime("last_ml_update")
+        mtime = os.path.getmtime(path)
         temp = datetime.datetime.fromtimestamp(mtime)
         last_update = pytz.utc.localize(temp)
         if latest.created < last_update:
             return
     except OSError:
         pass
+    except IOError:
+        pass
 
     in_clfs, in_pred_clfs = load_clfs()
     clfs = get_first_layer(FEATURE, HOMO, LUMO, GAP, in_clfs)
     pred_clfs = get_second_layer(FEATURE, HOMO, LUMO, GAP, clfs, in_pred_clfs)
     save_clfs(clfs, pred_clfs)
-    touch(path)
 
 
 if __name__ == "__main__":
