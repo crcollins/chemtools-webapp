@@ -578,21 +578,23 @@ class PostsTestCase(TestCase):
             self.assertIsNone(results["error"])
             self.assertIsNotNone(results["jobid"])
 
-    def test_post_single_exception(self):
+    def test_post_single_ajax_fail(self):
         r = self.client.login(**USER_LOGIN)
         self.assertTrue(r)
         options = SUB_OPTIONS.copy()
-        for name in NAMES:
+        for name, error in BAD_NAMES:
             options["name"] = name
+            options["email"] = ""
             response = self.client.get(reverse(views.molecule_detail,
                                                 args=(name, )))
             self.assertEqual(response.status_code, 200)
             url = reverse(views.molecule_detail, args=(name, ))
-            response = self.client.post(url, options)
+            response = self.client.post(url, options,
+                                        HTTP_X_REQUESTED_WITH="XMLHttpRequest")
 
             results = simplejson.loads(response.content)
-            self.assertIsNone(results["error"])
-            self.assertIsNotNone(results["jobid"])
+            self.assertFalse(results["success"])
+            self.assertIn("has-error", results["form_html"])
 
     def test_post_single_fail(self):
         r = self.client.login(**USER_LOGIN)
