@@ -548,34 +548,6 @@ class PostsFailTestCase(TestCase):
 
 
 class PostsTestCase(TestCase):
-    names = ["24a_TON", "24b_TSP_24a_24a", "CON_24a", "A_TON_A_A"]
-    bad_names = [
-        ("2a_TON_CC", "no rgroups allowed"),
-        ("ASADA", "(1, 'Bad Core Name')"),
-        ("TON_CC_CC", "can not attach to end"),
-    ]
-    cluster = {
-            "name": "test-machine",
-            "hostname": "localhost",
-            "port": 2222,
-        }
-    credential = {
-        "username": "vagrant",
-        "password": "vagrant",
-        "password2": "vagrant",
-        "use_password": True,
-    }
-    options = {
-        "email": "test@test.com",
-        "nodes": 1,
-        "walltime": 48,
-        "allocation": "TG-CHE120081",
-        "cluster": 'g',
-        "template":
-            "{{ name }} {{ email }} {{ nodes }} {{ time }} {{ allocation }}",
-        "credential": 1,
-    }
-
     def setUp(self):
         self.client = Client()
         new_user = User.objects.create_superuser(**USER)
