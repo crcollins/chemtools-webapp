@@ -591,7 +591,6 @@ class PostsTestCase(TestCase):
             url = reverse(views.molecule_detail, args=(name, ))
             response = self.client.post(url, options,
                                         HTTP_X_REQUESTED_WITH="XMLHttpRequest")
-
             results = simplejson.loads(response.content)
             self.assertFalse(results["success"])
             self.assertIn("has-error", results["form_html"])
@@ -670,6 +669,28 @@ class PostsTestCase(TestCase):
         self.assertIsNone(results["error"])
         self.assertEqual(len(results["worked"]), len(files))
         self.assertEqual(len(results["failed"]), 0)
+
+    def test_post_multi_job_ajax_fail(self):
+        files = []
+        base = os.path.join(settings.MEDIA_ROOT, "tests")
+        for filename in TEST_NAMES:
+            path = os.path.join(base, filename + ".gjf")
+            files.append(open(path, 'r'))
+
+        options = SUB_OPTIONS.copy()
+        options["files"] = files
+        options["name"] = "{{ name }}"
+        options["email"] = ""
+        r = self.client.login(**USER_LOGIN)
+        self.assertTrue(r)
+        response = self.client.get(reverse(views.multi_job))
+        self.assertEqual(response.status_code, 200)
+        url = reverse(views.multi_job)
+        response = self.client.post(url, options,
+                                    HTTP_X_REQUESTED_WITH="XMLHttpRequest")
+        results = simplejson.loads(response.content)
+        self.assertFalse(results["success"])
+        self.assertIn("has-error", results["form_html"])
 
 
 class UtilsTestCase(TestCase):
