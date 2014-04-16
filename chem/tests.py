@@ -670,6 +670,27 @@ class PostsTestCase(TestCase):
         self.assertEqual(len(results["worked"]), len(files))
         self.assertEqual(len(results["failed"]), 0)
 
+    def test_post_multi_job_do_html(self):
+        files = []
+        base = os.path.join(settings.MEDIA_ROOT, "tests")
+        for filename in TEST_NAMES:
+            path = os.path.join(base, filename + ".gjf")
+            files.append(open(path, 'r'))
+
+        options = SUB_OPTIONS.copy()
+        options["files"] = files
+        options["name"] = "{{ name }}"
+        options["html"] = True
+        r = self.client.login(**USER_LOGIN)
+        self.assertTrue(r)
+        response = self.client.get(reverse(views.multi_job))
+        self.assertEqual(response.status_code, 200)
+        url = reverse(views.multi_job)
+        response = self.client.post(url, options)
+
+        results = simplejson.loads(response.content)
+        self.assertTrue(results["success"])
+
     def test_post_multi_job_ajax_fail(self):
         files = []
         base = os.path.join(settings.MEDIA_ROOT, "tests")
