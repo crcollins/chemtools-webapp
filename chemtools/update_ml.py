@@ -3,6 +3,8 @@ import itertools
 import cPickle
 import datetime
 import pytz
+import shutil
+import time
 
 import numpy
 import scipy.optimize
@@ -10,6 +12,7 @@ from sklearn import svm
 from sklearn import cross_validation
 from sklearn.metrics import mean_absolute_error
 
+from constants import DATAPATH
 from data.models import DataPoint
 from project.utils import touch
 
@@ -138,16 +141,22 @@ def get_second_layer(X, homo, lumo, gap, clfs, in_pred_clfs=None):
 
 
 def save_clfs(clfs, pred_clfs):
-    with open("decay_predictors.pkl", 'w') as f:
+    path = path = os.path.join(DATAPATH, "decay_predictors.pkl")
+    dst_path = os.path.join(DATAPATH, "decay_predictors_%d.pkl" % time.time())
+    try:
+        shutil.move(path, dst_path)
+    except:
+        pass
+    with open(path, 'w') as f:
         cPickle.dump((clfs, pred_clfs), f, protocol=-1)
 
 
 def load_clfs():
     clfs = []
     pred_clfs = []
-
+    path = os.path.join(DATAPATH, "decay_predictors.pkl")
     try:
-        with open("decay_predictors.pkl", 'rb') as f:
+        with open(path, 'rb') as f:
             clfs, pred_clfs = cPickle.load(f)
     except OSError:
         pass
@@ -163,7 +172,7 @@ def load_clfs():
 def run_all():
     FEATURE, HOMO, LUMO, GAP = DataPoint.get_all_data()
     latest = DataPoint.objects.latest()
-    path = "decay_predictors.pkl"
+    path = os.path.join(DATAPATH, "decay_predictors.pkl")
     try:
         mtime = os.path.getmtime(path)
         temp = datetime.datetime.fromtimestamp(mtime)
