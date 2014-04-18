@@ -73,7 +73,7 @@ class ModelTestCase(TestCase):
 
     def test_datapoint_unicode(self):
         string = str(models.DataPoint.objects.all()[0])
-        self.assertEqual(string, "A_TON_A_A_n1_m1_x1_y1_z1")
+        self.assertEqual(string, "A_TON_A_A")
 
 
 class LoadDataTestCase(TestCase):
