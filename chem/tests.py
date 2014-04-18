@@ -373,6 +373,13 @@ class MainPageTestCase(TestCase):
                                             args=(name, )))
             self.assertEqual(response.status_code, 200)
 
+    def test_molecule_check_html(self):
+        for name in NAMES:
+            url = reverse(views.molecule_check, args=(name, )) + "?html=true"
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 200)
+            self.assertIn("<tbody>", response.content)
+
     def test_molecule_check_timeout(self):
         response = self.client.get(reverse(views.molecule_check,
                                         args=(TIMEOUT_NAMES, )))
