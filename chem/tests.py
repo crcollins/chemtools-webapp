@@ -731,6 +731,7 @@ class PostsTestCase(TestCase):
 
         results = simplejson.loads(response.content)
         self.assertTrue(results["success"])
+        self.assertIn("Go to jobs list", response.content)
 
     def test_post_multi_job(self):
         r = self.client.login(**SUPER_USER_LOGIN)
@@ -776,6 +777,7 @@ class PostsTestCase(TestCase):
 
         results = simplejson.loads(response.content)
         self.assertTrue(results["success"])
+        self.assertIn("Go to jobs list", response.content)
 
 
 class UtilsTestCase(TestCase):
