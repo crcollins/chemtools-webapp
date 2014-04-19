@@ -695,7 +695,7 @@ class PostsTestCase(TestCase):
         self.assertEqual(len(results["worked"]), len(NAMES))
         self.assertEqual(len(results["failed"]), 0)
 
-    def test_post_multi_do_html(self):
+    def test_post_multi_html(self):
         r = self.client.login(**USER_LOGIN)
         self.assertTrue(r)
 
@@ -734,7 +734,7 @@ class PostsTestCase(TestCase):
         self.assertEqual(len(results["worked"]), len(files))
         self.assertEqual(len(results["failed"]), 0)
 
-    def test_post_multi_job_do_html(self):
+    def test_post_multi_job_html(self):
         files = []
         base = os.path.join(settings.MEDIA_ROOT, "tests")
         for filename in TEST_NAMES:
