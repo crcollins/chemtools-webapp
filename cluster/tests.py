@@ -100,16 +100,20 @@ class SSHPageTestCase(TestCase):
     def test_job_detail(self):
         user = User.objects.get(username=self.user["username"])
         results = interface.get_all_jobs(user, self.cluster.name)
-        jobid = results[0]["jobs"][0][0]
-        url = reverse(views.job_detail, args=(self.cluster.name, jobid))
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 302)
+        try:
 
-        r = self.client.login(username=self.user["username"],
-                            password=self.user["password"])
-        self.assertTrue(r)
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+            jobid = results[0]["jobs"][0][0]
+            url = reverse(views.job_detail, args=(self.cluster.name, jobid))
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 302)
+
+            r = self.client.login(username=self.user["username"],
+                                password=self.user["password"])
+            self.assertTrue(r)
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 200)
+        except IndexError:
+            pass
 
     def test_job_detail_fail(self):
         url = reverse(views.job_detail, args=(self.cluster.name, 100000000000))
