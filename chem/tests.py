@@ -62,6 +62,14 @@ USER = {
 USER_LOGIN = USER.copy()
 del USER_LOGIN["email"]
 
+SUPER_USER = {
+    "username": "user",
+    "email": "user@test.com",
+    "password": "mypass",
+}
+SUPER_USER_LOGIN = SUPER_USER.copy()
+del SUPER_USER_LOGIN["email"]
+
 JOB_STRING = "{name} {email} {nodes} {walltime}:00:00 {allocation}"
 TIMEOUT_NAMES = "{$ARYL2}{$RGROUPS}{$RGROUPS}{$XGROUPS}_TON"
 
@@ -86,6 +94,8 @@ SUB_OPTIONS = {
         "{{ name }} {{ email }} {{ nodes }} {{ time }} {{ allocation }}",
     "credential": 1,
 }
+SUB_OPTIONS2 = SUB_OPTIONS.copy()
+SUB_OPTIONS2["credential"] = 2
 
 KEYWORDS_SET = ["opt HF/6-31g(d)", "td b3lyp/6-31g(d)", KEYWORDS]
 
@@ -479,21 +489,28 @@ class MainPageTestCase(TestCase):
 class PostsFailTestCase(TestCase):
     def setUp(self):
         self.client = Client()
-        new_user = User.objects.create_user(**USER)
-        new_user.save()
+        norm_user = User.objects.create_user(**USER)
+        norm_user.save()
+        super_user = User.objects.create_superuser(**SUPER_USER)
+        super_user.save()
         cluster = Cluster(**CLUSTER)
         cluster.save()
         self.cluster = cluster
-        credential = Credential(user=new_user,
+        credential = Credential(user=norm_user,
+                                cluster=cluster,
+                                **CREDENTIAL)
+        credential.save()
+        credential = Credential(user=super_user,
                                 cluster=cluster,
                                 **CREDENTIAL)
         credential.save()
         self.credential = credential
 
     def test_post_single_fail(self):
-        r = self.client.login(**USER_LOGIN)
+        r = self.client.login(**SUPER_USER_LOGIN)
         self.assertTrue(r)
-        options = SUB_OPTIONS.copy()
+
+        options = SUB_OPTIONS2.copy()
         for name, error in BAD_NAMES:
             options["name"] = name
             response = self.client.get(reverse(views.molecule_detail,
@@ -526,9 +543,9 @@ class PostsFailTestCase(TestCase):
             self.assertEqual(simplejson.loads(response.content), expected)
 
     def test_post_single_ajax_fail(self):
-        r = self.client.login(**USER_LOGIN)
+        r = self.client.login(**SUPER_USER_LOGIN)
         self.assertTrue(r)
-        options = SUB_OPTIONS.copy()
+        options = SUB_OPTIONS2.copy()
         for name, error in BAD_NAMES:
             options["name"] = name
             options["email"] = ""
@@ -543,12 +560,12 @@ class PostsFailTestCase(TestCase):
             self.assertIn("has-error", results["form_html"])
 
     def test_post_multi_fail(self):
-        r = self.client.login(**USER_LOGIN)
+        r = self.client.login(**SUPER_USER_LOGIN)
         self.assertTrue(r)
 
         names, errors = zip(*BAD_NAMES)
         string = ','.join(names)
-        options = SUB_OPTIONS.copy()
+        options = SUB_OPTIONS2.copy()
         options["name"] = "{{ name }}"
         response = self.client.get(reverse(views.multi_molecule,
                                         args=(string, )))
@@ -582,11 +599,11 @@ class PostsFailTestCase(TestCase):
         self.assertEqual(simplejson.loads(response.content), expected)
 
     def test_post_multi_ajax_fail(self):
-        r = self.client.login(**USER_LOGIN)
+        r = self.client.login(**SUPER_USER_LOGIN)
         self.assertTrue(r)
 
         name = ','.join(NAMES)
-        options = SUB_OPTIONS.copy()
+        options = SUB_OPTIONS2.copy()
         options["name"] = "{{ name }}"
         options["email"] = ''
         response = self.client.get(reverse(views.multi_molecule,
@@ -600,6 +617,9 @@ class PostsFailTestCase(TestCase):
         self.assertIn("has-error", results["form_html"])
 
     def test_post_multi_job_perm_fail(self):
+        r = self.client.login(**USER_LOGIN)
+        self.assertTrue(r)
+
         files = []
         base = os.path.join(settings.MEDIA_ROOT, "tests")
         for filename in TEST_NAMES:
@@ -609,8 +629,6 @@ class PostsFailTestCase(TestCase):
         options = SUB_OPTIONS.copy()
         options["myfiles"] = files
         options["name"] = "{{ name }}"
-        r = self.client.login(**USER_LOGIN)
-        self.assertTrue(r)
         response = self.client.get(reverse(views.multi_job))
         self.assertEqual(response.status_code, 200)
         url = reverse(views.multi_job)
@@ -624,18 +642,19 @@ class PostsFailTestCase(TestCase):
         self.assertEqual(simplejson.loads(response.content), expected)
 
     def test_post_multi_job_ajax_fail(self):
+        r = self.client.login(**SUPER_USER_LOGIN)
+        self.assertTrue(r)
+
         files = []
         base = os.path.join(settings.MEDIA_ROOT, "tests")
         for filename in TEST_NAMES:
             path = os.path.join(base, filename + ".gjf")
             files.append(open(path, 'r'))
 
-        options = SUB_OPTIONS.copy()
+        options = SUB_OPTIONS2.copy()
         options["files"] = files
         options["name"] = "{{ name }}"
         options["email"] = ""
-        r = self.client.login(**USER_LOGIN)
-        self.assertTrue(r)
         response = self.client.get(reverse(views.multi_job))
         self.assertEqual(response.status_code, 200)
         url = reverse(views.multi_job)
@@ -649,7 +668,7 @@ class PostsFailTestCase(TestCase):
 class PostsTestCase(TestCase):
     def setUp(self):
         self.client = Client()
-        new_user = User.objects.create_superuser(**USER)
+        new_user = User.objects.create_superuser(**SUPER_USER)
         new_user.save()
         cluster = Cluster(**CLUSTER)
         cluster.save()
@@ -662,7 +681,7 @@ class PostsTestCase(TestCase):
         self.credential = credential
 
     def test_post_single(self):
-        r = self.client.login(**USER_LOGIN)
+        r = self.client.login(**SUPER_USER_LOGIN)
         self.assertTrue(r)
         options = SUB_OPTIONS.copy()
         for name in NAMES:
@@ -677,8 +696,9 @@ class PostsTestCase(TestCase):
             self.assertIsNone(results["error"])
             self.assertIsNotNone(results["jobid"])
 
+
     def test_post_multi(self):
-        r = self.client.login(**USER_LOGIN)
+        r = self.client.login(**SUPER_USER_LOGIN)
         self.assertTrue(r)
 
         name = ','.join(NAMES)
@@ -696,7 +716,7 @@ class PostsTestCase(TestCase):
         self.assertEqual(len(results["failed"]), 0)
 
     def test_post_multi_html(self):
-        r = self.client.login(**USER_LOGIN)
+        r = self.client.login(**SUPER_USER_LOGIN)
         self.assertTrue(r)
 
         name = ','.join(NAMES)
@@ -713,6 +733,9 @@ class PostsTestCase(TestCase):
         self.assertTrue(results["success"])
 
     def test_post_multi_job(self):
+        r = self.client.login(**SUPER_USER_LOGIN)
+        self.assertTrue(r)
+
         files = []
         base = os.path.join(settings.MEDIA_ROOT, "tests")
         for filename in TEST_NAMES:
@@ -722,8 +745,6 @@ class PostsTestCase(TestCase):
         options = SUB_OPTIONS.copy()
         options["files"] = files
         options["name"] = "{{ name }}"
-        r = self.client.login(**USER_LOGIN)
-        self.assertTrue(r)
         response = self.client.get(reverse(views.multi_job))
         self.assertEqual(response.status_code, 200)
         url = reverse(views.multi_job)
@@ -735,6 +756,9 @@ class PostsTestCase(TestCase):
         self.assertEqual(len(results["failed"]), 0)
 
     def test_post_multi_job_html(self):
+        r = self.client.login(**SUPER_USER_LOGIN)
+        self.assertTrue(r)
+
         files = []
         base = os.path.join(settings.MEDIA_ROOT, "tests")
         for filename in TEST_NAMES:
@@ -745,8 +769,6 @@ class PostsTestCase(TestCase):
         options["files"] = files
         options["name"] = "{{ name }}"
         options["html"] = True
-        r = self.client.login(**USER_LOGIN)
-        self.assertTrue(r)
         response = self.client.get(reverse(views.multi_job))
         self.assertEqual(response.status_code, 200)
         url = reverse(views.multi_job)
