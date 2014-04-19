@@ -18,16 +18,14 @@ def run_job(credential, gjfstring, jobstring=None, **kwargs):
     }
     try:
         results["cluster"] = credential.cluster.name
+        if not credential.user.is_staff:
+            results["error"] = "You must be a staff user to submit a job."
+            return results
+        ssh = get_ssh_connection_obj(credential)
+        sftp = get_sftp_connection_obj(credential)
     except:
         results["error"] = "Invalid credential"
         results["cluster"] = None
-        return results
-
-    ssh = get_ssh_connection_obj(credential)
-    sftp = get_sftp_connection_obj(credential)
-
-    if not credential.user.is_staff:
-        results["error"] = "You must be a staff user to submit a job."
         return results
 
     with ssh, sftp:
@@ -45,16 +43,14 @@ def run_jobs(credential, names, gjfstrings, jobstring=None, **kwargs):
     }
     try:
         results["cluster"] = credential.cluster.name
+        if not credential.user.is_staff:
+            results["error"] = "You must be a staff user to submit a job."
+            return results
+        ssh = get_ssh_connection_obj(credential)
+        sftp = get_sftp_connection_obj(credential)
     except:
         results["error"] = "Invalid credential"
         results["cluster"] = None
-        return results
-
-    ssh = get_ssh_connection_obj(credential)
-    sftp = get_sftp_connection_obj(credential)
-
-    if not credential.user.is_staff:
-        results["error"] = "You must be a staff user to submit a job."
         return results
 
     with ssh, sftp:
@@ -76,6 +72,9 @@ def run_standard_job(credential, molecule, **kwargs):
     }
     try:
         results["cluster"] = credential.cluster.name
+        if not credential.user.is_staff:
+            results["error"] = "You must be a staff user to submit a job."
+            return results
     except:
         results["error"] = "Invalid credential"
         results["cluster"] = None
@@ -100,13 +99,12 @@ def run_standard_jobs(credential, string, **kwargs):
     }
     try:
         results["cluster"] = credential.cluster.name
-    except :
+        if not credential.user.is_staff:
+            results["error"] = "You must be a staff user to submit a job."
+            return results
+    except:
         results["error"] = "Invalid credential"
         results["cluster"] = None
-        return results
-
-    if not credential.user.is_staff:
-        results["error"] = "You must be a staff user to submit a job."
         return results
 
     names = []
