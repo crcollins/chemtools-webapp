@@ -490,6 +490,22 @@ class PostsFailTestCase(TestCase):
         credential.save()
         self.credential = credential
 
+    def test_post_single_fail(self):
+        r = self.client.login(**USER_LOGIN)
+        self.assertTrue(r)
+        options = SUB_OPTIONS.copy()
+        for name, error in BAD_NAMES:
+            options["name"] = name
+            response = self.client.get(reverse(views.molecule_detail,
+                                                args=(name, )))
+            self.assertEqual(response.status_code, 200)
+            url = reverse(views.molecule_detail, args=(name, ))
+            response = self.client.post(url, options)
+
+            results = simplejson.loads(response.content)
+            self.assertEqual(results["error"], error)
+            self.assertIsNone(results["jobid"])
+
     def test_post_single_perm_fail(self):
         r = self.client.login(**USER_LOGIN)
         self.assertTrue(r)
@@ -508,6 +524,42 @@ class PostsFailTestCase(TestCase):
                         'success': True
                         }
             self.assertEqual(simplejson.loads(response.content), expected)
+
+    def test_post_single_ajax_fail(self):
+        r = self.client.login(**USER_LOGIN)
+        self.assertTrue(r)
+        options = SUB_OPTIONS.copy()
+        for name, error in BAD_NAMES:
+            options["name"] = name
+            options["email"] = ""
+            response = self.client.get(reverse(views.molecule_detail,
+                                                args=(name, )))
+            self.assertEqual(response.status_code, 200)
+            url = reverse(views.molecule_detail, args=(name, ))
+            response = self.client.post(url, options,
+                                        HTTP_X_REQUESTED_WITH="XMLHttpRequest")
+            results = simplejson.loads(response.content)
+            self.assertFalse(results["success"])
+            self.assertIn("has-error", results["form_html"])
+
+    def test_post_multi_fail(self):
+        r = self.client.login(**USER_LOGIN)
+        self.assertTrue(r)
+
+        names, errors = zip(*BAD_NAMES)
+        string = ','.join(names)
+        options = SUB_OPTIONS.copy()
+        options["name"] = "{{ name }}"
+        response = self.client.get(reverse(views.multi_molecule,
+                                        args=(string, )))
+        self.assertEqual(response.status_code, 200)
+        url = reverse(views.multi_molecule, args=(string, ))
+        response = self.client.post(url, options)
+
+        results = simplejson.loads(response.content)
+        self.assertIsNone(results["error"])
+        self.assertEqual(len(results["worked"]), 0)
+        self.assertEqual(len(results["failed"]), len(names))
 
     def test_post_multi_perm_fail(self):
         r = self.client.login(**USER_LOGIN)
@@ -528,6 +580,24 @@ class PostsFailTestCase(TestCase):
                     "worked": []
                     }
         self.assertEqual(simplejson.loads(response.content), expected)
+
+    def test_post_multi_ajax_fail(self):
+        r = self.client.login(**USER_LOGIN)
+        self.assertTrue(r)
+
+        name = ','.join(NAMES)
+        options = SUB_OPTIONS.copy()
+        options["name"] = "{{ name }}"
+        options["email"] = ''
+        response = self.client.get(reverse(views.multi_molecule,
+                                        args=(name, )))
+        self.assertEqual(response.status_code, 200)
+        url = reverse(views.multi_molecule, args=(name, ))
+        response = self.client.post(url, options,
+                                    HTTP_X_REQUESTED_WITH="XMLHttpRequest")
+        results = simplejson.loads(response.content)
+        self.assertFalse(results["success"])
+        self.assertIn("has-error", results["form_html"])
 
     def test_post_multi_job_perm_fail(self):
         files = []
@@ -552,6 +622,28 @@ class PostsFailTestCase(TestCase):
                     "worked": []
                     }
         self.assertEqual(simplejson.loads(response.content), expected)
+
+    def test_post_multi_job_ajax_fail(self):
+        files = []
+        base = os.path.join(settings.MEDIA_ROOT, "tests")
+        for filename in TEST_NAMES:
+            path = os.path.join(base, filename + ".gjf")
+            files.append(open(path, 'r'))
+
+        options = SUB_OPTIONS.copy()
+        options["files"] = files
+        options["name"] = "{{ name }}"
+        options["email"] = ""
+        r = self.client.login(**USER_LOGIN)
+        self.assertTrue(r)
+        response = self.client.get(reverse(views.multi_job))
+        self.assertEqual(response.status_code, 200)
+        url = reverse(views.multi_job)
+        response = self.client.post(url, options,
+                                    HTTP_X_REQUESTED_WITH="XMLHttpRequest")
+        results = simplejson.loads(response.content)
+        self.assertFalse(results["success"])
+        self.assertIn("has-error", results["form_html"])
 
 
 class PostsTestCase(TestCase):
@@ -585,39 +677,6 @@ class PostsTestCase(TestCase):
             self.assertIsNone(results["error"])
             self.assertIsNotNone(results["jobid"])
 
-    def test_post_single_ajax_fail(self):
-        r = self.client.login(**USER_LOGIN)
-        self.assertTrue(r)
-        options = SUB_OPTIONS.copy()
-        for name, error in BAD_NAMES:
-            options["name"] = name
-            options["email"] = ""
-            response = self.client.get(reverse(views.molecule_detail,
-                                                args=(name, )))
-            self.assertEqual(response.status_code, 200)
-            url = reverse(views.molecule_detail, args=(name, ))
-            response = self.client.post(url, options,
-                                        HTTP_X_REQUESTED_WITH="XMLHttpRequest")
-            results = simplejson.loads(response.content)
-            self.assertFalse(results["success"])
-            self.assertIn("has-error", results["form_html"])
-
-    def test_post_single_fail(self):
-        r = self.client.login(**USER_LOGIN)
-        self.assertTrue(r)
-        options = SUB_OPTIONS.copy()
-        for name, error in BAD_NAMES:
-            options["name"] = name
-            response = self.client.get(reverse(views.molecule_detail,
-                                                args=(name, )))
-            self.assertEqual(response.status_code, 200)
-            url = reverse(views.molecule_detail, args=(name, ))
-            response = self.client.post(url, options)
-
-            results = simplejson.loads(response.content)
-            self.assertEqual(results["error"], error)
-            self.assertIsNone(results["jobid"])
-
     def test_post_multi(self):
         r = self.client.login(**USER_LOGIN)
         self.assertTrue(r)
@@ -636,25 +695,6 @@ class PostsTestCase(TestCase):
         self.assertEqual(len(results["worked"]), len(NAMES))
         self.assertEqual(len(results["failed"]), 0)
 
-    def test_post_multi_fail(self):
-        r = self.client.login(**USER_LOGIN)
-        self.assertTrue(r)
-
-        names, errors = zip(*BAD_NAMES)
-        string = ','.join(names)
-        options = SUB_OPTIONS.copy()
-        options["name"] = "{{ name }}"
-        response = self.client.get(reverse(views.multi_molecule,
-                                        args=(string, )))
-        self.assertEqual(response.status_code, 200)
-        url = reverse(views.multi_molecule, args=(string, ))
-        response = self.client.post(url, options)
-
-        results = simplejson.loads(response.content)
-        self.assertIsNone(results["error"])
-        self.assertEqual(len(results["worked"]), 0)
-        self.assertEqual(len(results["failed"]), len(names))
-
     def test_post_multi_do_html(self):
         r = self.client.login(**USER_LOGIN)
         self.assertTrue(r)
@@ -671,24 +711,6 @@ class PostsTestCase(TestCase):
 
         results = simplejson.loads(response.content)
         self.assertTrue(results["success"])
-
-    def test_post_multi_ajax_fail(self):
-        r = self.client.login(**USER_LOGIN)
-        self.assertTrue(r)
-
-        name = ','.join(NAMES)
-        options = SUB_OPTIONS.copy()
-        options["name"] = "{{ name }}"
-        options["email"] = ''
-        response = self.client.get(reverse(views.multi_molecule,
-                                        args=(name, )))
-        self.assertEqual(response.status_code, 200)
-        url = reverse(views.multi_molecule, args=(name, ))
-        response = self.client.post(url, options,
-                                    HTTP_X_REQUESTED_WITH="XMLHttpRequest")
-        results = simplejson.loads(response.content)
-        self.assertFalse(results["success"])
-        self.assertIn("has-error", results["form_html"])
 
     def test_post_multi_job(self):
         files = []
@@ -732,28 +754,6 @@ class PostsTestCase(TestCase):
 
         results = simplejson.loads(response.content)
         self.assertTrue(results["success"])
-
-    def test_post_multi_job_ajax_fail(self):
-        files = []
-        base = os.path.join(settings.MEDIA_ROOT, "tests")
-        for filename in TEST_NAMES:
-            path = os.path.join(base, filename + ".gjf")
-            files.append(open(path, 'r'))
-
-        options = SUB_OPTIONS.copy()
-        options["files"] = files
-        options["name"] = "{{ name }}"
-        options["email"] = ""
-        r = self.client.login(**USER_LOGIN)
-        self.assertTrue(r)
-        response = self.client.get(reverse(views.multi_job))
-        self.assertEqual(response.status_code, 200)
-        url = reverse(views.multi_job)
-        response = self.client.post(url, options,
-                                    HTTP_X_REQUESTED_WITH="XMLHttpRequest")
-        results = simplejson.loads(response.content)
-        self.assertFalse(results["success"])
-        self.assertIn("has-error", results["form_html"])
 
 
 class UtilsTestCase(TestCase):
