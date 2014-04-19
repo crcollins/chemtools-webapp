@@ -123,10 +123,11 @@ def run_standard_jobs(credential, string, **kwargs):
             results["failed"].append((mol, str(e)))
             continue
 
-    temp = run_jobs(credential, names, gjfs, **kwargs)
-    results["worked"] = temp["worked"]
-    results["failed"].extend(temp["failed"])
-    results["error"] = temp["error"]
+    if names:
+        temp = run_jobs(credential, names, gjfs, **kwargs)
+        results["worked"] = temp["worked"]
+        results["failed"].extend(temp["failed"])
+        results["error"] = temp["error"]
     return results
 
 
