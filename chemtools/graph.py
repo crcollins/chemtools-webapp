@@ -32,7 +32,6 @@ class Tree(object):
         visited = []
         nodes = [self, node]
         i = 0
-        stop = False
         while nodes[0] != nodes[1]:
             if nodes[i] in visited:
                 break
