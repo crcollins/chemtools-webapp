@@ -655,6 +655,41 @@ class PostsTestCase(TestCase):
         self.assertEqual(len(results["worked"]), 0)
         self.assertEqual(len(results["failed"]), len(names))
 
+    def test_post_multi_do_html(self):
+        r = self.client.login(**USER_LOGIN)
+        self.assertTrue(r)
+
+        name = ','.join(NAMES)
+        options = SUB_OPTIONS.copy()
+        options["name"] = "{{ name }}"
+        options["html"] = True
+        response = self.client.get(reverse(views.multi_molecule,
+                                        args=(name, )))
+        self.assertEqual(response.status_code, 200)
+        url = reverse(views.multi_molecule, args=(name, ))
+        response = self.client.post(url, options)
+
+        results = simplejson.loads(response.content)
+        self.assertTrue(results["success"])
+
+    def test_post_multi_ajax_fail(self):
+        r = self.client.login(**USER_LOGIN)
+        self.assertTrue(r)
+
+        name = ','.join(NAMES)
+        options = SUB_OPTIONS.copy()
+        options["name"] = "{{ name }}"
+        options["email"] = ''
+        response = self.client.get(reverse(views.multi_molecule,
+                                        args=(name, )))
+        self.assertEqual(response.status_code, 200)
+        url = reverse(views.multi_molecule, args=(name, ))
+        response = self.client.post(url, options,
+                                    HTTP_X_REQUESTED_WITH="XMLHttpRequest")
+        results = simplejson.loads(response.content)
+        self.assertFalse(results["success"])
+        self.assertIn("has-error", results["form_html"])
+
     def test_post_multi_job(self):
         files = []
         base = os.path.join(settings.MEDIA_ROOT, "tests")
