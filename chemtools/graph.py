@@ -101,25 +101,6 @@ def print_links(links):
     return [[(f.id, f.element) for f in x] for x,y in links]
 
 
-def depth_first_search(molecule):
-    # does not work with the cycle detection
-    point = molecule.atoms[0]
-    tree = Tree(point)
-    visited = [tree.value]
-    points = tree.search()
-
-    links = []
-    while points:
-        point = points.pop()
-        if point.value not in visited:
-            visited.append(point.value)
-            points.extend(point.search())
-        else:
-            link = sorted([point.value, point.parent.value])
-            links.append((link, point))
-    return links, tree
-
-
 def get_cycles(links, tree):
     sorted_links = sorted(links, key=lambda y: [x.id for x in y[0]])
     cycles = []
