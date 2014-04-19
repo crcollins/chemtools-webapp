@@ -209,13 +209,13 @@ def sort_fused_cycles(cycles):
     return sorted_cycles
 
 
-def identify_cycle_types(cycles):
+def identify_cycle_types(molecule, cycles):
     types = []
     for cycle_group in cycles:
         lengths = [len(x) for x in cycle_group]
         if len(lengths) == 3:
             if lengths == [5, 6, 5]:
-                core = identify_core(cycle_group)
+                core = identify_core(molecule, cycle_group)
                 types.append(core)
             elif lengths == [6, 5, 6]:
                 types.append("7")
@@ -224,7 +224,7 @@ def identify_cycle_types(cycles):
                 types.append("10")
         elif len(lengths) == 2:
             if lengths == [6, 5]:
-                core = identify_core(cycle_group)
+                core = identify_core(molecule, cycle_group)
                 types.append(core)
             else:
                 types.append("9")
@@ -234,27 +234,26 @@ def identify_cycle_types(cycles):
     return types
 
 
-def identify_core(fused_cycle):
+def identify_core(molecule, fused_cycle):
     pairs = []
     for ring in fused_cycle:
         temp = []
         for node in ring:
             ele = node.value.element
             children = [x for x in node.children if x.value.element == "H"]
-            temp.append((ele, len(children)))
+            temp.append((node.value, (ele, len(children))))
         pairs.append(temp)
     if len(pairs) == 2:
-        side = identify_core_side(pairs[1])
+        side, _ = identify_core_side(pairs[1])
         start = "E/Z"
     else:
-        side1 = identify_core_side(pairs[0])
-        side2 = identify_core_side(pairs[2])
-        if side1 == side2:
+        side1, name_atoms1 = identify_core_side(pairs[0])
+        side2, name_atoms2 = identify_core_side(pairs[2])
+        dist = graph_distance(molecule, name_atoms1[0], name_atoms2[0])
+        if dist == 4:
             start = 'C'
-        elif side1 != side2 and not set(side1) ^ set(side2):
+        elif dist == 5:
             start = 'T'
-        else:
-            raise ValueError("left and right sides of core do not match")
         side = side1
     return start + side
 
@@ -264,17 +263,23 @@ def identify_core_side(pairs):
     lower, upper = [zip(x,y) for x, y in zip(CORE_COMBO, CORE_FREE)]
 
     results = []
-    for pair in pairs:
-        if pair[0] not in core_elements:
-            raise ValueError("element not in possible core elements")
+    name_atoms = []
+    for atom, pair in pairs:
         if pair in lower:
-            results.append(("LOWER", pair))
-        elif pair in upper:
-            results.append(("UPPER", pair))
+            results.append(pair)
+            name_atoms.append(atom)
 
-    if len(results) > 2:
-        results.remove(("UPPER", ("C", 1)))
-    return ''.join([x[1][0] for x in results])
+    for atom, pair in pairs:
+        if pair in upper:
+            # This is used to remove a single Carbon on the end
+            temp1 = (name_atoms[0], results[0])
+            temp2 = (atom, pair)
+            dist = (pairs.index(temp1) - pairs.index(temp2)) % len(pairs)
+            if dist in [2, 3]:
+                results.append(pair)
+                name_atoms.append(atom)
+
+    return ''.join([x[0] for x in results]), name_atoms
 
 
 def identify_single_ring(ring):
