@@ -79,8 +79,27 @@ def breadth_first_search(molecule):
             links.append((link, point))
     return links, tree
 
+
+def graph_distance(molecule, start, end):
+    point = start
+    tree = Tree(point)
+    visited = {tree.value: 0}
+    points = tree.search()
+
+    while points:
+        point = points.pop(0)
+        if point.value not in visited:
+            parent = point.parent.value
+            visited[point.value] = visited[parent] + 1
+            points.extend(point.search())
+        if point.value is end:
+            return visited[point.value]
+    return None
+
+
 def print_links(links):
     return [[(f.id, f.element) for f in x] for x,y in links]
+
 
 def depth_first_search(molecule):
     # does not work with the cycle detection
