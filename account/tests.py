@@ -1,5 +1,6 @@
 import os
 import binascii
+from unittest import skipUnless
 
 from django.test import Client, TestCase
 from django.conf import settings
@@ -11,7 +12,15 @@ import views
 import utils
 
 from cluster.models import Cluster, Credential
+from project.utils import server_exists
 
+
+SERVER = {
+    "hostname": "localhost",
+    "port": 2222,
+    "username": "vagrant",
+    "password": "vagrant",
+}
 
 def _register(client, data):
     response = client.post(reverse(views.register_user), data)
@@ -264,6 +273,7 @@ class SettingsTestCase(TestCase):
             self.assertIn("The two password fields", response.content)
 
 
+@skipUnless(server_exists(**SERVER), "Requires external test server.")
 class SSHKeyTestCase(TestCase):
     cluster = {
             "name": "test-machine",

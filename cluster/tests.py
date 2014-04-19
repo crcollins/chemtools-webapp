@@ -1,4 +1,5 @@
 import os
+from unittest import skipUnless
 
 from django.conf import settings
 from django.test import Client, TestCase
@@ -11,9 +12,16 @@ import models
 import utils
 import interface
 from account.views import account_page
-from project.utils import get_sftp_connection, get_ssh_connection, AESCipher, \
-                        SSHClient, SFTPClient
+from project.utils import get_sftp_connection, get_ssh_connection, AESCipher
+from project.utils import SSHClient, SFTPClient, server_exists
 
+
+SERVER = {
+    "hostname": "localhost",
+    "port": 2222,
+    "username": "vagrant",
+    "password": "vagrant",
+}
 
 class SSHPageTestCase(TestCase):
     user = {
@@ -141,6 +149,7 @@ class SSHPageTestCase(TestCase):
         data = simplejson.loads(response.content)
         self.assertTrue(data["is_authenticated"])
 
+    @skipUnless(server_exists(**SERVER), "Requires external test server.")
     def test_kill_job(self):
         url = reverse(views.kill_job, args=("test-machine", ))
         response = self.client.get(url)
@@ -284,6 +293,7 @@ class SSHSettingsTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn("Those credentials did not work.", response.content)
 
+    @skipUnless(server_exists(**SERVER), "Requires external test server.")
     def test_add_credential_password(self):
         r = self.client.login(username=self.user["username"],
                             password=self.user["password"])
@@ -325,6 +335,7 @@ class SSHSettingsTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn("Your passwords do not match", response.content)
 
+    @skipUnless(server_exists(**SERVER), "Requires external test server.")
     def test_add_credential_key(self):
         r = self.client.login(username=self.user["username"],
                             password=self.user["password"])
@@ -399,23 +410,27 @@ class SSHSettingsTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn("Settings Successfully Saved", response.content)
 
+    @skipUnless(server_exists(**SERVER), "Requires external test server.")
     def test_credential_ssh(self):
         with self.credential.get_ssh_connection():
             pass
         with self.credential2.get_ssh_connection():
             pass
 
+    @skipUnless(server_exists(**SERVER), "Requires external test server.")
     def test_credential_sftp(self):
         with self.credential.get_sftp_connection():
             pass
         with self.credential2.get_sftp_connection():
             pass
 
+    @skipUnless(server_exists(**SERVER), "Requires external test server.")
     def test_get_ssh_connection_obj(self):
         ssh = self.credential.get_ssh_connection()
         obj = utils.get_ssh_connection_obj(self.credential)
         self.assertTrue(isinstance(obj, SSHClient))
 
+    @skipUnless(server_exists(**SERVER), "Requires external test server.")
     def test_get_ssh_connection_obj_SSHClient(self):
         ssh = self.credential.get_ssh_connection()
         self.assertEqual(utils.get_ssh_connection_obj(ssh), ssh)
@@ -425,11 +440,13 @@ class SSHSettingsTestCase(TestCase):
         with self.assertRaises(TypeError):
             utils.get_ssh_connection_obj(obj)
 
+    @skipUnless(server_exists(**SERVER), "Requires external test server.")
     def test_get_sftp_connection_obj(self):
         sftp = self.credential.get_sftp_connection()
         obj = utils.get_sftp_connection_obj(self.credential)
         self.assertTrue(isinstance(obj, SFTPClient))
 
+    @skipUnless(server_exists(**SERVER), "Requires external test server.")
     def test_get_sftp_connection_obj_SFTPClient(self):
         sftp = self.credential.get_sftp_connection()
         self.assertEqual(utils.get_sftp_connection_obj(sftp), sftp)
@@ -441,12 +458,14 @@ class SSHSettingsTestCase(TestCase):
 
 
 class UtilsTestCase(TestCase):
+    @skipUnless(server_exists(**SERVER), "Requires external test server.")
     def test_get_sftp_password(self):
         sftp = get_sftp_connection("localhost", "vagrant",
                                 password="vagrant", port=2222)
         with sftp:
             pass
 
+    @skipUnless(server_exists(**SERVER), "Requires external test server.")
     def test_get_sftp_key(self):
         test_path = os.path.join(settings.MEDIA_ROOT, "tests")
         with open(os.path.join(test_path, "id_rsa"), 'r') as key:
@@ -460,12 +479,14 @@ class UtilsTestCase(TestCase):
             with get_sftp_connection("localhost", "username"):
                 pass
 
+    @skipUnless(server_exists(**SERVER), "Requires external test server.")
     def test_get_ssh_password(self):
         ssh = get_ssh_connection("localhost", "vagrant",
                                 password="vagrant", port=2222)
         with ssh:
             pass
 
+    @skipUnless(server_exists(**SERVER), "Requires external test server.")
     def test_get_ssh_key(self):
         test_path = os.path.join(settings.MEDIA_ROOT, "tests")
         with open(os.path.join(test_path, "id_rsa"), 'r') as key:

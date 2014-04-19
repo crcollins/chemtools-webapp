@@ -2,6 +2,7 @@ import os
 import zipfile
 import itertools
 import urllib
+from unittest import skipUnless
 
 from django.test import Client, TestCase
 from django.core.urlresolvers import reverse
@@ -9,7 +10,7 @@ from django.utils import simplejson
 from django.contrib.auth.models import User
 from django.conf import settings
 
-from project.utils import StringIO
+from project.utils import StringIO, server_exists
 from data.models import DataPoint
 from cluster.models import Cluster, Credential
 from chemtools.constants import KEYWORDS
@@ -74,9 +75,15 @@ JOB_STRING = "{name} {email} {nodes} {walltime}:00:00 {allocation}"
 TIMEOUT_NAMES = "{$ARYL2}{$RGROUPS}{$RGROUPS}{$XGROUPS}_TON"
 
 CLUSTER = {
-        "name": "test-machine",
-        "hostname": "localhost",
-        "port": 2222,
+    "name": "test-machine",
+    "hostname": "localhost",
+    "port": 2222,
+}
+SERVER = {
+    "hostname": "localhost",
+    "port": 2222,
+    "username": "vagrant",
+    "password": "vagrant",
 }
 CREDENTIAL = {
     "username": "vagrant",
@@ -665,6 +672,7 @@ class PostsFailTestCase(TestCase):
         self.assertIn("has-error", results["form_html"])
 
 
+@skipUnless(server_exists(**SERVER), "Requires external test server.")
 class PostsTestCase(TestCase):
     def setUp(self):
         self.client = Client()

@@ -97,6 +97,14 @@ def touch(path, times=None):
         os.utime(path, times)
 
 
+def server_exists(*args, **kwargs):
+    try:
+        get_ssh_connection(*args, **kwargs)
+    except Exception as e:
+        return False
+    return True
+
+
 class AESCipher(object):
     # http://stackoverflow.com/questions/12524994/encrypt-decrypt-using-pycrypto-aes-256
     BS = AES.block_size
