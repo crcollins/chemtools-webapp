@@ -117,12 +117,11 @@ def run_standard_jobs(credential, string, **kwargs):
     for mol in name_expansion(string):
         try:
             out = gjfwriter.GJFWriter(mol, kwargs.get("keywords", None))
+            names.append(mol)
+            gjfs.append(out.get_gjf())
         except Exception as e:
             results["failed"].append((mol, str(e)))
             continue
-
-        names.append(mol)
-        gjfs.append(out.get_gjf())
 
     temp = run_jobs(credential, names, gjfs, **kwargs)
     results["worked"] = temp["worked"]
