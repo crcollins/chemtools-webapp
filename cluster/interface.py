@@ -89,9 +89,6 @@ def run_standard_job(credential, molecule, **kwargs):
 
     gjf = out.get_gjf()
     results = run_job(credential, gjf, **kwargs)
-    # if results["error"] is None:
-    #     job = Job(molecule=molecule, jobid=results["jobid"], **kwargs)
-    #     job.save()
     return results
 
 
