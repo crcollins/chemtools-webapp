@@ -7,7 +7,7 @@
 #PBS -M {{ email }}
 
 set name = {{ name }}
-set base = $HOME{% if internal %}/chemtools/{% endif %}
+set base = $HOME{% if internal %}/chemtools{% endif %}
 
 # Make the module command available
 source /usr/share/modules/init/csh

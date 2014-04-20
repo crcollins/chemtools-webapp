@@ -9,7 +9,7 @@
 #PBS -V
 
 name={{ name }}
-base=$HOME{% if internal %}/chemtools/{% endif %}
+base=$HOME{% if internal %}/chemtools{% endif %}
 temp=/scratch/$USER/$PBS_JOBID
 
 #cp $base/$name.gjf $temp

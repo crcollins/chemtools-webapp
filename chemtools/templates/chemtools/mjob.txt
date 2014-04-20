@@ -9,7 +9,7 @@
 #PBS -M {{ email }}
 
 name={{ name }}
-base=$HOME{% if internal %}/chemtools/{% endif %}
+base=$HOME{% if internal %}/chemtools{% endif %}
 temp=$PBS_O_WORKDIR
 
 cp $base/$name.gjf $temp
