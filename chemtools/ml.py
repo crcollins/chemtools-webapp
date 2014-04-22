@@ -5,7 +5,6 @@ import numpy
 
 from constants import CORE_COMBO, \
                     ARYL, ARYL2, XGROUPS, RGROUPS, NEEDSPACE, \
-                    SLOPE, WH, WL, WG, \
                     HOMO_CLF, LUMO_CLF, GAP_CLF, \
                     PRED_GAP_CLF, PRED_HOMO_CLF, PRED_LUMO_CLF
 
@@ -255,33 +254,6 @@ def get_name_from_weighted_naive_feature_vector(vector, limit=4):
         sides.append(sorted(names, reverse=True)[0][1])
     extra = "n%d_m%d_x%d_y%d_z%d" % tuple([math.ceil(abs(x)) for x in vector[:-1]])
     return '_'.join([sides[0], core, sides[1], sides[2], extra])
-
-
-def get_naive_vector_for_gap_value(gap):
-    # a := relation between (lumo - homo) and gap (~.9)
-    # gap = a * (lumo - homo)
-    # 1/a * gap = lumo - homo
-    #   X := goal feature vector (1 x N+1)
-    #   WH := fit parameters for homo (N+1 x 1)
-    #   WL := fit parameters for lumo (N+1 x 1)
-    #   lumo = X * WL; homo = X * WH
-    #   WL.I * lumo = X; WH.I * homo = X
-    #   define lumo or homo to be x
-    # 1/a * gap = (X * WL) - (X * WH)
-    # 1/a * gap = ((WL.I * x) * WL) - ((WL.I * x) * WH)
-    #   WL.I * WL = 1
-    # 1/a * gap = x - ((WL.I * x) * WH)
-    # 1/a * gap = x * (1 - WL.I * WH)
-    # 1/a * gap / (1 - WL.I * WH) = x
-    value = (1 / SLOPE) * gap / (1 - WL.I * WH)
-    return (WL * value).T.tolist()[0]
-
-
-def get_properties_from_decay_vector_linear(feature):
-    homo = feature * WH
-    lumo = feature * WL
-    gap = feature * WG
-    return homo[0, 0], lumo[0, 0], gap[0, 0]
 
 
 def get_properties_from_decay_vector_svm(feature):
