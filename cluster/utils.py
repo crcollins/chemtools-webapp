@@ -62,7 +62,7 @@ def _run_job(ssh, sftp, gjfstring, jobstring=None, **kwargs):
         f2.write(jobstring)
         f2.close()
 
-        s = "qsub " + jobname
+        s = "cd chemtools; qsub " + "%s.%sjob" % (name, cluster)
         _, stdout, stderr = ssh.exec_command(s)
         stderr = stderr.readlines()
         if stderr:
