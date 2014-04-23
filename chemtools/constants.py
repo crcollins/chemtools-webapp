@@ -1,7 +1,13 @@
 from itertools import product
 import string
+import cPickle
+import os
 
 import numpy
+
+
+folder, _ = os.path.split(__file__)
+DATAPATH = os.path.join(folder, "data")
 
 CORE_COMBO = (['O', 'S', 'N', 'P', 'C'], ['N', 'P', 'C'])
 CORE_FREE = ([0, 0, 1, 1, 2], [0, 0, 1])
@@ -45,25 +51,9 @@ COLORS = {
     'Si': (128, 170, 128),
 }
 
+with open(os.path.join(DATAPATH, "decay_predictors.pkl"), "rb") as f:
+    clfs, pred_clfs = cPickle.load(f)
 
+HOMO_CLF, LUMO_CLF, GAP_CLF = clfs
+PRED_HOMO_CLF, PRED_LUMO_CLF, PRED_GAP_CLF = pred_clfs
 
-
-
-import cPickle
-import os
-folder, _ = os.path.split(__file__)
-DATAPATH = os.path.join(folder, "data")
-
-with open(os.path.join(DATAPATH, "feat1homo.pkl"), "rb") as f:
-    HOMO_CLF = cPickle.load(f)
-with open(os.path.join(DATAPATH, "feat1lumo.pkl"), "rb") as f:
-    LUMO_CLF = cPickle.load(f)
-with open(os.path.join(DATAPATH, "feat1gap.pkl"), "rb") as f:
-    GAP_CLF = cPickle.load(f)
-
-with open(os.path.join(DATAPATH, "decaypredhomo.pkl"), "rb") as f:
-    PRED_HOMO_CLF = cPickle.load(f)
-with open(os.path.join(DATAPATH, "decaypredlumo.pkl"), "rb") as f:
-    PRED_LUMO_CLF = cPickle.load(f)
-with open(os.path.join(DATAPATH, "decaypredgap.pkl"), "rb") as f:
-    PRED_GAP_CLF = cPickle.load(f)
