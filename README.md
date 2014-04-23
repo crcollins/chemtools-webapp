@@ -10,7 +10,7 @@ Build/Run Requirements
 ----------------------
 
 - Python 2.7+
-- Django 1.4.1
+- Django 1.4.11
 - Misaka 1.0.2
 - Matplotlib 1.1.1rc
 - Numpy 1.6.1

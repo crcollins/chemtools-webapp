@@ -1,4 +1,4 @@
-Django==1.4.1
+Django==1.4.11
 Pillow==2.2.1
 matplotlib==1.1.1
 misaka==1.0.2
