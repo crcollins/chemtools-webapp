@@ -256,7 +256,7 @@ def get_name_from_weighted_naive_feature_vector(vector, limit=4):
     return '_'.join([sides[0], core, sides[1], sides[2], extra])
 
 
-def get_properties_from_decay_vector_svm(feature):
+def get_properties_from_decay_vector(feature):
     homo = HOMO_CLF.predict(feature)
     lumo = LUMO_CLF.predict(feature)
     gap = GAP_CLF.predict(feature)
@@ -264,7 +264,7 @@ def get_properties_from_decay_vector_svm(feature):
 
 
 def get_properties_from_decay_with_predictions(feature):
-    homo, lumo, gap = get_properties_from_decay_vector_svm(feature)
+    homo, lumo, gap = get_properties_from_decay_vector(feature)
 
     feature_gap = numpy.concatenate([feature, [homo, lumo]])
     feature_homo = numpy.concatenate([feature, [lumo, gap]])
