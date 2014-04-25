@@ -104,7 +104,8 @@ def fit_func(X, y, clf=None):
 
     clf = OptimizedCLF(X, y, func, params).get_optimized_clf()
     train, test = test_clf_kfold(X, y, clf, folds=10)
-    return clf, test
+    clf.test_error = test
+    return clf
 
 
 def get_first_layer(X, homo, lumo, gap, in_clfs=None):
@@ -113,9 +114,9 @@ def get_first_layer(X, homo, lumo, gap, in_clfs=None):
     else:
         in_homo_clf, in_lumo_clf, in_gap_clf = [None] * 3
 
-    homo_clf, homo_err = fit_func(X, homo, clf=in_homo_clf)
-    lumo_clf, lumo_err = fit_func(X, lumo, clf=in_lumo_clf)
-    gap_clf, gap_err = fit_func(X, gap, clf=in_gap_clf)
+    homo_clf = fit_func(X, homo, clf=in_homo_clf)
+    lumo_clf = fit_func(X, lumo, clf=in_lumo_clf)
+    gap_clf = fit_func(X, gap, clf=in_gap_clf)
     return homo_clf, lumo_clf, gap_clf
 
 
@@ -134,9 +135,9 @@ def get_second_layer(X, homo, lumo, gap, clfs, in_pred_clfs=None):
     X_lumo = numpy.concatenate([X, gapp, homop], 1)
     X_gap = numpy.concatenate([X, homop, lumop], 1)
 
-    pred_homo_clf, pred_homo_err = fit_func(X_homo, homo, clf=in_pred_homo)
-    pred_lumo_clf, pred_lumo_err = fit_func(X_lumo, lumo, clf=in_pred_lumo)
-    pred_gap_clf, pred_gap_err = fit_func(X_gap, gap, clf=in_pred_gap)
+    pred_homo_clf = fit_func(X_homo, homo, clf=in_pred_homo)
+    pred_lumo_clf = fit_func(X_lumo, lumo, clf=in_pred_lumo)
+    pred_gap_clf = fit_func(X_gap, gap, clf=in_pred_gap)
     return pred_homo_clf, pred_lumo_clf, pred_gap_clf
 
 
