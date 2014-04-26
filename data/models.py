@@ -41,3 +41,26 @@ class DataPoint(models.Model):
             vectors.append(ast.literal_eval(x.decay_feature))
         FEATURE = numpy.matrix(vectors)
         return FEATURE, HOMO, LUMO, GAP
+
+
+class JobTemplate(models.Model):
+    name = models.CharField(max_length=60)
+    template = models.FileField(upload_to="job_templates")
+
+    @classmethod
+    def render(**kwargs):
+        if "cluster" in kwargs and kwargs["cluster"] in CLUSTERS.keys():
+            template = Template(kwargs.get("template", ''))
+            c = Context({
+                "name": kwargs["name"],
+                "email": kwargs["email"],
+                "nodes": kwargs["nodes"],
+                "ncpus": int(kwargs["nodes"]) * 16,
+                "time": "%s:00:00" % kwargs["walltime"],
+                "internal": kwargs.get("internal", ''),
+                "allocation": kwargs["allocation"],
+                })
+
+            return template.render(c)
+        else:
+            return ''

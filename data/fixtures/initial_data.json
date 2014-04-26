@@ -1,0 +1,50 @@
+[
+    {
+        "pk": 1,
+        "model": "data.jobtemplate",
+        "fields": {
+            "name": "bjob",
+            "template": "job_templates\/bjob.txt"
+        }
+    },
+    {
+        "pk": 2,
+        "model": "data.jobtemplate",
+        "fields": {
+            "name": "cjob",
+            "template": "job_templates\/cjob.txt"
+        }
+    },
+    {
+        "pk": 3,
+        "model": "data.jobtemplate",
+        "fields": {
+            "name": "gjob",
+            "template": "job_templates\/gjob.txt"
+        }
+    },
+    {
+        "pk": 4,
+        "model": "data.jobtemplate",
+        "fields": {
+            "name": "hjob",
+            "template": "job_templates\/hjob.txt"
+        }
+    },
+    {
+        "pk": 5,
+        "model": "data.jobtemplate",
+        "fields": {
+            "name": "mjob",
+            "template": "job_templates\/mjob.txt"
+        }
+    },
+    {
+        "pk": 6,
+        "model": "data.jobtemplate",
+        "fields": {
+            "name": "tjob",
+            "template": "job_templates\/tjob.txt"
+        }
+    }
+]
