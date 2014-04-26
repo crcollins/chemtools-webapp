@@ -47,6 +47,9 @@ class JobTemplate(models.Model):
     name = models.CharField(max_length=60)
     template = models.FileField(upload_to="job_templates")
 
+    def __unicode__(self):
+        return self.name
+
     @classmethod
     def render(**kwargs):
         if "cluster" in kwargs and kwargs["cluster"] in CLUSTERS.keys():
