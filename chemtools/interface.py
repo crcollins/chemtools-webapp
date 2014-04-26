@@ -67,7 +67,7 @@ def get_multi_job(string, form):
     return ret_zip
 
 
-def get_property_limits(molecule):
+def get_property_limits(exact_name):
     results = {
                 "n": [None, None, None],
                 "m": [None, None, None]
@@ -77,12 +77,12 @@ def get_property_limits(molecule):
             groups = []
             xvals = range(1, 5)
             for j in xvals:
-                if direction in molecule:
+                if direction in exact_name:
                     exp = "%s\d+" % direction
                     replace = "%s%d" % (direction, j)
-                    temp_name = re.sub(exp, replace, molecule)
+                    temp_name = re.sub(exp, replace, exact_name)
                 else:
-                    temp_name = molecule + "_%s%d" % (direction, j)
+                    temp_name = exact_name + "_%s%d" % (direction, j)
 
                 temp_exact = mol_name.get_exact_name(temp_name, spacers=True)
                 temp = ml.get_decay_feature_vector(temp_exact)
