@@ -7,4 +7,5 @@ class Command(BaseCommand):
     help = 'Load parsed data into the database'
 
     def handle(self, path, *args, **options):
-        main(path)
+        count = main(path)
+        print "Added %d datapoint(s)." % count

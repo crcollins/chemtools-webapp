@@ -45,4 +45,4 @@ def main(path):
             except Exception as e:
                 pass
         DataPoint.objects.bulk_create(points)
-        print "Added %d datapoint(s)." % count
+        return count
