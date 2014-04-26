@@ -2,11 +2,10 @@ import os
 import bz2
 import time
 
-from chemtools.utils import write_job
 from project.utils import StringIO, SSHClient, SFTPClient
 
 from models import Credential
-
+from data.models import JobTemplate
 
 def get_ssh_connection_obj(obj):
     if isinstance(obj, Credential):
@@ -57,7 +56,7 @@ def _run_job(ssh, sftp, gjfstring, jobstring=None, **kwargs):
         f.close()
 
         if jobstring is None:
-            jobstring = write_job(internal=True, **kwargs)
+            jobstring = JobTemplate.render(internal=True, **kwargs)
         f2 = sftp.open(jobname, 'w')
         f2.write(jobstring)
         f2.close()

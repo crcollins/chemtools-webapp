@@ -34,18 +34,3 @@ class Output(object):
     @catch
     def parse_file(self, f):
         raise NotImplementedError
-
-
-def write_job(**kwargs):
-    template = Template(kwargs.get("template", ''))
-    c = Context({
-        "name": kwargs.get("name", ''),
-        "email": kwargs.get("email", ''),
-        "nodes": kwargs.get("nodes", ''),
-        "ncpus": int(kwargs.get("nodes", 1)) * 16,
-        "time": "%s:00:00" % kwargs.get("walltime", '1'),
-        "internal": kwargs.get("internal", ''),
-        "allocation": kwargs.get("allocation", ''),
-        })
-
-    return template.render(c)

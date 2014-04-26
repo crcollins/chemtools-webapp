@@ -4,10 +4,10 @@ from cStringIO import StringIO
 import zipfile
 
 import gjfwriter
-import utils
 import mol_name
 import dataparser
 import ml
+from data.models import JobTemplate
 
 
 def get_multi_molecule(molecules, keywords, options, form):
@@ -28,7 +28,7 @@ def get_multi_molecule(molecules, keywords, options, form):
                 others = True
             if "job" in options:
                 dnew = form.get_single_data(name)
-                zfile.writestr(name + ".job", utils.write_job(**dnew))
+                zfile.writestr(name + ".job", JobTemplate.render(**dnew))
                 others = True
 
             if "gjf" in options or not others:
@@ -56,8 +56,7 @@ def get_multi_job(string, form):
             continue
         name, _ = os.path.splitext(name)
         dnew = form.get_single_data(name)
-        zfile.writestr("%s.job" % name,
-                        utils.write_job(**dnew))
+        zfile.writestr("%s.job" % name, JobTemplate.render(**dnew))
 
     zfile.close()
     buff.flush()

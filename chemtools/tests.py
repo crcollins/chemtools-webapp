@@ -651,9 +651,6 @@ class UtilsTestCase(TestCase):
         result = out.format_output(errors=False)
         self.assertEqual(result, string + '\n')
 
-    def test_write_job(self):
-        self.assertEqual(utils.write_job(), '')
-
     def test_catch(self):
         class TestIt(utils.Output):
             @utils.catch

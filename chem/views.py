@@ -16,10 +16,10 @@ from models import ErrorReport, ErrorReportForm, JobForm
 from utils import get_multi_molecule_warnings, get_molecule_info
 
 from chemtools import gjfwriter
-from chemtools.utils import write_job
 from chemtools.constants import KEYWORDS
 from chemtools.interface import get_multi_molecule, get_multi_job
 import cluster.interface
+from data.models import JobTemplate
 
 
 def index(request):
@@ -113,7 +113,8 @@ def molecule_detail(request, molecule):
     if form.is_valid(request.method):
         d = dict(form.cleaned_data)
         if request.method == "GET":
-            response = HttpResponse(write_job(**d), content_type="text/plain")
+            job_string = JobTemplate.render(**d)
+            response = HttpResponse(job_string, content_type="text/plain")
             filename = '%s.job' % molecule
             response['Content-Disposition'] = add + 'filename=' + filename
             return response
@@ -152,7 +153,8 @@ def multi_molecule(request, string):
         if request.method == "GET":
             molecule = request.REQUEST.get("molname", "")
             d = form.get_single_data(molecule)
-            response = HttpResponse(write_job(**d), content_type="text/plain")
+            job_string = JobTemplate.render(**d)
+            response = HttpResponse(job_string, content_type="text/plain")
             filename = '%s.job' % molecule
             response['Content-Disposition'] = add + 'filename=' + filename
             return response
