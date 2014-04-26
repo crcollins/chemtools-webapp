@@ -23,16 +23,6 @@ ARYL = ARYL0 + ARYL2
 ALL = CORES + XGROUPS + RGROUPS + ARYL
 NEEDSPACE = XGROUPS + ARYL0
 
-CLUSTERS = {
-    'b': "Blacklight",
-    't': "Trestles",
-    'g': "Gordon",
-    'c': "Carver",
-    'h': "Hooper",
-    'm': "Marcy",
-}
-CLUSTER_TUPLES = [(x, CLUSTERS[x]) for x in CLUSTERS.keys()]
-
 KEYWORDS = "opt B3LYP/6-31g(d)"
 
 COLORS = {

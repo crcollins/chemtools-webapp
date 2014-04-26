@@ -3,7 +3,7 @@ import re
 from django.db import models
 from django import forms
 
-from chemtools.constants import CLUSTER_TUPLES
+from data.models import JobTemplate
 from cluster.models import Credential
 
 
@@ -28,7 +28,11 @@ class JobForm(forms.Form):
     nodes = forms.IntegerField()
     walltime = forms.IntegerField()
     allocation = forms.CharField(max_length=12)
-    cluster = forms.ChoiceField(choices=CLUSTER_TUPLES)
+    base_template = forms.ModelChoiceField(
+                                            queryset=JobTemplate.objects.all(),
+                                            to_field_name="template",
+                                            required=False,
+                                            )
     template = forms.CharField(
                         widget=forms.Textarea(attrs={'cols': 50, 'rows': 26})
                         )
@@ -58,14 +62,10 @@ class JobForm(forms.Form):
             else:
                 email = ""
 
-            with open("chemtools/templates/chemtools/gjob.txt", "r") as f:
-                text = f.read()
             form = JobForm(initial={
                 "name": molecule,
                 "email": email,
-                "cluster": 'g',
                 "allocation": "TG-CHE120081",
-                "template": text,
                 "walltime": 48,
                 "nodes": 1,
                 })

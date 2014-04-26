@@ -1,7 +1,5 @@
 from django.template import Template, Context
 
-from constants import CLUSTERS
-
 
 def catch(fn):
     '''Decorator to catch all exceptions and log them.'''
@@ -39,18 +37,15 @@ class Output(object):
 
 
 def write_job(**kwargs):
-    if "cluster" in kwargs and kwargs["cluster"] in CLUSTERS.keys():
-        template = Template(kwargs.get("template", ''))
-        c = Context({
-            "name": kwargs["name"],
-            "email": kwargs["email"],
-            "nodes": kwargs["nodes"],
-            "ncpus": int(kwargs["nodes"]) * 16,
-            "time": "%s:00:00" % kwargs["walltime"],
-            "internal": kwargs.get("internal", ''),
-            "allocation": kwargs["allocation"],
-            })
+    template = Template(kwargs.get("template", ''))
+    c = Context({
+        "name": kwargs.get("name", ''),
+        "email": kwargs.get("email", ''),
+        "nodes": kwargs.get("nodes", ''),
+        "ncpus": int(kwargs.get("nodes", 1)) * 16,
+        "time": "%s:00:00" % kwargs.get("walltime", '1'),
+        "internal": kwargs.get("internal", ''),
+        "allocation": kwargs.get("allocation", ''),
+        })
 
-        return template.render(c)
-    else:
-        return ''
+    return template.render(c)

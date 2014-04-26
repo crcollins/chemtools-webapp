@@ -14,11 +14,13 @@ $(document).ready(function() {
             $(".ajax-modal").hide();
         }
     });
-    $("select#id_cluster").change( function () {
+    $("select#id_base_template").change( function () {
         var val = $(this).val();
-        $.get("/chem/template/"+val, function (data) {
-            $("textarea#id_template").val(data);
-        });
+        if (val) {
+            $.get("/media/"+val, function (data) {
+                $("textarea#id_template").val(data);
+            });
+        }
     });
 
 });

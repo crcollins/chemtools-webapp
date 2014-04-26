@@ -381,7 +381,7 @@ class MainPageTestCase(TestCase):
                         d = options.copy()
                         d["name"] = name.split('.')[0]
                         self.assertEqual(f2.read(), JOB_STRING.format(**d))
-                names = set([x + ".gjob" for x in NAMES])
+                names = set([x + ".job" for x in NAMES])
                 self.assertEqual(set(zf.namelist()), names)
 
     def test_molecule_check(self):

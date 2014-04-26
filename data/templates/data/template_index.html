@@ -5,7 +5,7 @@
 {% block content %}
     <ul>
     {% for template in templates %}
-        <li><a href="{{ template }}">{{ template }}</a></li>
+        <li><a href="/media/{{ template.template }}">{{ template.name }}</a></li>
     {% endfor %}
     </ul>
 {% endblock %}

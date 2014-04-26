@@ -9,7 +9,7 @@ from django.core.management import call_command
 import views
 import models
 import load_data
-from chemtools.constants import RGROUPS, XGROUPS, ARYL, CLUSTERS
+from chemtools.constants import RGROUPS, XGROUPS, ARYL
 
 
 class FragmentTestCase(TestCase):
@@ -43,18 +43,6 @@ class TemplateTestCase(TestCase):
     def test_index(self):
         response = self.client.get(reverse(views.template_index))
         self.assertEqual(response.status_code, 200)
-
-    def test_detail(self):
-        for cluster in CLUSTERS:
-            response = self.client.get(reverse(views.get_template,
-                                                args=(cluster, )))
-            self.assertEqual(response.status_code, 200)
-
-    def test_empty_template(self):
-        response = self.client.get(reverse(views.get_template,
-                                            args=("notarealtemplate", )))
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content, '')
 
 
 class ModelTestCase(TestCase):
