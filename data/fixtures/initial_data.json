@@ -46,5 +46,13 @@
             "name": "Trestles",
             "template": "job_templates\/tjob.txt"
         }
+    },
+    {
+        "pk": 7,
+        "model": "data.jobtemplate",
+        "fields": {
+            "name": "Localhost",
+            "template": "job_templates\/ljob.txt"
+        }
     }
 ]

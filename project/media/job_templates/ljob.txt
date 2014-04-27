@@ -1,0 +1,22 @@
+#!/bin/bash
+#PBS -l nodes={{ nodes }}
+#PBS -l walltime={{ time }}
+#PBS -j oe
+#PBS -o {{ name }}.out
+#PBS -V
+
+name={{ name }}
+base=$HOME{% if internal %}/chemtools{% endif %}
+temp=$PBS_O_WORKDIR
+
+cp $base/$name.gjf $temp
+cd $temp
+
+gaussian=`which g09`
+formchk=`which formchk`
+
+/usr/bin/time $gaussian < $name.gjf > $name.log
+$formchk $name.chk $name.fchk
+
+mkdir -p $base/done/
+mv $name.* $base/done/
