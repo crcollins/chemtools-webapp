@@ -11,3 +11,10 @@
                 50% 50%
                 no-repeat;
 }
+
+.table thead div.checkbox {
+    margin-bottom: 0px;
+}
+.table thead div.checkbox label {
+    font-weight: bold;
+}
