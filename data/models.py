@@ -53,7 +53,11 @@ class JobTemplate(models.Model):
 
     @classmethod
     def render(cls, **kwargs):
-        template = Template(kwargs.get("template", ''))
+        base_template = kwargs.get("base_template")
+        if base_template is not None:
+            template = Template(base_template.template.read())
+        else:
+            template = Template(kwargs.get("template", ''))
         c = Context({
             "name": kwargs.get("name", ''),
             "email": kwargs.get("email"),

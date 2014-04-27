@@ -34,7 +34,8 @@ class JobForm(forms.Form):
                                             required=False,
                                             )
     template = forms.CharField(
-                        widget=forms.Textarea(attrs={'cols': 50, 'rows': 26})
+                        widget=forms.Textarea(attrs={'cols': 50, 'rows': 26}),
+                        required=False,
                         )
 
     credential = forms.ModelChoiceField(
@@ -84,3 +85,9 @@ class JobForm(forms.Form):
         d = dict(self.cleaned_data)
         d["name"] = re.sub(r"{{\s*name\s*}}", name, d["name"])
         return d
+
+    def clean(self):
+        if not (self.cleaned_data.get("base_template") or
+                self.cleaned_data.get("template")):
+            raise forms.ValidationError("A template or base template is required.")
+        return self.cleaned_data
