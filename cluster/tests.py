@@ -170,6 +170,20 @@ class SSHPageTestCase(TestCase):
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, 302)
 
+    def test_kill_job_invalid(self):
+        url = reverse(views.kill_job, args=("test-machine", ))
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 302)
+
+        r = self.client.login(username=self.super_user["username"],
+                            password=self.super_user["password"])
+        self.assertTrue(r)
+        data = {
+            "not an int": "on",
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 302)
+
     def test_kill_job_perm_fail(self):
         url = reverse(views.kill_job, args=("test-machine", ))
         response = self.client.get(url)
