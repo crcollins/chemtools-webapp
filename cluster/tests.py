@@ -168,6 +168,7 @@ class SSHPageTestCase(TestCase):
             results["jobid"]: "on",
         }
         response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 302)
 
     def test_kill_job_perm_fail(self):
         url = reverse(views.kill_job, args=("test-machine", ))
