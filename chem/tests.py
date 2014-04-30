@@ -566,6 +566,25 @@ class PostsFailTestCase(TestCase):
             self.assertFalse(results["success"])
             self.assertIn("has-error", results["form_html"])
 
+    def test_post_single_ajax_fail_template(self):
+        r = self.client.login(**SUPER_USER_LOGIN)
+        self.assertTrue(r)
+        options = SUB_OPTIONS2.copy()
+        for name, error in BAD_NAMES:
+            options["name"] = name
+            options["template"] = ""
+            options["base_template"] = None
+            response = self.client.get(reverse(views.molecule_detail,
+                                                args=(name, )))
+            self.assertEqual(response.status_code, 200)
+            url = reverse(views.molecule_detail, args=(name, ))
+            response = self.client.post(url, options,
+                                        HTTP_X_REQUESTED_WITH="XMLHttpRequest")
+            results = simplejson.loads(response.content)
+            self.assertFalse(results["success"])
+            message = "A template or base template is required."
+            self.assertIn(message, results["form_html"])
+
     def test_post_multi_fail(self):
         r = self.client.login(**SUPER_USER_LOGIN)
         self.assertTrue(r)
