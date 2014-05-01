@@ -22,65 +22,49 @@ SERVER = {
     "username": "vagrant",
     "password": "vagrant",
 }
+USER_LOGIN = {
+    "username": "testerman",
+    "password": "S0m3thing",
+}
+USER = USER_LOGIN.copy()
+USER["email"] = "test@test.com"
+
+SUPER_USER_LOGIN = {
+    "username": "admin",
+    "password": "cantstopmenow",
+}
+SUPER_USER = SUPER_USER_LOGIN.copy()
+SUPER_USER["email"] = "admin@test.com"
+
+CLUSTER = {
+        "name": "test-machine",
+        "hostname": "localhost",
+        "port": 2222,
+    }
+CREDENTIAL = {
+    "username": "vagrant",
+    "password": "vagrant",
+    "use_password": True,
+}
+CREDENTIAL2 = {
+    "username": "vagrant",
+    "use_password": False,
+}
 
 class SSHPageTestCase(TestCase):
-    user = {
-        "username": "testerman",
-        "email": "test@test.com",
-        "password": "S0m3thing",
-    }
-    super_user = {
-        "username": "admin",
-        "email": "admin@test.com",
-        "password": "cantstopmenow",
-    }
-    cluster = {
-            "name": "test-machine",
-            "hostname": "localhost",
-            "port": 2222,
-        }
-    credential = {
-        "username": "vagrant",
-        "password": "vagrant",
-        "password2": "vagrant",
-        "use_password": True,
-    }
-    credential2 = {
-        "username": "vagrant",
-        "password": "vagrant",
-        "password2": "vagrant",
-        "use_password": True,
-    }
-
     def setUp(self):
-        user = User.objects.create_user(**self.user)
+        user = User.objects.create_user(**USER)
         user.save()
-        super_user = User.objects.create_superuser(**self.super_user)
+        super_user = User.objects.create_superuser(**SUPER_USER)
         super_user.save()
 
-        cluster = models.Cluster(
-                                name=self.cluster["name"],
-                                hostname=self.cluster["hostname"],
-                                port=self.cluster["port"])
-        cluster.save()
-        self.cluster = cluster
-        credential = models.Credential(
-                                        user=user,
-                                        cluster=cluster,
-                                        username=self.credential["username"],
-                                        password=self.credential["password"],
-                                        use_password=True)
-        credential.save()
-        self.credential = credential
+        self.cluster = models.Cluster(**CLUSTER)
+        self.cluster.save()
+        self.credential = models.Credential(user=user, cluster=self.cluster, **CREDENTIAL)
+        self.credential.save()
 
-        credential2 = models.Credential(
-                                        user=super_user,
-                                        cluster=cluster,
-                                        username=self.credential2["username"],
-                                        password=self.credential2["password"],
-                                        use_password=True)
-        credential2.save()
-        self.credential2 = credential2
+        self.credential2 = models.Credential(user=super_user, cluster=self.cluster, **CREDENTIAL)
+        self.credential2.save()
 
         self.client = Client()
 
@@ -88,8 +72,7 @@ class SSHPageTestCase(TestCase):
         response = self.client.get(reverse(views.job_index))
         self.assertEqual(response.status_code, 302)
 
-        r = self.client.login(username=self.user["username"],
-                            password=self.user["password"])
+        r = self.client.login(**USER_LOGIN)
         self.assertTrue(r)
         response = self.client.get(reverse(views.job_index))
         self.assertEqual(response.status_code, 200)
@@ -99,14 +82,13 @@ class SSHPageTestCase(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 302)
 
-        r = self.client.login(username=self.user["username"],
-                            password=self.user["password"])
+        r = self.client.login(**USER_LOGIN)
         self.assertTrue(r)
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
     def test_job_detail(self):
-        user = User.objects.get(username=self.user["username"])
+        user = User.objects.get(username=USER["username"])
         results = interface.get_all_jobs(user, self.cluster.name)
         try:
 
@@ -115,8 +97,7 @@ class SSHPageTestCase(TestCase):
             response = self.client.get(url)
             self.assertEqual(response.status_code, 302)
 
-            r = self.client.login(username=self.user["username"],
-                                password=self.user["password"])
+            r = self.client.login(**USER_LOGIN)
             self.assertTrue(r)
             response = self.client.get(url)
             self.assertEqual(response.status_code, 200)
@@ -128,8 +109,7 @@ class SSHPageTestCase(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 302)
 
-        r = self.client.login(username=self.user["username"],
-                            password=self.user["password"])
+        r = self.client.login(**USER_LOGIN)
         self.assertTrue(r)
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
@@ -140,8 +120,7 @@ class SSHPageTestCase(TestCase):
         self.assertEqual(response.status_code, 302)
 
     def test_get_job_list_auth(self):
-        r = self.client.login(username=self.user["username"],
-                            password=self.user["password"])
+        r = self.client.login(**USER_LOGIN)
         self.assertTrue(r)
 
         response = self.client.get(reverse(views.get_job_list))
@@ -155,8 +134,7 @@ class SSHPageTestCase(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 302)
 
-        r = self.client.login(username=self.super_user["username"],
-                            password=self.super_user["password"])
+        r = self.client.login(**SUPER_USER_LOGIN)
         self.assertTrue(r)
 
         gjfstring = "EMPTY"
@@ -175,8 +153,7 @@ class SSHPageTestCase(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 302)
 
-        r = self.client.login(username=self.super_user["username"],
-                            password=self.super_user["password"])
+        r = self.client.login(**SUPER_USER_LOGIN)
         self.assertTrue(r)
         data = {
             "not an int": "on",
@@ -189,8 +166,7 @@ class SSHPageTestCase(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 302)
 
-        r = self.client.login(username=self.user["username"],
-                            password=self.user["password"])
+        r = self.client.login(**USER_LOGIN)
         self.assertTrue(r)
         data = {
             "123": "on",
@@ -206,8 +182,7 @@ class SSHPageTestCase(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 302)
 
-        r = self.client.login(username=self.user["username"],
-                            password=self.user["password"])
+        r = self.client.login(**USER_LOGIN)
         self.assertTrue(r)
 
         response = self.client.get(url)
