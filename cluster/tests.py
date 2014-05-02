@@ -49,6 +49,7 @@ CREDENTIAL = {
 CREDENTIAL2 = {
     "username": "vagrant",
     "use_password": False,
+    "password": '',
 }
 
 class SSHPageTestCase(TestCase):
@@ -190,31 +191,8 @@ class SSHPageTestCase(TestCase):
 
 
 class SSHSettingsTestCase(TestCase):
-    user = {
-        "username": "testerman",
-        "email": "test@test.com",
-        "password": "S0m3thing",
-    }
-    cluster = {
-            "name": "test-machine",
-            "hostname": "localhost",
-            "port": 2222,
-        }
-    credential = {
-        "username": "vagrant",
-        "password": "vagrant",
-        "password2": "vagrant",
-        "use_password": True,
-    }
-    credential2 = {
-        "username": "vagrant",
-        "use_password": False,
-    }
-
     def setUp(self):
-        user = User.objects.create_user(self.user["username"],
-                                        email=self.user["email"],
-                                        password=self.user["password"])
+        user = User.objects.create_user(**USER)
         user.save()
         profile = user.get_profile()
         test_path = os.path.join(settings.MEDIA_ROOT, "tests")
@@ -224,36 +202,19 @@ class SSHSettingsTestCase(TestCase):
             profile.private_key = f.read()
         profile.save()
 
-        cluster = models.Cluster(
-                                name=self.cluster["name"],
-                                hostname=self.cluster["hostname"],
-                                port=self.cluster["port"])
-        cluster.save()
-        self.cluster = cluster
-        credential = models.Credential(
-                                        user=user,
-                                        cluster=cluster,
-                                        username=self.credential["username"],
-                                        password=self.credential["password"],
-                                        use_password=True)
-        credential.save()
-        self.credential = credential
-        credential2 = models.Credential(
-                                        user=user,
-                                        cluster=cluster,
-                                        username=self.credential2["username"],
-                                        password='',
-                                        use_password=False)
-        credential2.save()
-        self.credential2 = credential2
+        self.cluster = models.Cluster(**CLUSTER)
+        self.cluster.save()
+        self.credential = models.Credential(user=user, cluster=self.cluster, **CREDENTIAL)
+        self.credential.save()
+        self.credential2 = models.Credential(user=user, cluster=self.cluster, **CREDENTIAL2)
+        self.credential2.save()
         self.client = Client()
 
     def test_add_cluster(self):
-        r = self.client.login(username=self.user["username"],
-                            password=self.user["password"])
+        r = self.client.login(**USER_LOGIN)
         self.assertTrue(r)
 
-        url = reverse(account_page, args=(self.user["username"], "clusters"))
+        url = reverse(account_page, args=(USER["username"], "clusters"))
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         data = {
@@ -266,8 +227,7 @@ class SSHSettingsTestCase(TestCase):
         self.assertIn("Settings Successfully Saved", response.content)
 
     def test_add_credential_invalid(self):
-        r = self.client.login(username=self.user["username"],
-                            password=self.user["password"])
+        r = self.client.login(**USER_LOGIN)
         self.assertTrue(r)
 
         data = {
@@ -277,19 +237,16 @@ class SSHSettingsTestCase(TestCase):
             "cluster": self.cluster.id,
             "use_password": True,
         }
-        url = reverse(account_page, args=(self.user["username"],
-                                        "credentials"))
+        url = reverse(account_page, args=(USER["username"], "credentials"))
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, 200)
         self.assertIn("Those credentials did not work.", response.content)
 
     @skipUnless(server_exists(**SERVER), "Requires external test server.")
     def test_add_credential_password(self):
-        r = self.client.login(username=self.user["username"],
-                            password=self.user["password"])
+        r = self.client.login(**USER_LOGIN)
         self.assertTrue(r)
-        url = reverse(account_page, args=(self.user["username"],
-                                        "credentials"))
+        url = reverse(account_page, args=(USER["username"], "credentials"))
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
@@ -305,12 +262,10 @@ class SSHSettingsTestCase(TestCase):
         self.assertIn("Settings Successfully Saved", response.content)
 
     def test_add_credential_invalid_password(self):
-        r = self.client.login(username=self.user["username"],
-                            password=self.user["password"])
+        r = self.client.login(**USER_LOGIN)
         self.assertTrue(r)
 
-        url = reverse(account_page, args=(self.user["username"],
-                                        "credentials"))
+        url = reverse(account_page, args=(USER["username"], "credentials"))
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
@@ -327,12 +282,10 @@ class SSHSettingsTestCase(TestCase):
 
     @skipUnless(server_exists(**SERVER), "Requires external test server.")
     def test_add_credential_key(self):
-        r = self.client.login(username=self.user["username"],
-                            password=self.user["password"])
+        r = self.client.login(**USER_LOGIN)
         self.assertTrue(r)
 
-        url = reverse(account_page, args=(self.user["username"],
-                                        "credentials"))
+        url = reverse(account_page, args=(USER["username"], "credentials"))
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
@@ -346,12 +299,10 @@ class SSHSettingsTestCase(TestCase):
         self.assertIn("Settings Successfully Saved", response.content)
 
     def test_delete_credential(self):
-        r = self.client.login(username=self.user["username"],
-                            password=self.user["password"])
+        r = self.client.login(**USER_LOGIN)
         self.assertTrue(r)
 
-        url = reverse(account_page, args=(self.user["username"],
-                                        "credentials"))
+        url = reverse(account_page, args=(USER["username"], "credentials"))
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
@@ -364,12 +315,10 @@ class SSHSettingsTestCase(TestCase):
         self.assertIn("Settings Successfully Saved", response.content)
 
     def test_delete_credential_invalid(self):
-        r = self.client.login(username=self.user["username"],
-                            password=self.user["password"])
+        r = self.client.login(**USER_LOGIN)
         self.assertTrue(r)
 
-        url = reverse(account_page, args=(self.user["username"],
-                                        "credentials"))
+        url = reverse(account_page, args=(USER["username"], "credentials"))
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
@@ -382,12 +331,10 @@ class SSHSettingsTestCase(TestCase):
         self.assertIn("Settings Successfully Saved", response.content)
 
     def test_delete_multi_credential(self):
-        r = self.client.login(username=self.user["username"],
-                            password=self.user["password"])
+        r = self.client.login(**USER_LOGIN)
         self.assertTrue(r)
 
-        url = reverse(account_page, args=(self.user["username"],
-                                        "credentials"))
+        url = reverse(account_page, args=(USER["username"], "credentials"))
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
