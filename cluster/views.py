@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.utils import simplejson
 
 from account.utils import add_account_page, PAGES
-from models import Job, CredentialForm, ClusterForm, Cluster
+from models import Job, CredentialForm, ClusterForm, Cluster, Credential
 import interface
 
 
@@ -68,7 +68,8 @@ def kill_job(request, cluster):
             jobids.append(key)
         except ValueError:
             pass
-    result = interface.kill_jobs(request.user, cluster, jobids)
+    credential = Credential.objects.get(user=request.user, cluster__name=cluster)
+    result = interface.kill_jobs(credential, jobids)
     if result["error"] is None:
         return redirect(job_index)
     else:

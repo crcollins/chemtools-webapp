@@ -126,21 +126,28 @@ def run_standard_jobs(credential, string, **kwargs):
     return results
 
 
-def kill_jobs(user, cluster, jobids):
-    cred = user.credentials.filter(cluster__name=cluster)[0]
+def kill_jobs(credential, jobids):
     results = {
         "worked": [],
         "failed": [],
         "error": None,
-        "cluster": cred.cluster.name,
     }
-    if not user.is_staff:
-        results["error"] = "You must be a staff user to kill a job."
+    try:
+        results["cluster"] = credential.cluster.name
+        if not credential.user.is_staff:
+            results["error"] = "You must be a staff user to kill a job."
+            return results
+        ssh = credential.get_ssh_connection()
+    except:
+        results["error"] = "Invalid credential"
+        results["cluster"] = None
         return results
 
-    ssh = cred.get_ssh_connection()
     with ssh:
-        specfic_results = get_specifc_jobs(user, cluster, jobids)
+        specfic_results = get_specifc_jobs(
+                                        credential.user,
+                                        credential.cluster.name,
+                                        jobids)
         if specfic_results["error"]:
             results["error"] = specfic_results["error"]
             return results
