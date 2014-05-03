@@ -461,3 +461,56 @@ class UtilsTestCase(TestCase):
         string = "The quick brown fox jumps over the lazy dog."
         ct = cipher.encrypt(string)[:10] + "randomgarbage"
         self.assertRaises(TypeError, cipher.decrypt, ct)
+
+
+class InterfaceTestCase(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(**USER)
+        self.user.save()
+        profile = self.user.get_profile()
+        test_path = os.path.join(settings.MEDIA_ROOT, "tests")
+        with open(os.path.join(test_path, "id_rsa.pub"), 'r') as f:
+            profile.public_key = f.read()
+        with open(os.path.join(test_path, "id_rsa"), 'r') as f:
+            profile.private_key = f.read()
+        profile.save()
+
+        self.cluster = models.Cluster(**CLUSTER)
+        self.cluster.save()
+        self.credential = models.Credential(user=self.user, cluster=self.cluster, **CREDENTIAL)
+        self.credential.save()
+        self.credential2 = models.Credential(user=self.user, cluster=self.cluster, **CREDENTIAL2)
+        self.credential2.save()
+        self.client = Client()
+
+    def test_run_job_staff_error(self):
+        results = interface.run_job(self.credential, '', jobstring=None)
+        self.assertEqual(results["error"], "You must be a staff user to submit a job." )
+
+    def test_run_job_invalid_credential(self):
+        results = interface.run_job(None, '', jobstring=None)
+        self.assertEqual(results["error"], "Invalid credential" )
+
+    def test_run_jobs_staff_error(self):
+        results = interface.run_jobs(self.credential, [], [], jobstring=None)
+        self.assertEqual(results["error"], "You must be a staff user to submit a job." )
+
+    def test_run_jobs_invalid_credential(self):
+        results = interface.run_jobs(None, [], [], jobstring=None)
+        self.assertEqual(results["error"], "Invalid credential" )
+
+    def test_run_standard_job_staff_error(self):
+        results = interface.run_standard_job(self.credential, '')
+        self.assertEqual(results["error"], "You must be a staff user to submit a job." )
+
+    def test_run_standard_job_invalid_credential(self):
+        results = interface.run_standard_job(None, '')
+        self.assertEqual(results["error"], "Invalid credential" )
+
+    def test_run_standard_jobs_staff_error(self):
+        results = interface.run_standard_jobs(self.credential, [''])
+        self.assertEqual(results["error"], "You must be a staff user to submit a job." )
+
+    def test_run_standard_jobs_invalid_credential(self):
+        results = interface.run_standard_jobs(None, [''])
+        self.assertEqual(results["error"], "Invalid credential" )
