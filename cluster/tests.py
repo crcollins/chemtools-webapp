@@ -515,7 +515,7 @@ class InterfaceTestCase(TestCase):
         results = interface.run_standard_jobs(None, [''])
         self.assertEqual(results["error"], "Invalid credential" )
 
-    def test_kill_jobs_staff_error_staff_error(self):
+    def test_kill_jobs_staff_error(self):
         results = interface.kill_jobs(self.credential, [''])
         self.assertEqual(results["error"], "You must be a staff user to kill a job." )
 
