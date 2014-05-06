@@ -191,18 +191,27 @@ def get_all_jobs(user, cluster=None):
     return [x for x in results if x]
 
 
-def get_specifc_jobs(user, cluster, jobids):
-    cred = user.credentials.filter(cluster__name=cluster)[0]
+def get_specifc_jobs(credential, jobids):
     results = {
         "worked": [],
         "failed": [],
         "error": None,
-        "cluster": cred.cluster.name,
     }
+    try:
+        results["cluster"] = credential.cluster.name
+        if not credential.user.is_staff:
+            results["error"] = "You must be a staff user access a cluster."
+            return results
+        ssh = credential.get_ssh_connection()
+    except:
+        results["error"] = "Invalid credential"
+        results["cluster"] = None
+        return results
+
     if jobids is None:
         return results
 
-    all_jobs = get_all_jobs(user, cluster)
+    all_jobs = get_all_jobs(credential.user, credential.cluster.name)
 
     if not all_jobs:
         results["error"] = "There are no jobs running."
