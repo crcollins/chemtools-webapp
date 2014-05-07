@@ -196,9 +196,6 @@ def get_specific_jobs(credential, jobids):
     }
     try:
         results["cluster"] = credential.cluster.name
-        if not credential.user.is_staff:
-            results["error"] = "You must be a staff user access a cluster."
-            return results
         ssh = credential.get_ssh_connection()
     except:
         results["error"] = "Invalid credential"
