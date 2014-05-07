@@ -38,7 +38,8 @@ def get_job_list(request):
 
 @login_required
 def job_detail(request, cluster, jobid):
-    results = interface.get_specifc_jobs(request.user, cluster, [jobid])
+    credential = Credential.objects.get(user=request.user, cluster__name=cluster)
+    results = interface.get_specific_jobs(credential, [jobid])
     if results["error"]:
         e = results["error"]
         job = None

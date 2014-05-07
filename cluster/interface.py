@@ -144,10 +144,7 @@ def kill_jobs(credential, jobids):
         return results
 
     with ssh:
-        specfic_results = get_specifc_jobs(
-                                        credential.user,
-                                        credential.cluster.name,
-                                        jobids)
+        specfic_results = get_specific_jobs(credential, jobids)
         if specfic_results["error"]:
             results["error"] = specfic_results["error"]
             return results
@@ -191,7 +188,7 @@ def get_all_jobs(user, cluster=None):
     return [x for x in results if x]
 
 
-def get_specifc_jobs(credential, jobids):
+def get_specific_jobs(credential, jobids):
     results = {
         "worked": [],
         "failed": [],

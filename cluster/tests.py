@@ -56,6 +56,7 @@ class SSHPageTestCase(TestCase):
     def setUp(self):
         user = User.objects.create_user(**USER)
         user.save()
+        self.user = user
         super_user = User.objects.create_superuser(**SUPER_USER)
         super_user.save()
 
@@ -90,9 +91,8 @@ class SSHPageTestCase(TestCase):
 
     def test_job_detail(self):
         user = User.objects.get(username=USER["username"])
-        results = interface.get_all_jobs(user, self.cluster.name)
+        results = interface.get_all_jobs(self.user, self.cluster.name)
         try:
-
             jobid = results[0]["jobs"][0][0]
             url = reverse(views.job_detail, args=(self.cluster.name, jobid))
             response = self.client.get(url)
