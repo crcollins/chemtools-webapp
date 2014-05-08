@@ -212,8 +212,8 @@ def get_specific_jobs(credential, jobids):
         results["error"] = "There are no jobs running."
         return results
 
-    running_jobs = all_jobs[0]["jobs"]
-    running_jobids = [x[0] for x in all_jobs[0]["jobs"]]
+    running_jobs = cluster_jobs["jobs"]
+    running_jobids = [x[0] for x in cluster_jobs["jobs"]]
 
     for job in jobids:
         if job not in running_jobids:
