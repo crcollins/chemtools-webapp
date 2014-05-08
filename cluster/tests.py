@@ -529,6 +529,13 @@ class InterfaceTestCase(TestCase):
         results = interface.get_specific_jobs(None, [])
         self.assertEqual(results["error"], "Invalid credential")
 
-    def test_get_specific_jobs_no_jobs(self):
+    def test_get_specific_jobs_no_match(self):
         results = interface.get_specific_jobs(self.credential, [])
-        self.assertEqual(results["error"], "There are no jobs running.")
+        expected = {
+                'cluster': CLUSTER["name"],
+                'failed': [],
+                'worked': [],
+                'error': None
+        }
+        self.assertEqual(results, expected)
+        self.assertEqual(results, expected)
