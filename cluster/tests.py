@@ -538,4 +538,22 @@ class InterfaceTestCase(TestCase):
                 'error': None
         }
         self.assertEqual(results, expected)
+
+    def test_get_all_jobs(self):
+        results = interface.get_all_jobs(self.user)
+        expected = [
+            {
+                'jobs': [],
+                'name': CLUSTER['name'],
+                'columns': [
+                            'Job ID',
+                            'Username',
+                            'Jobname',
+                            "Req'd Memory",
+                            "Req'd Time",
+                            'Elap Time',
+                            'S'
+                            ]
+            }
+        ]
         self.assertEqual(results, expected)
