@@ -52,6 +52,12 @@ CREDENTIAL2 = {
     "password": '',
 }
 
+def run_fake_job(credential):
+    gjfstring = "EMPTY"
+    jobstring = "sleep 10"
+    results = interface.run_job(credential, gjfstring, jobstring)
+    return results["jobid"]
+
 class SSHPageTestCase(TestCase):
     def setUp(self):
         user = User.objects.create_user(**USER)
@@ -138,13 +144,9 @@ class SSHPageTestCase(TestCase):
         r = self.client.login(**SUPER_USER_LOGIN)
         self.assertTrue(r)
 
-        gjfstring = "EMPTY"
-        jobstring = "sleep 60"
-        results = interface.run_job(self.credential2, gjfstring, jobstring)
-        self.assertIsNone(results["error"])
-        jobid = results["jobid"]
+        jobid = run_fake_job(self.credential2)
         data = {
-            results["jobid"]: "on",
+            jobid: "on",
         }
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, 302)
