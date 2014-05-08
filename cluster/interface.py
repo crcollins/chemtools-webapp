@@ -202,7 +202,7 @@ def get_specific_jobs(credential, jobids):
         results["cluster"] = None
         return results
 
-    if jobids is None:
+    if not jobids:
         return results
 
     all_jobs = get_all_jobs(credential.user, credential.cluster.name)
