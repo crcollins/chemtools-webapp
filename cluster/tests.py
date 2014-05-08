@@ -525,4 +525,8 @@ class InterfaceTestCase(TestCase):
 
     def test_get_specific_jobs_invalid_credential(self):
         results = interface.get_specific_jobs(None, [])
-        self.assertEqual(results["error"], "Invalid credential" )
+        self.assertEqual(results["error"], "Invalid credential")
+
+    def test_get_specific_jobs_no_jobs(self):
+        results = interface.get_specific_jobs(self.credential, [])
+        self.assertEqual(results["error"], "There are no jobs running.")
