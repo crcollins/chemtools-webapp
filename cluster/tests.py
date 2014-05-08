@@ -522,3 +522,7 @@ class InterfaceTestCase(TestCase):
     def test_kill_jobs_invalid_credential(self):
         results = interface.kill_jobs(None, [''])
         self.assertEqual(results["error"], "Invalid credential" )
+
+    def test_get_specific_jobs_invalid_credential(self):
+        results = interface.get_specific_jobs(None, [])
+        self.assertEqual(results["error"], "Invalid credential" )
