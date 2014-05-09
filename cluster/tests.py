@@ -469,6 +469,9 @@ class InterfaceTestCase(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(**USER)
         self.user.save()
+        super_user = User.objects.create_superuser(**SUPER_USER)
+        super_user.save()
+
         profile = self.user.get_profile()
         test_path = os.path.join(settings.MEDIA_ROOT, "tests")
         with open(os.path.join(test_path, "id_rsa.pub"), 'r') as f:
@@ -481,7 +484,7 @@ class InterfaceTestCase(TestCase):
         self.cluster.save()
         self.credential = models.Credential(user=self.user, cluster=self.cluster, **CREDENTIAL)
         self.credential.save()
-        self.credential2 = models.Credential(user=self.user, cluster=self.cluster, **CREDENTIAL2)
+        self.credential2 = models.Credential(user=super_user, cluster=self.cluster, **CREDENTIAL)
         self.credential2.save()
         self.client = Client()
 
@@ -493,6 +496,10 @@ class InterfaceTestCase(TestCase):
         results = interface.run_job(None, '', jobstring=None)
         self.assertEqual(results["error"], "Invalid credential")
 
+    def test_run_job(self):
+        results = interface.run_job(self.credential2, '', jobstring='sleep 10')
+        self.assertEqual(results["error"], None)
+
     def test_run_jobs_staff_error(self):
         results = interface.run_jobs(self.credential, [], [], jobstring=None)
         self.assertEqual(results["error"], "You must be a staff user to submit a job.")
@@ -500,6 +507,13 @@ class InterfaceTestCase(TestCase):
     def test_run_jobs_invalid_credential(self):
         results = interface.run_jobs(None, [], [], jobstring=None)
         self.assertEqual(results["error"], "Invalid credential" )
+
+    def test_run_jobs(self):
+        names = ['test', 'test2']
+        gjfs = ['', '']
+        job = 'sleep 10'
+        results = interface.run_jobs(self.credential2, names, gjfs, jobstring=job)
+        self.assertEqual(results["error"], None)
 
     def test_run_standard_job_staff_error(self):
         results = interface.run_standard_job(self.credential, '')
