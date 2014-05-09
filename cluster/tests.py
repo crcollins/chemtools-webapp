@@ -139,7 +139,7 @@ class SSHPageTestCase(TestCase):
 
     @skipUnless(server_exists(**SERVER), "Requires external test server.")
     def test_kill_job(self):
-        url = reverse(views.kill_job, args=("test-machine", ))
+        url = reverse(views.kill_job, args=(CLUSTER['name'], ))
         response = self.client.get(url)
         self.assertEqual(response.status_code, 302)
 
@@ -155,7 +155,7 @@ class SSHPageTestCase(TestCase):
 
     @skipUnless(server_exists(**SERVER), "Requires external test server.")
     def test_kill_job_invalid(self):
-        url = reverse(views.kill_job, args=("test-machine", ))
+        url = reverse(views.kill_job, args=(CLUSTER['name'], ))
         response = self.client.get(url)
         self.assertEqual(response.status_code, 302)
 
@@ -168,7 +168,7 @@ class SSHPageTestCase(TestCase):
         self.assertEqual(response.status_code, 302)
 
     def test_kill_job_perm_fail(self):
-        url = reverse(views.kill_job, args=("test-machine", ))
+        url = reverse(views.kill_job, args=(CLUSTER['name'], ))
         response = self.client.get(url)
         self.assertEqual(response.status_code, 302)
 
@@ -184,7 +184,7 @@ class SSHPageTestCase(TestCase):
                         "You must be a staff user to kill a job.")
 
     def test_kill_job_redirect(self):
-        url = reverse(views.kill_job, args=("test-machine", ))
+        url = reverse(views.kill_job, args=(CLUSTER['name'], ))
         response = self.client.get(url)
         self.assertEqual(response.status_code, 302)
 
