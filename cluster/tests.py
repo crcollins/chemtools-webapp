@@ -95,6 +95,7 @@ class SSHPageTestCase(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
+    @skipUnless(server_exists(**SERVER), "Requires external test server.")
     def test_job_detail(self):
         user = User.objects.get(username=USER["username"])
         results = interface.get_all_jobs(self.user, self.cluster.name)
@@ -111,6 +112,7 @@ class SSHPageTestCase(TestCase):
         except IndexError:
             pass
 
+    @skipUnless(server_exists(**SERVER), "Requires external test server.")
     def test_job_detail_fail(self):
         url = reverse(views.job_detail, args=(self.cluster.name, 100000000000))
         response = self.client.get(url)
@@ -151,6 +153,7 @@ class SSHPageTestCase(TestCase):
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, 302)
 
+    @skipUnless(server_exists(**SERVER), "Requires external test server.")
     def test_kill_job_invalid(self):
         url = reverse(views.kill_job, args=("test-machine", ))
         response = self.client.get(url)
@@ -464,7 +467,7 @@ class UtilsTestCase(TestCase):
         ct = cipher.encrypt(string)[:10] + "randomgarbage"
         self.assertRaises(TypeError, cipher.decrypt, ct)
 
-
+@skipUnless(server_exists(**SERVER), "Requires external test server.")
 class InterfaceTestCase(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(**USER)
