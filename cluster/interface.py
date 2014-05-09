@@ -208,10 +208,6 @@ def get_specific_jobs(credential, jobids):
     all_jobs = get_all_jobs(credential.user, credential.cluster.name)
     cluster_jobs = all_jobs[0]
 
-    if not cluster_jobs["jobs"]:
-        results["error"] = "There are no jobs running."
-        return results
-
     running_jobs = cluster_jobs["jobs"]
     running_jobids = [x[0] for x in cluster_jobs["jobs"]]
 
