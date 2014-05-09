@@ -159,9 +159,7 @@ def load_clfs():
     try:
         with open(path, 'rb') as f:
             clfs, pred_clfs = cPickle.load(f)
-    except OSError:
-        pass
-    except IOError:
+    except (OSError, IOError):
         pass
 
     if len(clfs) < 3 or len(pred_clfs) < 3:
@@ -179,10 +177,9 @@ def run_all():
         temp = datetime.datetime.fromtimestamp(mtime)
         last_update = pytz.utc.localize(temp)
         if latest.created < last_update:
+            print "No Update"
             return
-    except OSError:
-        pass
-    except IOError:
+    except (OSError, IOError):
         pass
 
     in_clfs, in_pred_clfs = load_clfs()
