@@ -145,9 +145,6 @@ def kill_jobs(credential, jobids):
 
     with ssh:
         specfic_results = get_specific_jobs(credential, jobids)
-        if specfic_results["error"]:
-            results["error"] = specfic_results["error"]
-            return results
 
         results["failed"] = specfic_results["failed"]
         for (jobid, job_data) in specfic_results["worked"]:
