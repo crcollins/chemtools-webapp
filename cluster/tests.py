@@ -52,11 +52,13 @@ CREDENTIAL2 = {
     "password": '',
 }
 
+
 def run_fake_job(credential):
     gjfstring = "EMPTY"
     jobstring = "sleep 10"
     results = interface.run_job(credential, gjfstring, jobstring)
     return results["jobid"]
+
 
 class SSHPageTestCase(TestCase):
     def setUp(self):
@@ -526,6 +528,16 @@ class InterfaceTestCase(TestCase):
         results = interface.run_standard_job(None, '')
         self.assertEqual(results["error"], "Invalid credential")
 
+    def test_run_standard_job(self):
+        job = 'sleep 10'
+        results = interface.run_standard_job(self.credential2, "TON", jobstring=job)
+        self.assertEqual(results["error"], None)
+
+    def test_run_standard_job_name_error(self):
+        job = 'sleep 10'
+        results = interface.run_standard_job(self.credential2, "T-N", jobstring=job)
+        self.assertEqual(results["error"], "(1, 'Bad Core Name')")
+
     def test_run_standard_jobs_staff_error(self):
         results = interface.run_standard_jobs(self.credential, [''])
         self.assertEqual(results["error"], "You must be a staff user to submit a job.")
@@ -533,6 +545,20 @@ class InterfaceTestCase(TestCase):
     def test_run_standard_jobs_invalid_credential(self):
         results = interface.run_standard_jobs(None, [''])
         self.assertEqual(results["error"], "Invalid credential" )
+
+    def test_run_standard_jobs(self):
+        job = 'sleep 10'
+        names = "TON,CON"
+        results = interface.run_standard_jobs(self.credential2, names, jobstring=job)
+        self.assertEqual(results["error"], None)
+        self.assertEqual(results["failed"], [])
+
+    def test_run_standard_jobs_name_error(self):
+        job = 'sleep 10'
+        names = "T-N,C-N"
+        results = interface.run_standard_jobs(self.credential2, names, jobstring=job)
+        for name, error in results['failed']:
+            self.assertEqual(error, "(1, 'Bad Core Name')")
 
     def test_kill_jobs_staff_error(self):
         results = interface.kill_jobs(self.credential, [''])
