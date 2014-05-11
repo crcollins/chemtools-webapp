@@ -51,7 +51,9 @@ CREDENTIAL2 = {
     "use_password": False,
     "password": '',
 }
-
+SUBMIT_ERROR = "You must be a staff user to submit a job."
+KILL_ERROR = "You must be a staff user to kill a job."
+CRED_ERROR = "Invalid credential"
 
 def run_fake_job(credential):
     gjfstring = "EMPTY"
@@ -469,6 +471,7 @@ class UtilsTestCase(TestCase):
         ct = cipher.encrypt(string)[:10] + "randomgarbage"
         self.assertRaises(TypeError, cipher.decrypt, ct)
 
+
 @skipUnless(server_exists(**SERVER), "Requires external test server.")
 class InterfaceTestCase(TestCase):
     def setUp(self):
@@ -495,11 +498,11 @@ class InterfaceTestCase(TestCase):
 
     def test_run_job_staff_error(self):
         results = interface.run_job(self.credential, '', jobstring=None)
-        self.assertEqual(results["error"], "You must be a staff user to submit a job.")
+        self.assertEqual(results["error"], SUBMIT_ERROR)
 
     def test_run_job_invalid_credential(self):
         results = interface.run_job(None, '', jobstring=None)
-        self.assertEqual(results["error"], "Invalid credential")
+        self.assertEqual(results["error"], CRED_ERROR)
 
     def test_run_job(self):
         results = interface.run_job(self.credential2, '', jobstring='sleep 10')
@@ -507,11 +510,11 @@ class InterfaceTestCase(TestCase):
 
     def test_run_jobs_staff_error(self):
         results = interface.run_jobs(self.credential, [], [], jobstring=None)
-        self.assertEqual(results["error"], "You must be a staff user to submit a job.")
+        self.assertEqual(results["error"], SUBMIT_ERROR)
 
     def test_run_jobs_invalid_credential(self):
         results = interface.run_jobs(None, [], [], jobstring=None)
-        self.assertEqual(results["error"], "Invalid credential" )
+        self.assertEqual(results["error"], CRED_ERROR)
 
     def test_run_jobs(self):
         names = ['test', 'test2']
@@ -522,11 +525,11 @@ class InterfaceTestCase(TestCase):
 
     def test_run_standard_job_staff_error(self):
         results = interface.run_standard_job(self.credential, '')
-        self.assertEqual(results["error"], "You must be a staff user to submit a job.")
+        self.assertEqual(results["error"], SUBMIT_ERROR)
 
     def test_run_standard_job_invalid_credential(self):
         results = interface.run_standard_job(None, '')
-        self.assertEqual(results["error"], "Invalid credential")
+        self.assertEqual(results["error"], CRED_ERROR)
 
     def test_run_standard_job(self):
         job = 'sleep 10'
@@ -540,11 +543,11 @@ class InterfaceTestCase(TestCase):
 
     def test_run_standard_jobs_staff_error(self):
         results = interface.run_standard_jobs(self.credential, [''])
-        self.assertEqual(results["error"], "You must be a staff user to submit a job.")
+        self.assertEqual(results["error"], SUBMIT_ERROR)
 
     def test_run_standard_jobs_invalid_credential(self):
         results = interface.run_standard_jobs(None, [''])
-        self.assertEqual(results["error"], "Invalid credential" )
+        self.assertEqual(results["error"], CRED_ERROR)
 
     def test_run_standard_jobs(self):
         job = 'sleep 10'
@@ -562,15 +565,15 @@ class InterfaceTestCase(TestCase):
 
     def test_kill_jobs_staff_error(self):
         results = interface.kill_jobs(self.credential, [''])
-        self.assertEqual(results["error"], "You must be a staff user to kill a job.")
+        self.assertEqual(results["error"], KILL_ERROR)
 
     def test_kill_jobs_invalid_credential(self):
         results = interface.kill_jobs(None, [''])
-        self.assertEqual(results["error"], "Invalid credential")
+        self.assertEqual(results["error"], CRED_ERROR)
 
     def test_get_specific_jobs_invalid_credential(self):
         results = interface.get_specific_jobs(None, [])
-        self.assertEqual(results["error"], "Invalid credential")
+        self.assertEqual(results["error"], CRED_ERROR)
 
     def test_get_specific_jobs_no_match(self):
         results = interface.get_specific_jobs(self.credential, [])
