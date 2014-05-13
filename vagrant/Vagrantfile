@@ -11,10 +11,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.vm.provision :shell, :inline => "echo 'Copying public Key to VM auth_keys...' && mkdir -p /home/vagrant/.ssh && echo '#{id_rsa_ssh_key_pub }' >> /home/vagrant/.ssh/authorized_keys && chmod 600 /home/vagrant/.ssh/authorized_keys"
 
-  config.vm.provision :shell, :path => "aptget.sh", :privileged => false
-  config.vm.provision :shell, :path => "virtualenv.sh", :privileged => false
-  config.vm.provision :shell, :path => "chemtools.sh", :privileged => false
-  config.vm.provision :shell, :path => "deploy.sh", :privileged => false
+  config.vm.provision :shell, :path => "install.sh", :privileged => false
 
   config.vm.network :forwarded_port, host: 4567, guest: 80
 end
