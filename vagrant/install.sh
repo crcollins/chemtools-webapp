@@ -28,6 +28,9 @@ install_chemtools() {
 }
 
 update() {
+    cd $PROJECT_DIR
+    . bin/activate
+
     cd $CHEMTOOLS_DIR
     git pull
     pip install -r requirements.txt
