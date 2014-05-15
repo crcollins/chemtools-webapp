@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-PROJECT_DIR=/home/vagrant/project
+INSTALL_USER=vagrant
+PROJECT_DIR=/home/$INSTALL_USER/project
 CHEMTOOLS_DIR=$PROJECT_DIR/chemtools-webapp
 
 dependencies() {
@@ -13,7 +14,6 @@ dependencies() {
 
 install_chemtools() {
     cd $HOME
-    # virtualenv
     virtualenv project
     cd $PROJECT_DIR
     . bin/activate
@@ -24,18 +24,7 @@ install_chemtools() {
     pip install numpy==1.6.1
     pip install -r requirements.txt
     python manage.py syncdb --noinput
-
-    # deploy
     pip install gunicorn
-
-    sudo sh -c 'sed project/nginx.conf -e "s/chris/vagrant/g" > /etc/nginx/nginx.conf'
-    sudo nginx -s reload
-    sudo sh -c 'sed project/chemtools.conf -e "s/chris/vagrant/g" > /etc/supervisor/conf.d/chemtools.conf'
-
-    sudo supervisorctl reread
-    sudo supervisorctl update
-    sudo service nginx stop
-    sudo service nginx start
 }
 
 update() {
@@ -48,3 +37,49 @@ update() {
 
 dependencies
 install_chemtools
+
+sudo bash -c "cat > /etc/supervisor/conf.d/chemtools.conf <<EOF
+[program:chemtools]
+command=$PROJECT_DIR/bin/gunicorn project.wsgi:application
+directory=$CHEMTOOLS_DIR
+user=$INSTALL_USER
+autostart=true
+autorestart=true
+redirect_stderr=true
+EOF"
+
+sudo bash -c "cat > /etc/nginx/sites-available/chemtools <<EOF
+server {
+    listen 80 default;
+    client_max_body_size 4G;
+    server_name gauss.crcollins.com;
+    keepalive_timeout 5;
+
+    root $CHEMTOOLS_DIR/project;
+    location /static {
+        autoindex on;
+        alias $CHEMTOOLS_DIR/project/static;
+    }
+
+    location / {
+      proxy_set_header X-Forwarded-For \\\$proxy_add_x_forwarded_for;
+      proxy_set_header Host \\\$http_host;
+      proxy_redirect off;
+      proxy_pass http://127.0.0.1:8000/;
+
+    }
+
+    error_page 500 502 503 504 /500.html;
+    location = /500.html {
+      root $CHEMTOOLS_DIR/project/static;
+    }
+}
+EOF"
+
+sudo ln -s /etc/nginx/sites-available/chemtools /etc/nginx/sites-enabled/chemtools
+sudo rm /etc/nginx/sites-enabled/default
+sudo nginx -s reload
+
+sudo supervisorctl reread
+sudo supervisorctl update
+sudo service nginx restart
