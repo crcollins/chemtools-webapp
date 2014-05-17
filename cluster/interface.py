@@ -65,67 +65,6 @@ def run_jobs(credential, names, gjfstrings, jobstring=None, **kwargs):
     return results
 
 
-def run_standard_job(credential, molecule, **kwargs):
-    results = {
-        "jobid": None,
-        "error": None,
-    }
-    try:
-        results["cluster"] = credential.cluster.name
-        if not credential.user.is_staff:
-            results["error"] = "You must be a staff user to submit a job."
-            return results
-    except:
-        results["error"] = "Invalid credential"
-        results["cluster"] = None
-        return results
-
-    try:
-        out = gjfwriter.GJFWriter(molecule, kwargs.get("keywords", None))
-    except Exception as e:
-        results["error"] = str(e)
-        return results
-
-    gjf = out.get_gjf()
-    results = run_job(credential, gjf, **kwargs)
-    return results
-
-
-def run_standard_jobs(credential, string, **kwargs):
-    results = {
-        "worked": [],
-        "failed": [],
-        "error": None,
-    }
-    try:
-        results["cluster"] = credential.cluster.name
-        if not credential.user.is_staff:
-            results["error"] = "You must be a staff user to submit a job."
-            return results
-    except:
-        results["error"] = "Invalid credential"
-        results["cluster"] = None
-        return results
-
-    names = []
-    gjfs = []
-    for mol in name_expansion(string):
-        try:
-            out = gjfwriter.GJFWriter(mol, kwargs.get("keywords", None))
-            names.append(mol)
-            gjfs.append(out.get_gjf())
-        except Exception as e:
-            results["failed"].append((mol, str(e)))
-            continue
-
-    if names:
-        temp = run_jobs(credential, names, gjfs, **kwargs)
-        results["worked"] = temp["worked"]
-        results["failed"].extend(temp["failed"])
-        results["error"] = temp["error"]
-    return results
-
-
 def kill_jobs(credential, jobids):
     results = {
         "worked": [],

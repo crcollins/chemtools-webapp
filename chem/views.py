@@ -14,6 +14,7 @@ from crispy_forms.utils import render_crispy_form
 
 from models import ErrorReport, ErrorReportForm, JobForm
 from utils import get_multi_molecule_warnings, get_molecule_info
+from utils import run_standard_job, run_standard_jobs
 
 from chemtools import gjfwriter
 from chemtools.constants import KEYWORDS
@@ -121,7 +122,7 @@ def molecule_detail(request, molecule):
         elif request.method == "POST":
             d["keywords"] = keywords
             cred = d.pop("credential")
-            a = cluster.interface.run_standard_job(cred, molecule, **d)
+            a = run_standard_job(cred, molecule, **d)
             a["success"] = True
             return HttpResponse(simplejson.dumps(a),
                                 mimetype="application/json")
@@ -163,7 +164,7 @@ def multi_molecule(request, string):
             d["keywords"] = request.REQUEST.get("keywords", None)
             cred = d.pop("credential")
             do_html = request.REQUEST.get("html", False)
-            a = cluster.interface.run_standard_jobs(cred, string, **d)
+            a = run_standard_jobs(cred, string, **d)
             if a["failed"]:
                 failed_names = zip(*a['failed'])[0]
                 a["failed_mols"] = ','.join(failed_names)

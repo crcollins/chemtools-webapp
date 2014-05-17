@@ -105,7 +105,8 @@ SUB_OPTIONS2 = SUB_OPTIONS.copy()
 SUB_OPTIONS2["credential"] = 2
 
 KEYWORDS_SET = ["opt HF/6-31g(d)", "td b3lyp/6-31g(d)", KEYWORDS]
-
+SUBMIT_ERROR = "You must be a staff user to submit a job."
+CRED_ERROR = "Invalid credential"
 
 class MainPageTestCase(TestCase):
     def setUp(self):
@@ -870,3 +871,66 @@ class UtilsTestCase(TestCase):
         }
         self.assertEqual(results, expected)
 
+
+@skipUnless(server_exists(**SERVER), "Requires external test server.")
+class UtilsServerTestCase(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(**USER)
+        self.user.save()
+        super_user = User.objects.create_superuser(**SUPER_USER)
+        super_user.save()
+
+        profile = self.user.get_profile()
+        test_path = os.path.join(settings.MEDIA_ROOT, "tests")
+        with open(os.path.join(test_path, "id_rsa.pub"), 'r') as f:
+            profile.public_key = f.read()
+        with open(os.path.join(test_path, "id_rsa"), 'r') as f:
+            profile.private_key = f.read()
+        profile.save()
+
+        self.cluster = Cluster(**CLUSTER)
+        self.cluster.save()
+        self.credential = Credential(user=self.user, cluster=self.cluster, **CREDENTIAL)
+        self.credential.save()
+        self.credential2 = Credential(user=super_user, cluster=self.cluster, **CREDENTIAL)
+        self.credential2.save()
+
+    def test_run_standard_job_staff_error(self):
+        results = utils.run_standard_job(self.credential, '')
+        self.assertEqual(results["error"], SUBMIT_ERROR)
+
+    def test_run_standard_job_invalid_credential(self):
+        results = utils.run_standard_job(None, '')
+        self.assertEqual(results["error"], CRED_ERROR)
+
+    def test_run_standard_job(self):
+        job = 'sleep 10'
+        results = utils.run_standard_job(self.credential2, "TON", jobstring=job)
+        self.assertEqual(results["error"], None)
+
+    def test_run_standard_job_name_error(self):
+        job = 'sleep 10'
+        results = utils.run_standard_job(self.credential2, "T-N", jobstring=job)
+        self.assertEqual(results["error"], "(1, 'Bad Core Name')")
+
+    def test_run_standard_jobs_staff_error(self):
+        results = utils.run_standard_jobs(self.credential, [''])
+        self.assertEqual(results["error"], SUBMIT_ERROR)
+
+    def test_run_standard_jobs_invalid_credential(self):
+        results = utils.run_standard_jobs(None, [''])
+        self.assertEqual(results["error"], CRED_ERROR)
+
+    def test_run_standard_jobs(self):
+        job = 'sleep 10'
+        names = "TON,CON"
+        results = utils.run_standard_jobs(self.credential2, names, jobstring=job)
+        self.assertEqual(results["error"], None)
+        self.assertEqual(results["failed"], [])
+
+    def test_run_standard_jobs_name_error(self):
+        job = 'sleep 10'
+        names = "T-N,C-N"
+        results = utils.run_standard_jobs(self.credential2, names, jobstring=job)
+        for name, error in results['failed']:
+            self.assertEqual(error, "(1, 'Bad Core Name')")
