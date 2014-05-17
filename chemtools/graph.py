@@ -274,3 +274,23 @@ def identify_single_ring(ring):
         else:
             ring_type = '6'
     return ring_type
+
+
+def run_name(name):
+    from chemtools import gjfwriter
+    mol = gjfwriter.GJFWriter(name).molecule
+    already, tree = breadth_first_search(mol)
+    cycles, link_nodes = get_cycles(already, tree)
+    pruned = prune_cycles(cycles, link_nodes)
+    fused = get_fused_cycles(pruned)
+    sorted_cycles = sort_fused_cycles(fused)
+    # for z in sorted_cycles:
+    #     for y in z:
+    #         print [(x.value.id, x.value.element) for x in y]
+    #     print
+    # print "FINAL:",
+    temp = identify_cycle_types(mol, sorted_cycles)
+    # print temp
+    return set(identify_cycle_types(mol, sorted_cycles))
+
+

@@ -15,6 +15,7 @@ import mol_name
 import ml
 import molecule
 import fileparser
+import graph
 from project.utils import StringIO
 
 
@@ -661,3 +662,47 @@ class UtilsTestCase(TestCase):
         test.get_fail()
         expected = "\n---- Errors (1) ----\nValueError('some string',)\n"
         self.assertEqual(test.format_output(errors=True), expected)
+
+class GraphTestCase(TestCase):
+    def test_graph(self):
+        # doesn't break
+        self.assertEqual(graph.run_name("TON"), set(["TON"]))
+
+        # multi cores
+        self.assertEqual(graph.run_name("TON_TON"), set(["TON"]))
+
+        # opposite cores
+        self.assertEqual(graph.run_name("TON_CON"), set(["TON", "CON"]))
+
+        # left side
+        self.assertEqual(graph.run_name("4_TON"), set(["TON", '4']))
+
+        # middle sides
+        self.assertEqual(graph.run_name("TON_4_"), set(["TON", '4']))
+
+        # right side
+        self.assertEqual(graph.run_name("TON__4"), set(["TON", '4']))
+
+        # left and right sides
+        self.assertEqual(graph.run_name("5_TON__4"), set(["TON", '4', '5']))
+
+        # multi left
+        self.assertEqual(graph.run_name("TON__45"), set(["TON", '4', '5']))
+
+        # multi right
+        self.assertEqual(graph.run_name("45_TON"), set(["TON", '4', '5']))
+
+        # multi middle
+        self.assertEqual(graph.run_name("TON_45_"), set(["TON", '4', '5']))
+
+        # all sides
+        self.assertEqual(graph.run_name("45_TON_67_89"), set(["TON", '4', '5', '6', '7', '8', '9']))
+
+        # sides and cores
+        self.assertEqual(graph.run_name("TON__4_TON"), set(["TON", '4']))
+
+        # side types
+        self.assertEqual(graph.run_name("TON__23456789"), set(["TON", '2', '3', '4', '5', '6', '7', '8', '9']))
+
+        # big
+        self.assertEqual(graph.run_name("TON_7_CCC_94_EON"), set(["TON", '7', "CCC", '9', '4', "E/ZON"]))
