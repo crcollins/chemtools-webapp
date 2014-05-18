@@ -24,6 +24,7 @@ install_chemtools() {
     pip install numpy==1.6.1
     pip install -r requirements.txt
     python manage.py syncdb --noinput
+    python manage.py load_data base_data.csv
     pip install gunicorn
 }
 
