@@ -42,7 +42,7 @@ update() {
 dependencies
 install_chemtools
 
-sudo bash -c "cat > /etc/supervisor/conf.d/chemtools.conf <<EOF
+sudo tee /etc/supervisor/conf.d/chemtools.conf <<EOF
 [program:chemtools]
 command=$PROJECT_DIR/bin/gunicorn project.wsgi:application
 directory=$CHEMTOOLS_DIR
@@ -50,9 +50,9 @@ user=$INSTALL_USER
 autostart=true
 autorestart=true
 redirect_stderr=true
-EOF"
+EOF
 
-sudo bash -c "cat > /etc/nginx/sites-available/chemtools <<EOF
+sudo tee /etc/nginx/sites-available/chemtools <<EOF
 server {
     listen 80 default;
     client_max_body_size 4G;
@@ -78,7 +78,8 @@ server {
       root $CHEMTOOLS_DIR/project/static;
     }
 }
-EOF"
+EOF
+
 
 sudo ln -s /etc/nginx/sites-available/chemtools /etc/nginx/sites-enabled/chemtools
 sudo rm /etc/nginx/sites-enabled/default
