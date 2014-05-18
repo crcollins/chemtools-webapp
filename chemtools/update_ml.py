@@ -100,6 +100,7 @@ def fit_func(X, y, clf=None):
     if clf is None:
         params = {"C": 10, "gamma": 0.05}
     else:
+        print "Using previous clf"
         params = {"C": clf.C, "gamma": clf.gamma}
 
     clf = OptimizedCLF(X, y, func, params).get_optimized_clf()
@@ -109,6 +110,7 @@ def fit_func(X, y, clf=None):
 
 
 def get_first_layer(X, homo, lumo, gap, in_clfs=None):
+    print "Creating first layer"
     if in_clfs is not None:
         in_homo_clf, in_lumo_clf, in_gap_clf = in_clfs
     else:
@@ -121,6 +123,7 @@ def get_first_layer(X, homo, lumo, gap, in_clfs=None):
 
 
 def get_second_layer(X, homo, lumo, gap, clfs, in_pred_clfs=None):
+    print "Creating second layer"
     if in_pred_clfs is not None:
         in_pred_homo, in_pred_lumo, in_pred_gap = in_pred_clfs
     else:
@@ -142,6 +145,7 @@ def get_second_layer(X, homo, lumo, gap, clfs, in_pred_clfs=None):
 
 
 def save_clfs(clfs, pred_clfs):
+    print "Saving clfs"
     path = path = os.path.join(DATAPATH, "decay_predictors.pkl")
     dst_path = os.path.join(DATAPATH, "decay_predictors_%d.pkl" % time.time())
     try:
@@ -153,6 +157,7 @@ def save_clfs(clfs, pred_clfs):
 
 
 def load_clfs():
+    print "Loading clfs"
     clfs = []
     pred_clfs = []
     path = os.path.join(DATAPATH, "decay_predictors.pkl")
