@@ -92,11 +92,6 @@ def get_ssh_connection(hostname, username, key=None, password=None, port=22):
     return client
 
 
-def touch(path, times=None):
-    with open(path, 'a'):
-        os.utime(path, times)
-
-
 def server_exists(*args, **kwargs):
     try:
         get_ssh_connection(*args, **kwargs)
