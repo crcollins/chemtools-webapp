@@ -14,7 +14,6 @@ from sklearn.metrics import mean_absolute_error
 
 from constants import DATAPATH
 from data.models import DataPoint
-from project.utils import touch
 
 
 def test_clf_kfold(X, y, clf, folds=10):
