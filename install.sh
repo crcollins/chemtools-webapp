@@ -24,9 +24,29 @@ install_chemtools() {
     cd $CHEMTOOLS_DIR
     pip install numpy==1.6.1
     pip install -r requirements.txt
+    pip install gunicorn
     python manage.py syncdb --noinput
     python manage.py load_data base_data.csv
-    pip install gunicorn
+}
+
+setup_nginx() {
+    cd $CHEMTOOLS_DIR
+    sudo sed -e "s/\$INSTALL_USER/$INSTALL_USER/g"      \
+             -e "s,\$CHEMTOOLS_DIR,$CHEMTOOLS_DIR,g"    \
+             project/nginx_settings.conf                \
+             | sudo tee /etc/nginx/sites-available/chemtools
+    sudo sed -e "s/\$INSTALL_USER/$INSTALL_USER/g"      \
+             -e "s,\$PROJECT_DIR,$PROJECT_DIR,g"        \
+             -e "s,\$CHEMTOOLS_DIR,$CHEMTOOLS_DIR,g"    \
+             project/supervisor_settings.conf           \
+             | sudo tee /etc/supervisor/conf.d/chemtools.conf
+    sudo ln -s /etc/nginx/sites-available/chemtools /etc/nginx/sites-enabled/chemtools
+    sudo rm /etc/nginx/sites-enabled/default
+    sudo nginx -s reload
+
+    sudo supervisorctl reread
+    sudo supervisorctl update
+    sudo service nginx restart
 }
 
 update() {
@@ -42,50 +62,4 @@ update() {
 
 dependencies
 install_chemtools
-
-sudo tee /etc/supervisor/conf.d/chemtools.conf <<EOF
-[program:chemtools]
-command=$PROJECT_DIR/bin/gunicorn project.wsgi:application
-directory=$CHEMTOOLS_DIR
-user=$INSTALL_USER
-autostart=true
-autorestart=true
-redirect_stderr=true
-EOF
-
-sudo tee /etc/nginx/sites-available/chemtools <<EOF
-server {
-    listen 80 default;
-    client_max_body_size 4G;
-    server_name gauss.crcollins.com;
-    keepalive_timeout 5;
-
-    root $CHEMTOOLS_DIR/project;
-    location /static {
-        autoindex on;
-        alias $CHEMTOOLS_DIR/project/static;
-    }
-
-    location / {
-      proxy_set_header X-Forwarded-For \\\$proxy_add_x_forwarded_for;
-      proxy_set_header Host \\\$http_host;
-      proxy_redirect off;
-      proxy_pass http://127.0.0.1:8000/;
-
-    }
-
-    error_page 500 502 503 504 /500.html;
-    location = /500.html {
-      root $CHEMTOOLS_DIR/project/static;
-    }
-}
-EOF
-
-
-sudo ln -s /etc/nginx/sites-available/chemtools /etc/nginx/sites-enabled/chemtools
-sudo rm /etc/nginx/sites-enabled/default
-sudo nginx -s reload
-
-sudo supervisorctl reread
-sudo supervisorctl update
-sudo service nginx restart
+setup_nginx
