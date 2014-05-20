@@ -3,6 +3,7 @@
 INSTALL_USER=vagrant
 PROJECT_DIR=/home/$INSTALL_USER/project
 CHEMTOOLS_DIR=$PROJECT_DIR/chemtools-webapp
+export PIP_DEFAULT_TIMEOUT=600
 
 dependencies() {
     sudo apt-get update
