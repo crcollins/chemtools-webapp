@@ -26,7 +26,6 @@ install_chemtools() {
     pip install -r requirements.txt
     pip install gunicorn
     python manage.py syncdb --noinput
-    python manage.py load_data base_data.csv
 }
 
 setup_nginx() {
