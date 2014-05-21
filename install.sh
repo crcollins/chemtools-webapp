@@ -65,6 +65,13 @@ update() {
     sudo supervisorctl restart chemtools
 }
 
+remove() {
+    sudo rm -rf $PROJECT_DIR /etc/nginx/sites-available/chemtools \
+                /etc/nginx/sites-enabled/chemtools /etc/supervisor/conf.d/chemtools.conf \
+    sudo supervisorctl shutdown chemtools
+    sudo service nginx restart
+}
+
 dependencies
 install_chemtools
 setup_nginx
