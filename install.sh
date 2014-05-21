@@ -20,7 +20,13 @@ install_chemtools() {
     . bin/activate
     ln -s /usr/lib/python2.7/dist-packages/cairo/ lib/python2.7/site-packages/
 
-    git clone https://github.com/crcollins/chemtools-webapp.git
+    if [ ! -d $CHEMTOOLS_DIR ];
+        then
+        git clone https://github.com/crcollins/chemtools-webapp.git
+    else
+        cd $CHEMTOOLS_DIR
+        git pull
+    fi
     cd $CHEMTOOLS_DIR
     pip install numpy==1.6.1
     pip install -r requirements.txt
