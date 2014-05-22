@@ -235,22 +235,6 @@ class SSHSettingsTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn("Settings Successfully Saved", response.content)
 
-    def test_add_credential_invalid(self):
-        r = self.client.login(**USER_LOGIN)
-        self.assertTrue(r)
-
-        data = {
-            "username": "vagrant",
-            "password": "incorrect",
-            "password2": "incorrect",
-            "cluster": self.cluster.id,
-            "use_password": True,
-        }
-        url = reverse(account_page, args=(USER["username"], "credentials"))
-        response = self.client.post(url, data)
-        self.assertEqual(response.status_code, 200)
-        self.assertIn("Those credentials did not work.", response.content)
-
     @skipUnless(server_exists(**SERVER), "Requires external test server.")
     def test_add_credential_password(self):
         r = self.client.login(**USER_LOGIN)

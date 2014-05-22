@@ -110,26 +110,6 @@ class CredentialForm(forms.ModelForm):
             raise forms.ValidationError("Your passwords do not match")
         return True
 
-    def clean(self, *args, **kwargs):
-        cleaned_data = super(CredentialForm, self).clean(*args, **kwargs)
-        cluster = cleaned_data.get("cluster")
-        username = cleaned_data.get("username")
-        try:
-            if cleaned_data.get("use_password"):
-                password = cleaned_data.get("password")
-                with get_ssh_connection(cluster.hostname, username,
-                                        password=password, port=cluster.port):
-                    pass
-            else:
-                profile = self.user.get_profile()
-                private = StringIO(profile.private_key)
-                with get_ssh_connection(cluster.hostname, username,
-                                        key=private, port=cluster.port):
-                    pass
-        except Exception:
-            raise forms.ValidationError("Those credentials did not work.")
-        return cleaned_data
-
 
 class Job(models.Model):
     credential = models.ForeignKey(Credential)
