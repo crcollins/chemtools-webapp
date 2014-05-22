@@ -5,7 +5,7 @@ VAGRANTFILE_API_VERSION = "2"
 
 $setup_script = <<SCRIPT
 #!/usr/bin/env bash
-sudo apt-get install git
+sudo apt-get install -y git
 git clone https://github.com/crcollins/chemtools-webapp
 
 cd chemtools-webapp

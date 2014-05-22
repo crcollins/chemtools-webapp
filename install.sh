@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 INSTALL_USER=vagrant
-CHEMTOOLS_DIR=/home/$INSTALL_USER/project/chemtools-webapp
+CHEMTOOLS_DIR=/home/$INSTALL_USER/chemtools-webapp
 export PIP_DEFAULT_TIMEOUT=600
 
 dependencies() {
@@ -14,7 +14,7 @@ dependencies() {
 
 install_chemtools() {
     cd $CHEMTOOLS_DIR
-    virtualenv project
+    virtualenv virtualenv
     . bin/activate
     ln -s /usr/lib/python2.7/dist-packages/cairo/ lib/python2.7/site-packages/
 
@@ -31,7 +31,6 @@ setup_nginx() {
              project/nginx_settings.conf                \
              | sudo tee /etc/nginx/sites-available/chemtools
     sudo sed -e "s/\$INSTALL_USER/$INSTALL_USER/g"      \
-             -e "s,\$PROJECT_DIR,$PROJECT_DIR,g"        \
              -e "s,\$CHEMTOOLS_DIR,$CHEMTOOLS_DIR,g"    \
              project/supervisor_settings.conf           \
              | sudo tee /etc/supervisor/conf.d/chemtools.conf
