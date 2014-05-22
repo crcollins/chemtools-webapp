@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 
 INSTALL_USER=vagrant
-PROJECT_DIR=/home/$INSTALL_USER/project
-CHEMTOOLS_DIR=$PROJECT_DIR/chemtools-webapp
+CHEMTOOLS_DIR=/home/$INSTALL_USER/project/chemtools-webapp
 export PIP_DEFAULT_TIMEOUT=600
 
 dependencies() {
@@ -14,20 +13,11 @@ dependencies() {
 }
 
 install_chemtools() {
-    cd $HOME
+    cd $CHEMTOOLS_DIR
     virtualenv project
-    cd $PROJECT_DIR
     . bin/activate
     ln -s /usr/lib/python2.7/dist-packages/cairo/ lib/python2.7/site-packages/
 
-    if [ ! -d $CHEMTOOLS_DIR ];
-        then
-        git clone https://github.com/crcollins/chemtools-webapp.git
-    else
-        cd $CHEMTOOLS_DIR
-        git pull
-    fi
-    cd $CHEMTOOLS_DIR
     pip install numpy==1.6.1
     pip install -r requirements.txt
     pip install gunicorn
@@ -55,10 +45,8 @@ setup_nginx() {
 }
 
 update() {
-    cd $PROJECT_DIR
-    . bin/activate
-
     cd $CHEMTOOLS_DIR
+    . bin/activate
     git pull
     pip install -r requirements.txt
     python manage.py syncdb --noinput
@@ -66,7 +54,7 @@ update() {
 }
 
 remove() {
-    sudo rm -rf $PROJECT_DIR /etc/nginx/sites-available/chemtools \
+    sudo rm -rf $CHEMTOOLS_DIR /etc/nginx/sites-available/chemtools \
                 /etc/nginx/sites-enabled/chemtools /etc/supervisor/conf.d/chemtools.conf \
     sudo supervisorctl shutdown chemtools
     sudo service nginx restart

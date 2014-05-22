@@ -3,6 +3,15 @@
 
 VAGRANTFILE_API_VERSION = "2"
 
+$setup_script = <<SCRIPT
+#!/usr/bin/env bash
+sudo apt-get install git
+git clone https://github.com/crcollins/chemtools-webapp
+
+cd chemtools-webapp
+source install.sh
+SCRIPT
+
 path = File.join("..", "project", "media", "tests")
 id_rsa_ssh_key_pub = File.read(File.join(path, "id_rsa.pub"))
 
@@ -11,7 +20,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.vm.provision :shell, :inline => "echo 'Copying public Key to VM auth_keys...' && mkdir -p /home/vagrant/.ssh && echo '#{id_rsa_ssh_key_pub }' >> /home/vagrant/.ssh/authorized_keys && chmod 600 /home/vagrant/.ssh/authorized_keys"
 
-  config.vm.provision :shell, :path => "../install.sh", :privileged => false
+  config.vm.provision :shell, :inline => $setup_script, :privileged => false
 
   config.vm.network :forwarded_port, host: 4567, guest: 80
 end
