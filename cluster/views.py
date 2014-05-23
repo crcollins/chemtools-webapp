@@ -7,6 +7,7 @@ from django.utils import simplejson
 from account.utils import add_account_page, PAGES
 from models import Job, CredentialForm, ClusterForm, Cluster, Credential
 import interface
+from utils import get_credentials_from_request
 
 
 @login_required
@@ -82,24 +83,23 @@ def kill_job(request, cluster):
 def credential_settings(request, username):
     state = "Change Settings"
     initial = {"username": request.user.get_profile().xsede_username}
+    working_creds = []
+    failing_creds = []
     if request.method == "POST":
         if "delete" in request.POST:
             form = CredentialForm(request.user, initial=initial)
-            usercreds = request.user.credentials.all()
-            for key in request.POST:
-                if "@" in key and ":" in key and '-' in key and request.POST[key] == "on":
-                    username, hostname = key.split('@')
-                    hostname, port = hostname.split(':')
-                    port, id_ = port.split('-')
-                    try:
-                        usercreds.get(
-                                    id=id_,
-                                    username=username,
-                                    cluster__hostname=hostname,
-                                    cluster__port=int(port)).delete()
-                    except Exception as e:
-                        pass
+            for cred in get_credentials_from_request(request):
+                cred.delete()
             state = "Settings Successfully Saved"
+
+        elif "test" in request.POST:
+            form = CredentialForm(request.user, initial=initial)
+            for cred in get_credentials_from_request(request):
+                if cred.connection_works():
+                    working_creds.append(cred)
+                else:
+                    failing_creds.append(cred)
+
         else:
             form = CredentialForm(request.user, request.POST)
             if form.is_valid():
@@ -116,6 +116,8 @@ def credential_settings(request, username):
         "page": "credentials",
         "state": state,
         "form": form,
+        "failing_creds": failing_creds,
+        "working_creds": working_creds,
         })
     return render(request, "cluster/credential_settings.html", c)
 

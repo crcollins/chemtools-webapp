@@ -83,6 +83,13 @@ class Credential(models.Model):
                                     key=private,
                                     port=self.cluster.port)
 
+    def connection_works(self):
+        try:
+            self.get_ssh_connection()
+            return True
+        except Exception:
+            return False
+
 
 class CredentialForm(forms.ModelForm):
     password = forms.CharField(max_length=50, required=False,

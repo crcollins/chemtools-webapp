@@ -7,6 +7,7 @@ from project.utils import StringIO, SSHClient, SFTPClient
 from models import Credential
 from data.models import JobTemplate
 
+
 def get_ssh_connection_obj(obj):
     if isinstance(obj, Credential):
         try:
@@ -29,6 +30,26 @@ def get_sftp_connection_obj(obj):
         return obj
     else:
         raise TypeError
+
+
+def get_credentials_from_request(request):
+    creds = []
+    usercreds = request.user.credentials.all()
+    for key in request.POST:
+        if set(key).intersection("@:-") and request.POST[key] == "on":
+            username, hostname = key.split('@')
+            hostname, port = hostname.split(':')
+            port, id_ = port.split('-')
+            try:
+                cred = usercreds.get(
+                            id=id_,
+                            username=username,
+                            cluster__hostname=hostname,
+                            cluster__port=int(port))
+                creds.append(cred)
+            except Exception as e:
+                pass
+    return creds
 
 
 def _make_folders(ssh):
