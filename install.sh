@@ -14,7 +14,7 @@ dependencies() {
 
 install_chemtools() {
     cd $CHEMTOOLS_DIR
-    virtualenv virtualenv
+    virtualenv .
     . bin/activate
     ln -s /usr/lib/python2.7/dist-packages/cairo/ lib/python2.7/site-packages/
 
@@ -26,6 +26,7 @@ install_chemtools() {
 
 setup_nginx() {
     cd $CHEMTOOLS_DIR
+    . bin/activate
     sudo sed -e "s/\$INSTALL_USER/$INSTALL_USER/g"      \
              -e "s,\$CHEMTOOLS_DIR,$CHEMTOOLS_DIR,g"    \
              project/nginx_settings.conf                \
