@@ -10,7 +10,7 @@ Setup
 
 This setup assumes you are on a machine with the apt package manager.
 
-    $ sudo apt-get install -y git
+    $ sudo apt-get install git
     $ git clone https://github.com/crcollins/chemtools-webapp
     $ cd chemtools-webapp
     $ source install.sh
