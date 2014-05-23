@@ -47,6 +47,9 @@ class Credential(models.Model):
         return "%s@%s:%d" % (self.username, self.cluster.hostname,
                             self.cluster.port)
 
+    def get_long_name(self):
+        return "%s-%d" % (unicode(self), self.id)
+
     def get_ssh_connection(self):
         if self.use_password:
             return get_ssh_connection(self.cluster.hostname,
