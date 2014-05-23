@@ -1,47 +1,20 @@
 ChemTools-WebApp
 ================
-A Django webapp built around the functionality of chemtools.
+A Django webapp built around the functionality of chemtools. This includes various utilities to parse Gaussian log files, creating benzobisazole structures, submitting jobs to Torque clusters, and predicting optoelectronic properties of benzobisazoles using machine learning.
 
 [Here is a demo site.](http://gauss.crcollins.com/)
-
-
-_______________________________________________________________________
-Build/Run Requirements
-----------------------
-
-- Python 2.7+
-- Django 1.4.11
-- Misaka 1.0.2
-- Matplotlib 1.1.1rc
-- Numpy 1.6.1
-- Paramiko 1.7.7.1
-- Pillow 2.2.1
-- PyCrypto 2.26
-- Scipy 0.9.0
-- Django Crispy Forms 1.4.0
-- Scikit-Learn 0.14.1
-
 
 
 Setup
 -----
 
-This setup assumes that you already have python 2.7+ and git installed and are on a machine with the apt package manager.
+This setup assumes you are on a machine with the apt package manager.
 
-    $ sudo apt-get install python-dev gfortran liblapack-dev libatlas-dev build-essential libfreetype6-dev libpng-dev python-cairo python-pip
-    $ sudo pip install virtualenv
-    $ virtualenv project
-    $ cd project/
-    $ . bin/activate
-    $ ln -s /usr/lib/python2.7/dist-packages/cairo/ lib/python2.7/site-packages/
-
-    $ git clone https://github.com/crcollins/chemtools-webapp.git
+    $ sudo apt-get install -y git
+    $ git clone https://github.com/crcollins/chemtools-webapp
     $ cd chemtools-webapp
-    $ pip install numpy==1.6.1
-    $ pip install -r requirements.txt
-    $ python manage.py syncdb
-    $ python manage.py runserver 0.0.0.0
-    Go to http://localhost/ with your browser
+    $ source install.sh
+
 
 Test
 ----
@@ -50,27 +23,11 @@ Currently, there are a few tests as a sanity check for some of the main features
 
     $ python manage.py test account chem chemtools cluster data parse docs
 
+
 Database
 --------
 
 The database used can be changed in by going in project/settings.py and changing the DATABASE dictionary.
-
-
-Deploy
-------
-
-This assumes you have already made it through the setup.
-
-    $ sudo apt-get install supervisor nginx
-    # While in your virtualenv from before
-    $ pip install gunicorn
-
-    $ sudo vim /etc/nginx/nginx.conf
-    $ sudo vim /etc/supervisor/conf.d/chemtools.conf
-    $ sudo supervisorctl reread
-    $ sudo supervisorctl update
-    $ sudo supervisorctl start chemtools
-    Go to http://yourdomain.com/ with your browser
 
 
 Vagrant Deploy
