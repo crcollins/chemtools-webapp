@@ -51,6 +51,11 @@ CREDENTIAL2 = {
     "use_password": False,
     "password": '',
 }
+BAD_CREDENTIAL = {
+    "username": "fails",
+    "password": "fails",
+    "use_password": False,
+}
 SUBMIT_ERROR = "You must be a staff user to submit a job."
 KILL_ERROR = "You must be a staff user to kill a job."
 CRED_ERROR = "Invalid credential"
@@ -290,6 +295,70 @@ class SSHSettingsTestCase(TestCase):
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, 200)
         self.assertIn("Settings Successfully Saved", response.content)
+
+    @skipUnless(server_exists(**SERVER), "Requires external test server.")
+    def test_test_credential(self):
+        r = self.client.login(**USER_LOGIN)
+        self.assertTrue(r)
+
+        url = reverse(account_page, args=(USER["username"], "credentials"))
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        data = {
+            "test": "on",
+            "vagrant@localhost:2222-1": "on",
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('class="success"', response.content)
+
+    def test_test_credential_fail(self):
+        user = User.objects.get(username=USER["username"])
+        cred = models.Credential(user=user,
+                                cluster=self.cluster,
+                                **BAD_CREDENTIAL)
+        cred.save()
+
+        r = self.client.login(**USER_LOGIN)
+        self.assertTrue(r)
+
+        url = reverse(account_page, args=(USER["username"], "credentials"))
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        data = {
+            "test": "on",
+            cred.get_long_name(): "on",
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('class="danger"', response.content)
+
+    @skipUnless(server_exists(**SERVER), "Requires external test server.")
+    def test_test_credential_both(self):
+        user = User.objects.get(username=USER["username"])
+        cred = models.Credential(user=user,
+                                cluster=self.cluster,
+                                **BAD_CREDENTIAL)
+        cred.save()
+
+        r = self.client.login(**USER_LOGIN)
+        self.assertTrue(r)
+
+        url = reverse(account_page, args=(USER["username"], "credentials"))
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        data = {
+            "test": "on",
+            cred.get_long_name(): "on",
+            "vagrant@localhost:2222-1": "on",
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('class="danger"', response.content)
+        self.assertIn('class="success"', response.content)
 
     def test_delete_credential(self):
         r = self.client.login(**USER_LOGIN)
