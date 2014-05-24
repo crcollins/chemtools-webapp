@@ -16,7 +16,7 @@ install_chemtools() {
     cd $CHEMTOOLS_DIR
     virtualenv .
     . bin/activate
-    ln -s /usr/lib/python2.7/dist-packages/cairo/ lib/python2.7/site-packages/
+    ln -fs /usr/lib/python2.7/dist-packages/cairo/ lib/python2.7/site-packages/
 
     pip install numpy==1.6.1
     pip install -r requirements.txt
@@ -35,8 +35,8 @@ setup_nginx() {
              -e "s,\$CHEMTOOLS_DIR,$CHEMTOOLS_DIR,g"    \
              project/supervisor_settings.conf           \
              | sudo tee /etc/supervisor/conf.d/chemtools.conf
-    sudo ln -s /etc/nginx/sites-available/chemtools /etc/nginx/sites-enabled/chemtools
-    sudo rm /etc/nginx/sites-enabled/default
+    sudo ln -fs /etc/nginx/sites-available/chemtools /etc/nginx/sites-enabled/chemtools
+    sudo rm -f /etc/nginx/sites-enabled/default
     sudo nginx -s reload
 
     sudo supervisorctl reread
