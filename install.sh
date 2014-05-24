@@ -63,3 +63,11 @@ remove() {
 dependencies
 install_chemtools
 setup_nginx
+
+sudo tee /etc/cron.d/chemtools <<EOF
+PATH=/home/vagrant/chemtools-webapp/bin
+0 3 * * * vagrant cd $CHEMTOOLS_DIR && python $CHEMTOOLS_DIR/manage.py update_ml >> $CHEMTOOLS_DIR/ml_update.log
+EOF
+
+
+setup_nginx
