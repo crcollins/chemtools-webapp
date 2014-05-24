@@ -16,6 +16,19 @@ from constants import DATAPATH
 from data.models import DataPoint
 
 
+def lock(func):
+    def wrapper(*args, **kwargs):
+        # Not very safe, but it will work well enough
+        if os.path.exists(".updating_ml"):
+            print "Already running"
+            return
+        with open(".updating_ml", "w"):
+            value = func(*args, **kwargs)
+        os.remove(".updating_ml")
+        return value
+    return wrapper
+
+
 def test_clf_kfold(X, y, clf, folds=10):
     train = numpy.zeros(folds)
     cross = numpy.zeros(folds)
@@ -172,6 +185,7 @@ def load_clfs():
     return clfs, pred_clfs
 
 
+@lock
 def run_all():
     FEATURE, HOMO, LUMO, GAP = DataPoint.get_all_data()
     latest = DataPoint.objects.latest()
