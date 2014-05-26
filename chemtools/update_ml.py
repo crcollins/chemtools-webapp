@@ -23,7 +23,11 @@ def lock(func):
             print "Already running"
             return
         with open(".updating_ml", "w"):
-            value = func(*args, **kwargs)
+            try:
+                value = func(*args, **kwargs)
+            except Exception as e:
+                print e
+                value = None
         os.remove(".updating_ml")
         return value
     return wrapper
