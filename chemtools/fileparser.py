@@ -2,16 +2,13 @@ import os
 from cStringIO import StringIO
 import multiprocessing
 
-from scipy.constants import physical_constants
-
 from utils import Output, catch
 from mol_name import get_exact_name
 from ml import get_naive_feature_vector, get_decay_feature_vector, \
                 get_decay_distance_correction_feature_vector
 
 
-EVTOHARTREE = physical_constants["electron volt-hartree relationship"][0]
-HARTREETOEV = 1 / EVTOHARTREE
+HARTREETOEV = 27.211385
 
 
 class Log(object):
