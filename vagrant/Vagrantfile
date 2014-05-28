@@ -13,7 +13,7 @@ echo "----------------------------------"
 if [ $1 ];
     then
     echo "Running dev install"
-    cp -r /tmp/chemtools-webapp chemtools-webapp
+    cp -r /tmp/chemtools-webapp .
     cd chemtools-webapp
 else
     sudo apt-get install -y git
