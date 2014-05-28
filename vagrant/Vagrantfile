@@ -6,17 +6,24 @@ VAGRANTFILE_API_VERSION = "2"
 $setup_script = <<SCRIPT
 #!/usr/bin/env bash
 
+echo
+echo "----------------------------------"
+echo "----------------------------------"
+
 if [ $1 ];
     then
+    echo "Running dev install"
     cp -r /tmp/chemtools-webapp chemtools-webapp
     cd chemtools-webapp
 else
     sudo apt-get install -y git
     if [ ! -d chemtools-webapp ];
         then
+        echo "Running staging install"
         git clone https://github.com/crcollins/chemtools-webapp
         cd chemtools-webapp
     else
+        echo "Running staging update"
         cd chemtools-webapp
         git pull
     fi
