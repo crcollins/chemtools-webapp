@@ -23,7 +23,7 @@ class Log(object):
 
             self.parsers = dict()
             for k, v in Log.PARSERS.items():
-                self.parsers[k] = v()
+                self.parsers[k] = v(self)
 
             self.order = ["Options", "HOMO", "LUMO", "HomoOrbital",
                         "Dipole", "Energy", "BandGap", "Time"]
