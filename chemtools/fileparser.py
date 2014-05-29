@@ -8,7 +8,7 @@ from ml import get_naive_feature_vector, get_decay_feature_vector, \
                 get_decay_distance_correction_feature_vector
 
 
-HARTREETOEV = 27.211385
+HARTREETOEV = 27.211383858491185
 
 
 class Log(object):
