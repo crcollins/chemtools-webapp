@@ -23,6 +23,12 @@ Currently, there are a few tests as a sanity check for some of the main features
 
     $ python manage.py test account chem chemtools cluster data parse docs
 
+If you have coverage.py installed, you can also run the following commands to see which parts of the code are covered by the tests.
+
+    $ coverage run manage.py test account chem chemtools cluster data parse docs
+    $ coverage html
+
+
 
 Database
 --------
