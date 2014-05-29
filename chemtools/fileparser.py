@@ -19,14 +19,21 @@ class Log(object):
             f = open(f, 'r')
         with f:
             self.fname = fname if fname else f.name
-            self.name, _ = os.path.splitext(self.fname)
+
+            name, _ = os.path.splitext(self.fname)
+            if name.lower().endswith("_td"):
+                # rstrip does not work because some names end with a "d"
+                name = name[:-3]
+            elif name.lower().endswith("_tddft"):
+                name = name[:-6]
+            self.name = name
 
             self.parsers = dict()
             for k, v in Log.PARSERS.items():
                 self.parsers[k] = v(self)
 
-            self.order = ["Options", "HOMO", "LUMO", "HomoOrbital",
-                        "Dipole", "Energy", "BandGap", "Time"]
+            self.order = ["ExactName", "Features", "Options", "HOMO", "LUMO",
+                        "HomoOrbital", "Dipole", "Energy", "BandGap", "Time"]
 
             for i, line in enumerate(f):
                 for k, parser in self.parsers.items():
@@ -65,31 +72,12 @@ class Log(object):
             # csv fixes
             if value and "," in value:
                 value = '"' + value.replace('"', '""') + '"'
-
             values.append(value if (done or value) else "---")
 
-        filename = self.fname
-        name = os.path.basename(filename).replace(".log", "")
-        if name.lower().endswith("_td"):
-            # rstrip does not work because some names end with a "d"
-            name = name[:-3]
-        elif name.lower().endswith("_tddft"):
-            name = name[:-6]
-        try:
-            spacer = get_exact_name(name, spacers=True)
-            exactname = spacer.replace('*', '')
-            features = '"' + str([
-                get_naive_feature_vector(spacer),
-                get_decay_feature_vector(spacer),
-                get_decay_distance_correction_feature_vector(spacer),
-            ]) + '"'
-        except:
-            exactname = "---"
-            features = "[]"
-        return ','.join([filename, name, exactname, features] + values)
+        return ','.join([self.fname, self.name] + values)
 
     def format_header(self):
-        nonparsed = ["Filename", "Name", "ExactName", "Features"]
+        nonparsed = ["Filename", "Name"]
         return ','.join(nonparsed + self.order)
 
 
@@ -153,6 +141,46 @@ class LineParser(object):
 
 ##############################################################################
 ##############################################################################
+
+@Log.add_parser
+class ExactName(LineParser):
+    def __init__(self, *args, **kwargs):
+        super(ExactName, self).__init__(*args, **kwargs)
+        try:
+            from mol_name import get_exact_name
+            spacer = get_exact_name(self.log.name, spacers=True)
+            self.value = spacer.replace('*', '')
+        except:
+            self.value = None
+        self.done = False
+
+    @is_done
+    def parse(self, line):
+        return
+
+@Log.add_parser
+class Features(LineParser):
+    def __init__(self, *args, **kwargs):
+        super(Features, self).__init__(*args, **kwargs)
+        try:
+            from mol_name import get_exact_name
+            from ml import get_decay_distance_correction_feature_vector, \
+                        get_naive_feature_vector, get_decay_feature_vector
+
+            spacer = get_exact_name(self.log.name, spacers=True)
+            exactname = spacer.replace('*', '')
+            self.value = '"' + str([
+                get_naive_feature_vector(spacer),
+                get_decay_feature_vector(spacer),
+                get_decay_distance_correction_feature_vector(spacer),
+            ]) + '"'
+        except:
+            self.value = "[]"
+        self.done = True
+
+    @is_done
+    def parse(self, line):
+        return
 
 
 @Log.add_parser
