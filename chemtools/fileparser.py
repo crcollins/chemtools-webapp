@@ -138,7 +138,8 @@ def is_done(fn):
 
 
 class LineParser(object):
-    def __init__(self):
+    def __init__(self, log):
+        self.log = log
         self.done = False
         self.value = None
         self.newfile = False
@@ -156,8 +157,8 @@ class LineParser(object):
 
 @Log.add_parser
 class Options(LineParser):
-    def __init__(self):
-        super(Options, self).__init__()
+    def __init__(self, *args, **kwargs):
+        super(Options, self).__init__(*args, **kwargs)
         self.start = False
         self.value = ''
         self.prevline = ''
@@ -185,8 +186,8 @@ class Options(LineParser):
 
 @Log.add_parser
 class HomoOrbital(LineParser):
-    def __init__(self):
-        super(HomoOrbital, self).__init__()
+    def __init__(self, *args, **kwargs):
+        super(HomoOrbital, self).__init__(*args, **kwargs)
         self.value = 0
 
     @is_done
@@ -204,8 +205,8 @@ class HomoOrbital(LineParser):
 
 @Log.add_parser
 class Energy(LineParser):
-    def __init__(self):
-        super(Energy, self).__init__()
+    def __init__(self, *args, **kwargs):
+        super(Energy, self).__init__(*args, **kwargs)
         self.start = False
         self.prevline = ''
 
@@ -229,8 +230,8 @@ class Energy(LineParser):
 
 @Log.add_parser
 class Time(LineParser):
-    def __init__(self):
-        super(Time, self).__init__()
+    def __init__(self, *args, **kwargs):
+        super(Time, self).__init__(*args, **kwargs)
 
     @is_done
     def parse(self, line):
@@ -244,8 +245,8 @@ class Time(LineParser):
 
 @Log.add_parser
 class BandGap(LineParser):
-    def __init__(self):
-        super(BandGap, self).__init__()
+    def __init__(self, *args, **kwargs):
+        super(BandGap, self).__init__(*args, **kwargs)
 
     @is_done
     def parse(self, line):
@@ -257,8 +258,8 @@ class BandGap(LineParser):
 
 @Log.add_parser
 class HOMO(LineParser):
-    def __init__(self):
-        super(HOMO, self).__init__()
+    def __init__(self, *args, **kwargs):
+        super(HOMO, self).__init__(*args, **kwargs)
         self.prevline = ''
 
     @is_done
@@ -274,8 +275,8 @@ class HOMO(LineParser):
 
 @Log.add_parser
 class LUMO(LineParser):
-    def __init__(self):
-        super(LUMO, self).__init__()
+    def __init__(self, *args, **kwargs):
+        super(LUMO, self).__init__(*args, **kwargs)
         self.prevline = ''
 
     @is_done
@@ -291,8 +292,8 @@ class LUMO(LineParser):
 
 @Log.add_parser
 class Geometry(LineParser):
-    def __init__(self):
-        super(Geometry, self).__init__()
+    def __init__(self, *args, **kwargs):
+        super(Geometry, self).__init__(*args, **kwargs)
         self.value = ''
         self.start = False
         self.newfile = True
@@ -333,8 +334,8 @@ class Geometry(LineParser):
 
 @Log.add_parser
 class Header(LineParser):
-    def __init__(self):
-        super(Header, self).__init__()
+    def __init__(self, *args, **kwargs):
+        super(Header, self).__init__(*args, **kwargs)
         self.value = ''
         self.start = False
 
@@ -355,8 +356,8 @@ class Header(LineParser):
 
 @Log.add_parser
 class Dipole(LineParser):
-    def __init__(self):
-        super(Dipole, self).__init__()
+    def __init__(self, *args, **kwargs):
+        super(Dipole, self).__init__(*args, **kwargs)
 
     @is_done
     def parse(self, line):
