@@ -21,6 +21,7 @@ class Log(object):
             self.fname = fname if fname else f.name
 
             name, _ = os.path.splitext(self.fname)
+            name = os.path.basename(name)
             if name.lower().endswith("_td"):
                 # rstrip does not work because some names end with a "d"
                 name = name[:-3]
