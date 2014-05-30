@@ -65,8 +65,14 @@ remove() {
     sudo service nginx restart
 }
 
-dependencies
-install_chemtools
-setup_nginx
 
 
+if [ "$1" == "remove" ];
+    then
+    echo "Uninstalling"
+    remove
+else
+    dependencies
+    install_chemtools
+    setup_nginx
+fi
