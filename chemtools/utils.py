@@ -1,6 +1,3 @@
-from django.template import Template, Context
-
-
 def catch(fn):
     '''Decorator to catch all exceptions and log them.'''
     def wrapper(self, *args, **kwargs):

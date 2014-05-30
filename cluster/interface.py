@@ -2,10 +2,6 @@ import os
 import re
 import threading
 
-from chemtools import gjfwriter
-from chemtools import fileparser
-from chemtools.mol_name import name_expansion
-
 from models import Job
 from utils import get_ssh_connection_obj, get_sftp_connection_obj, _run_job, \
                 _get_jobs
