@@ -18,3 +18,7 @@
 .table thead div.checkbox label {
     font-weight: bold;
 }
+
+.navbar {
+    border-radius: 0px;
+}
