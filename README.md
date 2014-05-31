@@ -15,6 +15,11 @@ This setup assumes you are on a machine with the apt package manager.
     $ cd chemtools-webapp
     $ source install.sh
 
+To remove chemtools, run the following commands.
+
+    $ cd chemtools-webapp
+    $ souce install remove
+
 
 Test
 ----
@@ -46,4 +51,6 @@ This assumes that you already have vagrant and virtualbox installed.
     # Warning: This includes the test key from project/media/tests by default. This key MUST be removed before opening this server up to the internet.
     Go to http://localhost:4567/
 
+To spin up a vm from the local copy of chemtools-webapp can set the environmental variable `DEV` to `true`
 
+    $ DEV=true vagrant up
