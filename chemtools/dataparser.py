@@ -8,7 +8,7 @@ matplotlib.use('Cairo')
 import matplotlib.pyplot as plot
 np.seterr(all="ignore")
 
-from utils import Output, catch
+from fileparser import Output, catch
 
 
 def kuhn_exp(x, a, b):
