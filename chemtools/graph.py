@@ -135,6 +135,40 @@ def prune_cycles(cycles, link_nodes):
     return final
 
 
+def get_noncycles(molecule, cycles):
+    cycle_set = set(sum([[y.value for y in x] for x in cycles], []))
+    noncycles = {}
+    for atom in molecule.atoms:
+        if atom not in cycle_set:
+            noncycles[atom] = []
+        for bond in atom.bonds:
+            if not set(bond.atoms).intersection(cycle_set):
+                noncycles[atom].append(bond)
+    return noncycles
+
+
+def prune_noncycles(noncycles):
+    results = {}
+    for atom, bonds in noncycles.items():
+        if atom.element != "H" and len(bonds):
+            results[atom] = bonds
+    return results
+
+
+def identify_noncycle_types(noncycles):
+    types = []
+    for atom, bonds in noncycles.items():
+        if atom.element == "C":
+            carbon_bonds = []
+            for bond in bonds:
+                if all(x.element == "C" for x in bond.atoms):
+                    carbon_bonds.append(bond)
+            for bond in carbon_bonds:
+                if bond.type in '23':
+                    types.append(bond.type)
+    return types
+
+
 def get_fused_cycles(cycles):
     cycle_sets = [set([x.value.id for x in y]) for y in cycles]
     sets = []
@@ -285,13 +319,14 @@ def run_name(name):
     pruned = prune_cycles(cycles, link_nodes)
     fused = get_fused_cycles(pruned)
     sorted_cycles = sort_fused_cycles(fused)
+
+    noncycles = get_noncycles(mol, pruned)
+    pruned2 = prune_noncycles(noncycles)
     # for z in sorted_cycles:
     #     for y in z:
     #         print [(x.value.id, x.value.element) for x in y]
     #     print
     # print "FINAL:",
     temp = identify_cycle_types(mol, sorted_cycles)
-    # print temp
-    return set(identify_cycle_types(mol, sorted_cycles))
-
-
+    temp2 = identify_noncycle_types(pruned2)
+    return set(temp + temp2)
