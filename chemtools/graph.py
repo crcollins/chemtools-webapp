@@ -314,19 +314,15 @@ def identify_single_ring(ring):
 def run_name(name):
     from chemtools import gjfwriter
     mol = gjfwriter.GJFWriter(name).molecule
-    already, tree = breadth_first_search(mol)
-    cycles, link_nodes = get_cycles(already, tree)
-    pruned = prune_cycles(cycles, link_nodes)
-    fused = get_fused_cycles(pruned)
+    links, tree = breadth_first_search(mol)
+
+    cycles, link_nodes = get_cycles(links, tree)
+    pruned_cycles = prune_cycles(cycles, link_nodes)
+    fused = get_fused_cycles(pruned_cycles)
     sorted_cycles = sort_fused_cycles(fused)
+    temp = identify_cycle_types(mol, sorted_cycles)
 
     noncycles = get_noncycles(mol, pruned)
-    pruned2 = prune_noncycles(noncycles)
-    # for z in sorted_cycles:
-    #     for y in z:
-    #         print [(x.value.id, x.value.element) for x in y]
-    #     print
-    # print "FINAL:",
-    temp = identify_cycle_types(mol, sorted_cycles)
-    temp2 = identify_noncycle_types(pruned2)
+    pruned_noncycles = prune_noncycles(noncycles)
+    temp2 = identify_noncycle_types(pruned_noncycles)
     return set(temp + temp2)
