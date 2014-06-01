@@ -322,7 +322,7 @@ def run_name(name):
     sorted_cycles = sort_fused_cycles(fused)
     temp = identify_cycle_types(mol, sorted_cycles)
 
-    noncycles = get_noncycles(mol, pruned)
+    noncycles = get_noncycles(mol, pruned_cycles)
     pruned_noncycles = prune_noncycles(noncycles)
     temp2 = identify_noncycle_types(pruned_noncycles)
     return set(temp + temp2)
