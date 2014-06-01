@@ -1,5 +1,6 @@
 from constants import CORE_COMBO, CORE_FREE
 
+
 class Tree(object):
     def __init__(self, value, parent=None):
         self.parent = parent
@@ -75,7 +76,7 @@ def breadth_first_search(molecule):
             visited.append(point.value)
             points.extend(point.search())
         else:
-            link = sorted([point.value, point.parent.value])
+            link = sorted([point.value, point.parent.value], key=lambda x: x.id)
             links.append((link, point))
     return links, tree
 
