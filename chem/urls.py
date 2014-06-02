@@ -9,6 +9,7 @@ multimolname = molname + ",\-\{\}\$\."
 urlpatterns = patterns('chem.views',
     url(r'^$', "index", name="chem_index"),
     url(r'^multi_job/$', "multi_job", name="multi_job"),
+    url(r"^upload/$", "upload_data", name="upload"),
 
     url(r"^(?P<molecule>[%s]*)/$" % molname, "molecule_detail"),
     url(r"^(?P<molecule>[%s]*)\.json$" % molname, "molecule_detail_json"),
@@ -22,3 +23,4 @@ urlpatterns = patterns('chem.views',
 
     url(r"^(?P<string>[%s]*)/check/$" % multimolname, "molecule_check"),
 )
+

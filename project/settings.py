@@ -163,7 +163,6 @@ INSTALLED_APPS = (
     'chemtools',
     'account',
     'docs',
-    'parse',
     'data',
     'cluster',
     'crispy_forms',

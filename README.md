@@ -26,11 +26,11 @@ Test
 
 Currently, there are a few tests as a sanity check for some of the main features of chemtools. You can run them with the following command. Note: For some of the tests to pass they require a test Torque Cluster. This requirement can be satisfied using [this](https://github.com/crcollins/torquecluster) repository which contains a Vagrant setup of a basic cluster. NOTE: These tests also assume that the test cluster is at localhost port 2222.
 
-    $ python manage.py test account chem chemtools cluster data parse docs
+    $ python manage.py test account chem chemtools cluster data docs
 
 If you have coverage.py installed, you can also run the following commands to see which parts of the code are covered by the tests.
 
-    $ coverage run manage.py test account chem chemtools cluster data parse docs
+    $ coverage run manage.py test account chem chemtools cluster data docs
     $ coverage html
 
 
