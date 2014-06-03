@@ -1,34 +1,127 @@
 {% extends "chem/base.html" %}
+{% load crispy_forms_tags %}
 
 {% block title %}Upload{% endblock %}
+
+{% block script %}
+<script>
+{% autoescape on %}
+
+$(function() {
+    function post_func() {
+        if (!$("#id_gjf_submit").is(':checked') || !$("#id_gjf_reset").is(':checked')) {
+            $("#id_form").submit();
+        }
+        event.preventDefault();
+        var a = new FormData($("#id_form")[0]);
+        var files = $("input[name='myfiles']").prop('files');
+        for(var x=0;x<files.length;x++) {
+            a.append("files", files[x]);
+        }
+        a.append("html", true);
+
+        // ajax call is used because of processData and contentType
+        $.ajax({
+            url: '',
+            type: "POST",
+            data: a,
+            processData: false,
+            contentType: false,
+            success: function (data) {
+                if (data.success) {
+                    var dialog = $("#resultsModal .modal-body");
+                    dialog.html(data.html);
+                    $('#resultsModal').modal();
+                } else {
+                    $("#id_form_input").html(data.form_html);
+                    var temp = $("div.has-error").get(0);
+                    if (temp !== undefined) {
+                        temp.scrollIntoView();
+                    }
+                }
+            }
+        });
+    }
+    $("#id_submit").click(post_func);
+
+    $("input[name='option']").change(function () {
+        if (!$("#id_gjf_reset").is(':checked')) {
+            if ($("#id_gjf_submit").is(':checked')) {
+                $("#id_gjf_submit").trigger('click');
+            }
+            if ($("#id_gjf_reset_td").is(':checked')) {
+                $("#id_gjf_reset_td").trigger('click');
+            }
+        }
+    });
+    $("#id_gjf_reset_td").change(function () {
+        if ($(this).is(':checked')) {
+            $("#id_gjf_reset").prop('checked', true);
+        }
+    });
+    $("#id_gjf_submit").change(function () {
+        if ($(this).is(':checked')) {
+            $("#id_gjf_reset").prop('checked', true);
+            $("#details").collapse('show');
+        } else {
+            $("#details").collapse('hide');
+        }
+    });
+});
+{% endautoescape %}
+</script>
+{% endblock %}
 
 {% block content %}
     {% if error_message %}
         <div class="alert alert-danger">{{ error_message }}</div>
     {% endif %}
-    <form enctype="multipart/form-data" role="form" action="." method="post">
+    <form enctype="multipart/form-data" id="id_form" role="form" action="." method="post">
         {% csrf_token %}
         <input type="file" name="myfiles" multiple />
         <div class="radio">
             <input type="radio" name="option" id="id_log" value="logparse" checked />
             <label for="id_log">Log Parse</label>
         </div>
-
+        <div class="radio">
+            <input type="radio" name="option" id="id_data" value="dataparse" />
+            <label for="id_data">Data Parse</label>
+        </div>
         <div class="radio">
                 <input type="radio" name="option" id="id_gjf_reset" value="gjfreset" />
                 <label for="id_gjf_reset">Gjf Reset</label>
 
                 <input type="checkbox" id="id_gjf_reset_td" name="reset_td" />
                 <label for="id_gjf_reset_td">Reset as TD?</label>
+                <input type="checkbox" id="id_gjf_submit" name="submit" />
+                <label for="id_gjf_submit">Submit?</label>
         </div>
-        <div class="radio">
-            <input type="radio" name="option" id="id_data" value="dataparse" />
-            <label for="id_data">Data Parse</label>
+        <div id="details" class="{% if form.errors %}in{% else %}collapse{% endif %}">
+            <div id="id_form_input">
+                {{ form|crispy }}
+            </div>
         </div>
-        <input class="btn btn-primary" type="submit" value="Upload!" />
+        <input class="btn btn-primary" id="id_submit" type="submit" value="Upload!" />
         <input class="btn" type="reset" value="Reset" />
     </form>
     <p>
         Files may be uploaded in zipped format (.zip, .tar.gz, .tar.bz2) or individually.
     </p>
+
+
+<div class="modal fade" id="resultsModal" tabindex="-1" role="dialog" aria-labelledby="resultsModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">Results</h4>
+            </div>
+            <div class="modal-body">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

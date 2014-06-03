@@ -48,14 +48,14 @@ class JobForm(forms.Form):
         super(JobForm, self).__init__(*args, **kwargs)
 
     @classmethod
-    def get_form(cls, request, molecule):
+    def get_form(cls, request, molecule, initial=False):
         req = request.REQUEST
         a = dict(req)
 
         keys = set(JobForm.base_fields.keys())
         # Only raise form errors if there are values in the request that match
         # any of the field names for the form
-        if a and set(a.keys()) & keys:
+        if not initial and a and set(a.keys()) & keys:
             form = JobForm(req, initial=a)
         else:
             if request.user.is_authenticated():

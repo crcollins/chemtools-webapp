@@ -286,6 +286,7 @@ def upload_data(request):
         "dataparse": parse_data,
         "gjfreset": reset_gjf,
     }
+
     error = None
     if request.method == "POST":
         if request.FILES.getlist('myfiles'):
@@ -296,7 +297,8 @@ def upload_data(request):
         else:
             error = "Please add some files."
     c = Context({
-        "error_message": error
+        "error_message": error,
+        "form": JobForm.get_form(request, "{{ name }}", initial=True),
         })
     return render(request, "chem/upload_log.html", c)
 
@@ -351,10 +353,10 @@ def parse_data(request):
 
 
 def reset_gjf(request):
-    buff = StringIO()
-    zfile = zipfile.ZipFile(buff, 'w', zipfile.ZIP_DEFLATED)
-
+    form = JobForm.get_form(request, "{{ name }}")
     errors = []
+    strings = []
+    names = []
     for f in parse_file_list(request.FILES.getlist('myfiles')):
         parser = fileparser.Log(f)
 
@@ -364,15 +366,50 @@ def reset_gjf(request):
             name += '_TD'
             td = True
         try:
-            zfile.writestr("%s.gjf" % name, parser.format_gjf(td=td))
+            strings.append(parser.format_gjf(td=td))
+            names.append(name)
         except Exception as e:
-            errors.append("%s - %s" % (name, e))
-    if errors:
-        zfile.writestr("errors.txt", '\n'.join(errors))
+            errors.append((f.name, e))
 
+    if request.REQUEST.get("submit"):
+        if not form.is_valid(request.method):
+            if request.is_ajax():
+                form_html = render_crispy_form(form,
+                                            context=RequestContext(request))
+                a = {"success": False, "form_html": form_html}
+                return HttpResponse(simplejson.dumps(a),
+                                    mimetype="application/json")
+            c = Context({
+                "form": form,
+                })
+            return render(request, "chem/upload_log.html", c)
+
+        d = dict(form.cleaned_data)
+        if request.method == "POST":
+            cred = d.pop("credential")
+            d["keywords"] = request.REQUEST.get("keywords", None)
+            files = request.FILES.getlist("files")
+            a = cluster.interface.run_jobs(cred, names, strings, **d)
+            a["failed"].extend(errors)
+            do_html = request.REQUEST.get("html", False)
+            if do_html:
+                html = render_to_string("chem/multi_submit.html", a)
+                temp = {"success": True, "html": html}
+                return HttpResponse(simplejson.dumps(temp),
+                                    mimetype="application/json")
+            else:
+                return HttpResponse(simplejson.dumps(a),
+                                    mimetype="application/json")
+
+    buff = StringIO()
+    zfile = zipfile.ZipFile(buff, 'w', zipfile.ZIP_DEFLATED)
+    for name, string in zip(names, strings):
+        zfile.writestr("%s.gjf" % name, string)
+    if errors:
+        temp = ['%s - %s' % (name, error) for (name, error) in errors]
+        zfile.writestr("errors.txt", '\n'.join(temp))
     zfile.close()
     buff.flush()
-
     ret_zip = buff.getvalue()
     buff.close()
 
