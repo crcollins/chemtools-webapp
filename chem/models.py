@@ -88,7 +88,7 @@ class UploadForm(forms.Form):
     helper.layout = Layout(
         'files',
         'options',
-        'td_reset'
+        'td_reset',
         'gjf_submit',
     )
 
