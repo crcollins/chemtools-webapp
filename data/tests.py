@@ -1,6 +1,7 @@
 from itertools import product
 import os
 
+import numpy
 from django.conf import settings
 from django.test import Client, TestCase
 from django.core.urlresolvers import reverse
@@ -58,10 +59,29 @@ class ModelTestCase(TestCase):
                                 energy=-567.1965205,
                                 band_gap=4.8068)
         new_data.save()
+        new_data2 = models.DataPoint(
+                                name="Garbage",
+                                exact_name="Garbage",
+                                options="Nothing",
+                                homo=1.0,
+                                lumo=2.0,
+                                homo_orbital=42,
+                                dipole=0.0,
+                                energy=100.0,
+                                band_gap=2.0,
+                                decay_feature="[1,2,3]")
+        new_data2.save()
 
     def test_datapoint_unicode(self):
         string = str(models.DataPoint.objects.all()[0])
         self.assertEqual(string, "A_TON_A_A")
+
+    def test_get_all_data(self):
+        FEATURE, HOMO, LUMO, GAP = models.DataPoint.get_all_data()
+        self.assertTrue((FEATURE == numpy.matrix([[1,2,3]])).all())
+        self.assertTrue((HOMO == numpy.matrix([[1.0]])).all())
+        self.assertTrue((LUMO == numpy.matrix([[2.0]])).all())
+        self.assertTrue((GAP == numpy.matrix([[2.0]])).all())
 
 
 class LoadDataTestCase(TestCase):
