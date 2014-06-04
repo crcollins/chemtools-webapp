@@ -692,6 +692,46 @@ class PostsFailTestCase(TestCase):
         self.assertFalse(results["success"])
         self.assertIn("has-error", results["form_html"])
 
+    def test_gjf_reset_submit_fail(self):
+        r = self.client.login(**SUPER_USER_LOGIN)
+        self.assertTrue(r)
+
+        base = os.path.join(settings.MEDIA_ROOT, "tests", "A_TON_A_A")
+        log_path = base + ".log"
+        with open(log_path, 'r') as log:
+            temp = {
+                "files": log,
+                "options": "gjfreset",
+                "gjf_submit": True,
+                "name": "{{ name }}",
+            }
+            data = dict(temp.items() + SUB_OPTIONS2.items())
+            del data["email"]
+            response = self.client.post(reverse(views.upload_data), data)
+            self.assertEqual(response.status_code, 200)
+
+    def test_gjf_reset_submit_ajax_fail(self):
+        r = self.client.login(**SUPER_USER_LOGIN)
+        self.assertTrue(r)
+
+        base = os.path.join(settings.MEDIA_ROOT, "tests", "A_TON_A_A")
+        log_path = base + ".log"
+        with open(log_path, 'r') as log:
+            temp = {
+                "files": log,
+                "options": "gjfreset",
+                "gjf_submit": True,
+                "name": "{{ name }}",
+            }
+            data = dict(temp.items() + SUB_OPTIONS2.items())
+            del data["email"]
+            response = self.client.post(reverse(views.upload_data), data,
+                                        HTTP_X_REQUESTED_WITH="XMLHttpRequest")
+            self.assertEqual(response.status_code, 200)
+            value = simplejson.loads(response.content)
+            self.assertFalse(value['success'])
+            self.assertIn("has-error", value["job_form_html"])
+
 
 @skipUnless(server_exists(**SERVER), "Requires external test server.")
 class PostsTestCase(TestCase):
@@ -807,6 +847,72 @@ class PostsTestCase(TestCase):
         results = simplejson.loads(response.content)
         self.assertTrue(results["success"])
         self.assertIn("Go to jobs list", response.content)
+
+    def test_gjf_reset_submit(self):
+        r = self.client.login(**SUPER_USER_LOGIN)
+        self.assertTrue(r)
+
+        base = os.path.join(settings.MEDIA_ROOT, "tests", "A_TON_A_A")
+        log_path = base + ".log"
+        with open(log_path, 'r') as log:
+            temp = {
+                "files": log,
+                "options": "gjfreset",
+                "gjf_submit": True,
+                "name": "{{ name }}",
+            }
+            data = dict(temp.items() + SUB_OPTIONS.items())
+            response = self.client.post(reverse(views.upload_data), data)
+            self.assertEqual(response.status_code, 200)
+            results = simplejson.loads(response.content)
+            self.assertIsNone(results["error"])
+            self.assertEqual(len(results["worked"]), 1)
+            self.assertEqual(len(results["failed"]), 0)
+
+    def test_gjf_reset_submit_td(self):
+        r = self.client.login(**SUPER_USER_LOGIN)
+        self.assertTrue(r)
+
+        base = os.path.join(settings.MEDIA_ROOT, "tests", "A_TON_A_A")
+        log_path = base + ".log"
+        with open(log_path, 'r') as log:
+            temp = {
+                "files": log,
+                "options": "gjfreset",
+                "td_reset": True,
+                "gjf_submit": True,
+                "name": "{{ name }}",
+            }
+            data = dict(temp.items() + SUB_OPTIONS.items())
+            response = self.client.post(reverse(views.upload_data), data)
+            self.assertEqual(response.status_code, 200)
+            results = simplejson.loads(response.content)
+            self.assertIsNone(results["error"])
+            self.assertEqual(len(results["worked"]), 1)
+            self.assertEqual(len(results["failed"]), 0)
+
+    def test_gjf_reset_submit_html(self):
+        r = self.client.login(**SUPER_USER_LOGIN)
+        self.assertTrue(r)
+
+        base = os.path.join(settings.MEDIA_ROOT, "tests", "A_TON_A_A")
+        log_path = base + ".log"
+        with open(log_path, 'r') as log:
+            temp = {
+                "files": log,
+                "options": "gjfreset",
+                "gjf_submit": True,
+                "html": True,
+                "name": "{{ name }}",
+            }
+            data = dict(temp.items() + SUB_OPTIONS.items())
+            response = self.client.post(reverse(views.upload_data), data)
+            self.assertEqual(response.status_code, 200)
+            results = simplejson.loads(response.content)
+            self.assertTrue(results["success"])
+            self.assertIn("Go to jobs list", response.content)
+
+
 
 
 class UtilsTestCase(TestCase):
