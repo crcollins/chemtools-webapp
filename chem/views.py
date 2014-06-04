@@ -13,7 +13,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.utils import simplejson
 from crispy_forms.utils import render_crispy_form
 
-from models import ErrorReport, ErrorReportForm, JobForm
+from models import ErrorReport, ErrorReportForm, JobForm, UploadForm
 from utils import get_multi_molecule_warnings, get_molecule_info
 from utils import run_standard_job, run_standard_jobs
 from utils import parse_file_list, find_sets, convert_logs
@@ -287,25 +287,22 @@ def upload_data(request):
         "gjfreset": reset_gjf,
     }
 
-    error = None
     if request.method == "POST":
-        if request.FILES.getlist('myfiles'):
-            try:
-                return switch[request.POST["option"]](request)
-            except ValueError as e:
-                error = str(e)
-        else:
-            error = "Please add some files."
+        upload_form = UploadForm(request.POST or None, files=request.FILES)
+        if upload_form.is_valid():
+            return switch[request.POST["options"]](request)
+    else:
+        upload_form = UploadForm()
     c = Context({
-        "error_message": error,
-        "form": JobForm.get_form(request, "{{ name }}", initial=True),
+        "upload_form": upload_form,
+        "job_form": JobForm.get_form(request, "{{ name }}", initial=True),
         })
     return render(request, "chem/upload_log.html", c)
 
 
 def parse_log(request):
     parser = fileparser.LogSet()
-    for f in parse_file_list(request.FILES.getlist('myfiles')):
+    for f in parse_file_list(request.FILES.getlist('files')):
         parser.parse_file(f)
 
     f = StringIO(parser.format_output())
@@ -314,17 +311,17 @@ def parse_log(request):
 
 
 def parse_data(request):
-    buff = StringIO()
-    zfile = zipfile.ZipFile(buff, 'w', zipfile.ZIP_DEFLATED)
-    files = list(parse_file_list(request.FILES.getlist('myfiles')))
-
+    files = list(parse_file_list(request.FILES.getlist('files')))
     logsets, files = find_sets(files)
+
     files.extend(convert_logs(logsets))
 
     num = len(files)
     if not num:
         raise ValueError("There are no data files to parse.")
 
+    buff = StringIO()
+    zfile = zipfile.ZipFile(buff, 'w', zipfile.ZIP_DEFLATED)
     for f in files:
         parser = dataparser.DataParser(f)
         homolumo, gap = parser.get_graphs()
@@ -353,16 +350,21 @@ def parse_data(request):
 
 
 def reset_gjf(request):
-    form = JobForm.get_form(request, "{{ name }}")
+    job_form = JobForm.get_form(request, "{{ name }}")
+    upload_form = UploadForm(request.POST, files=request.FILES)
+
+    # this should be fine because it already passed the first layer
+    upload_form.is_valid()
+
     errors = []
     strings = []
     names = []
-    for f in parse_file_list(request.FILES.getlist('myfiles')):
+    for f in parse_file_list(request.FILES.getlist('files')):
         parser = fileparser.Log(f)
 
         name, _ = os.path.splitext(f.name)
         td = False
-        if request.REQUEST.get("reset_td"):
+        if request.REQUEST.get("td_reset"):
             name += '_TD'
             td = True
         try:
@@ -371,35 +373,40 @@ def reset_gjf(request):
         except Exception as e:
             errors.append((f.name, e))
 
-    if request.REQUEST.get("submit"):
-        if not form.is_valid(request.method):
+    if request.REQUEST.get("gjf_submit"):
+        if not job_form.is_valid(request.method):
             if request.is_ajax():
-                form_html = render_crispy_form(form,
+                upload_form_html = render_crispy_form(upload_form,
                                             context=RequestContext(request))
-                a = {"success": False, "form_html": form_html}
+                job_form_html = render_crispy_form(job_form,
+                                            context=RequestContext(request))
+                a = {
+                    "success": False,
+                    "job_form_html": job_form_html,
+                    "upload_form_html": upload_form_html,
+                }
                 return HttpResponse(simplejson.dumps(a),
                                     mimetype="application/json")
             c = Context({
-                "form": form,
+                "job_form": job_form,
+                "upload_form": upload_form,
                 })
             return render(request, "chem/upload_log.html", c)
 
-        d = dict(form.cleaned_data)
-        if request.method == "POST":
-            cred = d.pop("credential")
-            d["keywords"] = request.REQUEST.get("keywords", None)
-            files = request.FILES.getlist("files")
-            a = cluster.interface.run_jobs(cred, names, strings, **d)
-            a["failed"].extend(errors)
-            do_html = request.REQUEST.get("html", False)
-            if do_html:
-                html = render_to_string("chem/multi_submit.html", a)
-                temp = {"success": True, "html": html}
-                return HttpResponse(simplejson.dumps(temp),
-                                    mimetype="application/json")
-            else:
-                return HttpResponse(simplejson.dumps(a),
-                                    mimetype="application/json")
+        d = dict(job_form.cleaned_data)
+        cred = d.pop("credential")
+        d["keywords"] = request.REQUEST.get("keywords", None)
+        a = cluster.interface.run_jobs(cred, names, strings, **d)
+        a["failed"].extend(errors)
+        do_html = request.REQUEST.get("html", False)
+        if do_html:
+            html = render_to_string("chem/multi_submit.html", a)
+            temp = {"success": True, "html": html}
+            return HttpResponse(simplejson.dumps(temp),
+                                mimetype="application/json")
+        else:
+            return HttpResponse(simplejson.dumps(a),
+                                mimetype="application/json")
 
     buff = StringIO()
     zfile = zipfile.ZipFile(buff, 'w', zipfile.ZIP_DEFLATED)

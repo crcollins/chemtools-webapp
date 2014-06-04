@@ -2,6 +2,9 @@ import re
 
 from django.db import models
 from django import forms
+from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Layout
+
 
 from data.models import JobTemplate
 from cluster.models import Credential
@@ -68,6 +71,26 @@ class MultiFileField(forms.FileField):
         for uploaded_file in data:
             if uploaded_file.size > self.maximum_file_size and self.maximum_file_size:
                 raise forms.ValidationError(self.error_messages['file_size'] % { 'uploaded_file_name': uploaded_file.name})
+
+class UploadForm(forms.Form):
+    CHOICES = (
+                ("logparse", "Log Parse"),
+                ("dataparse", 'Data Parse'),
+                ("gjfreset", 'Gjf Reset')
+            )
+    files = MultiFileField()
+    options = forms.ChoiceField(widget=forms.RadioSelect, choices=CHOICES)
+    td_reset = forms.BooleanField(required=False, label="TD Reset")
+    gjf_submit = forms.BooleanField(required=False,  label="GJF Submit")
+
+    helper = FormHelper()
+    helper.form_class = 'form-horizontal'
+    helper.layout = Layout(
+        'files',
+        'options',
+        'td_reset'
+        'gjf_submit',
+    )
 
 class JobForm(forms.Form):
     name = forms.CharField(max_length=400)

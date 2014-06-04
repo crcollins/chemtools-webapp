@@ -9,15 +9,11 @@
 
 $(function() {
     function post_func() {
-        if (!$("#id_gjf_submit").is(':checked') || !$("#id_gjf_reset").is(':checked')) {
+        if (!$("#id_gjf_submit").is(':checked') || !$("#id_td_reset").is(':checked')) {
             $("#id_form").submit();
         }
         event.preventDefault();
         var a = new FormData($("#id_form")[0]);
-        var files = $("input[name='myfiles']").prop('files');
-        for(var x=0;x<files.length;x++) {
-            a.append("files", files[x]);
-        }
         a.append("html", true);
 
         // ajax call is used because of processData and contentType
@@ -33,7 +29,8 @@ $(function() {
                     dialog.html(data.html);
                     $('#resultsModal').modal();
                 } else {
-                    $("#id_form_input").html(data.form_html);
+                    $("#id_upload_form").html(data.upload_form_html);
+                    $("#id_job_form").html(data.job_form_html);
                     var temp = $("div.has-error").get(0);
                     if (temp !== undefined) {
                         temp.scrollIntoView();
@@ -44,24 +41,24 @@ $(function() {
     }
     $("#id_submit").click(post_func);
 
-    $("input[name='option']").change(function () {
-        if (!$("#id_gjf_reset").is(':checked')) {
+    $("input[name='options']").change(function () {
+        if (!$("input[value='gjfreset']").is(':checked')) {
             if ($("#id_gjf_submit").is(':checked')) {
                 $("#id_gjf_submit").trigger('click');
             }
-            if ($("#id_gjf_reset_td").is(':checked')) {
-                $("#id_gjf_reset_td").trigger('click');
+            if ($("#id_td_reset").is(':checked')) {
+                $("#id_td_reset").trigger('click');
             }
         }
     });
-    $("#id_gjf_reset_td").change(function () {
+    $("#id_td_reset").change(function () {
         if ($(this).is(':checked')) {
-            $("#id_gjf_reset").prop('checked', true);
+            $("input[value='gjfreset']").prop('checked', true);
         }
     });
     $("#id_gjf_submit").change(function () {
         if ($(this).is(':checked')) {
-            $("#id_gjf_reset").prop('checked', true);
+            $("input[value='gjfreset']").prop('checked', true);
             $("#details").collapse('show');
         } else {
             $("#details").collapse('hide');
@@ -73,32 +70,14 @@ $(function() {
 {% endblock %}
 
 {% block content %}
-    {% if error_message %}
-        <div class="alert alert-danger">{{ error_message }}</div>
-    {% endif %}
-    <form enctype="multipart/form-data" id="id_form" role="form" action="." method="post">
+    <form multiple enctype="multipart/form-data" id="id_form" role="form" action="." method="post">
         {% csrf_token %}
-        <input type="file" name="myfiles" multiple />
-        <div class="radio">
-            <input type="radio" name="option" id="id_log" value="logparse" checked />
-            <label for="id_log">Log Parse</label>
-        </div>
-        <div class="radio">
-            <input type="radio" name="option" id="id_data" value="dataparse" />
-            <label for="id_data">Data Parse</label>
-        </div>
-        <div class="radio">
-                <input type="radio" name="option" id="id_gjf_reset" value="gjfreset" />
-                <label for="id_gjf_reset">Gjf Reset</label>
-
-                <input type="checkbox" id="id_gjf_reset_td" name="reset_td" />
-                <label for="id_gjf_reset_td">Reset as TD?</label>
-                <input type="checkbox" id="id_gjf_submit" name="submit" />
-                <label for="id_gjf_submit">Submit?</label>
+        <div id="id_upload_form">
+            {{ upload_form|crispy }}
         </div>
         <div id="details" class="{% if form.errors %}in{% else %}collapse{% endif %}">
-            <div id="id_form_input">
-                {{ form|crispy }}
+            <div id="id_job_form">
+                {{ job_form|crispy }}
             </div>
         </div>
         <input class="btn btn-primary" id="id_submit" type="submit" value="Upload!" />

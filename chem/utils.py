@@ -161,8 +161,6 @@ def run_standard_jobs(credential, string, **kwargs):
     return results
 
 
-
-
 def parse_file_list(files):
     for f in files:
         if f.name.endswith(".zip"):
