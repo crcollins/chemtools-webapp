@@ -162,7 +162,7 @@ def get_second_layer(X, homo, lumo, gap, clfs, in_pred_clfs=None):
 
 def save_clfs(clfs, pred_clfs):
     print "Saving clfs"
-    path = path = os.path.join(DATAPATH, "decay_predictors.pkl")
+    path = os.path.join(DATAPATH, "decay_predictors.pkl")
     dst_path = os.path.join(DATAPATH, "decay_predictors_%d.pkl" % time.time())
     try:
         shutil.move(path, dst_path)
