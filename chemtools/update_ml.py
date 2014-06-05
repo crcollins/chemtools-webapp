@@ -100,9 +100,14 @@ class OptimizedCLF(object):
         if itemparams:
             bounds = ((1e-8, None), ) * len(self.params.keys())
             results = scipy.optimize.fmin_l_bfgs_b(
-                self, self.params.values(),
+                self,
+                self.params.values(),
                 bounds=bounds,
-                approx_grad=True, epsilon=1e-3)
+                approx_grad=True,
+                epsilon=0.1,
+                maxiter=15,
+                maxfun=30,
+                )
             itemvalues = results[0].tolist()
         keys = listparams.keys() + itemparams.keys()
         values = listvalues + itemvalues
