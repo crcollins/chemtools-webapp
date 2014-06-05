@@ -1,5 +1,6 @@
 import numpy
 import ast
+import cPickle
 
 from django.db import models
 from django.template import Template, Context
@@ -42,6 +43,21 @@ class DataPoint(models.Model):
             vectors.append(ast.literal_eval(x.decay_feature))
         FEATURE = numpy.matrix(vectors)
         return FEATURE, HOMO, LUMO, GAP
+
+
+class Predictor(models.Model):
+    created = models.DateTimeField(auto_now_add=True)
+    pickle = models.FileField(upload_to="predictors")
+    homo_error = models.FloatField()
+    lumo_error = models.FloatField()
+    gap_error = models.FloatField()
+
+    class Meta:
+        get_latest_by = "created"
+
+    def get_predictors(self):
+        clfs, pred_clfs = cPickle.load(self.pickle)
+        return clfs, pred_clfs
 
 
 class JobTemplate(models.Model):
