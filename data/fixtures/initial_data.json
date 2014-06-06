@@ -54,5 +54,16 @@
             "name": "Localhost",
             "template": "job_templates\/ljob.txt"
         }
+    },
+    {
+        "pk": 1,
+        "model": "data.predictor",
+        "fields": {
+            "lumo_error": 0.08798041865127021,
+            "homo_error": 0.09533302140558235,
+            "gap_error": 0.12166433143849145,
+            "pickle": "predictors/decay_predictors.pkl",
+            "created": "2014-06-05T02:23:58.719Z"
+        }
     }
 ]
