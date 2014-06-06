@@ -3,12 +3,9 @@ import math
 from numpy.linalg import norm
 import numpy
 
-from constants import CORE_COMBO, \
-                    ARYL, ARYL2, XGROUPS, RGROUPS, NEEDSPACE, \
-                    HOMO_CLF, LUMO_CLF, GAP_CLF, \
-                    PRED_GAP_CLF, PRED_HOMO_CLF, PRED_LUMO_CLF
-
+from constants import CORE_COMBO, ARYL, ARYL2, XGROUPS, RGROUPS, NEEDSPACE
 from gjfwriter import Molecule, read_data
+from data.models import Predictor
 
 
 def get_core_features(core):
@@ -256,15 +253,15 @@ def get_name_from_weighted_naive_feature_vector(vector, limit=4):
     return '_'.join([sides[0], core, sides[1], sides[2], extra])
 
 
-def get_properties_from_decay_vector(feature):
-    homo = HOMO_CLF.predict(feature)
-    lumo = LUMO_CLF.predict(feature)
-    gap = GAP_CLF.predict(feature)
-    return homo[0], lumo[0], gap[0]
-
-
 def get_properties_from_decay_with_predictions(feature):
-    homo, lumo, gap = get_properties_from_decay_vector(feature)
+    pred = Predictor.objects.latest()
+    clfs, pred_clfs = pred.get_predictors()
+    (HOMO_CLF, LUMO_CLF, GAP_CLF) = clfs
+    (PRED_HOMO_CLF, PRED_LUMO_CLF, PRED_GAP_CLF) = pred_clfs
+
+    homo = HOMO_CLF.predict(feature)[0]
+    lumo = LUMO_CLF.predict(feature)[0]
+    gap = GAP_CLF.predict(feature)[0]
 
     feature_gap = numpy.concatenate([feature, [homo, lumo]])
     feature_homo = numpy.concatenate([feature, [lumo, gap]])

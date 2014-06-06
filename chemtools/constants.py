@@ -1,9 +1,6 @@
 from itertools import product
 import string
-import cPickle
 import os
-
-import numpy
 
 
 folder, _ = os.path.split(__file__)
@@ -40,10 +37,3 @@ COLORS = {
     'H': (220, 220, 220),
     'Si': (128, 170, 128),
 }
-
-with open(os.path.join(DATAPATH, "decay_predictors.pkl"), "rb") as f:
-    clfs, pred_clfs = cPickle.load(f)
-
-HOMO_CLF, LUMO_CLF, GAP_CLF = clfs
-PRED_HOMO_CLF, PRED_LUMO_CLF, PRED_GAP_CLF = pred_clfs
-
