@@ -56,8 +56,13 @@ class Predictor(models.Model):
         get_latest_by = "created"
 
     def get_predictors(self):
-        clfs, pred_clfs = cPickle.load(self.pickle)
-        return clfs, pred_clfs
+        try:
+            return self.clfs, self.pred_clfs
+        except AttributeError:
+            clfs, pred_clfs = cPickle.load(self.pickle)
+            self.clfs = clfs
+            self.pred_clfs = pred_clfs
+            return clfs, pred_clfs
 
 
 class JobTemplate(models.Model):
