@@ -444,6 +444,8 @@ if __name__ == "__main__":
             self.files = self.check_input_files(args.files
                                 + self.convert_files(args.listfiles)
                                 + self.convert_folders(args.folders))
+            if args.logs:
+                self.files = [x for x in self.files if x.endswith(".log")]
             self.output_gjf = args.gjf | args.td
             self.td = args.td
 
@@ -530,6 +532,8 @@ if __name__ == "__main__":
                         help='Toggles writing gjf file from log.')
     parser.add_argument('-T', action="store_true", dest="td", default=False,
                         help='Toggles writing TD gjf file from log.')
+    parser.add_argument('-L', action="store_true", dest="logs", default=False,
+                        help='Toggles only parsing .log files.')
 
     if len(sys.argv) > 1:
         args = sys.argv[1:]
