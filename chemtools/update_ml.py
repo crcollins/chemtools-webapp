@@ -1,11 +1,8 @@
 import os
 import itertools
 import cPickle
-import datetime
-import pytz
-import shutil
-import time
 
+from django.core.files import File
 import numpy
 import scipy.optimize
 from sklearn import svm
@@ -13,7 +10,8 @@ from sklearn import cross_validation
 from sklearn.metrics import mean_absolute_error
 
 from constants import DATAPATH
-from data.models import DataPoint
+from data.models import DataPoint, Predictor
+from project.utils import StringIO
 
 
 def lock(func):
@@ -167,49 +165,34 @@ def get_second_layer(X, homo, lumo, gap, clfs, in_pred_clfs=None):
 
 def save_clfs(clfs, pred_clfs):
     print "Saving clfs"
-    path = os.path.join(DATAPATH, "decay_predictors.pkl")
-    dst_path = os.path.join(DATAPATH, "decay_predictors_%d.pkl" % time.time())
-    try:
-        shutil.move(path, dst_path)
-    except:
-        pass
-    with open(path, 'w') as f:
+
+    with StringIO(name="decay_predictors.pkl") as f:
         cPickle.dump((clfs, pred_clfs), f, protocol=-1)
+        f.seek(0)
 
-
-def load_clfs():
-    print "Loading clfs"
-    clfs = []
-    pred_clfs = []
-    path = os.path.join(DATAPATH, "decay_predictors.pkl")
-    try:
-        with open(path, 'rb') as f:
-            clfs, pred_clfs = cPickle.load(f)
-    except (OSError, IOError):
-        pass
-
-    if len(clfs) < 3 or len(pred_clfs) < 3:
-        clfs = None
-        pred_clfs = None
-    return clfs, pred_clfs
+        homo, lumo, gap = pred_clfs
+        pred = Predictor(
+                homo_error=homo.test_error[0],
+                lumo_error=lumo.test_error[0],
+                gap_error=gap.test_error[0],
+                pickle=File(f),
+                )
+        pred.save()
 
 
 @lock
 def run_all():
-    FEATURE, HOMO, LUMO, GAP = DataPoint.get_all_data()
-    latest = DataPoint.objects.latest()
-    path = os.path.join(DATAPATH, "decay_predictors.pkl")
-    try:
-        mtime = os.path.getmtime(path)
-        temp = datetime.datetime.fromtimestamp(mtime)
-        last_update = pytz.utc.localize(temp)
-        if latest.created < last_update:
-            print "No Update"
-            return
-    except (OSError, IOError):
-        pass
 
-    in_clfs, in_pred_clfs = load_clfs()
+    pred = Predictor.objects.latest()
+    latest = DataPoint.objects.latest()
+
+    if latest.created < pred.created:
+        print "No Update"
+        return
+
+    print "Loading Data"
+    FEATURE, HOMO, LUMO, GAP = DataPoint.get_all_data()
+    in_clfs, in_pred_clfs = pred.get_predictors()
     clfs = get_first_layer(FEATURE, HOMO, LUMO, GAP, in_clfs)
     pred_clfs = get_second_layer(FEATURE, HOMO, LUMO, GAP, clfs, in_pred_clfs)
     save_clfs(clfs, pred_clfs)
