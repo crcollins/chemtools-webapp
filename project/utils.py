@@ -14,6 +14,14 @@ class StringIO(object):
         self.s = cStringIO.StringIO(*args)
         self.name = kwargs.get("name", '')
 
+    @property
+    def size(self):
+        current = self.tell()
+        self.seek(0, os.SEEK_END)
+        value = self.tell()
+        self.seek(current)
+        return value
+
     def __getattr__(self, key):
         return getattr(self.s, key)
 
