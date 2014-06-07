@@ -152,3 +152,34 @@ def get_specific_jobs(credential, jobids):
             pair = (job, running_jobs[running_jobids.index(job)])
             results["worked"].append(pair)
     return results
+
+
+def get_log_data(credential):
+    results = {
+        "results": None,
+        "error": None,
+    }
+    try:
+        results["cluster"] = credential.cluster.name
+        ssh = credential.get_ssh_connection()
+        sftp = credential.get_sftp_connection()
+    except:
+        results["error"] = "Invalid credential"
+        results["cluster"] = None
+        return results
+
+    with ssh, sftp:
+        with sftp.open("chemtools/fileparser.py", 'w') as f:
+            with open("chemtools/fileparser.py", 'r') as f2:
+                f.write(f2.read())
+
+        command = "python chemtools/fileparser.py -L -f chemtools/done"
+        _, stdout, stderr = ssh.exec_command(command)
+
+        err = stderr.read()
+        if err:
+            results["error"] = err
+            return results
+
+        results["results"] = stdout.read()
+    return results
