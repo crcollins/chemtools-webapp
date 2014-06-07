@@ -177,6 +177,15 @@ def get_log_data(credential):
         _, stdout, stderr = ssh.exec_command(command)
 
         err = stderr.read()
+        if "No module named argparse" in err:
+            print "err"
+            import argparse
+            with sftp.open("chemtools/argparse.py", 'w') as f:
+                with open(argparse.__file__.rstrip('c'), 'r') as f2:
+                    f.write(f2.read())
+            _, stdout, stderr = ssh.exec_command(command)
+            err = stderr.read()
+
         if err:
             results["error"] = err
             return results
