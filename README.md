@@ -18,7 +18,7 @@ This setup assumes you are on a machine with the apt package manager.
 To remove chemtools, run the following commands.
 
     $ cd chemtools-webapp
-    $ souce install remove
+    $ souce install.sh remove
 
 
 Test
