@@ -4,7 +4,7 @@ import threading
 
 from models import Job
 from utils import get_ssh_connection_obj, get_sftp_connection_obj, _run_job, \
-                _get_jobs
+                _get_jobs, add_fileparser
 
 
 def run_job(credential, gjfstring, jobstring=None, **kwargs):
@@ -169,22 +169,13 @@ def get_log_data(credential):
         return results
 
     with ssh, sftp:
-        with sftp.open("chemtools/fileparser.py", 'w') as f:
-            with open("chemtools/fileparser.py", 'r') as f2:
-                f.write(f2.read())
+        err = add_fileparser(ssh, sftp)
+        if err:
+            results["error"] = err
+            return results
 
         command = "python chemtools/fileparser.py -L -f chemtools/done"
         _, stdout, stderr = ssh.exec_command(command)
-
-        err = stderr.read()
-        if "No module named argparse" in err:
-            print "err"
-            import argparse
-            with sftp.open("chemtools/argparse.py", 'w') as f:
-                with open(argparse.__file__.rstrip('c'), 'r') as f2:
-                    f.write(f2.read())
-            _, stdout, stderr = ssh.exec_command(command)
-            err = stderr.read()
 
         if err:
             results["error"] = err

@@ -61,6 +61,27 @@ def _make_folders(ssh):
     return None
 
 
+def add_fileparser(ssh, sftp):
+    with sftp.open("chemtools/fileparser.py", 'w') as f:
+        with open("chemtools/fileparser.py", 'r') as f2:
+            f.write(f2.read())
+
+    command = "python chemtools/fileparser.py"
+    _, stdout, stderr = ssh.exec_command(command)
+
+    err = stderr.read()
+    if "No module named argparse" in err:
+        import argparse
+        with sftp.open("chemtools/argparse.py", 'w') as f:
+            with open(argparse.__file__.rstrip('c'), 'r') as f2:
+                f.write(f2.read())
+        _, stdout, stderr = ssh.exec_command(command)
+        err = stderr.read()
+        if err:
+            return err
+    return None
+
+
 def _run_job(ssh, sftp, gjfstring, jobstring=None, **kwargs):
     try:
         error = _make_folders(ssh)
