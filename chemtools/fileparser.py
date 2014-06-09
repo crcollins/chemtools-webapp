@@ -43,6 +43,8 @@ class Output(object):
 
 class Log(object):
     PARSERS = dict()
+    order = ["ExactName", "Features", "Options", "HOMO", "LUMO",
+            "HomoOrbital", "Dipole", "Energy", "BandGap", "Time"]
 
     def __init__(self, f, fname=None):
         if not hasattr(f, "read"):  # filename
@@ -62,9 +64,6 @@ class Log(object):
             self.parsers = dict()
             for k, v in Log.PARSERS.items():
                 self.parsers[k] = v(self)
-
-            self.order = ["ExactName", "Features", "Options", "HOMO", "LUMO",
-                        "HomoOrbital", "Dipole", "Energy", "BandGap", "Time"]
 
             for i, line in enumerate(f):
                 for k, parser in self.parsers.items():
@@ -107,9 +106,10 @@ class Log(object):
 
         return ','.join([self.fname, self.name] + values)
 
-    def format_header(self):
+    @classmethod
+    def format_header(cls):
         nonparsed = ["Filename", "Name"]
-        return ','.join(nonparsed + self.order)
+        return ','.join(nonparsed + cls.order)
 
 
 class LogSet(Output):
