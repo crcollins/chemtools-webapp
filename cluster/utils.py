@@ -66,7 +66,7 @@ def add_fileparser(ssh, sftp):
         with open("chemtools/fileparser.py", 'r') as f2:
             f.write(f2.read())
 
-    command = "python chemtools/fileparser.py"
+    command = "python chemtools/fileparser.py -"
     _, stdout, stderr = ssh.exec_command(command)
 
     err = stderr.read()
