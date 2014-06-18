@@ -4,7 +4,7 @@ import copy
 import numpy
 from PIL import Image, ImageDraw
 
-from constants import COLORS
+from constants import COLORS, CONNECTIONS
 
 
 class Atom(object):
@@ -61,11 +61,11 @@ class Bond(object):
 
     def connection(self):
         '''Returns the connection type of the bond for merging.'''
-        if self.atoms[0].element[0] in "~*+":
+        if self.atoms[0].element[0] in CONNECTIONS:
             b = self.atoms[0].element[:2]
         else:
             b = self.atoms[1].element[:2]
-        return ''.join([x for x in b if x in "~*+"])
+        return ''.join([x for x in b if x in CONNECTIONS])
 
     def remove(self):
         '''Disconnects removes this bond from its atoms.'''
@@ -197,7 +197,7 @@ class Molecule(object):
     ######################################################################
     ######################################################################
 
-    def open_ends(self, types="+*~"):
+    def open_ends(self, types=CONNECTIONS):
         '''Returns a list of any bonds that contain non-standard elements.'''
         openbonds = []
         for x in self.bonds:
@@ -205,7 +205,7 @@ class Molecule(object):
                 openbonds.append(x)
         return openbonds
 
-    def next_open(self, conn="~*+"):
+    def next_open(self, conn=CONNECTIONS):
         '''Returns the next open bond of the given connection type.'''
         #scans for the first available bond in order of importance.
         bonds = self.open_ends()
@@ -226,7 +226,7 @@ class Molecule(object):
     def close_ends(self):
         '''Converts any non-standard atoms into Hydrogens.'''
         for atom in self.atoms:
-            if atom.element[0] in "~*+":
+            if atom.element[0] in CONNECTIONS:
                 atom.element = "H"
 
     def draw(self, scale):
@@ -275,15 +275,15 @@ class Molecule(object):
         '''Merges two bonds. Bond1 is the bond being bonded to.'''
         #bond1 <= (bond2 from frag)
         #find the part to change
-        if bond1.atoms[0].element[0] in "~*+":
+        if bond1.atoms[0].element[0] in CONNECTIONS:
             R1, C1 = bond1.atoms
-        elif bond1.atoms[1].element[0] in "~*+":
+        elif bond1.atoms[1].element[0] in CONNECTIONS:
             C1, R1 = bond1.atoms
         else:
             raise Exception(5, "bad bond")
-        if bond2.atoms[0].element[0] in "~*+":
+        if bond2.atoms[0].element[0] in CONNECTIONS:
             R2, C2 = bond2.atoms
-        elif bond2.atoms[1].element[0] in "~*+":
+        elif bond2.atoms[1].element[0] in CONNECTIONS:
             C2, R2 = bond2.atoms
         else:
             raise Exception(6, "bad bond")
@@ -303,7 +303,7 @@ class Molecule(object):
         rot = self.get_full_rotation_matrix(vec2, -diff[0, 0], -diff[0, 1])
         frag.rotate_3d(rot, R2xyz, C1xyz)
 
-        if bond1.atoms[0].element[0] in "~*+":
+        if bond1.atoms[0].element[0] in CONNECTIONS:
             bond1.atoms = (C2, C1)
         else:
             bond1.atoms = (C1, C2)
