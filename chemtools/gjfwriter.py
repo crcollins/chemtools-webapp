@@ -1,5 +1,4 @@
 import structure
-# from structure import from_data as read_data
 from constants import KEYWORDS
 from project.utils import StringIO
 
