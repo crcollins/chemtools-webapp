@@ -248,7 +248,7 @@ def write_gjf(request, molecule):
     keywords = request.REQUEST.get("keywords")
     add = "" if request.REQUEST.get("view") else "attachment; "
 
-    out = gjfwriter.GJFWriter(molecule, keywords=keywords)
+    out = gjfwriter.Benzobisazole(molecule, keywords=keywords)
     f = StringIO(out.get_gjf())
     response = HttpResponse(FileWrapper(f), content_type="text/plain")
     response['Content-Disposition'] = add + 'filename=%s.gjf' % molecule
@@ -258,7 +258,7 @@ def write_gjf(request, molecule):
 def write_mol2(request, molecule):
     add = "" if request.REQUEST.get("view") else "attachment; "
 
-    out = gjfwriter.GJFWriter(molecule)
+    out = gjfwriter.Benzobisazole(molecule)
     f = StringIO(out.get_mol2())
     response = HttpResponse(FileWrapper(f), content_type="text/plain")
     response['Content-Disposition'] = add + 'filename=%s.mol2' % molecule
@@ -268,7 +268,7 @@ def write_mol2(request, molecule):
 def write_png(request, molecule):
     scale = request.REQUEST.get("scale", 10)
 
-    out = gjfwriter.GJFWriter(molecule)
+    out = gjfwriter.Benzobisazole(molecule)
     response = HttpResponse(out.get_png(int(scale)), content_type="image/png")
     response['Content-Disposition'] = 'filename=%s.png' % molecule
     return response

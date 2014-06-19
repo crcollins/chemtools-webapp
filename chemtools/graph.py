@@ -313,7 +313,7 @@ def identify_single_ring(ring):
 
 def run_name(name):
     from chemtools import gjfwriter
-    mol = gjfwriter.GJFWriter(name).structure
+    mol = gjfwriter.Benzobisazole(name).structure
     links, tree = breadth_first_search(mol)
 
     cycles, link_nodes = get_cycles(links, tree)

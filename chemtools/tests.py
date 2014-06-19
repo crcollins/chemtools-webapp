@@ -19,7 +19,7 @@ import graph
 from project.utils import StringIO
 
 
-class GJFWriterTestCase(TestCase):
+class BenzobisazoleTestCase(TestCase):
     templates = [
         "{0}_TON",
         "CON_{0}",
@@ -49,12 +49,12 @@ class GJFWriterTestCase(TestCase):
 
     def test_cores(self):
         for core in self.cores:
-            gjfwriter.GJFWriter(core)
+            gjfwriter.Benzobisazole(core)
 
     def test_invalid_cores(self):
         for core in self.invalid_cores:
             try:
-                gjfwriter.GJFWriter(core)
+                gjfwriter.Benzobisazole(core)
                 self.fail(core)
             except:
                 pass
@@ -66,7 +66,7 @@ class GJFWriterTestCase(TestCase):
         ]
         for template, group in product(*sets):
             name = template.format(group)
-            gjfwriter.GJFWriter(name)
+            gjfwriter.Benzobisazole(name)
 
     def test_invalid_sides(self):
         sets = [
@@ -76,7 +76,7 @@ class GJFWriterTestCase(TestCase):
         for template, group in product(*sets):
             name = template.format(group)
             try:
-                gjfwriter.GJFWriter(name)
+                gjfwriter.Benzobisazole(name)
                 if group != "TON" and name != "CON_BB":
                     self.fail(name)
             except Exception:
@@ -90,7 +90,7 @@ class GJFWriterTestCase(TestCase):
         ]
         for template, group, option in product(*sets):
             name = template.format(group) + option
-            gjfwriter.GJFWriter(name)
+            gjfwriter.Benzobisazole(name)
 
     def test_invalid_polymer(self):
         sets = [
@@ -101,7 +101,7 @@ class GJFWriterTestCase(TestCase):
         for template, group, option in product(*sets):
             name = template.format(group) + option
             try:
-                gjfwriter.GJFWriter(name)
+                gjfwriter.Benzobisazole(name)
                 self.fail(name)
             except Exception:
                 pass
@@ -114,7 +114,7 @@ class GJFWriterTestCase(TestCase):
         ]
         for group, axis, num  in product(*sets):
             name = self.templates[0].format(group) + '_' + axis + num
-            gjfwriter.GJFWriter(name)
+            gjfwriter.Benzobisazole(name)
 
     def test_multi_axis_expand(self):
         sets = [
@@ -125,7 +125,7 @@ class GJFWriterTestCase(TestCase):
         ]
         for group, x, y, z in product(*sets):
             name = self.templates[0].format(group) + x + z + z
-            gjfwriter.GJFWriter(name)
+            gjfwriter.Benzobisazole(name)
 
     def test_manual_polymer(self):
         sets = [
@@ -135,7 +135,7 @@ class GJFWriterTestCase(TestCase):
         ]
         for template, group, num in product(*sets):
             name = '_'.join([template.format(group)] * num)
-            gjfwriter.GJFWriter(name)
+            gjfwriter.Benzobisazole(name)
 
     def test_invalid_manual_polymer(self):
         sets = [
@@ -146,7 +146,7 @@ class GJFWriterTestCase(TestCase):
         for template, group, num in product(*sets):
             name = '_'.join([template.format(group)] * num)
             try:
-                gjfwriter.GJFWriter(name)
+                gjfwriter.Benzobisazole(name)
                 if "__" in name:
                     continue
                 if any(x.endswith("B") for x in name.split("_TON_")):
@@ -173,7 +173,7 @@ class GJFWriterTestCase(TestCase):
             '5_TON_n13',
         ]
         for name in names:
-            gjfwriter.GJFWriter(name)
+            gjfwriter.Benzobisazole(name)
 
     def test_spot_check_invalid(self):
         pairs = [
@@ -190,7 +190,7 @@ class GJFWriterTestCase(TestCase):
         ]
         for name, message in pairs:
             try:
-                gjfwriter.GJFWriter(name)
+                gjfwriter.Benzobisazole(name)
                 self.fail((name, message))
             except Exception as e:
                 self.assertEqual(message, str(e))
@@ -202,7 +202,7 @@ class GJFWriterTestCase(TestCase):
         ]
         for template, group in product(*sets):
             name = template.format(group)
-            obj = gjfwriter.GJFWriter(name)
+            obj = gjfwriter.Benzobisazole(name)
             obj.get_png()
 
     def test_gjf(self):
@@ -212,7 +212,7 @@ class GJFWriterTestCase(TestCase):
         ]
         for template, group in product(*sets):
             name = template.format(group)
-            obj = gjfwriter.GJFWriter(name)
+            obj = gjfwriter.Benzobisazole(name)
             obj.get_gjf()
 
     def test_mol2(self):
@@ -222,7 +222,7 @@ class GJFWriterTestCase(TestCase):
         ]
         for template, group in product(*sets):
             name = template.format(group)
-            obj = gjfwriter.GJFWriter(name)
+            obj = gjfwriter.Benzobisazole(name)
             obj.get_mol2()
 
 

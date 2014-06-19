@@ -56,5 +56,3 @@ class Benzobisazole(Molecule):
     def __init__(self, name, **kwargs):
         super(Benzobisazole, self).__init__(name, **kwargs)
         self.structure = structure.from_name(name)
-
-GJFWriter = Benzobisazole
