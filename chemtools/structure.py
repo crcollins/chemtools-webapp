@@ -136,19 +136,19 @@ def from_name(name):
         temp = _concatenate_fragments(core[0], fragments)
         structures.append((temp, ends))
 
-    a, final_ends = structures[0][0].chain(structures)
+    structure, final_ends = structures[0][0].chain(structures)
 
     #multiplication of molecule/chain
     horizontal_ends = final_ends[2:]
-    a, _ = a.polymerize(horizontal_ends, nm[0])
+    structure = structure.polymerize(horizontal_ends, nm[0])
     vertical_ends = final_ends[:2]
-    a, _ = a.polymerize(vertical_ends, nm[1])
+    structure = structure.polymerize(vertical_ends, nm[1])
 
     if any(xyz):
-        a = a.stack(*xyz)
+        structure = structure.stack(*xyz)
 
-    a.close_ends()
-    return a
+    structure.close_ends()
+    return structure
 
 
 class Atom(object):
@@ -394,7 +394,6 @@ class Structure(object):
     def next_open(self, connections=CONNECTIONS):
         '''Returns the next open bond of the given connection type.'''
         # scans for the first available bond in order of importance.
-        # !!
         bonds = self.open_ends()
         for conn in connections:
             for bond in bonds:
@@ -467,7 +466,6 @@ class Structure(object):
 
     def polymerize(self, ends, n):
         '''Returns an n length chain of the structure.'''
-        # !!
         if n <= 1 or not all(ends):
             return self, ends
 
@@ -477,9 +475,8 @@ class Structure(object):
             struct = copy.deepcopy(self)
             newends = [struct.bonds[x] for x in idxs]
             # newends twice to keep on single axis
-            # ?
             structures.append((struct, newends * 2))
-        return self.chain(structures)
+        return self.chain(structures)[0]
 
     def stack(self, x, y, z):
         '''Returns a structure with x,y,z stacking.'''
