@@ -63,8 +63,8 @@ class Tree(object):
 
 
 
-def breadth_first_search(molecule):
-    point = molecule.atoms[0]
+def breadth_first_search(structure):
+    point = structure.atoms[0]
     tree = Tree(point)
     visited = [tree.value]
     points = tree.search()
@@ -81,7 +81,7 @@ def breadth_first_search(molecule):
     return links, tree
 
 
-def graph_distance(molecule, start, end):
+def graph_distance(structure, start, end):
     point = start
     tree = Tree(point)
     visited = {tree.value: 0}
@@ -135,10 +135,10 @@ def prune_cycles(cycles, link_nodes):
     return final
 
 
-def get_noncycles(molecule, cycles):
+def get_noncycles(structure, cycles):
     cycle_set = set(sum([[y.value for y in x] for x in cycles], []))
     noncycles = {}
-    for atom in molecule.atoms:
+    for atom in structure.atoms:
         if atom not in cycle_set:
             noncycles[atom] = []
         for bond in atom.bonds:
@@ -225,13 +225,13 @@ def sort_fused_cycles(cycles):
     return sorted_cycles
 
 
-def identify_cycle_types(molecule, cycles):
+def identify_cycle_types(structure, cycles):
     types = []
     for cycle_group in cycles:
         lengths = [len(x) for x in cycle_group]
         if len(lengths) == 3:
             if lengths == [5, 6, 5]:
-                core = identify_core(molecule, cycle_group)
+                core = identify_core(structure, cycle_group)
                 types.append(core)
             elif lengths == [6, 5, 6]:
                 types.append("7")
@@ -240,7 +240,7 @@ def identify_cycle_types(molecule, cycles):
                 types.append("10")
         elif len(lengths) == 2:
             if lengths == [6, 5]:
-                core = identify_core(molecule, cycle_group)
+                core = identify_core(structure, cycle_group)
                 types.append(core)
             else:
                 types.append("9")
@@ -250,7 +250,7 @@ def identify_cycle_types(molecule, cycles):
     return types
 
 
-def identify_core(molecule, fused_cycle):
+def identify_core(structure, fused_cycle):
     pairs = []
     for ring in fused_cycle:
         temp = []
@@ -265,7 +265,7 @@ def identify_core(molecule, fused_cycle):
     else:
         side1, name_atoms1 = identify_core_side(pairs[0])
         side2, name_atoms2 = identify_core_side(pairs[2])
-        dist = graph_distance(molecule, name_atoms1[0], name_atoms2[0])
+        dist = graph_distance(structure, name_atoms1[0], name_atoms2[0])
         if dist == 4:
             start = 'C'
         elif dist == 5:
@@ -313,7 +313,7 @@ def identify_single_ring(ring):
 
 def run_name(name):
     from chemtools import gjfwriter
-    mol = gjfwriter.GJFWriter(name).molecule
+    mol = gjfwriter.GJFWriter(name).structure
     links, tree = breadth_first_search(mol)
 
     cycles, link_nodes = get_cycles(links, tree)

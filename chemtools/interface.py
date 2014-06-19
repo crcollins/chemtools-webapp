@@ -17,7 +17,7 @@ def get_multi_molecule(molecules, keywords, options, form):
     generrors = []
     for name in molecules:
         try:
-            out = gjfwriter.GJFWriter(name, keywords)
+            out = gjfwriter.GJFWriter(name, keywords=keywords)
             others = False
 
             if "image" in options:

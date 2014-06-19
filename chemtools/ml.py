@@ -4,7 +4,7 @@ from numpy.linalg import norm
 import numpy
 
 from constants import CORE_COMBO, ARYL, ARYL2, XGROUPS, RGROUPS, NEEDSPACE
-from gjfwriter import Molecule, read_data
+from structure import from_data
 from data.models import Predictor
 
 
@@ -72,8 +72,8 @@ def get_end_features2(left, center, right, power=1, H=1, lacunarity=1):
 def get_end_features3(left, center, right, power=1, H=1, lacunarity=1):
     lengths = []
     for name in ARYL:
-        mol = Molecule(read_data(name))
-        atoms = [x.atoms[1] for x in mol.open_ends("~")]
+        struct = from_data(name)
+        atoms = [x.atoms[1] for x in struct.open_ends("~")]
         lengths.append(norm(atoms[0].xyz - atoms[1].xyz))
     lengths = numpy.matrix(lengths)
     minlen = lengths.argmin()
