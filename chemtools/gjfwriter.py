@@ -1,5 +1,6 @@
 import structure
 from constants import KEYWORDS
+from mol_name import get_exact_name
 from project.utils import StringIO
 
 
@@ -55,3 +56,7 @@ class Benzobisazole(Molecule):
     def __init__(self, name, **kwargs):
         super(Benzobisazole, self).__init__(name, **kwargs)
         self.structure = structure.from_name(name)
+
+    def get_exact_name(self, spacers=False):
+        return get_exact_name(self.name, spacers=spacers)
+
