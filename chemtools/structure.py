@@ -467,7 +467,7 @@ class Structure(object):
     def polymerize(self, ends, n):
         '''Returns an n length chain of the structure.'''
         if n <= 1 or not all(ends):
-            return self, ends
+            return self
 
         idxs = [self.bonds.index(x) for x in ends]
         structures = []
