@@ -5,7 +5,7 @@ import copy
 import numpy
 from PIL import Image, ImageDraw
 
-from constants import COLORS, CONNECTIONS, DATAPATH, ARYL, XGROUPS
+from constants import COLORS, CONNECTIONS, DATAPATH, ARYL, XGROUPS, MASSES
 from mol_name import parse_name
 
 
@@ -496,3 +496,30 @@ class Structure(object):
                     a.displace(numpy.matrix(use).T)
                     frags.append(a)
         return Structure.concatenate(frags)
+
+    ###########################################################################
+    # Properties
+    ###########################################################################
+
+    def get_center(self):
+        totals = numpy.matrix([0.0, 0.0, 0.0]).T
+        for atom in self.atoms:
+            totals += atom.xyz
+        return totals / len(self.atoms)
+
+    def get_mass(self):
+        return sum(MASSES[atom.element] for atom in self.atoms)
+
+    def get_mass_center(self):
+        totals = numpy.matrix([0.0, 0.0, 0.0]).T
+        for atom in self.atoms:
+            totals += atom.xyz * MASSES[atom.element]
+        return totals / self.get_mass()
+
+    def get_moment_of_inertia(self, center=None):
+        if center is None:
+            center = self.get_mass_center()
+        total = 0
+        for atom in self.atoms:
+            total += MASSES[atom.element] * numpy.linalg.norm(atom.xyz - center) ** 2
+        return total
