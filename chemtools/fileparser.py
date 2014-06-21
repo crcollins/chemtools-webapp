@@ -67,7 +67,7 @@ class Log(object):
 
             for i, line in enumerate(f):
                 for k, parser in self.parsers.items():
-                    parser.parse(line)
+                    parser.parse(line.replace('\r', ''))
 
             # major memory saver by deleting all the line parser objects
             for parser in self.parsers:
