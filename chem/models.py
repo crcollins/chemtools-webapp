@@ -72,6 +72,7 @@ class MultiFileField(forms.FileField):
             if uploaded_file.size > self.maximum_file_size and self.maximum_file_size:
                 raise forms.ValidationError(self.error_messages['file_size'] % { 'uploaded_file_name': uploaded_file.name})
 
+
 class UploadForm(forms.Form):
     CHOICES = (
                 ("logparse", "Log Parse"),
@@ -92,19 +93,26 @@ class UploadForm(forms.Form):
         'gjf_submit',
     )
 
+
 class JobForm(forms.Form):
     name = forms.CharField(max_length=400)
     email = forms.EmailField()
     nodes = forms.IntegerField()
     walltime = forms.IntegerField()
     allocation = forms.CharField(max_length=12)
+    custom_template = forms.BooleanField(required=False)
     base_template = forms.ModelChoiceField(
                                             queryset=JobTemplate.objects.all(),
                                             to_field_name="template",
                                             required=False,
                                             )
     template = forms.CharField(
-                        widget=forms.Textarea(attrs={'cols': 50, 'rows': 26}),
+                        widget=forms.Textarea(
+                                            attrs={
+                                                    'cols': 50,
+                                                    'rows': 26,
+                                                    'disabled': True
+                                                }),
                         required=False,
                         )
 

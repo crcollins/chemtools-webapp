@@ -22,7 +22,9 @@ $(document).ready(function() {
             });
         }
     });
-
+    $("#id_custom_template").change( function () {
+        $("textarea#id_template").attr('disabled', !this.checked);
+    });
 });
 
 String.prototype.format = function () {
