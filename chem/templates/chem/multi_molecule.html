@@ -36,7 +36,7 @@ $(function() {
         event.preventDefault();
         var a = $('#headerform').serialize();
         if ($('#id_job').val() === 'on') {
-            a += '&' + $('#newform').serialize();
+            a += '&' + $('#id_job_form').serialize();
         }
         if ($("#id_unique").is(':checked')) {
             a += '&unique=on';
@@ -83,10 +83,10 @@ $(function() {
     <label for="id_unique">Only Show Unique</label>
 </div>
 
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <form id="headerform">
+<form id="headerform">
+    <table class="table table-striped">
+        <thead>
+            <tr>
                 <th>Name</th>
                 <th>
                     <div class="checkbox">
@@ -113,10 +113,10 @@ $(function() {
                     </div>
                 </th>
                 <th>Report</th>
-            </form>
-        </tr>
-    </thead>
-</table>
+            </tr>
+        </thead>
+    </table>
+</form>
 
 <div class="container">
     <div class="btn-group" data-toggle="buttons-checkbox">
