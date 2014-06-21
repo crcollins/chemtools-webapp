@@ -1,5 +1,7 @@
+import numpy
+from numpy.linalg import norm
 import structure
-from constants import KEYWORDS
+from constants import KEYWORDS, NUMBERS, MASSES
 from mol_name import get_exact_name
 from project.utils import StringIO
 
