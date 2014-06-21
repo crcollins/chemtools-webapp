@@ -7,6 +7,7 @@ from PIL import Image, ImageDraw
 
 from constants import COLORS, CONNECTIONS, DATAPATH, ARYL, XGROUPS, MASSES
 from mol_name import parse_name
+from utils import get_full_rotation_matrix, get_angles
 
 
 def from_data(filename):
@@ -344,39 +345,6 @@ class Structure(object):
         maxs = numpy.max(coords, 1)
         return mins, maxs
 
-    def get_full_rotation_matrix(self, vector, azimuth, altitude):
-        xyaxis = vector[:2, 0]
-        zaxis = numpy.matrix([0, 0,  1]).T
-        raxis = numpy.cross(zaxis.T, xyaxis.T)
-        rotz = self.get_axis_rotation_matrix(numpy.matrix(raxis).T, altitude)
-        rotxy = self.get_axis_rotation_matrix(-zaxis, azimuth)
-        return rotxy * rotz
-
-    def get_angles(self, vector):
-        x = vector[0, 0]
-        y = vector[1, 0]
-        z = vector[2, 0]
-        r = numpy.linalg.norm(vector)
-        azimuth = math.atan2(y, x)
-        altitude = math.asin(z / r)
-        return azimuth, altitude
-
-    def get_axis_rotation_matrix(self, axis, theta):
-        # http://stackoverflow.com/questions/6721544/circular-rotation-around-an-arbitrary-axis
-        ct = math.cos(theta)
-        nct = 1 - ct
-        st = math.sin(theta)
-        r = numpy.linalg.norm(axis)
-        ux = axis[0, 0] / r
-        uy = axis[1, 0] / r
-        uz = axis[2, 0] / r
-        rot = numpy. matrix([
-            [ct+ux**2*nct, ux*uy*nct-uz*st, ux*uz*nct+uy*st],
-            [uy*ux*nct+uz*st, ct+uy**2*nct, uy*uz*nct-ux*st],
-            [uz*ux*nct-uy*st, uz*uy*nct+ux*st, ct+uz**2*nct],
-        ])
-        return rot
-
     ###########################################################################
     # Manipulate
     ###########################################################################
@@ -431,11 +399,11 @@ class Structure(object):
         vec2 = C2.xyz - R2.xyz
 
         # diff = [azimuth, altitude]
-        vec1_angles = numpy.matrix(self.get_angles(vec1))
-        vec2_angles = numpy.matrix(self.get_angles(vec2))
+        vec1_angles = numpy.matrix(get_angles(vec1))
+        vec2_angles = numpy.matrix(get_angles(vec2))
         diff = vec1_angles - vec2_angles
         #angle of 1 - angle of 2 = angle to rotate
-        rot = self.get_full_rotation_matrix(vec2, -diff[0, 0], -diff[0, 1])
+        rot = get_full_rotation_matrix(vec2, -diff[0, 0], -diff[0, 1])
         fragment.rotate_3d(rot, R2xyz, C1xyz)
 
         if bond1.atoms[0].element[0] in CONNECTIONS:

@@ -19,6 +19,25 @@ def get_axis_rotation_matrix(axis, theta):
     return rot
 
 
+def get_angles(vector):
+    x = vector[0, 0]
+    y = vector[1, 0]
+    z = vector[2, 0]
+    r = numpy.linalg.norm(vector)
+    azimuth = math.atan2(y, x)
+    altitude = math.asin(z / r)
+    return azimuth, altitude
+
+
+def get_full_rotation_matrix(vector, azimuth, altitude):
+    xyaxis = vector[:2, 0]
+    zaxis = numpy.matrix([0, 0,  1]).T
+    raxis = numpy.cross(zaxis.T, xyaxis.T)
+    rotz = get_axis_rotation_matrix(numpy.matrix(raxis).T, altitude)
+    rotxy = get_axis_rotation_matrix(-zaxis, azimuth)
+    return rotxy * rotz
+
+
 def project_plane(normal, vec):
     n = normal / numpy.linalg.norm(normal)
     return vec - (vec.T * n)[0,0] * n
