@@ -643,18 +643,16 @@ class FileParserTestCase(TestCase):
                 pass
             self.assertEqual(expected, line[1:])
 
-
-class UtilsTestCase(TestCase):
     def test_Output_newline(self):
-        out = utils.Output()
+        out = fileparser.Output()
         string = "Some message"
         out.write(string, newline=False)
         result = out.format_output(errors=False)
         self.assertEqual(result, string + '\n')
 
     def test_catch(self):
-        class TestIt(utils.Output):
-            @utils.catch
+        class TestIt(fileparser.Output):
+            @fileparser.catch
             def get_fail(self):
                 raise ValueError("some string")
 
@@ -662,6 +660,11 @@ class UtilsTestCase(TestCase):
         test.get_fail()
         expected = "\n---- Errors (1) ----\nValueError('some string',)\n"
         self.assertEqual(test.format_output(errors=True), expected)
+
+
+class UtilsTestCase(TestCase):
+    pass
+
 
 class GraphTestCase(TestCase):
     def test_graph(self):
