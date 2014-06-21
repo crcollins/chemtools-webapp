@@ -355,6 +355,7 @@ class Geometry(LineParser):
         self.start = False
         self.newfile = True
         self.prevline = ''
+        self.delimiter = '\\'
 
     @is_done
     def parse(self, line):
@@ -364,18 +365,21 @@ class Geometry(LineParser):
         # " 4,1.2501547542\H,22.6120510229,1.0505502972,0.1022974384\H,2.283441615"
         # " 6,-0.8632316482,20.4346296726\\Version=EM64L-G09RevC.01\State=1-A\HF=-"
         line = line[1:]
-        modline = self.prevline + line.strip('\n')
-        if "\\" in modline:
-            self.start = True
+        modline = self.prevline + line.strip('\n').replace('\r', '')
+        if self.delimiter in modline:
+            if ":\\" in modline:
+                self.delimiter = '|'
+                self.start = False
+            else:
+                self.start = True
 
         if self.start:
-            # self.value += line.split("\\")[0].strip('\n')
-            if r"\\@" in modline:
+            if '{0}{0}@'.format(self.delimiter) in modline:
                 # select only the gjf part of the results
                 start = self.value.index('#')
-                end = self.value.index(r"\Version", start)
+                end = self.value.index("{0}Version".format(self.delimiter), start)
 
-                d = {',': ' ', "\\": '\n',
+                d = {',': ' ', self.delimiter: '\n',
                     "geom=connectivity": "",
                 }
                 value = self.value[start:end]
@@ -386,7 +390,7 @@ class Geometry(LineParser):
                 self.done = True
             if not self.done:
                 self.prevline = line.strip('\n')
-                self.value += line.strip('\n')
+                self.value += line.strip('\n').replace('\r', '')
 
 
 @Log.add_parser
