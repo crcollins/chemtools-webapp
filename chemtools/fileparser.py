@@ -219,22 +219,29 @@ class Options(LineParser):
         self.start = False
         self.value = ''
         self.prevline = ''
+        self.delimiter = '\\'
 
     @is_done
     def parse(self, line):
         # "12\0\\# opt B3LYP/svp geom=connectivity\\2J_TON_25a_2J_DFT\\0,1\C,-0.0"
         # "585127864,0.0307750915,0.0000205395\C,1.354447744,-0.0385659542,0.0000"
         line = line[1:]
+
         modline = self.prevline + line.strip('\n')
-        if "\\#" in modline:
-            idx = modline.index("\\#") + 3
-            self.value = modline[idx:].split("\\")[0].strip('\n')
+        if self.delimiter in modline:
+            if ":\\" in modline:
+                self.delimiter = '|'
+                self.start = False
+
+        if "{0}#".format(self.delimiter) in modline:
+            idx = modline.index("{0}#".format(self.delimiter)) + 3
+            self.value = modline[idx:].split(self.delimiter)[0].strip('\n')
             self.start = True
-            if "\\" in modline[idx:]:
+            if self.delimiter in modline[idx:]:
                 self.done = True
         elif self.start:
-            self.value += line.split("\\")[0].strip('\n')
-            if "\\" in line:
+            self.value += line.split(self.delimiter)[0].strip('\n')
+            if self.delimiter in line:
                 self.done = True
                 self.value = self.value.strip()
         else:
@@ -266,20 +273,26 @@ class Energy(LineParser):
         super(Energy, self).__init__(*args, **kwargs)
         self.start = False
         self.prevline = ''
+        self.delimiter = '\\'
 
     @is_done
     def parse(self, line):
         # " 36\\Version=EM64L-G09RevC.01\State=1-A\HF=-1127.8085512\RMSD=3.531e-09"
         modline = self.prevline + line.strip()
-        if "\\HF=" in modline:
+        if self.delimiter in modline:
+            if ":\\" in modline:
+                self.delimiter = '|'
+                self.start = False
+
+        if "{0}HF=".format(self.delimiter) in modline:
             idx = modline.index("HF=") + 3
-            self.value = modline[idx:].split("\\")[0].strip()
+            self.value = modline[idx:].split(self.delimiter)[0].strip()
             self.start = True
-            if "\\" in modline[idx:]:
+            if self.delimiter in modline[idx:]:
                 self.done = True
         elif self.start:
-            self.value += line.split("\\")[0].strip()
-            if "\\" in line:
+            self.value += line.split(self.delimiter)[0].strip()
+            if self.delimiter in line:
                 self.done = True
         else:
             self.prevline = line.strip()
@@ -365,7 +378,7 @@ class Geometry(LineParser):
         # " 4,1.2501547542\H,22.6120510229,1.0505502972,0.1022974384\H,2.283441615"
         # " 6,-0.8632316482,20.4346296726\\Version=EM64L-G09RevC.01\State=1-A\HF=-"
         line = line[1:]
-        modline = self.prevline + line.strip('\n').replace('\r', '')
+        modline = self.prevline + line.strip('\n')
         if self.delimiter in modline:
             if ":\\" in modline:
                 self.delimiter = '|'
@@ -390,7 +403,7 @@ class Geometry(LineParser):
                 self.done = True
             if not self.done:
                 self.prevline = line.strip('\n')
-                self.value += line.strip('\n').replace('\r', '')
+                self.value += line.strip('\n')
 
 
 @Log.add_parser
@@ -521,26 +534,22 @@ if __name__ == "__main__":
                 files += [x for x in paths if os.path.isfile(x)]
             return files
 
-        def write_file(self):
-            logs = LogSet()
-            logs.parse_files(self.files)
-
+        def write(self, log):
             if self.output_gjf:
-                for log in logs.logs:
-                    ending = ".gjf"
-                    if self.td:
-                        ending = "_TD" + ending
-                    try:
-                        # used to bubble up errors before creating the file
-                        string = log.format_gjf(self.td)
-                        with open(log.name + ending, 'w') as outputfile:
-                            outputfile.write(string)
-                    except Exception as e:
-                        print log.name, str(e)
+                ending = ".gjf"
+                if self.td:
+                    ending = "_TD" + ending
+                try:
+                    # used to bubble up errors before creating the file
+                    string = log.format_gjf(self.td)
+                    with open(log.name + ending, 'w') as outputfile:
+                        outputfile.write(string)
+                except Exception as e:
+                    print log.name, str(e)
             else:
                 if self.outputfilename:
-                    with open(self.outputfilename, 'w') as outputfile:
-                        outputfile.write(logs.format_output(errors=self.error))
+                    with open(self.outputfilename, 'wa') as outputfile:
+                        outputfile.write(log.format_output())
                 else:
                     print logs.format_output(errors=self.error)
 
