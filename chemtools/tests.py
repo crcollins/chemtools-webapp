@@ -643,6 +643,36 @@ class FileParserTestCase(TestCase):
                 pass
             self.assertEqual(expected, line[1:])
 
+    def test_parse_nonbenzo_windows(self):
+        name = "methane_windows.log"
+        path = os.path.join(settings.MEDIA_ROOT, "tests", name)
+        log = fileparser.Log(path)
+
+        with StringIO(log.format_data()) as f:
+            reader = csv.reader(f, delimiter=',', quotechar='"')
+            expected = ['methane_windows', '---', '[]',
+                    'OPT B3LYP/3-21G GEOM=CONNECTIVITY', '-10.5803302719',
+                    '3.96823610808', '5', '0.0000', '-40.3016014', '---',
+                    '0.0']
+            for line in reader:
+                pass
+            self.assertEqual(expected, line[1:])
+
+    def test_parse_nonbenzo_windows_td(self):
+        name = "methane_td_windows.log"
+        path = os.path.join(settings.MEDIA_ROOT, "tests", name)
+        log = fileparser.Log(path)
+
+        with StringIO(log.format_data()) as f:
+            reader = csv.reader(f, delimiter=',', quotechar='"')
+            expected = ['methane_td_windows', '---', '[]',
+                    'TD RB3LYP/3-21G GEOM=CONNECTIVITY', '-10.5803302719',
+                    '3.96823610808', '5', '0.0000', '-40.3016014', '13.3534',
+                    '0.0']
+            for line in reader:
+                pass
+            self.assertEqual(expected, line[1:])
+
     def test_Output_newline(self):
         out = fileparser.Output()
         string = "Some message"
