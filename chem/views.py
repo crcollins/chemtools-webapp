@@ -126,10 +126,20 @@ def molecule_detail(request, molecule):
         elif request.method == "POST":
             d["keywords"] = keywords
             cred = d.pop("credential")
-            a = run_standard_job(cred, molecule, **d)
-            a["success"] = True
-            return HttpResponse(simplejson.dumps(a),
-                                mimetype="application/json")
+            do_html = request.REQUEST.get("html", False)
+            a = run_standard_jobs(cred, molecule, **d)
+            if a["failed"]:
+                failed_names = zip(*a['failed'])[0]
+                a["failed_mols"] = ','.join(failed_names)
+            if do_html:
+                html = render_to_string("chem/multi_submit.html", a)
+                temp = {"success": True, "html": html}
+                return HttpResponse(simplejson.dumps(temp),
+                                    mimetype="application/json")
+            else:
+                return HttpResponse(simplejson.dumps(a),
+                                    mimetype="application/json")
+
     elif request.is_ajax():
         form_html = render_crispy_form(form, context=RequestContext(request))
         a = {"success": False, "form_html": form_html}

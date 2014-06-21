@@ -25,6 +25,26 @@ $(document).ready(function() {
     $("#id_custom_template").change( function () {
         $("textarea#id_template").attr('disabled', !this.checked);
     });
+
+    function post_func() {
+        event.preventDefault();
+        var a = $('#id_job_form').serialize();
+        a += "&html=true";
+        $.post('', a, function(data) {
+            if (data.success) {
+                var dialog = $("#resultsModal .modal-body");
+                dialog.html(data.html);
+                $('#resultsModal').modal();
+            } else {
+                $("#id_form_input").html(data.form_html);
+                var temp = $("div.has-error").get(0);
+                if (temp !== undefined) {
+                    temp.scrollIntoView();
+                }
+            }
+        });
+    }
+    $("#id_post").click(post_func);
 });
 
 String.prototype.format = function () {

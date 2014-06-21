@@ -11,19 +11,11 @@ $(function() {
     function post_func() {
         event.preventDefault();
         var a = $('#id_job_form').serialize();
-
+        a += "&html=true";
         $.post('', a, function(data) {
-            var text = '';
             if (data.success) {
-                if (data.error !== null ) {
-                    text = data.error;
-                } else {
-                    var text = "<h3>{0}</h3>".format(data.cluster);
-                    text += "Your job id is <a href='/chem/jobs/{1}/{0}/'>{0}.</a>".format(data.jobid, data.cluster);
-                }
-                text += "<br><a href='/chem/jobs/'>Go to jobs list.</a>";
                 var dialog = $("#resultsModal .modal-body");
-                dialog.html(text);
+                dialog.html(data.html);
                 $('#resultsModal').modal();
             } else {
                 $("#id_form_input").html(data.form_html);
@@ -32,9 +24,7 @@ $(function() {
                     temp.scrollIntoView();
                 }
             }
-            },
-            'json'
-        );
+        });
     }
     $("#id_post").click(post_func);
 });
