@@ -1,5 +1,7 @@
 import numpy
 from numpy.linalg import norm
+from scipy.spatial.distance import pdist
+
 import structure
 from constants import KEYWORDS, NUMBERS, MASSES
 from mol_name import get_exact_name
@@ -53,6 +55,37 @@ class Molecule(object):
     def get_svg(self):
         pass
 
+    def coulomb_matrix(self):
+        coords = []
+        other = []
+
+        for atom in self.structure.atoms:
+            coords.append(atom.xyz)
+            other.append(NUMBERS[atom.element])
+
+        N = len(self.structure.atoms)
+        data = numpy.matrix(numpy.zeros((N, N)))
+        for i, x in enumerate(coords):
+            for j, y in enumerate(coords[:i]):
+                val = (other[i]*other[j])/norm(x-y)
+                data[i, j] = val
+                data[j, i] = val
+
+        diag = [0.5 * x ** 2.4 for x in other]
+        for i, x in enumerate(diag):
+            data[i, i] = x
+
+        return data
+
+    def coulomb_matrix_feature(self):
+        data = self.coulomb_matrix()
+        vector = []
+        end = []
+        for i in xrange(data.shape[0]):
+            for j in xrange(0,i):
+                vector.append(data[i,j])
+            end.append(data[i,i])
+        return vector + end
 
 class Benzobisazole(Molecule):
     def __init__(self, name, **kwargs):
@@ -61,4 +94,3 @@ class Benzobisazole(Molecule):
 
     def get_exact_name(self, spacers=False):
         return get_exact_name(self.name, spacers=spacers)
-
