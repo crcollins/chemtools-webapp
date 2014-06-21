@@ -95,9 +95,8 @@ def replace_geom_vars(string):
     geom, variables = string.split("\n\n")
     if variables:
         d = dict([x.strip().split() for x in variables.split('\n') if x])
-    return d
 
-    for key, value in variables.items():
+    for key, value in d.items():
         geom = geom.replace(key, value)
     return geom
 
@@ -115,6 +114,6 @@ def convert_zmatrix_to_cart(string):
         coords.append(point)
 
     new_string = ''
-    for elem, coord in zip(*results):
-        new_string += " %s %0.8f %0.8f %0.8f" % tuple([elem] + coord.T.tolist()[0])
+    for elem, coord in zip(elems, coords):
+        new_string += " %s %0.8f %0.8f %0.8f\n" % tuple([elem] + coord.T.tolist()[0])
     return new_string
