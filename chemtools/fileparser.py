@@ -534,22 +534,26 @@ if __name__ == "__main__":
                 files += [x for x in paths if os.path.isfile(x)]
             return files
 
-        def write(self, log):
+        def write_file(self):
+            logs = LogSet()
+            logs.parse_files(self.files)
+
             if self.output_gjf:
-                ending = ".gjf"
-                if self.td:
-                    ending = "_TD" + ending
-                try:
-                    # used to bubble up errors before creating the file
-                    string = log.format_gjf(self.td)
-                    with open(log.name + ending, 'w') as outputfile:
-                        outputfile.write(string)
-                except Exception as e:
-                    print log.name, str(e)
+                for log in logs.logs:
+                    ending = ".gjf"
+                    if self.td:
+                        ending = "_TD" + ending
+                    try:
+                        # used to bubble up errors before creating the file
+                        string = log.format_gjf(self.td)
+                        with open(log.name + ending, 'w') as outputfile:
+                            outputfile.write(string)
+                    except Exception as e:
+                        print log.name, str(e)
             else:
                 if self.outputfilename:
-                    with open(self.outputfilename, 'wa') as outputfile:
-                        outputfile.write(log.format_output())
+                    with open(self.outputfilename, 'w') as outputfile:
+                        outputfile.write(logs.format_output(errors=self.error))
                 else:
                     print logs.format_output(errors=self.error)
 
