@@ -1000,24 +1000,6 @@ class UtilsServerTestCase(TestCase):
         self.credential2 = Credential(user=super_user, cluster=self.cluster, **CREDENTIAL)
         self.credential2.save()
 
-    def test_run_standard_job_staff_error(self):
-        results = utils.run_standard_job(self.credential, '')
-        self.assertEqual(results["error"], SUBMIT_ERROR)
-
-    def test_run_standard_job_invalid_credential(self):
-        results = utils.run_standard_job(None, '')
-        self.assertEqual(results["error"], CRED_ERROR)
-
-    def test_run_standard_job(self):
-        job = 'sleep 10'
-        results = utils.run_standard_job(self.credential2, "TON", jobstring=job)
-        self.assertEqual(results["error"], None)
-
-    def test_run_standard_job_name_error(self):
-        job = 'sleep 10'
-        results = utils.run_standard_job(self.credential2, "T-N", jobstring=job)
-        self.assertEqual(results["error"], "(1, 'Bad Core Name')")
-
     def test_run_standard_jobs_staff_error(self):
         results = utils.run_standard_jobs(self.credential, [''])
         self.assertEqual(results["error"], SUBMIT_ERROR)

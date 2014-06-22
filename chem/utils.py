@@ -100,32 +100,6 @@ def get_molecule_info(molecule, keywords=KEYWORDS):
         }
     return a
 
-def run_standard_job(credential, molecule, **kwargs):
-    results = {
-        "jobid": None,
-        "error": None,
-    }
-    try:
-        results["cluster"] = credential.cluster.name
-        if not credential.user.is_staff:
-            results["error"] = "You must be a staff user to submit a job."
-            return results
-    except:
-        results["error"] = "Invalid credential"
-        results["cluster"] = None
-        return results
-
-    try:
-        keywords = kwargs.get("keywords", None)
-        out = gjfwriter.Benzobisazole(molecule, keywords=keywords)
-    except Exception as e:
-        results["error"] = str(e)
-        return results
-
-    gjf = out.get_gjf()
-    results = run_job(credential, gjf, **kwargs)
-    return results
-
 
 def run_standard_jobs(credential, string, **kwargs):
     results = {
