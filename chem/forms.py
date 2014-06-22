@@ -167,6 +167,8 @@ class JobForm(forms.Form):
     def get_results(self, request, string):
         d = dict(self.cleaned_data)
         if request.method == "GET":
+            if request.REQUEST.get('molname'):
+                d['name'] = request.REQUEST.get('molname')
             job_string = JobTemplate.render(**d)
             response = HttpResponse(job_string, content_type="text/plain")
             filename = '%s.job' % request.REQUEST.get("molname")
