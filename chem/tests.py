@@ -41,7 +41,6 @@ OPTIONS = {
         "nodes": 1,
         "walltime": 48,
         "allocation": "TG-CHE120081",
-        "cluster": 'g',
         "template":
             "{{ name }} {{ email }} {{ nodes }} {{ time }} {{ allocation }}",
 }
@@ -97,7 +96,6 @@ SUB_OPTIONS = {
     "nodes": 1,
     "walltime": 48,
     "allocation": "TG-CHE120081",
-    "cluster": 'g',
     "template":
         "{{ name }} {{ email }} {{ nodes }} {{ time }} {{ allocation }}",
     "credential": 1,
@@ -529,8 +527,8 @@ class PostsFailTestCase(TestCase):
             response = self.client.post(url, options)
 
             results = simplejson.loads(response.content)
-            self.assertEqual(results["error"], error)
-            self.assertIsNone(results["jobid"])
+            self.assertEqual(results["failed"][0][1], error)
+            self.assertFalse(len(results['worked']) > 0)
 
     def test_post_single_perm_fail(self):
         r = self.client.login(**USER_LOGIN)
@@ -546,8 +544,8 @@ class PostsFailTestCase(TestCase):
             expected = {
                         "cluster": "test-machine",
                         "error": "You must be a staff user to submit a job.",
-                        "jobid": None,
-                        'success': True
+                        "failed": [],
+                        "worked": [],
                         }
             self.assertEqual(simplejson.loads(response.content), expected)
 
@@ -763,7 +761,7 @@ class PostsTestCase(TestCase):
 
             results = simplejson.loads(response.content)
             self.assertIsNone(results["error"])
-            self.assertIsNotNone(results["jobid"])
+            self.assertTrue(len(results["worked"]))
 
 
     def test_post_multi(self):
