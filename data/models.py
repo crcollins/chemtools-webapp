@@ -74,11 +74,14 @@ class JobTemplate(models.Model):
 
     @classmethod
     def render(cls, **kwargs):
-        base_template = kwargs.get("base_template")
-        try:
-            template = Template(base_template.template.read())
-        except AttributeError:
+        if kwargs.get("custom_template"):
             template = Template(kwargs.get("template", ''))
+        else:
+            base_template = kwargs.get("base_template")
+            try:
+                template = Template(base_template.template.read())
+            except AttributeError:
+                template = Template(kwargs.get("template", ''))
         c = Context({
             "name": kwargs.get("name", ''),
             "email": kwargs.get("email"),
