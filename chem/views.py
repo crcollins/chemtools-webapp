@@ -115,7 +115,7 @@ def molecule_detail(request, molecule):
     keywords = request.REQUEST.get("keywords", '')
 
     if form.is_valid(request.method):
-        return form.get_results(request)
+        return form.get_results(request, molecule)
     elif request.is_ajax():
         form_html = render_crispy_form(form, context=RequestContext(request))
         a = {"success": False, "form_html": form_html}
@@ -139,7 +139,7 @@ def multi_molecule(request, string):
     form = JobForm.get_form(request, "{{ name }}")
 
     if form.is_valid(request.method):
-        return form.get_results(request)
+        return form.get_results(request, string)
     elif request.is_ajax():
         form_html = render_crispy_form(form, context=RequestContext(request))
         a = {"success": False, "form_html": form_html}

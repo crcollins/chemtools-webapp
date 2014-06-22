@@ -2,6 +2,8 @@ import re
 
 from django import forms
 from django.http import HttpResponse
+from django.utils import simplejson
+from django.template.loader import render_to_string
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout
 
@@ -162,7 +164,7 @@ class JobForm(forms.Form):
             raise forms.ValidationError("A template or base template is required.")
         return self.cleaned_data
 
-    def get_results(request, string):
+    def get_results(self, request, string):
         d = dict(self.cleaned_data)
         if request.method == "GET":
             job_string = JobTemplate.render(**d)
@@ -172,7 +174,7 @@ class JobForm(forms.Form):
             response['Content-Disposition'] = add + 'filename=' + filename
             return response
         elif request.method == "POST":
-            d["keywords"] = keywords
+            d["keywords"] = request.REQUEST.get('keywords', '')
             cred = d.pop("credential")
             do_html = request.REQUEST.get("html", False)
             results = run_standard_jobs(cred, string, **d)
