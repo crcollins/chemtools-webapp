@@ -2,12 +2,13 @@ import re
 
 from django.db import models
 from django import forms
+from django.http import HttpResponse
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout
 
-
 from data.models import JobTemplate
 from cluster.models import Credential
+from utils import run_standard_jobs
 
 
 class ErrorReport(models.Model):
@@ -169,3 +170,29 @@ class JobForm(forms.Form):
                 self.cleaned_data.get("template")):
             raise forms.ValidationError("A template or base template is required.")
         return self.cleaned_data
+
+    def get_results(request, string):
+        d = dict(self.cleaned_data)
+        if request.method == "GET":
+            job_string = JobTemplate.render(**d)
+            response = HttpResponse(job_string, content_type="text/plain")
+            filename = '%s.job' % request.REQUEST.get("molname")
+            add = "" if request.REQUEST.get("view") else "attachment; "
+            response['Content-Disposition'] = add + 'filename=' + filename
+            return response
+        elif request.method == "POST":
+            d["keywords"] = keywords
+            cred = d.pop("credential")
+            do_html = request.REQUEST.get("html", False)
+            results = run_standard_jobs(cred, string, **d)
+            if results["failed"]:
+                failed_names = zip(*results['failed'])[0]
+                results["failed_mols"] = ','.join(failed_names)
+            if do_html:
+                html = render_to_string("chem/multi_submit.html", results)
+                temp = {"success": True, "html": html}
+                return HttpResponse(simplejson.dumps(temp),
+                                    mimetype="application/json")
+            else:
+                return HttpResponse(simplejson.dumps(results),
+                                    mimetype="application/json")

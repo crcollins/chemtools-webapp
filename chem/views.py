@@ -15,7 +15,6 @@ from crispy_forms.utils import render_crispy_form
 
 from models import ErrorReport, ErrorReportForm, JobForm, UploadForm
 from utils import get_multi_molecule_warnings, get_molecule_info
-from utils import run_standard_job, run_standard_jobs
 from utils import parse_file_list, find_sets, convert_logs
 
 from chemtools import gjfwriter
@@ -113,33 +112,9 @@ def molecule_check(request, string):
 def molecule_detail(request, molecule):
     form = JobForm.get_form(request, molecule)
     keywords = request.REQUEST.get("keywords", '')
-    add = "" if request.REQUEST.get("view") else "attachment; "
 
     if form.is_valid(request.method):
-        d = dict(form.cleaned_data)
-        if request.method == "GET":
-            job_string = JobTemplate.render(**d)
-            response = HttpResponse(job_string, content_type="text/plain")
-            filename = '%s.job' % molecule
-            response['Content-Disposition'] = add + 'filename=' + filename
-            return response
-        elif request.method == "POST":
-            d["keywords"] = keywords
-            cred = d.pop("credential")
-            do_html = request.REQUEST.get("html", False)
-            a = run_standard_jobs(cred, molecule, **d)
-            if a["failed"]:
-                failed_names = zip(*a['failed'])[0]
-                a["failed_mols"] = ','.join(failed_names)
-            if do_html:
-                html = render_to_string("chem/multi_submit.html", a)
-                temp = {"success": True, "html": html}
-                return HttpResponse(simplejson.dumps(temp),
-                                    mimetype="application/json")
-            else:
-                return HttpResponse(simplejson.dumps(a),
-                                    mimetype="application/json")
-
+        return form.get_results(request)
     elif request.is_ajax():
         form_html = render_crispy_form(form, context=RequestContext(request))
         a = {"success": False, "form_html": form_html}
@@ -161,35 +136,9 @@ def molecule_detail_json(request, molecule):
 
 def multi_molecule(request, string):
     form = JobForm.get_form(request, "{{ name }}")
-    add = "" if request.REQUEST.get("view") else "attachment; "
 
     if form.is_valid(request.method):
-        d = dict(form.cleaned_data)
-        if request.method == "GET":
-            molecule = request.REQUEST.get("molname", "")
-            d = form.get_single_data(molecule)
-            job_string = JobTemplate.render(**d)
-            response = HttpResponse(job_string, content_type="text/plain")
-            filename = '%s.job' % molecule
-            response['Content-Disposition'] = add + 'filename=' + filename
-            return response
-
-        elif request.method == "POST":
-            d["keywords"] = request.REQUEST.get("keywords", None)
-            cred = d.pop("credential")
-            do_html = request.REQUEST.get("html", False)
-            a = run_standard_jobs(cred, string, **d)
-            if a["failed"]:
-                failed_names = zip(*a['failed'])[0]
-                a["failed_mols"] = ','.join(failed_names)
-            if do_html:
-                html = render_to_string("chem/multi_submit.html", a)
-                temp = {"success": True, "html": html}
-                return HttpResponse(simplejson.dumps(temp),
-                                    mimetype="application/json")
-            else:
-                return HttpResponse(simplejson.dumps(a),
-                                    mimetype="application/json")
+        return form.get_results(request)
     elif request.is_ajax():
         form_html = render_crispy_form(form, context=RequestContext(request))
         a = {"success": False, "form_html": form_html}
