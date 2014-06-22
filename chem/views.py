@@ -13,7 +13,8 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.utils import simplejson
 from crispy_forms.utils import render_crispy_form
 
-from models import ErrorReport, ErrorReportForm, JobForm, UploadForm
+from models import ErrorReport
+from forms import ErrorReportForm, JobForm, UploadForm
 from utils import get_multi_molecule_warnings, get_molecule_info
 from utils import parse_file_list, find_sets, convert_logs
 
