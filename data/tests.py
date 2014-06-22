@@ -13,6 +13,16 @@ import load_data
 from chemtools.constants import RGROUPS, XGROUPS, ARYL
 
 
+OPTIONS = {
+        "name": "{{ name }}",
+        "email": "test@test.com",
+        "nodes": 1,
+        "walltime": 48,
+        "allocation": "TG-CHE120081",
+        "template":
+            "{{ name }} {{ email }} {{ nodes }} {{ time }} {{ allocation }}",
+}
+
 class FragmentTestCase(TestCase):
     def setUp(self):
         self.client = Client()
@@ -82,6 +92,35 @@ class ModelTestCase(TestCase):
         self.assertTrue((HOMO == numpy.matrix([[1.0]])).all())
         self.assertTrue((LUMO == numpy.matrix([[2.0]])).all())
         self.assertTrue((GAP == numpy.matrix([[2.0]])).all())
+
+    def test_jobtemplate(self):
+        data = OPTIONS.copy()
+        data["custom_template"] = True
+        string = models.JobTemplate.render(**data)
+        expected = "{{ name }} test@test.com 1 48:00:00 TG-CHE120081"
+        self.assertEqual(string, expected)
+
+    def test_jobtemplate_base(self):
+        data = OPTIONS.copy()
+        data["custom_template"] = False
+        data['base_template'] = models.JobTemplate.objects.get(name="Localhost")
+        data['template'] = None
+        string = models.JobTemplate.render(**data)
+        self.assertIn(data["name"], string)
+
+    def test_jobtemplate_base_multi(self):
+        template = models.JobTemplate.objects.get(name="Localhost")
+        data = OPTIONS.copy()
+        data["custom_template"] = False
+        data['base_template'] = template
+        data['template'] = None
+        string = models.JobTemplate.render(**data)
+        self.assertTrue(string != '')
+        self.assertIn(data["name"], string)
+
+        string2 = models.JobTemplate.render(**data)
+        self.assertTrue(string2 != '')
+        self.assertIn(data["name"], string)
 
 
 class LoadDataTestCase(TestCase):

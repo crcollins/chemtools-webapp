@@ -69,6 +69,11 @@ class JobTemplate(models.Model):
     name = models.CharField(max_length=60)
     template = models.FileField(upload_to="job_templates")
 
+    def read(self):
+        data = self.template.read()
+        self.template.seek(0)
+        return data
+
     def __unicode__(self):
         return self.name
 
@@ -79,7 +84,7 @@ class JobTemplate(models.Model):
         else:
             base_template = kwargs.get("base_template")
             try:
-                template = Template(base_template.template.read())
+                template = Template(base_template.read())
             except AttributeError:
                 template = Template(kwargs.get("template", ''))
         c = Context({
