@@ -14,17 +14,22 @@ $(document).ready(function() {
             $(".ajax-modal").hide();
         }
     });
-    $("select#id_base_template").change( function () {
-        var val = $(this).val();
+
+    function template_change_func() {
+        var elem = $("select#id_base_template");
+        var val = elem.val();
         if (val) {
             $.get("/media/"+val, function (data) {
                 $("textarea#id_template").val(data);
             });
         }
-    });
-    $("#id_custom_template").change( function () {
-        $("textarea#id_template").attr('disabled', !this.checked);
-    });
+    }
+    $("select#id_base_template").change(template_change_func);
+
+    function custom_template_func() {
+        $("textarea#id_template").attr('disabled', !$("#id_custom_template")[0].checked);
+    }
+    $("#id_custom_template").change(custom_template_func);
 
     function post_func() {
         event.preventDefault();
@@ -37,6 +42,11 @@ $(document).ready(function() {
                 $('#resultsModal').modal();
             } else {
                 $("#id_form_input").html(data.form_html);
+
+                $("select#id_base_template").change(template_change_func);
+                $("#id_custom_template").change(custom_template_func);
+                $("#id_post").click(post_func);
+
                 var temp = $("div.has-error").get(0);
                 if (temp !== undefined) {
                     temp.scrollIntoView();
