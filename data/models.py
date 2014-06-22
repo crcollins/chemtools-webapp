@@ -9,7 +9,6 @@ from django.template import Template, Context
 class DataPoint(models.Model):
     name = models.CharField(max_length=600)
     exact_name = models.CharField(max_length=1000, null=True, blank=True)
-    decay_feature = models.CharField(max_length=1000, null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True)
 
     options = models.CharField(max_length=100)
@@ -27,10 +26,10 @@ class DataPoint(models.Model):
         return unicode(self.name)
 
     @classmethod
-    def get_all_data(cls):
+    def get_all_data(cls, type=1):
         data = DataPoint.objects.filter(band_gap__isnull=False,
                                         exact_name__isnull=False,
-                                        decay_feature__isnull=False)
+                                        vectors__type=type)
         M = len(data)
         HOMO = numpy.zeros((M, 1))
         LUMO = numpy.zeros((M, 1))
@@ -40,9 +39,34 @@ class DataPoint(models.Model):
             HOMO[i] = x.homo
             LUMO[i] = x.lumo
             GAP[i] = x.band_gap
-            vectors.append(ast.literal_eval(x.decay_feature))
+            vectors.append(x.vectors.get(type=type).vector)
         FEATURE = numpy.matrix(vectors)
         return FEATURE, HOMO, LUMO, GAP
+
+
+class VectorField(models.TextField):
+    __metaclass__ = models.SubfieldBase
+
+    def to_python(self, value):
+        if type(value) != list:
+            return ast.literal_eval(value)
+        else:
+            return value
+
+    def get_prep_value(self, value):
+        return str(value)
+
+
+class FeatureVector(models.Model):
+    VECTOR_NAMES = (
+                    (0, "Naive"),
+                    (1, "Decay"),
+                    (2, "Decay_Length"),
+                    (3, "Coulomb")
+                    )
+    type = models.IntegerField(choices=VECTOR_NAMES)
+    datapoint = models.ForeignKey(DataPoint, related_name='vectors', null=True, blank=True)
+    vector = VectorField()
 
 
 class Predictor(models.Model):
