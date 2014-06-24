@@ -6,6 +6,8 @@ import structure
 from constants import KEYWORDS, NUMBERS, MASSES
 from mol_name import get_exact_name
 from project.utils import StringIO
+from ml import get_decay_distance_correction_feature_vector, \
+            get_naive_feature_vector, get_decay_feature_vector
 
 
 class Molecule(object):
@@ -101,3 +103,12 @@ class Benzobisazole(Molecule):
             return self._exact_name
         else:
             return self._exact_name.replace('*', '')
+
+    def get_naive_feature_vector(self, **kwargs):
+        return get_naive_feature_vector(self.get_exact_name(spacers=True), **kwargs)
+
+    def get_decay_feature_vector(self, power=1, H=1, lacunarity=1):
+        return get_decay_feature_vector(self.get_exact_name(spacers=True), power=1, H=1, lacunarity=1)
+
+    def get_decay_distance_correction_feature_vector(self, power=1, H=1, lacunarity=1):
+        return get_decay_distance_correction_feature_vector(self.get_exact_name(spacers=True), power=1, H=1, lacunarity=1)
