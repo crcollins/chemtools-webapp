@@ -87,10 +87,17 @@ class Molecule(object):
             end.append(data[i,i])
         return vector + end
 
+
 class Benzobisazole(Molecule):
     def __init__(self, name, **kwargs):
         super(Benzobisazole, self).__init__(name, **kwargs)
         self.structure = structure.from_name(name)
+        self._exact_name = None
 
     def get_exact_name(self, spacers=False):
-        return get_exact_name(self.name, spacers=spacers)
+        if self._exact_name is None:
+            self._exact_name = get_exact_name(self.name, spacers=True)
+        if spacers:
+            return self._exact_name
+        else:
+            return self._exact_name.replace('*', '')
