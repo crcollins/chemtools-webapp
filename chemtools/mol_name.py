@@ -234,17 +234,8 @@ def get_sides(parts, core_idx):
         middle = right[0]
         right = right[1]
     else:
-        try:
-            letter = right[0][0]
-            if letter.lower() in ALL and letter.lower() != letter:
-                middle = letter
-                right = right[0][1:]
-            else:
-                middle = None
-                right = right[0]
-        except IndexError:
-            middle = None
-            right = right[0]
+        middle = None
+        right = right[0]
     return (left, middle, right)
 
 

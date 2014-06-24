@@ -78,11 +78,11 @@ From there the name takes a form similar to this:
 
 ![/chem/24a_TON_35b_24c.png](/chem/24a_TON_35b_24c.png)
 
-The left part (`24a` in this case) corresponds to the left side of the cruciform. The next part is the core. The next part goes with the two vertical parts. In an edge case this segment can be substituted to being just an X-group and added to the beginning of the last part.
+The left part (`24a` in this case) corresponds to the left side of the cruciform. The next part is the core. The next part goes with the two vertical parts. In the past, there was an edge case that allowed the first letter in this group to be the middle group. This is no longer allowed.
 
-    24a_TON_B24a
+    24a_TON_B_24a
 
-![/chem/24a_TON_B24a.png](/chem/24a_TON_B24a.png)
+![/chem/24a_TON_B_24a.png](/chem/24a_TON_B_24a.png)
 
 The last part of the name is the right side of the molecule. Beyond the slight option for the middle, there is also the ability to leave off any of the sides and they will be assumed to be just a hydrogen.
 
@@ -104,9 +104,9 @@ Added to the naming scheme are two types of expansion. They are polymer type and
 
 ![/chem/4a_TON_n2](/chem/4a_TON_n2.png)
 
-    4a_TON_B24c_n3
+    4a_TON_24c_n3
 
-![/chem/4a_TON_B24c_n3](/chem/4a_TON_B24c_n3.png)
+![/chem/4a_TON_24c_n3](/chem/4a_TON_24c_n3.png)
 
     4a_TON_35_2_m3
 
@@ -272,7 +272,7 @@ Right now, the API is very minimal, the current access is just enough to give th
 
 
 ### Naming ###
-
+OSNPC
 For generating the molecules, there is a very rough Finite State Machine that parses through the names given and spits out either the molecule requested or an error. Here is roughly what the context free grammar would look like.
 
     digit       = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" ;
@@ -289,13 +289,12 @@ For generating the molecules, there is a very rough Finite State Machine that pa
     rgroup      = "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k" | "l" ;
     full        = aryl2, ["-"], [rgroup], ["-"], [rgroup], ["-"]
     end         = [aryl0, {aryl0}], [full, {full}], [xgroup]
-    end2        = "_", end
 
     extend      = ("n" | "m"), int ;
     stack       = ("x" | "y" | "z"), int ;
 
-    main        = [end], core, ([end2], [end2] | ["_", xgroup, end])
-    molecule    = main, {main}, ["_", extend], ["_", stack] {"_", stack}
+    main        = [end, "_"], core, ["_", end2, "_"], [("_" | "__"), end2]
+    molecule    = main, {"_", main}, ["_", extend], ["_", stack] {"_", stack}
 
 
 ### Molecule Specific ###

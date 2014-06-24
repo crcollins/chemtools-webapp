@@ -77,7 +77,7 @@ class BenzobisazoleTestCase(TestCase):
             name = template.format(group)
             try:
                 gjfwriter.Benzobisazole(name)
-                if group != "TON" and name != "CON_BB":
+                if group != "TON":
                     self.fail(name)
             except Exception:
                 pass
@@ -159,12 +159,11 @@ class BenzobisazoleTestCase(TestCase):
         names = [
             '5ba_TON_5ba55_TON_345495_2_TON_n6',
             '24a_TON_35b_24c',
-            '24a_TON_B24a',
             'TON_24a_24a',
             '24a_TON_24a',
             '24a_TON',
             '4a_TON_n2',
-            '4a_TON_B24c_n3',
+            '4a_TON_B_24c_n3',
             '4a_TON_35_2_m3',
             'TON_24a_24a_TON',
             'TON_24a__TON',
@@ -286,7 +285,6 @@ class MolNameTestCase(TestCase):
             ('TON_4b_n2', '_TON_A**_4bb_n2_m1'),
             ('TON_4bc_n2', '_TON_A**_4bc_n2_m1'),
             ('TON_44bc_n2', '_TON_A**_4aa4bc_n2_m1'),
-            ('TON_B4bc_n2', '_TON_B**_4bc_n2_m1'),  # special case
 
             ('TON_2__n2', '_TON_2**A**__n2_m1'),
             ('TON_4__n2', '_TON_4aaA**__n2_m1'),
