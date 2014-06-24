@@ -95,6 +95,9 @@ class Benzobisazole(Molecule):
         super(Benzobisazole, self).__init__(name, **kwargs)
         self.structure = structure.from_name(name)
         self._exact_name = None
+        self._naive_feature_vector = None
+        self._decay_feature_vector = None
+        self._decay_distance_correction_feature_vector = None
 
     def get_exact_name(self, spacers=False):
         if self._exact_name is None:
@@ -105,10 +108,23 @@ class Benzobisazole(Molecule):
             return self._exact_name.replace('*', '')
 
     def get_naive_feature_vector(self, **kwargs):
-        return get_naive_feature_vector(self.get_exact_name(spacers=True), **kwargs)
+        exact_name = self.get_exact_name(spacers=True)
+        if self._naive_feature_vector is None:
+            self._naive_feature_vector = get_naive_feature_vector(exact_name,
+                                                                    **kwargs)
+        return self._naive_feature_vector
 
-    def get_decay_feature_vector(self, power=1, H=1, lacunarity=1):
-        return get_decay_feature_vector(self.get_exact_name(spacers=True), power=1, H=1, lacunarity=1)
+    def get_decay_feature_vector(self, **kwargs):
+        exact_name = self.get_exact_name(spacers=True)
+        if self._decay_feature_vector is None:
+            self._decay_feature_vector = get_decay_feature_vector(exact_name,
+                                                                    **kwargs)
+        return self._decay_feature_vector
 
-    def get_decay_distance_correction_feature_vector(self, power=1, H=1, lacunarity=1):
-        return get_decay_distance_correction_feature_vector(self.get_exact_name(spacers=True), power=1, H=1, lacunarity=1)
+    def get_decay_distance_correction_feature_vector(self, **kwargs):
+        exact_name = self.get_exact_name(spacers=True)
+        if self._decay_distance_correction_feature_vector is None:
+            temp = get_decay_distance_correction_feature_vector(exact_name,
+                                                                **kwargs)
+            self._decay_distance_correction_feature_vector = temp
+        return self._decay_distance_correction_feature_vector
