@@ -23,7 +23,7 @@ $(function() {
         }
     });
 
-    function post_func() {
+    function multi_job_post_func() {
         event.preventDefault();
         var a = new FormData($("#id_job_form")[0]);
         var files = $("input[name='myfiles']").prop('files');
@@ -54,7 +54,7 @@ $(function() {
             }
         });
     }
-    $("#id_post").click(post_func);
+    $("#id_multi_job_post").click(multi_job_post_func);
 
 
 
@@ -95,7 +95,7 @@ $(function() {
             </div>
             {% if user.is_authenticated %}
             <div class="col-xs-4">
-                <button id="id_post" class="btn btn-lg btn-primary btn-block">Submit Jobs</button>
+                <button id="id_multi_job_post" class="btn btn-lg btn-primary btn-block">Submit Jobs</button>
             </div>
             {% endif %}
             <div class="col-xs-4">
