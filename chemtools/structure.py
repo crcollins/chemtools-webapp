@@ -6,7 +6,7 @@ import numpy
 from PIL import Image, ImageDraw
 import cairo
 
-from constants import COLORS, CONNECTIONS, DATAPATH, ARYL, XGROUPS, MASSES
+from constants import COLORS, COLORS2, CONNECTIONS, DATAPATH, ARYL, XGROUPS, MASSES
 from mol_name import parse_name
 from utils import get_full_rotation_matrix, get_angles
 from project.utils import StringIO
@@ -313,14 +313,15 @@ class Structure(object):
         ctx.set_line_width(0.1)
 
         for bond in self.bonds:
-            ctx.set_source_rgb(0, 0, 0)
-            point1 = bond.atoms[0].xyz_tuple
-            point2 = bond.atoms[1].xyz_tuple
-            ctx.move_to(point1[0], point1[1])
-            ctx.line_to(point2[0], point2[1])
+            ctx.set_source_rgb(*COLORS2[bond.type])
+            coords1 = bond.atoms[0].xyz[:2]
+            coords2 = bond.atoms[1].xyz[:2]
+            ctx.move_to(*(coords1.T.tolist()[0]))
+            ctx.line_to(*(coords2.T.tolist()[0]))
             ctx.stroke()
 
         for atom in self.atoms:
+            ctx.set_source_rgb(*COLORS2[atom.element])
             point = atom.xyz_tuple
             ctx.arc(point[0], point[1], 0.05, 0, 2*math.pi)
             ctx.fill()
