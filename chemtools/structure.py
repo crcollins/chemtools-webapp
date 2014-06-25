@@ -4,10 +4,12 @@ import copy
 
 import numpy
 from PIL import Image, ImageDraw
+import cairo
 
 from constants import COLORS, CONNECTIONS, DATAPATH, ARYL, XGROUPS, MASSES
 from mol_name import parse_name
 from utils import get_full_rotation_matrix, get_angles
+from project.utils import StringIO
 
 
 def from_data(filename):
@@ -290,6 +292,41 @@ class Structure(object):
                     draw.ellipse(circle, fill=COLORS[bond.atoms[x].element])
         #rotate to standard view
         return img.rotate(-90)
+
+    def draw2(self, scale):
+        '''Draws a basic image of the molecule.'''
+        offset = 0.25
+        mins, maxs = self.bounding_box()
+        mins = (mins-offset).T.tolist()[0]
+        dimensions = self.get_dimensions() + 2 * offset
+        dimensions *= scale
+
+        WIDTH = int(dimensions[0,0])
+        HEIGHT = int(dimensions[1,0])
+
+        f = StringIO()
+        surface = cairo.SVGSurface(f, WIDTH, HEIGHT)
+        ctx = cairo.Context(surface)
+
+        ctx.scale(scale, scale)
+        ctx.translate(-mins[0], -mins[1])
+        ctx.set_line_width(0.1)
+
+        for bond in self.bonds:
+            ctx.set_source_rgb(0, 0, 0)
+            point1 = bond.atoms[0].xyz_tuple
+            point2 = bond.atoms[1].xyz_tuple
+            ctx.move_to(point1[0], point1[1])
+            ctx.line_to(point2[0], point2[1])
+            ctx.stroke()
+
+        for atom in self.atoms:
+            point = atom.xyz_tuple
+            ctx.arc(point[0], point[1], 0.05, 0, 2*math.pi)
+            ctx.fill()
+
+        surface.write_to_png(f)
+        return f
 
     @property
     def mol2(self):
