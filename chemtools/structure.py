@@ -345,6 +345,10 @@ class Structure(object):
         maxs = numpy.max(coords, 1)
         return mins, maxs
 
+    def get_dimensions(self):
+        mins, maxs = self.bounding_box()
+        return maxs - mins
+
     ###########################################################################
     # Manipulate
     ###########################################################################
