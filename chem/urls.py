@@ -16,6 +16,7 @@ urlpatterns = patterns('chem.views',
     url(r"^(?P<molecule>[%s]*)\.gjf$" % molname, "write_gjf"),
     url(r"^(?P<molecule>[%s]*)\.mol2$" % molname, "write_mol2"),
     url(r"^(?P<molecule>[%s]*)\.png$" % molname, "write_png"),
+    url(r"^(?P<molecule>[%s]*)\.svg$" % molname, "write_svg"),
     url(r"^(?P<molecule>[%s]*)/report/$" % molname, "report"),
 
     url(r"^(?P<string>[%s]*)/$" % multimolname, "multi_molecule"),

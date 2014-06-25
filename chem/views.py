@@ -233,6 +233,15 @@ def write_png(request, molecule):
     response['Content-Disposition'] = 'filename=%s.png' % molecule
     return response
 
+
+def write_svg(request, molecule):
+    scale = request.REQUEST.get("scale", 10)
+
+    out = gjfwriter.Benzobisazole(molecule)
+    response = HttpResponse(out.get_svg(int(scale)), content_type="image/svg+xml")
+    response['Content-Disposition'] = 'filename=%s.svg' % molecule
+    return response
+
 ###########################################################
 ###########################################################
 # Upload

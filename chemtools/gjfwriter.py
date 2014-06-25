@@ -54,8 +54,8 @@ class Molecule(object):
         self.structure.draw(size).save(f, "PNG")
         return f.getvalue()
 
-    def get_svg(self):
-        pass
+    def get_svg(self, size=10):
+        return self.structure.draw2(size, svg=True).getvalue()
 
     def coulomb_matrix(self):
         coords = []

@@ -293,7 +293,7 @@ class Structure(object):
         #rotate to standard view
         return img.rotate(-90)
 
-    def draw2(self, scale):
+    def draw2(self, scale, svg=False):
         '''Draws a basic image of the molecule.'''
         offset = 0.25
         mins, maxs = self.bounding_box()
@@ -326,7 +326,10 @@ class Structure(object):
             ctx.arc(point[0], point[1], 0.05, 0, 2*math.pi)
             ctx.fill()
 
-        surface.write_to_png(f)
+        if svg:
+            surface.finish()
+        else:
+            surface.write_to_png(f)
         return f
 
     @property
