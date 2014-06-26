@@ -309,9 +309,9 @@ class Structure(object):
         ctx = cairo.Context(surface)
 
         ctx.scale(scale, scale)
-        ctx.rotate(-math.pi/2)
+        ctx.rotate(math.pi/2)
         # hack to fix the translation from the rotation
-        ctx.translate(-dimensions[0,0]/scale, 0)
+        ctx.translate(0, -dimensions[1,0]/scale)
         ctx.translate(-mins[0], -mins[1])
         ctx.set_line_width(0.1)
 
