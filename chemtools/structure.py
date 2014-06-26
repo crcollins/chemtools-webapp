@@ -301,14 +301,17 @@ class Structure(object):
         dimensions = self.get_dimensions() + 2 * offset
         dimensions *= scale
 
-        WIDTH = int(dimensions[0,0])
-        HEIGHT = int(dimensions[1,0])
+        WIDTH = int(dimensions[1,0])
+        HEIGHT = int(dimensions[0,0])
 
         f = StringIO()
         surface = cairo.SVGSurface(f, WIDTH, HEIGHT)
         ctx = cairo.Context(surface)
 
         ctx.scale(scale, scale)
+        ctx.rotate(-math.pi/2)
+        # hack to fix the translation from the rotation
+        ctx.translate(-dimensions[0,0]/scale, 0)
         ctx.translate(-mins[0], -mins[1])
         ctx.set_line_width(0.1)
 
