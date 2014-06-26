@@ -3,7 +3,6 @@ import math
 import copy
 
 import numpy
-from PIL import Image, ImageDraw
 import cairo
 
 from constants import COLORS, COLORS2, CONNECTIONS, DATAPATH, ARYL, XGROUPS, MASSES
