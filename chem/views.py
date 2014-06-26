@@ -328,14 +328,14 @@ def reset_gjf(request):
     strings = []
     names = []
     for f in parse_file_list(request.FILES.getlist('files')):
-        parser = fileparser.Log(f)
-
-        name, _ = os.path.splitext(f.name)
-        td = False
-        if request.REQUEST.get("td_reset"):
-            name += '_TD'
-            td = True
         try:
+            parser = fileparser.Log(f)
+
+            name, _ = os.path.splitext(f.name)
+            td = False
+            if request.REQUEST.get("td_reset"):
+                name += '_TD'
+                td = True
             strings.append(parser.format_gjf(td=td))
             names.append(name)
         except Exception as e:

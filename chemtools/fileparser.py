@@ -69,6 +69,9 @@ class Log(object):
                 for k, parser in self.parsers.items():
                     parser.parse(line.replace('\r', ''))
 
+            if "Normal termination of Gaussian" not in line:
+                raise Exception("The log file was invalid")
+
             # major memory saver by deleting all the line parser objects
             for parser in self.parsers:
                 self.parsers[parser] = (self.parsers[parser].value,
