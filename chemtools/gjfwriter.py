@@ -50,12 +50,10 @@ class Molecule(object):
         return self.structure.mol2
 
     def get_png(self, size=10):
-        f = StringIO()
-        self.structure.draw(size).save(f, "PNG")
-        return f.getvalue()
+        return self.structure.draw(size).getvalue()
 
     def get_svg(self, size=10):
-        return self.structure.draw2(size, svg=True).getvalue()
+        return self.structure.draw(size, svg=True).getvalue()
 
     def coulomb_matrix(self):
         coords = []

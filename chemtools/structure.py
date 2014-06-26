@@ -269,31 +269,7 @@ class Structure(object):
     # DISPLAY
     ###########################################################################
 
-    def draw(self, scale):
-        '''Draws a basic image of the molecule.'''
-        mins, maxs = self.bounding_box()
-        res = (scale * numpy.abs(mins - maxs)).astype(int) + int(.5 * scale)
-        xres = res[0, 0]
-        yres = res[1, 0]
-
-        img = Image.new("RGB", (xres, yres))
-        draw = ImageDraw.Draw(img)
-        s = int(scale * .25)
-        for bond in self.bonds:
-            pts = [(x.xyz[:2] - mins[:2]) * scale + s for x in bond.atoms]
-            ends = (pts[0][0, 0], pts[0][1, 0], pts[1][0, 0], pts[1][1, 0])
-            draw.line(ends, fill=COLORS[bond.type], width=scale / 10)
-            for x in xrange(2):
-                if bond.atoms[x].element not in "C":
-                    lower = pts[x] - s
-                    higher = pts[x] + s
-                    circle = (lower[0, 0], lower[1, 0],
-                            higher[0, 0], higher[1, 0])
-                    draw.ellipse(circle, fill=COLORS[bond.atoms[x].element])
-        #rotate to standard view
-        return img.rotate(-90)
-
-    def draw2(self, scale, svg=False):
+    def draw(self, scale, svg=False):
         '''Draws a basic image of the molecule.'''
         offset = 0.25
         mins, maxs = self.bounding_box()
