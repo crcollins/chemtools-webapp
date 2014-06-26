@@ -204,6 +204,16 @@ class BenzobisazoleTestCase(TestCase):
             obj = gjfwriter.Benzobisazole(name)
             obj.get_png()
 
+    def test_svg(self):
+        sets = [
+            self.templates,
+            self.valid_sides,
+        ]
+        for template, group in product(*sets):
+            name = template.format(group)
+            obj = gjfwriter.Benzobisazole(name)
+            obj.get_svg()
+
     def test_gjf(self):
         sets = [
             self.templates,

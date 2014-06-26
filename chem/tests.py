@@ -325,6 +325,12 @@ class MainPageTestCase(TestCase):
                                             args=(name, )))
             self.assertEqual(response.status_code, 200)
 
+    def test_write_svg(self):
+        for name in NAMES:
+            response = self.client.get(reverse(views.write_svg,
+                                            args=(name, )))
+            self.assertEqual(response.status_code, 200)
+
     def test_write_job(self):
         options = OPTIONS.copy()
         del options["job"]
