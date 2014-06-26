@@ -326,7 +326,7 @@ class Structure(object):
         for atom in self.atoms:
             ctx.set_source_rgb(*COLORS2[atom.element])
             point = atom.xyz_tuple
-            ctx.arc(point[0], point[1], 0.05, 0, 2*math.pi)
+            ctx.arc(point[0], point[1], 0.25, 0, 2*math.pi)
             ctx.fill()
 
         if svg:
