@@ -1,3 +1,5 @@
+import functools
+
 import numpy
 from numpy.linalg import norm
 from scipy.spatial.distance import pdist
@@ -8,6 +10,18 @@ from mol_name import get_exact_name
 from project.utils import StringIO
 from ml import get_decay_distance_correction_feature_vector, \
             get_naive_feature_vector, get_decay_feature_vector
+
+
+def cache(f):
+    @functools.wraps(f)
+    def wrapper(self, *args, **kwargs):
+        name = '_' + f.__name__.lstrip('get')
+        value = self.__dict__.get(name, None)
+        if value is None:
+            value = f(self, *args, **kwargs)
+        self.__dict__[name] = value
+        return self.__dict__[name]
+    return wrapper
 
 
 class Molecule(object):
@@ -55,7 +69,8 @@ class Molecule(object):
     def get_svg(self, size=10):
         return self.structure.draw(size, svg=True).getvalue()
 
-    def coulomb_matrix(self):
+    @cache
+    def get_coulomb_matrix(self):
         coords = []
         other = []
 
@@ -77,8 +92,9 @@ class Molecule(object):
 
         return data
 
-    def coulomb_matrix_feature(self):
-        data = self.coulomb_matrix()
+    @cache
+    def get_coulomb_matrix_feature(self):
+        data = self.get_coulomb_matrix()
         vector = []
         end = []
         for i in xrange(data.shape[0]):
@@ -93,9 +109,6 @@ class Benzobisazole(Molecule):
         super(Benzobisazole, self).__init__(name, **kwargs)
         self.structure = structure.from_name(name)
         self._exact_name = None
-        self._naive_feature_vector = None
-        self._decay_feature_vector = None
-        self._decay_distance_correction_feature_vector = None
 
     def get_exact_name(self, spacers=False):
         if self._exact_name is None:
@@ -105,24 +118,18 @@ class Benzobisazole(Molecule):
         else:
             return self._exact_name.replace('*', '')
 
+    @cache
     def get_naive_feature_vector(self, **kwargs):
         exact_name = self.get_exact_name(spacers=True)
-        if self._naive_feature_vector is None:
-            self._naive_feature_vector = get_naive_feature_vector(exact_name,
-                                                                    **kwargs)
-        return self._naive_feature_vector
+        return get_naive_feature_vector(exact_name, **kwargs)
 
+    @cache
     def get_decay_feature_vector(self, **kwargs):
         exact_name = self.get_exact_name(spacers=True)
-        if self._decay_feature_vector is None:
-            self._decay_feature_vector = get_decay_feature_vector(exact_name,
-                                                                    **kwargs)
-        return self._decay_feature_vector
+        return get_decay_feature_vector(exact_name, **kwargs)
 
+    @cache
     def get_decay_distance_correction_feature_vector(self, **kwargs):
         exact_name = self.get_exact_name(spacers=True)
-        if self._decay_distance_correction_feature_vector is None:
-            temp = get_decay_distance_correction_feature_vector(exact_name,
-                                                                **kwargs)
-            self._decay_distance_correction_feature_vector = temp
-        return self._decay_distance_correction_feature_vector
+        return get_decay_distance_correction_feature_vector(exact_name,
+                                                            **kwargs)
