@@ -268,7 +268,8 @@ class Structure(object):
     # DISPLAY
     ###########################################################################
 
-    def draw(self, scale, svg=False):
+    def draw(self, scale, svg=False, hydrogens=True, colors=True,
+            fancy_bonds=True):
         '''Draws a basic image of the molecule.'''
         offset = 0.25
         mins, maxs = self.bounding_box()
@@ -290,15 +291,43 @@ class Structure(object):
         ctx.translate(-mins[0], -mins[1])
         ctx.set_line_width(0.1)
 
+        def draw_bond(ctx, coords1, coords2, unit, factors):
+            for x in factors:
+                ctx.move_to(*((x * unit + coords1).T.tolist()[0]))
+                ctx.line_to(*((x * unit + coords2).T.tolist()[0]))
+                ctx.stroke()
+
+        ctx.set_source_rgb(*COLORS2['1'])
         for bond in self.bonds:
-            ctx.set_source_rgb(*COLORS2[bond.type])
-            coords1 = bond.atoms[0].xyz_tuple[:2]
-            coords2 = bond.atoms[1].xyz_tuple[:2]
-            ctx.move_to(*coords1)
-            ctx.line_to(*coords2)
-            ctx.stroke()
+            if not hydrogens and any(x.element == 'H' for x in bond.atoms):
+                continue
+            if colors:
+                ctx.set_source_rgb(*COLORS2[bond.type])
+
+            coords1 = numpy.matrix(bond.atoms[0].xyz_tuple[:2]).T
+            coords2 = numpy.matrix(bond.atoms[1].xyz_tuple[:2]).T
+
+            temp = (coords2 - coords1)
+            mag = numpy.linalg.norm(temp)
+            unit = numpy.matrix([-temp[1,0]/mag, temp[0,0]/mag]).T
+            if fancy_bonds:
+                if bond.type == '2':
+                    draw_bond(ctx, coords1, coords2, unit, [0.1, -0.1])
+                elif bond.type == '3':
+                    draw_bond(ctx, coords1, coords2, unit, [0.2, 0.0, -0.2])
+                elif bond.type == 'Ar':
+                    ctx.save()
+                    ctx.set_dash([0.3, 0.15])
+                    draw_bond(ctx, coords1, coords2, unit, [0.1, -0.1])
+                    ctx.restore()
+                else:
+                    draw_bond(ctx, coords1, coords2, unit, [0.0])
+            else:
+                draw_bond(ctx, coords1, coords2, unit, [0.0])
 
         for atom in self.atoms:
+            if not hydrogens and atom.element == 'H':
+                continue
             ctx.set_source_rgb(*COLORS2[atom.element])
             point = atom.xyz_tuple
             ctx.arc(point[0], point[1], 0.25, 0, 2*math.pi)
