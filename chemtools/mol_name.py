@@ -263,7 +263,7 @@ def parse_name(name):
             (
                 'TON',
                 (
-                    [('4', 0, False), ('a', 1, False), ('a', 1, False)],
+                    [('4', -1, False), ('a', 1, False), ('a', 1, False)],
                     None,
                     [('5', -1, True), ('b', 0, False), ('b', 0, False)]
                 )
@@ -273,7 +273,7 @@ def parse_name(name):
                 (
                     None,
                     None,
-                    [('4', 0, False), ('c', 1, False), ('d', 1, False)]
+                    [('4', -1, False), ('c', 1, False), ('d', 1, False)]
                 )
             )
         ],
