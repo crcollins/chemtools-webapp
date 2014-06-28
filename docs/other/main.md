@@ -28,16 +28,19 @@ Cores are made up of three parts, the type, the "x" element, and the "y" element
     7 = Carbazole
     8 = TZ
     9 = EDOT
-    [DTP]
+    10 = DTP
+    11 = Acetyl
+    12 = Furan
+    13 = Pyrrole
 
 Within Aryl there are also two minor sub classifications of Aryl groups.
 #### Zero Substituent ####
 
-    2,3,8,9
+    2,3,8,9,10,11
 
 #### Two Substituent ####
 
-    4,5,6,7
+    4,5,6,7,12,13
 
 
 ### X-Groups ####
@@ -284,8 +287,8 @@ For generating the molecules, there is a very rough Finite State Machine that pa
     XX          = "O" | "S" | YY ;
     type        = "C" | "T" | "E" | "Z" ;
     core        = type, XX, YY ;
-    aryl0       = "2" | "3" | "8" | "9" ;
-    aryl2       = "4" | "5" | "6" | "7" ;
+    aryl0       = "10" | "11" | "2" | "3" | "8" | "9" ;
+    aryl2       = "12" | "13" | "4" | "5" | "6" | "7" ;
     aryl        = aryl0 | aryl2 ;
     xgroup      = "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" | "K" | "L" | "M" ;
     rgroup      = "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k" | "l" | "m" ;
