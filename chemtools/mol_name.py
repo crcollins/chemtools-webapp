@@ -120,8 +120,6 @@ def parse_cores(parts):
             else:
                 output.append([part, []])
         output[i][1].append(part)
-    if output[0][0] is None:
-        raise Exception(1, "Bad Core Name")
     return output
 
 
@@ -224,8 +222,12 @@ def check_sides(parsedsides, numsets, idx, nm):
 
 
 def get_sides(parts, core_idx):
-    left = parts[:core_idx][0] if parts[:core_idx] else None
-    right = parts[core_idx + 1:]
+    if core_idx is not None:
+        left = parts[:core_idx][0] if parts[:core_idx] else None
+        right = parts[core_idx + 1:]
+    else:
+        right = parts
+        left = None
 
     if not right:
         right = None
@@ -288,7 +290,11 @@ def parse_name(name):
 
     output = []
     for idx, (core, parts) in enumerate(partsets):
-        core_idx = parts.index(core)
+        if core is not None:
+            core_idx = parts.index(core)
+        else:
+            core_idx = None
+
         sides = get_sides(parts, core_idx)
 
         parsedsides = tuple(parse_end_name(x) if x else None for x in sides)
@@ -328,7 +334,9 @@ def get_exact_name(name, spacers=False):
             parts.append(endname)
 
         # only first set will have left sides
-        if num == 0:
+        if core is None:
+            coreset = ''.join([parts[2]])
+        elif num == 0:
             coreset = '_'.join([parts[0], core, parts[1], parts[2]])
         else:
             coreset = '_'.join([core, parts[1], parts[2]])

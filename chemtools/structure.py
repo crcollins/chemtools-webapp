@@ -62,14 +62,18 @@ def from_log(file):
 def _load_fragments(coreset):
     corename, (leftparsed, middleparsed, rightparsed) = coreset
     # molecule, name, parent
-    core = (from_data(corename), corename, corename)
+    if corename is not None:
+        core = (from_data(corename), corename, corename)
+    else:
+        core = (None, None, None)
 
     fragments = []
     for side in [middleparsed] * 2 + [rightparsed, leftparsed]:
         temp = []
         if side is not None:
             for (char, parentid, flip) in side:
-                parentid += 1  # offset for core
+                if all(x is not None for x in core):
+                    parentid += 1  # offset for core
                 struct = from_data(char)
                 temp.append((struct, char, parentid))
                 if flip:
@@ -98,10 +102,18 @@ def from_name(name):
     for coreset in coresets:
         core, fragments = _load_fragments(coreset)
 
+        null_core = False
         ends = []
+        if all(x is None for x in core):
+            core = fragments[2][0]
+            fragments = [fragments[2][1:]]
+            null_core = True
         cends = core[0].open_ends()
         #bond all of the fragments together
         for j, side in enumerate(fragments):
+            if not side:
+                continue
+
             if side[0] is None:
                 ends.append(cends[j])
                 continue
@@ -109,7 +121,7 @@ def from_name(name):
             this = [core] + side
             for (part, char, parentid) in side:
                 bondb = part.next_open()
-                if not parentid:
+                if not parentid and not null_core:
                     bonda = cends[j]
                 else:
                     c = bondb.connection()
