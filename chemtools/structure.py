@@ -108,14 +108,20 @@ def from_name(name):
             core = fragments[2][0]
             fragments = [fragments[2][1:]]
             null_core = True
-        cends = core[0].open_ends()
+        cends = core[0].open_ends('~*')
+
+        if null_core:
+            ends = [None, None]
+            ends.append(cends[0])
+            cends = cends[1:]
+
         #bond all of the fragments together
         for j, side in enumerate(fragments):
-            if not side:
-                continue
-
-            if side[0] is None:
-                ends.append(cends[j])
+            if not side or side[0] is None:
+                # This conditional is for edge cases like when it is just an
+                # X group for the molecule
+                if cends:
+                    ends.append(cends[j])
                 continue
 
             this = [core] + side
@@ -130,21 +136,29 @@ def from_name(name):
                         c = "+"
                     elif char.isupper():
                         c += "~"
-                    bonda = this[parentid][0].next_open(c)
+                    # skip is to jump the first open bond if this is a coreless
+                    # chain. This is needed to prevent infinte recursion with
+                    # the same two bonds trying to connect to each other.
+                    skip = null_core and not parentid and '~' in c
+                    bonda = this[parentid][0].next_open(c, skip=skip)
 
                 if bonda and bondb:
                     this[parentid][0].merge(bonda, bondb, part)
                 else:
                     raise Exception(6, "Part not connected")
 
+            # The skip here is dependent on if there are any other aryl groups
+            # in the chain. If there are none, then the first open needs
+            # skipping
+            skip = null_core and not [x for x in side if x[1] in ARYL]
             # find the furthest part and get its parent's next open
             if char in ARYL:
-                ends.append(part.next_open('~'))
+                ends.append(part.next_open('~', skip=skip))
             elif char in XGROUPS:
                 ends.append(None)
             else:  # find R-Group parent
                 furthest = max(x[2] for x in side)
-                ends.append(this[furthest][0].next_open('~'))
+                ends.append(this[furthest][0].next_open('~',  skip=skip))
 
         #merge the fragments into single molecule
         temp = _concatenate_fragments(core[0], fragments)
@@ -423,13 +437,17 @@ class Structure(object):
                 openbonds.append(bond)
         return openbonds
 
-    def next_open(self, connections=CONNECTIONS):
+    def next_open(self, connections=CONNECTIONS, skip=False):
         '''Returns the next open bond of the given connection type.'''
         # scans for the first available bond in order of importance.
         bonds = self.open_ends()
+        found = False
         for conn in connections:
             for bond in bonds:
                 if conn in bond.connection():
+                    if skip and not found:
+                        found = True
+                        continue
                     return bond
 
     def close_ends(self):
