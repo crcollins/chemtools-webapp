@@ -221,6 +221,7 @@ class BenzobisazoleTestCase(TestCase):
         "{0}_TNN_{0}_",
         "CPP_{0}_{0}",
         "{0}_TON_{0}_{0}",
+        "{0}",
     ]
     cores = constants.CORES
     invalid_cores = ["cao", "bo", "CONA", "asD"]
@@ -282,6 +283,8 @@ class BenzobisazoleTestCase(TestCase):
             self.valid_polymer_options
         ]
         for template, group, option in product(*sets):
+            if template == '{0}' and option.startswith('_m'):
+                continue
             name = template.format(group) + option
             gjfwriter.Benzobisazole(name)
 
