@@ -124,23 +124,28 @@ def parse_cores(parts):
 
 
 def parse_end_name(name):
-    xgroup = ''.join(XGROUPS)
-    rgroup = ''.join(RGROUPS)
-    aryl0 = ''.join(ARYL0)
-    aryl2 = ''.join(ARYL2)
+    xgroup = XGROUPS
+    rgroup = RGROUPS
+    aryl0 = ARYL0
+    aryl2 = ARYL2
     block = xgroup + aryl0 + aryl2
     substituent = block + rgroup
+
+    xstring = ''.join(XGROUPS)
+    rstring = ''.join(RGROUPS)
+
+    tokens = re.findall('(1?\d|-|[%s%s])' % (xstring, rstring), name)
 
     parts = []
     r = 0
     # start with -1 to add 1 later for core
     lastconnect = -1
     state = "start"
-    for i, char in enumerate(name):
-        if char not in substituent and char != '-':
-            raise ValueError("Bad Substituent Name: %s (%d)" % (char, i))
+    for i, token in enumerate(tokens):
+        if token not in substituent and token != '-':
+            raise ValueError("Bad Substituent Name: %s (%d)" % (token, i))
 
-        if char == "-":
+        if token == "-":
             previous = parts[lastconnect]
             if previous[0] in aryl0 + aryl2:
                 parts[lastconnect] = (previous[0], previous[1], True)
@@ -149,54 +154,54 @@ def parse_end_name(name):
                 raise ValueError("reflection only allowed for aryl groups")
 
         if state == "start":
-            if char in xgroup:
+            if token in xgroup:
                 state = "end"
-            elif char in aryl0:
+            elif token in aryl0:
                 state = "aryl0"
-            elif char in aryl2:
+            elif token in aryl2:
                 state = "aryl2"
             else:
                 raise ValueError("no rgroups allowed")
-            parts.append((char, lastconnect, False))
+            parts.append((token, lastconnect, False))
             r = 0
             lastconnect = len(parts) - 1
 
         elif state == "aryl0":
-            if char in xgroup:
+            if token in xgroup:
                 state = "end"
-            elif char in aryl0:
+            elif token in aryl0:
                 state = "aryl0"
-            elif char in aryl2:
+            elif token in aryl2:
                 state = "aryl2"
             else:
                 raise ValueError("no rgroups allowed")
-            parts.append((char, lastconnect, False))
+            parts.append((token, lastconnect, False))
             lastconnect = len(parts) - 1
 
         elif state == "aryl2":
-            if char not in rgroup:
-                if char in xgroup:
+            if token not in rgroup:
+                if token in xgroup:
                     state = "end"
-                elif char in aryl0:
+                elif token in aryl0:
                     state = "aryl0"
-                elif char in aryl2:
+                elif token in aryl2:
                     state = "aryl2"
                 parts.append(("a", lastconnect, False))
                 parts.append(("a", lastconnect, False))
-                parts.append((char, lastconnect, False))
+                parts.append((token, lastconnect, False))
                 lastconnect = len(parts) - 1
             else:
                 if not r:
                     if i + 1 < len(name) and name[i + 1] in rgroup:
-                        parts.append((char, lastconnect, False))
+                        parts.append((token, lastconnect, False))
                         r += 1
                     else:
-                        parts.append((char, lastconnect, False))
-                        parts.append((char, lastconnect, False))
+                        parts.append((token, lastconnect, False))
+                        parts.append((token, lastconnect, False))
                         r += 2
                         state = "start"
                 else:
-                    parts.append((char, lastconnect, False))
+                    parts.append((token, lastconnect, False))
                     r += 1
                     state = "start"
 
