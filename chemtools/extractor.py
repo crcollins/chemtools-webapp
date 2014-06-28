@@ -2,12 +2,11 @@ import os
 import itertools
 
 from molecule import Atom, Bond
+from constants import RGROUPS, ARYL
 
 
 PARTS_OF_NAME = ['C', 'T', 'Z', 'E'], ['2', '3', '4'], ['3', '4']
 CORES = [''.join(x) for x in itertools.product(*PARTS_OF_NAME)]
-RGROUPS = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l']
-ARYL = ['2', '3', '4', '5', '6', '7', '8', '9']
 COREPARTS = ["*~0", "*~1", "~0", "~1"]
 XRPARTS = ["*+0", "*+1"]
 ARYLPARTS = ["~0", "~1", "+0", "+1"]
