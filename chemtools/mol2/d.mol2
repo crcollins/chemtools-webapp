@@ -1,0 +1,21 @@
+# Molecule Name
+# Created by GaussView 3.09
+#
+
+#
+#
+
+@<TRIPOS>MOLECULE
+Molecule Name
+3 2
+SMALL
+NO_CHARGES
+
+
+@<TRIPOS>ATOM
+1 N1     1.9942     0.9317     0.0000 N
+2 C2     0.8476     0.9317     0.0000 C
+3 Sg3    -0.4524     0.9317     0.0000 Sg
+@<TRIPOS>BOND
+1 1 2 3
+2 2 3 1
