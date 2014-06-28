@@ -12,8 +12,8 @@ CORE_FREE = ([0, 0, 1, 1, 2], [0, 0, 1])
 SCORES = [''.join(x) for x in product(['E', 'Z'], *CORE_COMBO)]
 DCORES = [''.join(x) for x in product(['C', 'T'], *CORE_COMBO)]
 CORES = SCORES + DCORES
-XGROUPS = list(string.uppercase[:12])
-RGROUPS = list(string.lowercase[:12])
+XGROUPS = list(string.uppercase[:13])
+RGROUPS = list(string.lowercase[:13])
 ARYL0 = ['2', '3', '8', '9']
 ARYL2 = ['4', '5', '6', '7']
 ARYL = ARYL0 + ARYL2
@@ -33,6 +33,7 @@ COLORS = {
     'N': (0, 0, 255),
     'P': (255, 128, 0),
     'Cl': (0, 255, 0),
+    'F': (0, 200, 160),
     'Br': (180, 0, 0),
     'C': (128, 128, 128),
     'H': (220, 220, 220),
@@ -51,6 +52,7 @@ MASSES = {
     'Br': 79.91,
     'H': 1.0079,
     'Si': 28.09,
+    'F': 19.00,
 }
 NUMBERS = {
     'C': 6,
@@ -62,4 +64,5 @@ NUMBERS = {
     'Br': 35,
     'H': 1,
     'Si': 14,
+    'F': 9,
 }

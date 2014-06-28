@@ -54,6 +54,7 @@ Within Aryl there are also two minor sub classifications of Aryl groups.
     J = Phenyl
     K = TMS
     L = OCH_3
+    M = Fluorine
 
 
 ### R-Groups ####
@@ -70,6 +71,7 @@ Within Aryl there are also two minor sub classifications of Aryl groups.
     j = Phenyl
     k = TMS
     l = OCH_3
+    m = Fluorine
 
 
 From there the name takes a form similar to this:
@@ -285,8 +287,8 @@ For generating the molecules, there is a very rough Finite State Machine that pa
     aryl0       = "2" | "3" | "8" | "9" ;
     aryl2       = "4" | "5" | "6" | "7" ;
     aryl        = aryl0 | aryl2 ;
-    xgroup      = "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" | "K" | "L" ;
-    rgroup      = "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k" | "l" ;
+    xgroup      = "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" | "K" | "L" | "M" ;
+    rgroup      = "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k" | "l" | "m" ;
     full        = aryl2, ["-"], [rgroup], ["-"], [rgroup], ["-"] ;
     end         = [aryl0, {aryl0}], [full, {full}], [xgroup] ;
 
@@ -325,6 +327,8 @@ The last molecule specific access is the png image. It is a very basic rendering
     Phosphorus      = orange dot
     Hydrogen        = off white dot
     Silicon         = green/gray dot
+    Flourine        = green/blue dot
+
 
 Similar to the gjf file, the images can be parameterized, with their scaling. The default view is a size 10 which means the atoms have a diameter of 10.
 
