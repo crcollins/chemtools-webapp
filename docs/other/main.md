@@ -287,14 +287,14 @@ For generating the molecules, there is a very rough Finite State Machine that pa
     aryl        = aryl0 | aryl2 ;
     xgroup      = "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" | "K" | "L" ;
     rgroup      = "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k" | "l" ;
-    full        = aryl2, ["-"], [rgroup], ["-"], [rgroup], ["-"]
-    end         = [aryl0, {aryl0}], [full, {full}], [xgroup]
+    full        = aryl2, ["-"], [rgroup], ["-"], [rgroup], ["-"] ;
+    end         = [aryl0, {aryl0}], [full, {full}], [xgroup] ;
 
     extend      = ("n" | "m"), int ;
     stack       = ("x" | "y" | "z"), int ;
 
-    main        = [end, "_"], core, ["_", end2, "_"], [("_" | "__"), end2]
-    molecule    = main, {"_", main}, ["_", extend], ["_", stack] {"_", stack}
+    main        = [end, "_"], core, ["_", end2, "_"], [("_" | "__"), end2] ;
+    molecule    = main, {"_", main}, ["_", extend], ["_", stack] {"_", stack} ;
 
 
 ### Molecule Specific ###
