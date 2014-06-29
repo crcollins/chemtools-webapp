@@ -298,6 +298,8 @@ def parse_name(name):
         if core is not None:
             core_idx = parts.index(core)
         else:
+            # If there is no core, join all the parts together into 1 chain
+            parts = [''.join(parts)]
             core_idx = None
 
         sides = get_sides(parts, core_idx)
