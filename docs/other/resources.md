@@ -13,6 +13,7 @@ Hammet Parameters
     i   CH_3  -0.17   -0.069
     j   Ph
     k   TMS
-    l   OCH_3 -0.268  +0.115
+    l   OCH_3 -0.268   0.115
+    m   F      0.062   0.337
 
 0.043 eV = 1 kcal/mol
