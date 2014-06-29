@@ -94,7 +94,7 @@ class Credential(models.Model):
             return False
 
 
-class CredentialForm(forms.ModelForm):
+class CredentialAdminForm(forms.ModelForm):
     password = forms.CharField(max_length=50, required=False,
                             widget=forms.PasswordInput)
     password2 = forms.CharField(max_length=50, required=False,
@@ -102,12 +102,8 @@ class CredentialForm(forms.ModelForm):
 
     class Meta:
         model = Credential
-        fields = ("cluster", "username", "password",
+        fields = ("user", "cluster", "username", "password",
                 "password2", "use_password")
-
-    def __init__(self, user, *args, **kwargs):
-        super(CredentialForm, self).__init__(*args, **kwargs)
-        self.user = user
 
     def clean_use_password(self):
         password = self.cleaned_data.get("password")
@@ -119,6 +115,17 @@ class CredentialForm(forms.ModelForm):
         if password != password2:
             raise forms.ValidationError("Your passwords do not match")
         return True
+
+
+class CredentialForm(CredentialAdminForm):
+    class Meta:
+        model = Credential
+        fields = ("cluster", "username", "password",
+                "password2", "use_password")
+
+    def __init__(self, user, *args, **kwargs):
+        super(CredentialForm, self).__init__(*args, **kwargs)
+        self.user = user
 
 
 class Job(models.Model):
