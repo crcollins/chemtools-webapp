@@ -8,6 +8,11 @@ from structure import from_data
 from data.models import Predictor
 
 
+ARYL = [x for x in ARYL if len(x) == 1]
+XGROUPS = XGROUPS[:-1]
+RGROUPS = RGROUPS[:-1]
+
+
 def get_core_features(core):
     if core[0] == "T":
         corefeatures = [1]
