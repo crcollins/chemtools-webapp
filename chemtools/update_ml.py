@@ -124,6 +124,7 @@ def fit_func(X, y, clf=None):
 
     clf = OptimizedCLF(X, y, func, params).get_optimized_clf()
     train, test = test_clf_kfold(X, y, clf, folds=10)
+    clf.fit(X, y.T.tolist()[0])
     clf.test_error = test
     return clf
 
