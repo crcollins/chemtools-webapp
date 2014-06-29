@@ -24,7 +24,7 @@ from models import ErrorReport
 NAMES = ["24a_TON", "24b_TSP_24a_24a", "CON_24a", "A_TON_A_A", "TON_CCC"]
 BAD_NAMES = [
         ("2a_TON_CC", "no rgroups allowed"),
-        ("ASADA", "Bad Substituent Name: S (1)"),
+        ("ASADA", "Bad Substituent Name"),
         ("TON_CC_CC", "can not attach to end"),
 ]
 TEST_NAMES = ["A_TON_A_A", "A_TON_A_A_TD"]
@@ -106,6 +106,7 @@ SUB_OPTIONS2["credential"] = 2
 KEYWORDS_SET = ["opt HF/6-31g(d)", "td b3lyp/6-31g(d)", KEYWORDS]
 SUBMIT_ERROR = "You must be a staff user to submit a job."
 CRED_ERROR = "Invalid credential"
+
 
 class MainPageTestCase(TestCase):
     def setUp(self):
@@ -1025,7 +1026,7 @@ class UtilsServerTestCase(TestCase):
         names = "E-N,C-N"
         results = utils.run_standard_jobs(self.credential2, names, jobstring=job)
         for name, error in results['failed']:
-            self.assertEqual(error, "reflection only allowed for aryl groups")
+            self.assertEqual(error, "Bad Substituent Name")
 
 
 class UploadsTestCase(TestCase):

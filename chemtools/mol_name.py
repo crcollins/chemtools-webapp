@@ -123,6 +123,7 @@ def parse_cores(parts):
     return output
 
 
+
 def parse_end_name(name):
     xgroup = XGROUPS
     rgroup = RGROUPS
@@ -135,6 +136,8 @@ def parse_end_name(name):
     rstring = ''.join(RGROUPS)
 
     tokens = re.findall('(1?\d|-|[%s%s])' % (xstring, rstring), name)
+    if ''.join(tokens) != name:
+        raise ValueError("Bad Substituent Name")
 
     parts = []
     r = 0
@@ -142,9 +145,6 @@ def parse_end_name(name):
     lastconnect = -1
     state = "start"
     for i, token in enumerate(tokens):
-        if token not in substituent and token != '-':
-            raise ValueError("Bad Substituent Name: %s (%d)" % (token, i))
-
         if token == "-":
             previous = parts[lastconnect]
             if previous[0] in aryl0 + aryl2:
