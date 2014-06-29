@@ -10,9 +10,10 @@ from data.models import JobTemplate
 
 def frag_index(request):
     xrnames = ["H", "Cl", "Br", "CN", "CCH", "OH",
-            "SH", "NH_2", "CH_3", "phenyl", "TMS", "OCH_3"]
-    arylnames = ["double bond", "triple bond", "phenyl",
-                "thiophene", "pyridine", "carbazole", "TZ", "EDOT"]
+            "SH", "NH_2", "CH_3", "phenyl", "TMS", "OCH_3", "F"]
+    arylnames = ["double bond", "triple bond", "phenyl", "thiophene",
+                "pyridine", "carbazole", "TZ", "EDOT", "DTF", "acetyl",
+                "furan", "pyrrole"]
     data = (
         ["Cores", CORES],
         ["X/R Groups", zip(RGROUPS, xrnames)],
