@@ -3,7 +3,7 @@ import math
 from numpy.linalg import norm
 import numpy
 
-from constants import CORE_COMBO, ARYL, ARYL2, XGROUPS, RGROUPS, NEEDSPACE
+from constants import CORE_COMBO, ARYL, XGROUPS, RGROUPS
 from structure import from_data
 from data.models import Predictor
 
@@ -140,122 +140,6 @@ def get_decay_distance_correction_feature_vector(exactname, power=1, H=1, lacuna
 
 def decay_function(distance, power=1, H=1, lacunarity=1):
     return (lacunarity * (distance ** -H)) ** power
-
-
-def get_name_from_naive_feature_vector(vector, limit=4):
-    core = ''
-    if vector[0]:
-        core += 'T'
-    else:
-        core += 'C'
-    vector = vector[1:]
-
-    first, second = CORE_COMBO
-    core += first[vector.index(1)]
-    vector = vector[len(first):]
-    core += second[vector.index(1)]
-    vector = vector[len(second):]
-
-    first = ARYL + XGROUPS
-    second = ['*'] + RGROUPS
-    length = len(first) + 2 * len(second)
-    sides = []
-    while len(vector) > length:
-        count = 0
-        name = ''
-        while count < limit:
-            try:
-                name += first[vector.index(1)]
-                vector = vector[len(first):]
-                name += second[vector.index(1)]
-                vector = vector[len(second):]
-                name += second[vector.index(1)]
-                vector = vector[len(second):]
-                count += 1
-            except IndexError:
-                vector = vector[length * (limit - count):]
-                break
-        sides.append(name)
-
-    extra = "n%d_m%d_x%d_y%d_z%d" % tuple(vector[:-1])
-    return '_'.join([sides[0], core, sides[1], sides[2], extra])
-
-
-def argmax(vector):
-    return max(enumerate(vector), key=lambda x: x[1])[0]
-
-
-def consume(vector, options):
-    temp = vector[:len(options)]
-    idx = argmax(temp)
-    if temp[idx] == 0:
-        raise IndexError
-    return options[idx]
-
-
-def get_name_from_weighted_naive_feature_vector(vector, limit=4):
-    core = ''
-    if vector[0] > 0:
-        core += 'T'
-    else:
-        core += 'C'
-    vector = vector[1:]
-
-    first, second = CORE_COMBO
-    core += consume(vector, first)
-    vector = vector[len(first):]
-    core += consume(vector, second)
-    vector = vector[len(second):]
-
-    first = ARYL + XGROUPS
-    second = ['*'] + RGROUPS
-    length = len(first) + 2 * len(second)
-    sides = []
-    while len(vector) > length:
-        count = 0
-        name = ''
-        saved = []
-        while count < limit:
-            fraction = 0
-            count += 1
-            temp = []
-            try:
-                for group in [first, second, second]:
-                    temp.append(sorted([(x, group[i]) for i, x in enumerate(vector[:len(group)])], reverse=True))
-                    vector = vector[len(group):]
-                    fraction += len(group)
-            except IndexError:
-                vector = vector[length * (limit - count) + (length - fraction):]
-                break
-
-            single = []
-            multi = []
-            singleoption = [NEEDSPACE, '*', '*']
-            multioption = [ARYL2, RGROUPS, RGROUPS]
-            for i, (pair, selector, selector2) in enumerate(zip(temp, singleoption, multioption)):
-                for (val, char) in pair:
-                    if len(single) <= i and char in selector:
-                        single.append((val, char))
-                    elif len(multi) <= i and char in selector2:
-                        multi.append((val, char))
-
-            singleval = sum(x[0] for x in single)
-            multival = sum(x[0] for x in multi)
-            saved.append(((singleval, single), (multival, multi)))
-
-        names = [(0, '')]
-        total = 0
-        totalname = ''
-        for i, (single, multi) in enumerate(saved):
-            names[-1] = (names[-1][0] + single[0], names[-1][1] + single[1][0][1] + '**')
-            total += multi[0]
-            totalname += ''.join([x[1] for x in multi[1]])
-            names.append((total, totalname))
-        single, _ = saved[-1]
-        names[-1] = (names[-1][0] + single[0], names[-1][1] + single[1][0][1] + '**')
-        sides.append(sorted(names, reverse=True)[0][1])
-    extra = "n%d_m%d_x%d_y%d_z%d" % tuple([math.ceil(abs(x)) for x in vector[:-1]])
-    return '_'.join([sides[0], core, sides[1], sides[2], extra])
 
 
 def get_properties_from_decay_with_predictions(feature):

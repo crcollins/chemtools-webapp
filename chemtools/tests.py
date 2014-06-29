@@ -724,22 +724,6 @@ class MLTestCase(TestCase):
         self.assertEqual(ml.get_naive_feature_vector(name),
                         NAIVE_FEATURE_VECTOR)
 
-    def test_get_name_from_naive_feature_vector(self):
-        names = ["A**_TON_A**_A**_n1_m1_x1_y1_z1",
-                "A**_CON_A**_A**_n1_m1_x1_y1_z1"]
-        for name in names:
-            vector = ml.get_naive_feature_vector(name)
-            actual = ml.get_name_from_naive_feature_vector(vector)
-            self.assertEqual(actual, name)
-
-    def test_get_name_from_weighted_naive_feature_vector(self):
-        names = ["A**_TON_A**_A**_n1_m1_x1_y1_z1",
-                "A**_CON_A**_A**_n1_m1_x1_y1_z1"]
-        for name in names:
-            vector = ml.get_naive_feature_vector(name)
-            actual = ml.get_name_from_weighted_naive_feature_vector(vector)
-            self.assertEqual(actual, name)
-
     def test_get_decay_feature_vector(self):
         name = "A**_TON_A**_A**_n1_m1_x1_y1_z1"
         self.assertEqual(ml.get_decay_feature_vector(name),
