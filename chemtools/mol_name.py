@@ -192,7 +192,7 @@ def parse_end_name(name):
                 lastconnect = len(parts) - 1
             else:
                 if not r:
-                    if i + 1 < len(name) and name[i + 1] in rgroup:
+                    if i + 1 < len(tokens) and tokens[i + 1] in rgroup:
                         parts.append((token, lastconnect, False))
                         r += 1
                     else:
