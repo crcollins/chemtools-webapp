@@ -13,7 +13,7 @@ import constants
 import extractor
 import mol_name
 import ml
-import molecule
+import structure
 import fileparser
 import graph
 from project.utils import StringIO
@@ -737,7 +737,7 @@ class MLTestCase(TestCase):
 
 class MoleculeTestCase(TestCase):
     def test_atom_print(self):
-        atom = molecule.Atom(0, 0, 0, "C")
+        atom = structure.Atom(0, 0, 0, "C")
         self.assertEqual(str(atom), "C 0.000000 0.000000 0.000000")
 
 

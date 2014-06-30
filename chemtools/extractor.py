@@ -1,7 +1,7 @@
 import os
 import itertools
 
-from molecule import Atom, Bond
+from structure import Atom, Bond
 from constants import RGROUPS, ARYL
 
 
