@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 [ -z "$INSTALL_USER" ] && INSTALL_USER=vagrant
-[ -z "$CHEMTOOLS_DIR" ] && CHEMTOOLS_DIR=/home/$INSTALL_USER/chemtools-webapp
+[ -z "$CHEMTOOLS_DIR" ] && "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 export PIP_DEFAULT_TIMEOUT=600
 
 dependencies() {
