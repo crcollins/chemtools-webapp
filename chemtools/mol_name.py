@@ -130,14 +130,16 @@ def parse_end_name(name):
     aryl0 = ARYL0
     aryl2 = ARYL2
     block = xgroup + aryl0 + aryl2
-    substituent = block + rgroup
+    valid_tokens = set(block + rgroup + ['-'])
 
     xstring = ''.join(XGROUPS)
     rstring = ''.join(RGROUPS)
+    match = '(1?\d|-|[%s%s])' % (xstring, rstring)
+    tokens = [x for x in re.split(match, name) if x and x != '_']
 
-    tokens = re.findall('(1?\d|-|[%s%s])' % (xstring, rstring), name)
-    if ''.join(tokens) != name:
-        raise ValueError("Bad Substituent Name")
+    invalid_idxs = [x for i, x in enumerate(tokens) if x not in valid_tokens]
+    if invalid_idxs:
+        raise ValueError("Bad Substituent Name(s): %s" % str(invalid_idxs))
 
     parts = []
     r = 0
@@ -161,7 +163,7 @@ def parse_end_name(name):
             elif token in aryl2:
                 state = "aryl2"
             else:
-                raise ValueError("no rgroups allowed")
+                raise ValueError("no rgroups allowed at start")
             parts.append((token, lastconnect, False))
             r = 0
             lastconnect = len(parts) - 1
@@ -174,7 +176,7 @@ def parse_end_name(name):
             elif token in aryl2:
                 state = "aryl2"
             else:
-                raise ValueError("no rgroups allowed")
+                raise ValueError("no rgroups allowed on aryl0")
             parts.append((token, lastconnect, False))
             lastconnect = len(parts) - 1
 
@@ -206,7 +208,7 @@ def parse_end_name(name):
                     state = "start"
 
         elif state == "end":
-            raise ValueError("can not attach to end")
+            raise ValueError("'%s' can not attach to end" % token)
 
     if state not in ["start", "end", "aryl0"]:
         parts.append(("a", lastconnect, False))
@@ -299,7 +301,7 @@ def parse_name(name):
             core_idx = parts.index(core)
         else:
             # If there is no core, join all the parts together into 1 chain
-            parts = [''.join(parts)]
+            parts = ['_'.join(parts)]
             core_idx = None
 
         sides = get_sides(parts, core_idx)

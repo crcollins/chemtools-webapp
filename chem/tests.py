@@ -23,9 +23,9 @@ from models import ErrorReport
 
 NAMES = ["24a_TON", "24b_TSP_24a_24a", "CON_24a", "A_TON_A_A", "TON_CCC"]
 BAD_NAMES = [
-        ("2a_TON_CC", "no rgroups allowed"),
-        ("ASADA", "Bad Substituent Name"),
-        ("TON_CC_CC", "can not attach to end"),
+        ("2a_TON_CC", "no rgroups allowed on aryl0"),
+        ("ASADA", "Bad Substituent Name(s): [u'S']"),
+        ("TON_CC_CC", "'C' can not attach to end"),
 ]
 TEST_NAMES = ["A_TON_A_A", "A_TON_A_A_TD"]
 MULTI_NAMES = ["24{a,b}_TON"]
@@ -419,8 +419,8 @@ class MainPageTestCase(TestCase):
 
     def test_molecule_check_specific(self):
         names = [
-            ("24ball_TON", "no rgroups allowed"),
-            ("AA_TON", "can not attach to end"),
+            ("24ball_TON", "no rgroups allowed at start"),
+            ("AA_TON", "'A' can not attach to end"),
         ]
         for name, error in names:
             response = self.client.get(reverse(views.molecule_check,
@@ -937,7 +937,7 @@ class UtilsTestCase(TestCase):
         expected = (
                     self.names,
                     [None, None, True, None],
-                    [None, "can not attach to end", None, None],
+                    [None, "Bad Substituent Name(s): ['_N']", None, None],
                     [True, True, True, False],
                 )
         self.assertEqual(results, expected)
@@ -948,7 +948,7 @@ class UtilsTestCase(TestCase):
         expected = (
                     self.names,
                     [None, None, True, None],
-                    [None, "can not attach to end", None, None],
+                    [None, "Bad Substituent Name(s): ['_N']", None, None],
                     [True, True, True, False]
                 )
         self.assertEqual(results, expected)
@@ -1026,7 +1026,7 @@ class UtilsServerTestCase(TestCase):
         names = "E-N,C-N"
         results = utils.run_standard_jobs(self.credential2, names, jobstring=job)
         for name, error in results['failed']:
-            self.assertEqual(error, "Bad Substituent Name")
+            self.assertEqual(error, "Bad Substituent Name(s): ['N']")
 
 
 class UploadsTestCase(TestCase):
