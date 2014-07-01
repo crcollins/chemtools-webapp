@@ -123,23 +123,20 @@ def parse_cores(parts):
     return output
 
 
+def tokenize(string):
+    rxgroups = ''.join(XGROUPS + RGROUPS)
+    match = '(1?\d|-|[%s])' % rxgroups
+    tokens = [x for x in re.split(match, string) if x and x != '_']
 
-def parse_end_name(name):
-    xgroup = XGROUPS
-    rgroup = RGROUPS
-    aryl0 = ARYL0
-    aryl2 = ARYL2
-    block = xgroup + aryl0 + aryl2
-    valid_tokens = set(block + rgroup + ['-'])
-
-    xstring = ''.join(XGROUPS)
-    rstring = ''.join(RGROUPS)
-    match = '(1?\d|-|[%s%s])' % (xstring, rstring)
-    tokens = [x for x in re.split(match, name) if x and x != '_']
-
+    valid_tokens = set(XGROUPS + ARYL + RGROUPS + ['-'])
     invalid_idxs = [x for i, x in enumerate(tokens) if x not in valid_tokens]
     if invalid_idxs:
         raise ValueError("Bad Substituent Name(s): %s" % str(invalid_idxs))
+    return tokens
+
+
+def parse_end_name(name):
+    tokens = tokenize(name)
 
     parts = []
     r = 0
@@ -149,18 +146,18 @@ def parse_end_name(name):
     for i, token in enumerate(tokens):
         if token == "-":
             previous = parts[lastconnect]
-            if previous[0] in aryl0 + aryl2:
+            if previous[0] in ARYL0 + ARYL2:
                 parts[lastconnect] = (previous[0], previous[1], True)
                 continue
             else:
                 raise ValueError("reflection only allowed for aryl groups")
 
         if state == "start":
-            if token in xgroup:
+            if token in XGROUPS:
                 state = "end"
-            elif token in aryl0:
+            elif token in ARYL0:
                 state = "aryl0"
-            elif token in aryl2:
+            elif token in ARYL2:
                 state = "aryl2"
             else:
                 raise ValueError("no rgroups allowed at start")
@@ -169,11 +166,11 @@ def parse_end_name(name):
             lastconnect = len(parts) - 1
 
         elif state == "aryl0":
-            if token in xgroup:
+            if token in XGROUPS:
                 state = "end"
-            elif token in aryl0:
+            elif token in ARYL0:
                 state = "aryl0"
-            elif token in aryl2:
+            elif token in ARYL2:
                 state = "aryl2"
             else:
                 raise ValueError("no rgroups allowed on aryl0")
@@ -181,12 +178,12 @@ def parse_end_name(name):
             lastconnect = len(parts) - 1
 
         elif state == "aryl2":
-            if token not in rgroup:
-                if token in xgroup:
+            if token not in RGROUPS:
+                if token in XGROUPS:
                     state = "end"
-                elif token in aryl0:
+                elif token in ARYL0:
                     state = "aryl0"
-                elif token in aryl2:
+                elif token in ARYL2:
                     state = "aryl2"
                 parts.append(("a", lastconnect, False))
                 parts.append(("a", lastconnect, False))
@@ -194,7 +191,7 @@ def parse_end_name(name):
                 lastconnect = len(parts) - 1
             else:
                 if not r:
-                    if i + 1 < len(tokens) and tokens[i + 1] in rgroup:
+                    if i + 1 < len(tokens) and tokens[i + 1] in RGROUPS:
                         parts.append((token, lastconnect, False))
                         r += 1
                     else:
@@ -338,8 +335,8 @@ def get_exact_name(name, spacers=False):
 
             endname = endname.replace("J", "4aaA")
             if spacers:
-                endname = ''.join([char + "**" if char in NEEDSPACE else char
-                                                         for char in endname])
+                endname = ''.join([token + "**" if token in NEEDSPACE else token
+                                             for token in tokenize(endname)])
             parts.append(endname)
 
         # only first set will have left sides

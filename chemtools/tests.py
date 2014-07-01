@@ -469,6 +469,10 @@ class BenzobisazoleTestCase(TestCase):
 
 class MolNameTestCase(TestCase):
     pairs = [
+        ('234', '2**3**4aaA**'),
+        ('10234', '10**2**3**4aaA**'),
+        ('1110234', '11**10**2**3**4aaA**'),
+
         ('TON', 'A**_TON_A**_A**'),
 
         ('2_TON', '2**A**_TON_A**_A**'),
