@@ -23,8 +23,8 @@ install_chemtools() {
     pip install gunicorn
     python manage.py syncdb --noinput
     sudo tee /etc/cron.d/chemtools <<EOF
-PATH=/home/vagrant/chemtools-webapp/bin
-0 3 * * * vagrant cd $CHEMTOOLS_DIR && python -u $CHEMTOOLS_DIR/manage.py update_ml >> $CHEMTOOLS_DIR/ml_update.log
+PATH=$CHEMTOOLS_DIR/bin
+0 3 * * * $INSTALL_USER cd $CHEMTOOLS_DIR && python -u $CHEMTOOLS_DIR/manage.py update_ml >> $CHEMTOOLS_DIR/ml_update.log
 EOF
 }
 
