@@ -26,7 +26,7 @@ Cores are made up of three parts, the type, the "x" element, and the "y" element
     5 = Thiophene
     6 = Pyridine
     7 = Carbazole
-    8 = TZ
+    8 = Tetrazine
     9 = EDOT
     10 = DTP
     11 = Acetyl
@@ -48,15 +48,15 @@ Within Aryl there are also two minor sub classifications of Aryl groups.
     A = Hydrogen
     B = Chlorine
     C = Bromine
-    D = CN
-    E = CCH
-    F = OH
-    G = SH
-    H = NH_2
-    I = CH_3
+    D = Cyano
+    E = Alkyne
+    F = Hydroxy
+    G = Thiol
+    H = Amine
+    I = Methyl
     J = Phenyl
     K = TMS
-    L = OCH_3
+    L = Methoxy
     M = Fluorine
 
 
@@ -65,17 +65,19 @@ Within Aryl there are also two minor sub classifications of Aryl groups.
     a = Hydrogen
     b = Chlorine
     c = Bromine
-    d = CN
-    e = CCH
-    f = OH
-    g = SH
-    h = NH_2
-    i = CH_3
+    d = Cyano
+    e = Alkyne
+    f = Hydroxy
+    g = Thiol
+    h = Amine
+    i = Methyl
     j = Phenyl
     k = TMS
-    l = OCH_3
+    l = Methoxy
     m = Fluorine
 
+
+### Basic Examples ####
 
 From there the name takes a form similar to this:
 
@@ -103,6 +105,9 @@ The last part of the name is the right side of the molecule. Beyond the slight o
 
 ![/chem/24a_TON](/chem/24a_TON.png)
 
+
+### Polymer ####
+
 Added to the naming scheme are two types of expansion. They are polymer type and stacking type. The former is a direct linking of the parts of the molecule. The latter is, basically, just a copy and paste along the respective axis. In the case of polymer type expansion, one can not have both an `n` (along the horizontal axis) and `m` (along the vertical) expansion due to conflicts in the connection points.
 
     4a_TON_n2
@@ -116,6 +121,9 @@ Added to the naming scheme are two types of expansion. They are polymer type and
     4a_TON_35_2_m3
 
 ![/chem/4a_TON_35_2_m3](/chem/4a_TON_35_2_m3.png)
+
+
+### Multicore ####
 
 In addition to building molecules with a single core, this also allows creating multicore structures. For multicore structures, it attributes all the segments directly to the right (up until the next core) as part of the current core.
 
@@ -132,6 +140,27 @@ At first glance it might seem like there would be a problem correctly grouping c
     TON__24a_TON
 
 ![/chem/TON__24a_TON](/chem/TON__24a_TON.png)
+
+
+### No Core ####
+
+Beyond multicore names, there is also the ability to build chains just from the aryl groups by excluding the cores altogether. When there is no core in the structure name, all underscores are rendered just as spaces in the name that mean nothing. All of the following names are equivalent.
+
+    4444
+    4_444
+    44_44
+    444_4
+    4_4_44
+    4_44_4
+    44_4_4
+    4_4_4_4
+
+![/chem/4444](/chem/4444.png)
+
+From this example, you might also notice that there is no distinct direction that the chain goes in. This is due to the fact that each of these structures on their own does not have a defined orientation like they would have if they were being built from a core.
+
+
+### Flipping ####
 
 A little less obvious of a problem that arises from this naming scheme is how to handle rotations (a group can be rotated 180 degrees around the bond axis). This problem has been solved by the addition of a meta character `-`.
 
@@ -154,23 +183,35 @@ This character applies to the the Aryl group directly preceding the character. S
 ![/chem/TON_5b-](/chem/TON_5b-.png)
 
 
+### Other Examples ####
+
 For some fun with the naming:
 
     4a_TON_5555555555_4a
     5_TON_n13
     5ba_TON_5ba55_TON_345495_2_TON_n6
 
-Any errors in the naming scheme will be denoted on the respective molecules page. The error reporting is currently very primitive, but it gives an idea of the problem. An example problem being
 
-`no rgroups allowed`
+### Errors ####
+
+
+Any errors in the naming scheme will be denoted on the respective molecules page. The error reporting is currently fairly primitive, but it gives an idea of the problem in the structure name. An example problem being
+
+`no rgroups allowed on aryl0`
 
 [/chem/2a\_TON](/chem/2a_TON)
 
 This is caused because the double bond can not have any R-Group substituants. This can be fixed by using `A` instead of `a` because the former is an X-Group.
 
+Another example of an error is if you try to put a name that contains a part that is not a valid token.
+
+`Bad Substituent Name(s): [u'z']`
+
+[/chem/2za\_TON/](/chem/2za_TON/)
+
+In this example, it tells you the exact value that was invalid.
+
 If there are errors in the molecule, or if the molecule gives an error when it should work, feel free to submit an error report by clicking the "Report Me" button seen on all of the molecule pages. This button is also listed for each molecule on the multi molecule pages.
-
-
 
 
 _______________________________________________________________________
@@ -184,10 +225,11 @@ All of the following forms of output are possible for all of the molecules gener
 - gjf - a standard Gaussian Cartesian connectivity molecule file
 - mol2 - a standard Cartesian-style molecule file format
 - png - this is just a very rough rendering of the structure of the molecule.
+- svg - this is the same as the png rendering with the added benefit that it is a vector image
 - json - this returns a json object with all of the properties of a molecule.
 - Job - there also is a job form on each molecule page that will allow generation of job files for any of the clusters given a few parameters.
 
-In addition to the files, the page for each structure also includes the exact name, the feature vector, and estimates for the HOMO, LUMO, and Band Gap energies. These estimates are calculated using the weights from a 567 dimensional linear regression on the feature vector. The linear regression was trained on ~1000 benzobisazole structures.
+In addition to the files, the page for each structure also includes the exact name, the feature vector, and estimates for the HOMO, LUMO, and Band Gap energies. These estimates are calculated using a support vector machines predictor which was trained on about 1100 single core benzobisazole structures with side lengths less than 5 aryl groups.
 
 
 ### Jobs ###
@@ -201,7 +243,7 @@ Jobs can also be made in bulk using the [Make Jobs](/chem/multi_job/) page.
 
 #### Show Running Jobs ####
 
-If you are logged in, and have set up your ssh keys, then under the [Running](/chem/jobs/) page you can see all the jobs you currently have running on any cluster you have credentials for. Along with seeing the currently running jobs, there are also buttons there to allow you to kill running jobs.
+If you are logged in, and have set up your credentials, then under the [Running](/chem/jobs/) page you can see all the jobs you currently have running on any cluster you have credentials for. Along with seeing the currently running jobs, there are also buttons that allow you to kill running jobs.
 
 
 ### Upload ###
@@ -230,19 +272,17 @@ Data parsing can also be done now using just the log files. If you upload a set 
 
 #### Gjf Reset ####
 
-This takes a log file (assumed to be correct) and returns a gjf file with the extracted geometry. This is intended to be used to extract the optimized geometry from the DFT log files to then use as the TDDFT gjf file. _WARNING: this will not work in some cases where the job stopped part way through writing._
+This takes a log file and returns a gjf file with the extracted geometry. This is intended to be used to extract the optimized geometry from the DFT log files to then use as the TDDFT gjf file. _WARNING: this will not work in some cases where the job stopped part way through writing._
 
-In addition to just being able to write out the gjf with the same parameters that were used to generate the log file, this also allows the creation of TDDFT files.
+In addition to just being able to write out the gjf with the same parameters that were used to generate the log file, this also allows the creation of TDDFT files. If you are logged in, you can use this same mechanism to then submit the TDDFT calculation on the spot.
 
 
 ### Users ###
 #### Account ####
 
-Chemtools-Webapp has a very simplified view of user accounts. They are mainly used as a shell to persistently store information like emails and usernames for submitting jobs on the clusters. As well as the needed ssh keys.
+Chemtools-Webapp has a very simplified view of user accounts. They are mainly used as a shell to persistently store information like emails and usernames for submitting jobs on the clusters. They are also used as a way of keeping track of cluster credentials.
 
-Registering an account is much like any other site. An email server is not set up yet so it does not do email verification, but that is more of a formality anyways. After registering, click the activation key link to active your account. From there, it is a matter of setting up your directory structure. SSH into all of the different clusters and run the following command.
-
-    $ mkdir chemtools chemtools/done
+Registering an account is much like any other site. An email server is not set up yet so it does not do email verification, but that is more of a formality anyways. After registering, click the activation key link to active your account.
 
 After your directories on the cluster are setup, then you need to setup your SSH Keys.
 
@@ -273,7 +313,7 @@ _______________________________________________________________________
 API
 ---
 
-Right now, the API is very minimal, the current access is just enough to give the basic functionality to the entire site. These features include: dynamic generation of .gjf, .mol2, and .png files for any molecule given the name.
+Right now, the API is very minimal, the current access is just enough to give the basic functionality to the entire site. These features include: dynamic generation of .gjf, .mol2, .svg, and .png files for any molecule given the name.
 
 
 ### Naming ###
@@ -315,12 +355,12 @@ The next form of output is the mol2 format. This is added because it is a fairly
     /chem/$NAME.mol2
     /chem/$NAME.mol2?view=true
 
-The last molecule specific access is the png image. It is a very basic rendering over the overall structure of the molecule.
+The last type of molecule specific access is an image of the structure. This comes in two different forms, both of which show the exact same thing. The first is a standard .png image. The second is a vector version in the form of a .svg. It is a very basic rendering over the overall structure of the molecule.
 
-    Single Bond     = single white line
-    Aromatic Bond   = single red line
-    Double Bond     = single green line
-    Triple Bond     = single blue line
+    Single Bond     = single black line
+    Aromatic Bond   = two dashed red lines
+    Double Bond     = two green lines
+    Triple Bond     = three blue lines
 
     Sulfur          = yellow dot
     Oxygen          = red dot
@@ -337,12 +377,15 @@ Similar to the gjf file, the images can be parameterized, with their scaling. Th
 
     /chem/$NAME.png
     /chem/$NAME.png?size=20
+    /chem/$NAME.svg
+    /chem/$NAME.svg?size=20
 
 The whole thing is very hackish and is just intended to allow a preview of the molecule without having to open it in Gaussian. As expected of a 2D Image, three dimensionality is poorly shown. this is especially apparent in molecules with TMS or Carbazole. This is also compounded with the fact that the fragments have a hackish transform to align them)
 
 [/chem/7k\_TON\_7k\_7k.png](/chem/7k_TON_7k_7k.png)
 
 ![/chem/7k_TON_7k_7k.png](/chem/7k_TON_7k_7k.png)
+
 
 #### Molecule JSON Data ####
 If you want a simple machine readable collection of the properties of a given name you can use the molecule JSON interface. Many of the values that are returned by this are dependent on the name of the molecule and if the calculated values of the molecule are already in the database. `lumo`, `homo`, and `band_gap` will only be available for names that fit the subset of the naming scheme that the machine learning was done (single core). The `limits` values will be available if the name fits the subset of the naming scheme and if that respective direction can be polymerized (ie, no X-Groups capping expansion in that direction). `datapoint` will only be seen in structures that already have calculated values stored in the database.
@@ -390,6 +433,7 @@ Jobs have a few required parameters: `name`, `email`, `cluster`, `nodes`, and `w
     Trestles    = t
     Hooper      = h
     Carver      = c
+    Localhost   = l
 
 `nodes` is the number of nodes to use on the cluster. This value is multiplied by 16 for the clusters that require ncpu numbers instead of nodes. The final value `walltime` is the maximum amount of time, in hours, that the job should run.
 
@@ -453,9 +497,9 @@ With chemtools-webapp there are six variables each of which correspond to a set 
     DCORES   = "{C,T}{O,S,N,P,C}{N,P,C}"
     RGROUPS = "a,b,c,d,e,f,g,h,i,j,k,l"
     XGROUPS = "A,B,C,D,E,F,G,H,I,J,K,L"
-    ARYL    = "2,3,4,5,6,7,8,9"
-    ARYL0   = "2,3,8,9"
-    ARYL2   = "4,5,6,7"
+    ARYL    = "2,3,4,5,6,7,8,9,10,11,12,13"
+    ARYL0   = "2,3,8,9,10,11"
+    ARYL2   = "4,5,6,7,12,13"
 
 So, if you wanted to create all of the substituant combinations for `4X_TON`, rather than typing all the substituants out, you can just use:
 
@@ -520,7 +564,7 @@ If you want to check the validity of a name or set of names you can use the name
     {
         "molecules": [
             ["24a_TON", true, null],
-            ["24ball_TON", null, "no rgroups allowed"]
+            ["24ball_TON", null, "no rgroups allowed at start"]
         ],
         "error": null
     }
