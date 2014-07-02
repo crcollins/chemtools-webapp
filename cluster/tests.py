@@ -616,3 +616,11 @@ class InterfaceTestCase(TestCase):
             }
         ]
         self.assertEqual(results, expected)
+
+    def test_get_all_log_data_invalid_credential(self):
+        results = interface.get_all_log_data(None)
+        self.assertEqual(results["error"], CRED_ERROR)
+
+    def test_get_log_data_invalid_credential(self):
+        results = interface.get_log_data(None, "24a_TON")
+        self.assertEqual(results["error"], CRED_ERROR)
