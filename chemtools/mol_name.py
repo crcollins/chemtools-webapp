@@ -2,7 +2,7 @@ import re
 import itertools
 
 from constants import SCORES, DCORES, CORES, RGROUPS, XGROUPS, ARYL, ARYL0, \
-                    ARYL2, ALL, NEEDSPACE, TURNING
+                    ARYL2, ALL, NEEDSPACE, TURNING, VALID_SIDE_TOKENS
 
 
 def name_expansion(string):
@@ -128,8 +128,8 @@ def tokenize(string):
     match = '(1?\d|-|[%s])' % rxgroups
     tokens = [x for x in re.split(match, string) if x and x != '_']
 
-    valid_tokens = set(XGROUPS + ARYL + RGROUPS + ['-'])
-    invalid_idxs = [x for i, x in enumerate(tokens) if x not in valid_tokens]
+    VALID_SIDE_TOKENS = set(XGROUPS + ARYL + RGROUPS + ['-'])
+    invalid_idxs = [x for i, x in enumerate(tokens) if x not in VALID_SIDE_TOKENS]
     if invalid_idxs:
         raise ValueError("Bad Substituent Name(s): %s" % str(invalid_idxs))
     return tokens
