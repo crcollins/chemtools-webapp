@@ -144,10 +144,16 @@ def parse_end_name(name):
     lastconnect = -1
     state = "start"
     for i, token in enumerate(tokens):
+        # Alternate flipping structures
+        if token != '2' and token.upper() not in XGROUPS:
+            flip = (lastconnect + 1) % 2
+        else:
+            flip = 0
+
         if token == "-":
             previous = parts[lastconnect]
             if previous[0] in ARYL0 + ARYL2:
-                parts[lastconnect] = (previous[0], previous[1], True)
+                parts[lastconnect] = (previous[0], previous[1], not previous[2])
                 continue
             else:
                 raise ValueError("reflection only allowed for aryl groups")
@@ -161,7 +167,7 @@ def parse_end_name(name):
                 state = "aryl2"
             else:
                 raise ValueError("no rgroups allowed at start")
-            parts.append((token, lastconnect, False))
+            parts.append((token, lastconnect, flip))
             r = 0
             lastconnect = len(parts) - 1
 
@@ -174,7 +180,7 @@ def parse_end_name(name):
                 state = "aryl2"
             else:
                 raise ValueError("no rgroups allowed on aryl0")
-            parts.append((token, lastconnect, False))
+            parts.append((token, lastconnect, flip))
             lastconnect = len(parts) - 1
 
         elif state == "aryl2":
@@ -187,7 +193,7 @@ def parse_end_name(name):
                     state = "aryl2"
                 parts.append(("a", lastconnect, False))
                 parts.append(("a", lastconnect, False))
-                parts.append((token, lastconnect, False))
+                parts.append((token, lastconnect, flip))
                 lastconnect = len(parts) - 1
             else:
                 if not r:
