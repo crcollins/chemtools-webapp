@@ -87,7 +87,7 @@ def name_expansion(string):
             braces.extend(expand(split))
         else:
             braces.append(part)
-    return braces
+    return set(braces)
 
 
 def parse_options(parts):
