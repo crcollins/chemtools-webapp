@@ -2,7 +2,7 @@ import re
 import itertools
 
 from constants import SCORES, DCORES, CORES, RGROUPS, XGROUPS, ARYL, ARYL0, \
-                    ARYL2, ALL, NEEDSPACE
+                    ARYL2, ALL, NEEDSPACE, TURNING
 
 
 def name_expansion(string):
@@ -143,10 +143,12 @@ def parse_end_name(name):
     # start with -1 to add 1 later for core
     lastconnect = -1
     state = "start"
+    turns = 0
     for i, token in enumerate(tokens):
         # Alternate flipping structures
-        if token != '2' and token.upper() not in XGROUPS:
-            flip = (lastconnect + 1) % 2
+        if token in TURNING:
+            flip = turns % 2
+            turns += 1
         else:
             flip = 0
 

@@ -19,6 +19,7 @@ ARYL2 = ['4', '5', '6', '7', '12', '13']
 ARYL = ARYL0 + ARYL2
 ALL = CORES + XGROUPS + RGROUPS + ARYL
 NEEDSPACE = XGROUPS + ARYL0
+TURNING = set(['5', '7', '9', '10', '11', '12', '13'])
 
 KEYWORDS = "opt B3LYP/6-31g(d)"
 CONNECTIONS = "~*+"
