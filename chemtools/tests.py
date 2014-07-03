@@ -466,7 +466,6 @@ class BenzobisazoleTestCase(TestCase):
         self.assertEqual(value, DECAY_DISTANCE_CORRECTION_FEATURE_VECTOR)
 
 
-
 class MolNameTestCase(TestCase):
     pairs = [
         ('234', '2**3**4aaA**'),
@@ -695,9 +694,6 @@ class ExtractorTestCase(TestCase):
     def test_run_all(self):
         extractor.run_all()
 
-    def test_extract_command(self):
-        call_command('extract')
-
 
 class MLTestCase(TestCase):
     def test_get_core_features(self):
@@ -739,7 +735,7 @@ class MLTestCase(TestCase):
                         DECAY_DISTANCE_CORRECTION_FEATURE_VECTOR)
 
 
-class MoleculeTestCase(TestCase):
+class StructureTestCase(TestCase):
     def test_atom_print(self):
         atom = structure.Atom(0, 0, 0, "C")
         self.assertEqual(str(atom), "C 0.000000 0.000000 0.000000")
