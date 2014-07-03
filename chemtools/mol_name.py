@@ -1,5 +1,6 @@
 import re
 import itertools
+import collections
 
 from constants import SCORES, DCORES, CORES, RGROUPS, XGROUPS, ARYL, ARYL0, \
                     ARYL2, ALL, NEEDSPACE, TURNING, VALID_SIDE_TOKENS
@@ -87,7 +88,8 @@ def name_expansion(string):
             braces.extend(expand(split))
         else:
             braces.append(part)
-    return set(braces)
+    temp = collections.OrderedDict(zip(braces, itertools.repeat(True)))
+    return temp.keys()
 
 
 def parse_options(parts):
