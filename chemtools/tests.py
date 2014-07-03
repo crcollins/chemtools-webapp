@@ -770,6 +770,26 @@ class MoleculeTestCase(TestCase):
                                 ]).T
         self.assertTrue(numpy.allclose(result, expected))
 
+    def test_get_moment_of_inertia(self):
+        struct = structure.from_name("TON")
+        direction = numpy.matrix([0, 1, 0]).T
+        offset = numpy.matrix([0, 0, 0]).T
+        result = struct.get_moment_of_inertia(direction=direction,
+                                            offset=offset)
+        self.assertAlmostEqual(result, 239.74162427124799)
+
+    def test_get_moment_of_inertia_no_direction(self):
+        struct = structure.from_name("TON")
+        offset = numpy.matrix([100, 0, 0]).T
+        result = struct.get_moment_of_inertia(offset=offset)
+        self.assertAlmostEqual(result, 1581424.2246356755)
+
+    def test_get_moment_of_inertia_no_offset(self):
+        struct = structure.from_name("TON")
+        direction = numpy.matrix([0, 1, 0]).T
+        result = struct.get_moment_of_inertia(direction=direction)
+        self.assertAlmostEqual(result, 170.56126165978225)
+
 
 class FileParserTestCase(TestCase):
     def test_parse_files(self):
