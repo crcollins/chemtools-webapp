@@ -565,10 +565,16 @@ class Structure(object):
             totals += atom.xyz * MASSES[atom.element]
         return totals / self.get_mass()
 
-    def get_moment_of_inertia(self, center=None):
-        if center is None:
-            center = self.get_mass_center()
+    def get_moment_of_inertia(self, direction=None, offset=None):
+        if direction is None:
+            direction = numpy.matrix([0.0, 0.0, 1.0]).T
+        if offset is None:
+            offset = self.get_mass_center()
+
+        direction = direction / numpy.linalg.norm(direction)
+
         total = 0
         for atom in self.atoms:
-            total += MASSES[atom.element] * numpy.linalg.norm(atom.xyz - center) ** 2
+            dist = numpy.linalg.norm(numpy.cross((atom.xyz - offset).T, direction.T))
+            total += MASSES[atom.element] * dist ** 2
         return total
