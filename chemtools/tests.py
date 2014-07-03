@@ -744,6 +744,32 @@ class MoleculeTestCase(TestCase):
         atom = structure.Atom(0, 0, 0, "C")
         self.assertEqual(str(atom), "C 0.000000 0.000000 0.000000")
 
+    def test_get_mass(self):
+        struct = structure.from_name("TON")
+        result = struct.get_mass()
+        self.assertAlmostEqual(result, 160.1316)
+
+    def test_get_center(self):
+        struct = structure.from_name("TON")
+        result = struct.get_center()
+        expected = [0.657275, 1.12065, -0.00013125]
+        expected = numpy.matrix([
+                                0.657275,
+                                1.12065,
+                                -0.00013125
+                                ]).T
+        self.assertTrue(numpy.allclose(result, expected))
+
+    def test_get_mass_center(self):
+        struct = structure.from_name("TON")
+        result = struct.get_mass_center()
+        expected = numpy.matrix([
+                                0.657283740998029,
+                                1.12065,
+                                -0.00011002400525567719
+                                ]).T
+        self.assertTrue(numpy.allclose(result, expected))
+
 
 class FileParserTestCase(TestCase):
     def test_parse_files(self):
