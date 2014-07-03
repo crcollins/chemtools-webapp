@@ -210,9 +210,7 @@ COULOMB_MATRIX_FEATURE = [
     53.358707399828099]
 
 
-
-
-class BenzobisazoleTestCase(TestCase):
+class StructureTestCase(TestCase):
     templates = [
         "{0}_TON",
         "CON_{0}",
@@ -237,18 +235,68 @@ class BenzobisazoleTestCase(TestCase):
     invalid_polymer_options = ['_n2_m2', '_n3_m3', '_m2_n2', '_m3_n3',
                             '_n0', '_m0', '_n0_m0']
 
+    def test_atom_print(self):
+        atom = structure.Atom(0, 0, 0, "C")
+        self.assertEqual(str(atom), "C 0.000000 0.000000 0.000000")
+
+    def test_get_mass(self):
+        struct = structure.from_name("TON")
+        result = struct.get_mass()
+        self.assertAlmostEqual(result, 160.1316)
+
+    def test_get_center(self):
+        struct = structure.from_name("TON")
+        result = struct.get_center()
+        expected = [0.657275, 1.12065, -0.00013125]
+        expected = numpy.matrix([
+                                0.657275,
+                                1.12065,
+                                -0.00013125
+                                ]).T
+        self.assertTrue(numpy.allclose(result, expected))
+
+    def test_get_mass_center(self):
+        struct = structure.from_name("TON")
+        result = struct.get_mass_center()
+        expected = numpy.matrix([
+                                0.657283740998029,
+                                1.12065,
+                                -0.00011002400525567719
+                                ]).T
+        self.assertTrue(numpy.allclose(result, expected))
+
+    def test_get_moment_of_inertia(self):
+        struct = structure.from_name("TON")
+        direction = numpy.matrix([0, 1, 0]).T
+        offset = numpy.matrix([0, 0, 0]).T
+        result = struct.get_moment_of_inertia(direction=direction,
+                                            offset=offset)
+        self.assertAlmostEqual(result, 239.74162427124799)
+
+    def test_get_moment_of_inertia_no_direction(self):
+        struct = structure.from_name("TON")
+        offset = numpy.matrix([100, 0, 0]).T
+        result = struct.get_moment_of_inertia(offset=offset)
+        self.assertAlmostEqual(result, 1581424.2246356755)
+
+    def test_get_moment_of_inertia_no_offset(self):
+        struct = structure.from_name("TON")
+        direction = numpy.matrix([0, 1, 0]).T
+        result = struct.get_moment_of_inertia(direction=direction)
+        self.assertAlmostEqual(result, 170.56126165978225)
+
     def test_load_data_invalid(self):
         with self.assertRaises(Exception):
-            gjfwriter.read_data("filename")
+            structure.read_data("filename")
 
     def test_cores(self):
         for core in self.cores:
-            gjfwriter.Benzobisazole(core)
+            structure.from_name(core)
 
     def test_invalid_cores(self):
         for core in self.invalid_cores:
             try:
-                gjfwriter.Benzobisazole(core)
+                structure.from_name(core)
                 self.fail(core)
             except:
                 pass
@@ -260,7 +308,7 @@ class BenzobisazoleTestCase(TestCase):
         ]
         for template, group in product(*sets):
             name = template.format(group)
-            gjfwriter.Benzobisazole(name)
+            structure.from_name(name)
 
     def test_invalid_sides(self):
         sets = [
@@ -270,7 +318,7 @@ class BenzobisazoleTestCase(TestCase):
         for template, group in product(*sets):
             name = template.format(group)
             try:
-                gjfwriter.Benzobisazole(name)
+                structure.from_name(name)
                 if group != "TON":
                     self.fail(name)
             except Exception:
@@ -286,7 +334,7 @@ class BenzobisazoleTestCase(TestCase):
             if template == '{0}' and option.startswith('_m'):
                 continue
             name = template.format(group) + option
-            gjfwriter.Benzobisazole(name)
+            structure.from_name(name)
 
     def test_invalid_polymer(self):
         sets = [
@@ -297,7 +345,7 @@ class BenzobisazoleTestCase(TestCase):
         for template, group, option in product(*sets):
             name = template.format(group) + option
             try:
-                gjfwriter.Benzobisazole(name)
+                structure.from_name(name)
                 self.fail(name)
             except Exception:
                 pass
@@ -310,7 +358,7 @@ class BenzobisazoleTestCase(TestCase):
         ]
         for group, axis, num  in product(*sets):
             name = self.templates[0].format(group) + '_' + axis + num
-            gjfwriter.Benzobisazole(name)
+            structure.from_name(name)
 
     def test_multi_axis_expand(self):
         sets = [
@@ -321,7 +369,7 @@ class BenzobisazoleTestCase(TestCase):
         ]
         for group, x, y, z in product(*sets):
             name = self.templates[0].format(group) + x + z + z
-            gjfwriter.Benzobisazole(name)
+            structure.from_name(name)
 
     def test_manual_polymer(self):
         sets = [
@@ -331,7 +379,7 @@ class BenzobisazoleTestCase(TestCase):
         ]
         for template, group, num in product(*sets):
             name = '_'.join([template.format(group)] * num)
-            gjfwriter.Benzobisazole(name)
+            structure.from_name(name)
 
     def test_invalid_manual_polymer(self):
         sets = [
@@ -342,7 +390,7 @@ class BenzobisazoleTestCase(TestCase):
         for template, group, num in product(*sets):
             name = '_'.join([template.format(group)] * num)
             try:
-                gjfwriter.Benzobisazole(name)
+                structure.from_name(name)
                 if "__" in name:
                     continue
                 if any(x.endswith("B") for x in name.split("_TON_")):
@@ -368,7 +416,7 @@ class BenzobisazoleTestCase(TestCase):
             '5_TON_n13',
         ]
         for name in names:
-            gjfwriter.Benzobisazole(name)
+            structure.from_name(name)
 
     def test_spot_check_invalid(self):
         pairs = [
@@ -385,10 +433,27 @@ class BenzobisazoleTestCase(TestCase):
         ]
         for name, message in pairs:
             try:
-                gjfwriter.Benzobisazole(name)
+                structure.from_name(name)
                 self.fail((name, message))
             except Exception as e:
                 self.assertEqual(message, str(e))
+
+
+class BenzobisazoleTestCase(TestCase):
+    templates = [
+        "{0}_TON",
+        "CON_{0}",
+        "TON_{0}_",
+        "{0}_TPN_{0}",
+        "{0}_TNN_{0}_",
+        "CPP_{0}_{0}",
+        "{0}_TON_{0}_{0}",
+        "{0}",
+    ]
+    valid_polymer_sides = ['2', '4b', '22', '24', '4bc', '44bc', '4b4',
+                        '5-', '5-5', '55-', '5-a', '5-ab4-', '4b114b']
+    invalid_polymer_sides = ['B', '2B']
+    valid_sides = valid_polymer_sides + invalid_polymer_sides
 
     def test_png(self):
         sets = [
@@ -733,58 +798,6 @@ class MLTestCase(TestCase):
         name = "A**_TON_2**4aa3**5aa2**5aa4aaA**_A**_n1_m1_x1_y1_z1"
         self.assertEqual(ml.get_decay_distance_correction_feature_vector(name),
                         DECAY_DISTANCE_CORRECTION_FEATURE_VECTOR)
-
-
-class StructureTestCase(TestCase):
-    def test_atom_print(self):
-        atom = structure.Atom(0, 0, 0, "C")
-        self.assertEqual(str(atom), "C 0.000000 0.000000 0.000000")
-
-    def test_get_mass(self):
-        struct = structure.from_name("TON")
-        result = struct.get_mass()
-        self.assertAlmostEqual(result, 160.1316)
-
-    def test_get_center(self):
-        struct = structure.from_name("TON")
-        result = struct.get_center()
-        expected = [0.657275, 1.12065, -0.00013125]
-        expected = numpy.matrix([
-                                0.657275,
-                                1.12065,
-                                -0.00013125
-                                ]).T
-        self.assertTrue(numpy.allclose(result, expected))
-
-    def test_get_mass_center(self):
-        struct = structure.from_name("TON")
-        result = struct.get_mass_center()
-        expected = numpy.matrix([
-                                0.657283740998029,
-                                1.12065,
-                                -0.00011002400525567719
-                                ]).T
-        self.assertTrue(numpy.allclose(result, expected))
-
-    def test_get_moment_of_inertia(self):
-        struct = structure.from_name("TON")
-        direction = numpy.matrix([0, 1, 0]).T
-        offset = numpy.matrix([0, 0, 0]).T
-        result = struct.get_moment_of_inertia(direction=direction,
-                                            offset=offset)
-        self.assertAlmostEqual(result, 239.74162427124799)
-
-    def test_get_moment_of_inertia_no_direction(self):
-        struct = structure.from_name("TON")
-        offset = numpy.matrix([100, 0, 0]).T
-        result = struct.get_moment_of_inertia(offset=offset)
-        self.assertAlmostEqual(result, 1581424.2246356755)
-
-    def test_get_moment_of_inertia_no_offset(self):
-        struct = structure.from_name("TON")
-        direction = numpy.matrix([0, 1, 0]).T
-        result = struct.get_moment_of_inertia(direction=direction)
-        self.assertAlmostEqual(result, 170.56126165978225)
 
 
 class FileParserTestCase(TestCase):
