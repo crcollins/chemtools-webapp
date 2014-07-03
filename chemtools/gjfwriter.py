@@ -61,7 +61,9 @@ class Molecule(object):
         return string
 
     def get_mol2(self):
-        return self.structure.mol2
+        header = "@<TRIPOS>MOLECULE\n%s\n" % self.name
+        body = self.structure.mol2
+        return header + body
 
     def get_png(self, size=10):
         return self.structure.draw(size).getvalue()
