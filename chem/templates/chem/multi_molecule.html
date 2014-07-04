@@ -98,35 +98,35 @@ $(function() {
     </table>
 </form>
 
-<div class="container">
-    <div class="btn-group" data-toggle="buttons-checkbox">
-        <a class="btn collapse-data-btn" data-toggle="collapse" href="#details">Job Form</a>
-    </div>
 
-    <div id="details" class="{% if form.errors %}in{% else %}collapse{% endif %}">
-        <form id="id_job_form" action="." method="get">
-            <div id="id_form_input">
-                {{ form|crispy }}
-            </div>
-            {% if keywords %}<input type="hidden" name="keywords" value="{{ keywords }}">{% endif %}
-            <input type="hidden" id="id_molname" name="molname" value="">
-            <div class="row">
-                {% if user.is_authenticated %}
-                <div class="col-xs-6">
-                    {% csrf_token %}
-                    <a id="id_post" class="btn btn-lg btn-primary btn-block">Submit Jobs</a>
+<div class="container">
+    <div class="list-group">
+        <a class="list-group-item collapse-data-btn" data-toggle="collapse" href="#details">Job Form <b class="caret"></b></a>
+
+        <div id="details" class="{% if form.errors %}in{% else %}collapse{% endif %}">
+            <form id="id_job_form" action="." method="get">
+                <div id="id_form_input">
+                    {{ form|crispy }}
                 </div>
-                {% endif %}
-                <div class="col-xs-6">
-                    <button class="btn btn-lg btn-block" type="reset">Reset</button>
+                {% if keywords %}<input type="hidden" name="keywords" value="{{ keywords }}">{% endif %}
+                <input type="hidden" id="id_molname" name="molname" value="">
+                <div class="row">
+                    {% if user.is_authenticated %}
+                    <div class="col-xs-6">
+                        {% csrf_token %}
+                        <a id="id_post" class="btn btn-lg btn-primary btn-block">Submit Jobs</a>
+                    </div>
+                    {% endif %}
+                    <div class="col-xs-6">
+                        <button class="btn btn-lg btn-block" type="reset">Reset</button>
+                    </div>
                 </div>
-            </div>
-        </form>
+            </form>
+        </div>
+        <a class="list-group-item collapse-data-btn"  href='../{{ pagename }}.zip' id="id_zip_download">Download All</a>
     </div>
 </div>
-<div class="btn-group">
-    <a class="btn" href='../{{ pagename }}.zip' id="id_zip_download">Download All</a>
-</div>
+
 
 
 <div class="modal fade" id="resultsModal" tabindex="-1" role="dialog" aria-labelledby="resultsModalLabel" aria-hidden="true">

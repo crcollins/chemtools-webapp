@@ -83,7 +83,7 @@
     <div class="list-group">
         <a class="list-group-item" href="../{{ molecule }}.gjf?{{ keywords|urlencode }}">{{ molecule }}.gjf</a>
         <a class="list-group-item" href="../{{ molecule }}.mol2">{{ molecule }}.mol2</a>
-        <a class="list-group-item collapse-data-btn" data-toggle="collapse" href="#details">Job Form</a>
+        <a class="list-group-item collapse-data-btn" data-toggle="collapse" href="#details">Job Form <b class="caret"></b></a>
     </div>
 
     <div id="details" class="{% if form.errors %}in{% else %}collapse{% endif %}">
