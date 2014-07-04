@@ -3,6 +3,7 @@ import bz2
 import zipfile
 import tarfile
 import re
+import collections
 
 from models import ErrorReport
 
@@ -21,33 +22,31 @@ from project.utils import StringIO
 
 def get_molecule_warnings(name):
     try:
-        exact_name = get_exact_name(name, spacers=True)
+        exact_spacers = get_exact_name(name, spacers=True)
         error = None
     except Exception as e:
-        exact_name = ''
+        exact_spacers = ''
         error = str(e)
     warn = ErrorReport.objects.filter(molecule=name)
     warning = True if warn else None
-    unique = not DataPoint.objects.filter(exact_name=exact_name.replace('*', '')).exists()
-    return exact_name, warning, error, unique
+    exact_name = exact_spacers.replace('*', '')
+    unique = not DataPoint.objects.filter(exact_name=exact_name).exists()
+    return exact_spacers, warning, error, unique
 
 
 def get_multi_molecule_warnings(string):
-    errors = []
-    warnings = []
-    uniques = []
-
     molecules = name_expansion(string)
+    unique_molecules = collections.OrderedDict()
 
     start = time.time()
     for name in molecules:
         if time.time() - start > 1:
             raise ValueError("The operation has timed out.")
         exact_spacer, warning, error, unique = get_molecule_warnings(name)
-        warnings.append(warning)
-        errors.append(error)
-        uniques.append(unique)
-    return molecules, warnings, errors, uniques
+        if exact_spacer not in unique_molecules:
+            unique_molecules[exact_spacer] = [name, warning, error, unique]
+
+    return zip(*unique_molecules.values())
 
 
 def get_molecule_info(molecule, keywords=KEYWORDS):

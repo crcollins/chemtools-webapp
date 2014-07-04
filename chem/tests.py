@@ -934,23 +934,23 @@ class UtilsTestCase(TestCase):
     def test_get_multi_molecule_warnings(self):
         string = ','.join(self.names)
         results = utils.get_multi_molecule_warnings(string)
-        expected = (
-                    self.names,
-                    [None, None, True, None],
-                    [None, "Bad Substituent Name(s): ['_N']", None, None],
-                    [True, True, True, False],
-                )
+        expected = [
+                    tuple(self.names),
+                    (None, None, True, None),
+                    (None, "Bad Substituent Name(s): ['_N']", None, None),
+                    (True, True, True, False),
+                ]
         self.assertEqual(results, expected)
 
     def test_get_multi_molecule_warnings_unique(self):
         string = ','.join(self.names)
         results = utils.get_multi_molecule_warnings(string)
-        expected = (
-                    self.names,
-                    [None, None, True, None],
-                    [None, "Bad Substituent Name(s): ['_N']", None, None],
-                    [True, True, True, False]
-                )
+        expected = [
+                    tuple(self.names),
+                    (None, None, True, None),
+                    (None, "Bad Substituent Name(s): ['_N']", None, None),
+                    (True, True, True, False)
+                ]
         self.assertEqual(results, expected)
 
     def test_get_molecule_info(self):
