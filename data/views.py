@@ -8,11 +8,12 @@ from django.core.servers.basehttp import FileWrapper
 from chemtools.extractor import CORES, RGROUPS, ARYL
 from data.models import JobTemplate
 
+
 def frag_index(request):
-    xrnames = ["H", "Cl", "Br", "CN", "CCH", "OH",
-            "SH", "NH_2", "CH_3", "phenyl", "TMS", "OCH_3", "F"]
+    xrnames = ["Hydrogen", "Chlorine", "Bromine", "Cyano", "Alkyne", "Hydroxy",
+            "Thiol", "Amine", "Methyl", "Phenyl", "TMS", "Methoxy", "Fluorine"]
     arylnames = ["double bond", "triple bond", "phenyl", "thiophene",
-                "pyridine", "carbazole", "TZ", "EDOT", "DTF", "acetyl",
+                "pyridine", "carbazole", "tetrazine", "EDOT", "DTF", "acetyl",
                 "furan", "pyrrole"]
     data = (
         ["Cores", CORES],
