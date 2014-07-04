@@ -21,15 +21,15 @@ from project.utils import StringIO
 
 def get_molecule_warnings(name):
     try:
-        exact_name = get_exact_name(name)
+        exact_name = get_exact_name(name, spacers=True)
         error = None
     except Exception as e:
         exact_name = ''
         error = str(e)
     warn = ErrorReport.objects.filter(molecule=name)
     warning = True if warn else None
-    unique = not DataPoint.objects.filter(exact_name=exact_name).exists()
-    return warning, error, unique
+    unique = not DataPoint.objects.filter(exact_name=exact_name.replace('*', '')).exists()
+    return exact_name, warning, error, unique
 
 
 def get_multi_molecule_warnings(string):
@@ -43,7 +43,7 @@ def get_multi_molecule_warnings(string):
     for name in molecules:
         if time.time() - start > 1:
             raise ValueError("The operation has timed out.")
-        warning, error, unique = get_molecule_warnings(name)
+        exact_spacer, warning, error, unique = get_molecule_warnings(name)
         warnings.append(warning)
         errors.append(error)
         uniques.append(unique)
@@ -51,16 +51,14 @@ def get_multi_molecule_warnings(string):
 
 
 def get_molecule_info(molecule, keywords=KEYWORDS):
-    warning, error, unique = get_molecule_warnings(molecule)
+    exactspacer, warning, error, unique = get_molecule_warnings(molecule)
+    exactname = exactspacer.replace('*', '')
 
     if not error:
-        exactspacer = get_exact_name(molecule, spacers=True)
-        exactname = exactspacer.replace('*', '')
         try:
-
             features = [
                         get_naive_feature_vector(exactspacer),
-                        get_decay_feature_vector(exactspacer)
+                        get_decay_feature_vector(exactspacer),
                     ]
             homo, lumo, gap = get_properties_from_decay_with_predictions(
                                                                 features[1]
@@ -76,8 +74,6 @@ def get_molecule_info(molecule, keywords=KEYWORDS):
         else:
             datapoint = None
     else:
-        exactname = ''
-        exactspacer = ''
         features = ['', '']
         homo, lumo, gap = None, None, None
         datapoint = None
