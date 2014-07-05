@@ -81,34 +81,40 @@
     </table>
     <hr>
     <div class="list-group">
+        <a class="list-group-item collapse-data-btn" data-toggle="collapse" href="#mol_details">Molecule Form <b class="caret"></b></a>
+        <div id="mol_details" class="{% if mol_form.errors %}in{% else %}collapse{% endif %}">
+            <form id="id_mol_form">
+                {{ mol_form|crispy }}
+            </form>
+        </div>
+        <a class="list-group-item collapse-data-btn" data-toggle="collapse" href="#details">Job Form <b class="caret"></b></a>
+        <div id="details" class="{% if form.errors %}in{% else %}collapse{% endif %}">
+            <form id="id_job_form" action="." method="get">
+                <div id="id_form_input">
+                    {{ job_form|crispy }}
+                </div>
+                {% if keywords %}<input type="hidden" name="keywords" value="{{ keywords }}">{% endif %}
+                <input type="hidden" id="id_molname" name="molname" value="">
+                <div class="row">
+                    <div class="col-xs-4">
+                        <button class="btn btn-lg btn-primary btn-block" type="submit">Get Job</button>
+                    </div>
+                    {% if user.is_authenticated %}
+                    <div class="col-xs-4">
+                        {% csrf_token %}
+                        <a id="id_post" class="btn btn-lg btn-primary btn-block">Submit Job</a>
+                    </div>
+                    {% endif %}
+                    <div class="col-xs-4">
+                        <button class="btn btn-lg btn-block" type="reset">Reset</button>
+                    </div>
+                </div>
+            </form>
+        </div>
         <a class="list-group-item" href="../{{ molecule }}.gjf?{{ keywords|urlencode }}">{{ molecule }}.gjf</a>
         <a class="list-group-item" href="../{{ molecule }}.mol2">{{ molecule }}.mol2</a>
-        <a class="list-group-item collapse-data-btn" data-toggle="collapse" href="#details">Job Form <b class="caret"></b></a>
     </div>
 
-    <div id="details" class="{% if form.errors %}in{% else %}collapse{% endif %}">
-        <form id="id_job_form" action="." method="get">
-            <div id="id_form_input">
-                {{ form|crispy }}
-            </div>
-            {% if keywords %}<input type="hidden" name="keywords" value="{{ keywords }}">{% endif %}
-            <input type="hidden" id="id_molname" name="molname" value="">
-            <div class="row">
-                <div class="col-xs-4">
-                    <button class="btn btn-lg btn-primary btn-block" type="submit">Get Job</button>
-                </div>
-                {% if user.is_authenticated %}
-                <div class="col-xs-4">
-                    {% csrf_token %}
-                    <a id="id_post" class="btn btn-lg btn-primary btn-block">Submit Job</a>
-                </div>
-                {% endif %}
-                <div class="col-xs-4">
-                    <button class="btn btn-lg btn-block" type="reset">Reset</button>
-                </div>
-            </div>
-        </form>
-    </div>
 
     <div class="modal fade" id="resultsModal" tabindex="-1" role="dialog" aria-labelledby="resultsModalLabel" aria-hidden="true">
         <div class="modal-dialog">

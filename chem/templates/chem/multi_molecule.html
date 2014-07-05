@@ -65,12 +65,18 @@ $(function() {
         <label for="id_unique">Only Show Unique</label>
     </div>
     <div class="list-group">
-        <a class="list-group-item collapse-data-btn" data-toggle="collapse" href="#details">Job Form <b class="caret"></b></a>
+        <a class="list-group-item collapse-data-btn" data-toggle="collapse" href="#mol_details">Molecule Form <b class="caret"></b></a>
+        <div id="mol_details" class="{% if mol_form.errors %}in{% else %}collapse{% endif %}">
+            <form id="id_mol_form">
+                {{ mol_form|crispy }}
+            </form>
+        </div>
+        <a class="list-group-item collapse-data-btn" data-toggle="collapse" href="#job_details">Job Form <b class="caret"></b></a>
 
-        <div id="details" class="{% if form.errors %}in{% else %}collapse{% endif %}">
+        <div id="job_details" class="{% if job_form.errors %}in{% else %}collapse{% endif %}">
             <form id="id_job_form" action="." method="get">
                 <div id="id_form_input">
-                    {{ form|crispy }}
+                    {{ job_form|crispy }}
                 </div>
                 {% if keywords %}<input type="hidden" name="keywords" value="{{ keywords }}">{% endif %}
                 <input type="hidden" id="id_molname" name="molname" value="">

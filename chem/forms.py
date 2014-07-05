@@ -11,6 +11,7 @@ from data.models import JobTemplate
 from cluster.models import Credential
 from utils import run_standard_jobs
 from models import ErrorReport
+from chemtools.constants import KEYWORDS
 
 
 class MultiFileInput(forms.FileInput):
@@ -86,6 +87,12 @@ class UploadForm(forms.Form):
         'td_reset',
         'gjf_submit',
     )
+
+
+class MoleculeForm(forms.Form):
+    keywords = forms.CharField(max_length="200", initial=KEYWORDS)
+    memory = forms.IntegerField(initial=59)
+    nprocshared = forms.IntegerField(initial=16)
 
 
 class JobForm(forms.Form):
