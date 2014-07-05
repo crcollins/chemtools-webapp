@@ -146,22 +146,19 @@ def multi_molecule(request, string):
         return HttpResponse(simplejson.dumps(a), mimetype="application/json")
 
     keywords = request.REQUEST.get("keywords", "")
-    encoded_keywords = '?' + urllib.urlencode({"keywords": keywords})
-    encoded_zip = '?' + urllib.urlencode({"keywords": keywords})
+    encoded_keywords = urllib.urlencode({"keywords": keywords})
     c = Context({
         "pagename": string,
         "form": form,
         "gjf": "checked",
         "encoded_keywords": encoded_keywords if keywords else '',
         "keywords": keywords,
-        "encoded_zip": encoded_zip,
         })
     return render(request, "chem/multi_molecule.html", c)
 
 
 def multi_molecule_zip(request, string):
     keywords = request.REQUEST.get("keywords")
-    unique = request.REQUEST.get("unique", '')
 
     try:
         molecules, warnings, errors, uniques = get_multi_molecule_warnings(
@@ -195,7 +192,7 @@ def multi_molecule_zip(request, string):
 
     selection = ("image", "mol2", "job", "gjf")
     options = [x for x in selection if request.REQUEST.get(x)]
-    if unique:
+    if request.REQUEST.get("unique", ''):
         molecules = [x for i, x in enumerate(molecules) if uniques[i]]
     ret_zip = get_multi_molecule(molecules, keywords, options, form)
 

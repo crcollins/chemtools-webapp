@@ -21,7 +21,7 @@ $(function() {
         if ($("#id_unique").is(':checked')) {
             a += '&unique=on';
         }
-        a += "{{ encoded_zip }}".slice(1);
+        a += "&{{ encoded_keywords }}";
         window.location = "/chem/{{ pagename }}.zip?{0}".format(a);
     });
 
