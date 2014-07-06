@@ -31,7 +31,7 @@ class Molecule(object):
         if self.keywords is None:
             self.keywords = KEYWORDS
         self.nprocshared = kwargs.get('nprocshared', 16)
-        self.mem = kwargs.get('mem', '59GB')
+        self.mem = kwargs.get('memory', 59)
         self.charge = kwargs.get('charge', 0)
         self.multiplicty = kwargs.get('multiplicity', 1)
         self.structure = None
