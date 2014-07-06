@@ -1,5 +1,6 @@
 {% extends "chem/base.html" %}
 {% load crispy_forms_tags %}
+{% load url from future %}
 
 {% block title %}{{ pagename }}{% endblock %}
 
@@ -35,7 +36,7 @@ $(function() {
         }
     );
 
-    $.get('check/', {"unique": "{{ unique }}", "html": true}, function(data) {
+    $.get('{% url "molecule_check" pagename %}', {"unique": "{{ unique }}", "html": true}, function(data) {
         var table = $("table.table");
         html = table.html();
         html += data;
