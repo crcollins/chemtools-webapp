@@ -93,6 +93,8 @@ class MoleculeForm(forms.Form):
     keywords = forms.CharField(max_length="200", initial=KEYWORDS)
     memory = forms.IntegerField(initial=59)
     nprocshared = forms.IntegerField(initial=16)
+    charge = forms.IntegerField(initial=0)
+    multiplicity = forms.IntegerField(initial=1)
 
 
 class JobForm(forms.Form):
