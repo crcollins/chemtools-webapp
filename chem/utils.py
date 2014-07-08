@@ -53,6 +53,10 @@ def get_molecule_info(molecule, keywords=KEYWORDS):
     exactspacer, warning, error, unique = get_molecule_warnings(molecule)
     exactname = exactspacer.replace('*', '')
 
+    features = ['', '']
+    homo, lumo, gap = None, None, None
+    datapoint = None
+
     if not error:
         try:
             features = [
@@ -62,20 +66,15 @@ def get_molecule_info(molecule, keywords=KEYWORDS):
             homo, lumo, gap = get_properties_from_decay_with_predictions(
                                                                 features[1]
                                                                 )
-        except ValueError:  # multi core and other non-ML structures
-            features = ['', '']
-            homo, lumo, gap = None, None, None
+        except ValueError:
+            # multi core and other non-ML structures
+            pass
 
         temp = DataPoint.objects.filter(exact_name=exactname,
                                         band_gap__isnull=False).values()
         if temp:
             datapoint = temp[0]
-        else:
-            datapoint = None
-    else:
-        features = ['', '']
-        homo, lumo, gap = None, None, None
-        datapoint = None
+
     limits = get_property_limits(molecule)
 
     a = {
