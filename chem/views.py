@@ -123,16 +123,18 @@ def molecule_detail(request, molecule):
         return HttpResponse(simplejson.dumps(a), mimetype="application/json")
 
     keywords2 = request.REQUEST.get("keywords", KEYWORDS)
-    a = get_molecule_info(molecule, keywords2)
+    a = get_molecule_info(molecule)
     a["job_form"] = job_form
     a["mol_form"] = mol_form
+    a["keywords"] = keywords2
     c = Context(a)
     return render(request, "chem/molecule_detail.html", c)
 
 
 def molecule_detail_json(request, molecule):
     keywords = request.REQUEST.get("keywords", KEYWORDS)
-    a = get_molecule_info(molecule, keywords)
+    a = get_molecule_info(molecule)
+    a["keywords"] = keywords
     return HttpResponse(simplejson.dumps(a, cls=DjangoJSONEncoder),
                     mimetype="application/json")
 

@@ -962,7 +962,6 @@ class UtilsTestCase(TestCase):
             'lumo': -2.1298787902985779,
             'homo': -5.6866366091077571,
             'exact_name': '24aaA_TON_A_A_n1_m1_x1_y1_z1',
-            'keywords': 'opt B3LYP/6-31g(d)',
             'band_gap': 3.4415766653971942,
             'limits': {
                 'm': [

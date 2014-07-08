@@ -49,7 +49,7 @@ def get_multi_molecule_warnings(string):
     return zip(*unique_molecules.values())
 
 
-def get_molecule_info(molecule, keywords=KEYWORDS):
+def get_molecule_info(molecule):
     exactspacer, warning, error, unique = get_molecule_warnings(molecule)
     exactname = exactspacer.replace('*', '')
 
@@ -90,7 +90,6 @@ def get_molecule_info(molecule, keywords=KEYWORDS):
         "unique": unique,
         "known_errors": warning,
         "error_message": error,
-        "keywords": keywords,
         "limits": limits,
         }
     return a
