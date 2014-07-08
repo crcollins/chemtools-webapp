@@ -47,7 +47,7 @@ class Molecule(object):
         if self.nprocshared is not None:
             starter.append("%%nprocshared=%d" % self.nprocshared)
         starter.extend([
-                    "%%mem=%s" % self.mem,
+                    "%%mem=%dGB" % self.mem,
                     "%%chk=%s.chk" % self.name,
                     "# %s geom=connectivity" % self.keywords,
                     "",
