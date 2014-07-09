@@ -45,7 +45,6 @@ $(document).ready(function() {
 
                 $("select#id_base_template").change(template_change_func);
                 $("#id_custom_template").change(custom_template_func);
-                $("#id_post").click(post_func);
 
                 var temp = $("div.has-error").get(0);
                 if (temp !== undefined) {
