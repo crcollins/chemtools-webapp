@@ -195,7 +195,7 @@ class JobForm(forms.Form):
         elif request.method == "POST":
             cred = job_settings.pop("credential")
             do_html = request.REQUEST.get("html", False)
-            results = run_standard_jobs(cred, string, **d)
+            results = run_standard_jobs(cred, string, mol_settings, job_settings)
             if results["failed"]:
                 failed_names = zip(*results['failed'])[0]
                 results["failed_mols"] = ','.join(failed_names)

@@ -95,7 +95,7 @@ def get_molecule_info(molecule):
     return a
 
 
-def run_standard_jobs(credential, string, **kwargs):
+def run_standard_jobs(credential, string, mol_settings, job_settings):
     results = {
         "worked": [],
         "failed": [],
@@ -115,8 +115,7 @@ def run_standard_jobs(credential, string, **kwargs):
     gjfs = []
     for mol in name_expansion(string):
         try:
-            keywords = kwargs.get("keywords", None)
-            out = gjfwriter.Benzobisazole(mol, keywords=keywords)
+            out = gjfwriter.Benzobisazole(mol, **mol_settings)
             names.append(mol)
             gjfs.append(out.get_gjf())
         except Exception as e:
@@ -124,7 +123,7 @@ def run_standard_jobs(credential, string, **kwargs):
             continue
 
     if names:
-        temp = run_jobs(credential, names, gjfs, **kwargs)
+        temp = run_jobs(credential, names, gjfs, **job_settings)
         results["worked"] = temp["worked"]
         results["failed"].extend(temp["failed"])
         results["error"] = temp["error"]

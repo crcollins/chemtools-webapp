@@ -1006,24 +1006,24 @@ class UtilsServerTestCase(TestCase):
         self.credential2.save()
 
     def test_run_standard_jobs_staff_error(self):
-        results = utils.run_standard_jobs(self.credential, [''])
+        results = utils.run_standard_jobs(self.credential, [''], {}, {})
         self.assertEqual(results["error"], SUBMIT_ERROR)
 
     def test_run_standard_jobs_invalid_credential(self):
-        results = utils.run_standard_jobs(None, [''])
+        results = utils.run_standard_jobs(None, [''], {}, {})
         self.assertEqual(results["error"], CRED_ERROR)
 
     def test_run_standard_jobs(self):
         job = 'sleep 10'
         names = "TON,CON"
-        results = utils.run_standard_jobs(self.credential2, names, jobstring=job)
+        results = utils.run_standard_jobs(self.credential2, names, {}, {'jobstring': job})
         self.assertEqual(results["error"], None)
         self.assertEqual(results["failed"], [])
 
     def test_run_standard_jobs_name_error(self):
         job = 'sleep 10'
         names = "E-N,C-N"
-        results = utils.run_standard_jobs(self.credential2, names, jobstring=job)
+        results = utils.run_standard_jobs(self.credential2, names, {}, {'jobstring': job})
         for name, error in results['failed']:
             self.assertEqual(error, "Bad Substituent Name(s): ['N']")
 
