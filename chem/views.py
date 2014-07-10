@@ -72,7 +72,6 @@ def multi_job(request):
     d = dict(form.cleaned_data)
     if request.method == "POST":
         cred = d.pop("credential")
-        d["keywords"] = request.REQUEST.get("keywords", None)
         files = request.FILES.getlist("files")
         strings = [''.join(f.readlines()) for f in files]
         names = [os.path.splitext(f.name)[0] for f in files]
