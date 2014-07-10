@@ -132,7 +132,7 @@ def molecule_detail(request, molecule):
 
     a = get_molecule_info(molecule)
     a["job_form"] = job_form
-    a["mol_form"] = mol_form
+    a["mol_form"] = MoleculeForm()
     c = Context(a)
     return render(request, "chem/molecule_detail.html", c)
 
@@ -165,7 +165,7 @@ def multi_molecule(request, string):
     c = Context({
         "pagename": string,
         "job_form": job_form,
-        "mol_form": mol_form,
+        "mol_form": MoleculeForm(),
         "gjf": "checked",
         })
     return render(request, "chem/multi_molecule.html", c)
