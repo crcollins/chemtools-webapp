@@ -205,7 +205,7 @@ def multi_molecule_zip(request, string):
     options = [x for x in selection if request.REQUEST.get(x)]
     if request.REQUEST.get("unique", ''):
         molecules = [x for i, x in enumerate(molecules) if uniques[i]]
-    ret_zip = get_multi_molecule(molecules, keywords, options, job_form)
+    ret_zip = get_multi_molecule(molecules, options, mol_form, job_form)
 
     response = HttpResponse(ret_zip, mimetype="application/zip")
     response["Content-Disposition"] = "attachment; filename=molecules.zip"
