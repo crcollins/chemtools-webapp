@@ -59,9 +59,12 @@ def multi_job(request):
         })
     if not form.is_valid(request.method):
         if request.is_ajax():
-            form_html = render_crispy_form(form,
-                                        context=RequestContext(request))
-            a = {"success": False, "form_html": form_html}
+            job_form_html = render_crispy_form(form, context=RequestContext(request))
+            a = {
+                "success": False,
+                "job_form_html": job_form_html,
+                "mol_form_html": '',
+            }
             return HttpResponse(simplejson.dumps(a),
                                 mimetype="application/json")
         return render(request, "chem/multi_job.html", c)
@@ -119,8 +122,13 @@ def molecule_detail(request, molecule):
     if job_is_valid and mol_is_valid:
         return job_form.get_results(request, molecule, mol_form)
     elif request.is_ajax():
-        form_html = render_crispy_form(job_form, context=RequestContext(request))
-        a = {"success": False, "form_html": form_html}
+        job_form_html = render_crispy_form(job_form, context=RequestContext(request))
+        mol_form_html = render_crispy_form(mol_form, context=RequestContext(request))
+        a = {
+            "success": False,
+            "job_form_html": job_form_html,
+            "mol_form_html": mol_form_html,
+        }
         return HttpResponse(simplejson.dumps(a), mimetype="application/json")
 
     a = get_molecule_info(molecule)
@@ -146,8 +154,13 @@ def multi_molecule(request, string):
     if job_is_valid and mol_is_valid:
         return job_form.get_results(request, string, mol_form)
     elif request.is_ajax():
-        form_html = render_crispy_form(job_form, context=RequestContext(request))
-        a = {"success": False, "form_html": form_html}
+        job_form_html = render_crispy_form(job_form, context=RequestContext(request))
+        mol_form_html = render_crispy_form(mol_form, context=RequestContext(request))
+        a = {
+            "success": False,
+            "job_form_html": job_form_html,
+            "mol_form_html": mol_form_html,
+        }
         return HttpResponse(simplejson.dumps(a), mimetype="application/json")
 
     c = Context({
@@ -169,8 +182,9 @@ def multi_molecule_zip(request, string):
             })
         return render(request, "chem/multi_molecule.html", c)
 
+    mol_form = MoleculeForm(request.REQUEST)
+    mol_form.is_valid()
     if request.REQUEST.get("job"):
-        mol_form = MoleculeForm()
         job_form = JobForm.get_form(request, "{{ name }}")
         if not job_form.is_valid():
             f = lambda x: 'checked' if request.REQUEST.get(x) else ''
@@ -199,10 +213,12 @@ def multi_molecule_zip(request, string):
 
 
 def write_gjf(request, molecule):
-    keywords = request.REQUEST.get("keywords")
+    mol_form = MoleculeForm(request.REQUEST)
+    mol_form.is_valid()
     add = "" if request.REQUEST.get("view") else "attachment; "
 
-    out = gjfwriter.Benzobisazole(molecule, keywords=keywords)
+    mol_settings = dict(mol_form.cleaned_data)
+    out = gjfwriter.Benzobisazole(molecule, **mol_settings)
     f = StringIO(out.get_gjf())
     response = HttpResponse(FileWrapper(f), content_type="text/plain")
     response['Content-Disposition'] = add + 'filename=%s.gjf' % molecule
@@ -210,9 +226,12 @@ def write_gjf(request, molecule):
 
 
 def write_mol2(request, molecule):
+    mol_form = MoleculeForm(request.REQUEST)
+    mol_form.is_valid()
     add = "" if request.REQUEST.get("view") else "attachment; "
 
-    out = gjfwriter.Benzobisazole(molecule)
+    mol_settings = dict(mol_form.cleaned_data)
+    out = gjfwriter.Benzobisazole(molecule, **mol_settings)
     f = StringIO(out.get_mol2())
     response = HttpResponse(FileWrapper(f), content_type="text/plain")
     response['Content-Disposition'] = add + 'filename=%s.mol2' % molecule

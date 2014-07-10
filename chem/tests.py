@@ -570,7 +570,7 @@ class PostsFailTestCase(TestCase):
                                         HTTP_X_REQUESTED_WITH="XMLHttpRequest")
             results = simplejson.loads(response.content)
             self.assertFalse(results["success"])
-            self.assertIn("has-error", results["form_html"])
+            self.assertIn("has-error", results["job_form_html"])
 
     def test_post_single_ajax_fail_template(self):
         r = self.client.login(**SUPER_USER_LOGIN)
@@ -589,7 +589,7 @@ class PostsFailTestCase(TestCase):
             results = simplejson.loads(response.content)
             self.assertFalse(results["success"])
             message = "A template or base template is required."
-            self.assertIn(message, results["form_html"])
+            self.assertIn(message, results["job_form_html"])
 
     def test_post_multi_fail(self):
         r = self.client.login(**SUPER_USER_LOGIN)
@@ -646,7 +646,7 @@ class PostsFailTestCase(TestCase):
                                     HTTP_X_REQUESTED_WITH="XMLHttpRequest")
         results = simplejson.loads(response.content)
         self.assertFalse(results["success"])
-        self.assertIn("has-error", results["form_html"])
+        self.assertIn("has-error", results["job_form_html"])
 
     def test_post_multi_job_perm_fail(self):
         r = self.client.login(**USER_LOGIN)
@@ -694,7 +694,7 @@ class PostsFailTestCase(TestCase):
                                     HTTP_X_REQUESTED_WITH="XMLHttpRequest")
         results = simplejson.loads(response.content)
         self.assertFalse(results["success"])
-        self.assertIn("has-error", results["form_html"])
+        self.assertIn("has-error", results["job_form_html"])
 
     def test_gjf_reset_submit_fail(self):
         r = self.client.login(**SUPER_USER_LOGIN)
