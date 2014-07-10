@@ -25,10 +25,6 @@
             <th>Exact Name (with spacers)</th>
             <td>{{ exact_name_spacers }}</td>
         </tr>
-        <tr>
-            <th>Keywords</th>
-            <td>{% if keywords %}{{ keywords|escape }}{% else %}{{ default_keywords|escape }}{% endif %}</td>
-        </tr>
     </table>
 
     <a class="btn collapse-data-btn collapsed" data-toggle="collapse" href="#features">Feature Vectors</a>
@@ -93,7 +89,6 @@
                 <div id="id_form_input">
                     {{ job_form|crispy }}
                 </div>
-                {% if keywords %}<input type="hidden" name="keywords" value="{{ keywords }}">{% endif %}
                 <input type="hidden" id="id_molname" name="molname" value="">
                 <div class="row">
                     <div class="col-xs-4">

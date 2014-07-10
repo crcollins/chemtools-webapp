@@ -79,7 +79,6 @@ $(function() {
                 <div id="id_form_input">
                     {{ job_form|crispy }}
                 </div>
-                {% if keywords %}<input type="hidden" name="keywords" value="{{ keywords }}">{% endif %}
                 <input type="hidden" id="id_molname" name="molname" value="">
                 <div class="row">
                     {% if user.is_authenticated %}
