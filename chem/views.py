@@ -123,19 +123,15 @@ def molecule_detail(request, molecule):
         a = {"success": False, "form_html": form_html}
         return HttpResponse(simplejson.dumps(a), mimetype="application/json")
 
-    keywords2 = request.REQUEST.get("keywords", KEYWORDS)
     a = get_molecule_info(molecule)
     a["job_form"] = job_form
     a["mol_form"] = mol_form
-    a["keywords"] = keywords2
     c = Context(a)
     return render(request, "chem/molecule_detail.html", c)
 
 
 def molecule_detail_json(request, molecule):
-    keywords = request.REQUEST.get("keywords", KEYWORDS)
     a = get_molecule_info(molecule)
-    a["keywords"] = keywords
     return HttpResponse(simplejson.dumps(a, cls=DjangoJSONEncoder),
                     mimetype="application/json")
 
@@ -154,22 +150,16 @@ def multi_molecule(request, string):
         a = {"success": False, "form_html": form_html}
         return HttpResponse(simplejson.dumps(a), mimetype="application/json")
 
-    keywords = request.REQUEST.get("keywords", "")
-    encoded_keywords = urllib.urlencode({"keywords": keywords})
     c = Context({
         "pagename": string,
         "job_form": job_form,
         "mol_form": mol_form,
         "gjf": "checked",
-        "encoded_keywords": encoded_keywords if keywords else '',
-        "keywords": keywords,
         })
     return render(request, "chem/multi_molecule.html", c)
 
 
 def multi_molecule_zip(request, string):
-    keywords = request.REQUEST.get("keywords")
-
     try:
         molecules, warnings, errors, uniques = get_multi_molecule_warnings(
                                                                         string)
@@ -183,12 +173,8 @@ def multi_molecule_zip(request, string):
         mol_form = MoleculeForm()
         job_form = JobForm.get_form(request, "{{ name }}")
         if not job_form.is_valid():
-            keywords = request.REQUEST.get("keywords")
             f = lambda x: 'checked' if request.REQUEST.get(x) else ''
-
-            encoded_keywords = '?' + urllib.urlencode({"keywords": keywords})
             c = Context({
-                "molecules": zip(molecules, errors, warnings, uniques),
                 "pagename": string,
                 "job_form": job_form,
                 "mol_form": mol_form,
@@ -196,7 +182,6 @@ def multi_molecule_zip(request, string):
                 "mol2": f("mol2"),
                 "image": f("image"),
                 "job": f("job"),
-                "encoded_keywords": encoded_keywords if keywords else '',
                 })
             return render(request, "chem/multi_molecule.html", c)
     else:
