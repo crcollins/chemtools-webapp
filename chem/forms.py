@@ -96,6 +96,13 @@ class MoleculeForm(forms.Form):
     charge = forms.IntegerField(initial=0, required=False)
     multiplicity = forms.IntegerField(initial=1, required=False)
 
+    def clean(self):
+        super(MoleculeForm, self).clean()
+        for field in self.fields:
+            if self.cleaned_data.get(field) in [None, '']:
+                self.cleaned_data[field] = self.fields[field].initial
+        return self.cleaned_data
+
 
 class JobForm(forms.Form):
     name = forms.CharField(max_length=400)
