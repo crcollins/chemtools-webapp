@@ -111,12 +111,13 @@ def molecule_check(request, string):
 
 def molecule_detail(request, molecule):
     job_form = JobForm.get_form(request, molecule)
-    mol_form = MoleculeForm()
+    mol_form = MoleculeForm(request.REQUEST)
 
     job_is_valid = job_form.is_valid(request.method)
+    mol_is_valid = mol_form.is_valid()
 
-    if job_is_valid:
-        return job_form.get_results(request, molecule)
+    if job_is_valid and mol_is_valid:
+        return job_form.get_results(request, molecule, mol_form)
     elif request.is_ajax():
         form_html = render_crispy_form(job_form, context=RequestContext(request))
         a = {"success": False, "form_html": form_html}
@@ -141,10 +142,13 @@ def molecule_detail_json(request, molecule):
 
 def multi_molecule(request, string):
     job_form = JobForm.get_form(request, "{{ name }}")
-    mol_form = MoleculeForm()
+    mol_form = MoleculeForm(request.REQUEST)
 
-    if job_form.is_valid(request.method):
-        return job_form.get_results(request, string)
+    job_is_valid = job_form.is_valid(request.method)
+    mol_is_valid = mol_form.is_valid()
+
+    if job_is_valid and mol_is_valid:
+        return job_form.get_results(request, string, mol_form)
     elif request.is_ajax():
         form_html = render_crispy_form(job_form, context=RequestContext(request))
         a = {"success": False, "form_html": form_html}

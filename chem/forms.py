@@ -180,20 +180,20 @@ class JobForm(forms.Form):
             raise forms.ValidationError("A template or base template is required.")
         return self.cleaned_data
 
-    def get_results(self, request, string):
-        d = dict(self.cleaned_data)
+    def get_results(self, request, string, mol_form):
+        job_settings = dict(self.cleaned_data)
+        mol_settings = dict(mol_form.cleaned_data)
         if request.method == "GET":
             if request.REQUEST.get('molname'):
-                d['name'] = request.REQUEST.get('molname')
-            job_string = JobTemplate.render(**d)
+                job_settings['name'] = request.REQUEST.get('molname')
+            job_string = JobTemplate.render(**job_settings)
             response = HttpResponse(job_string, content_type="text/plain")
             filename = '%s.job' % request.REQUEST.get("molname")
             add = "" if request.REQUEST.get("view") else "attachment; "
             response['Content-Disposition'] = add + 'filename=' + filename
             return response
         elif request.method == "POST":
-            d["keywords"] = request.REQUEST.get('keywords', '')
-            cred = d.pop("credential")
+            cred = job_settings.pop("credential")
             do_html = request.REQUEST.get("html", False)
             results = run_standard_jobs(cred, string, **d)
             if results["failed"]:
