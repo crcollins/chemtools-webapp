@@ -28,8 +28,6 @@ class Molecule(object):
     def __init__(self, name, **kwargs):
         self.name = name
         self.keywords = kwargs.get('keywords', KEYWORDS)
-        if self.keywords is None:
-            self.keywords = KEYWORDS
         self.nprocshared = kwargs.get('nprocshared', 16)
         self.mem = kwargs.get('memory', 59)
         self.charge = kwargs.get('charge', 0)
