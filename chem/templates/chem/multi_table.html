@@ -5,11 +5,11 @@
     {% for name, warning, error, unique in molecules %}
         <tr {% if unique %}data-unique="true"{% endif %} {% if warning %}class="warning"{% elif error %}class="danger"{% endif %}>
             <td>
-                <a href="../{{ name }}/{{ encoded_keywords }}">{{ name }}</a>
+                <a href="../{{ name }}">{{ name }}</a>
             </td>
             {% if not error %}
-                <td><a href="../{{ name }}.gjf{{ encoded_keywords }}">gjf</a></td>
-                <td><a href="../{{ name }}.mol2{{ encoded_keywords }}">mol2</a></td>
+                <td><a href="../{{ name }}.gjf">gjf</a></td>
+                <td><a href="../{{ name }}.mol2">mol2</a></td>
                 <td>
                     <a class="delayimage" data-toggle="collapse" href="#{{ name }}">
                         Image
