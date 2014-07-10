@@ -90,11 +90,11 @@ class UploadForm(forms.Form):
 
 
 class MoleculeForm(forms.Form):
-    keywords = forms.CharField(max_length="200", initial=KEYWORDS)
-    memory = forms.IntegerField(initial=59)
-    nprocshared = forms.IntegerField(initial=16)
-    charge = forms.IntegerField(initial=0)
-    multiplicity = forms.IntegerField(initial=1)
+    keywords = forms.CharField(max_length="200", initial=KEYWORDS, required=False)
+    memory = forms.IntegerField(initial=59, required=False)
+    nprocshared = forms.IntegerField(initial=16, required=False)
+    charge = forms.IntegerField(initial=0, required=False)
+    multiplicity = forms.IntegerField(initial=1, required=False)
 
 
 class JobForm(forms.Form):
