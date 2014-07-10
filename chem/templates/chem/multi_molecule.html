@@ -22,7 +22,7 @@ $(function() {
         if ($("#id_unique").is(':checked')) {
             a += '&unique=on';
         }
-        a += "&{{ encoded_keywords }}";
+        a += '&' + $('#id_mol_form').serialize();
         window.location = "/chem/{{ pagename }}.zip?{0}".format(a);
     });
 
