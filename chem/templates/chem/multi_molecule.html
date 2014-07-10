@@ -14,16 +14,23 @@ function submitForm(name) {
 
 $(function() {
     $("#id_zip_download").click(function() {
-        event.preventDefault();
-        var a = $('#headerform').serialize();
+        var data = $('#headerform').serialize();
         if ($('#id_job').val() === 'on') {
-            a += '&' + $('#id_job_form').serialize();
+            data += '&' + $('#id_job_form').serialize();
         }
         if ($("#id_unique").is(':checked')) {
-            a += '&unique=on';
+            data += '&unique=on';
         }
-        a += '&' + $('#id_mol_form').serialize();
-        window.location = "/chem/{{ pagename }}.zip?{0}".format(a);
+        data += '&' + $('#id_mol_form').serialize();
+
+        var val = $(this).attr('href');
+        var idx = val.indexOf('?')
+        if (idx === -1) {
+            $(this).attr('href', val + '?' + data);
+        } else {
+            val = val.slice(0, idx);
+            $(this).attr('href', val + '?' + data);
+        }
     });
 
     $("#id_unique").change(function () {
@@ -45,6 +52,17 @@ $(function() {
             img = $($(this).find("img"));
             if (!img.attr('src')) {
                 img.attr('src', img.attr('data-src'));
+            }
+        });
+        $("table.table .mol_setting").click( function () {
+            var data = $('#id_mol_form').serialize();
+            var val = $(this).attr('href');
+            var idx = val.indexOf('?')
+            if (idx === -1) {
+                $(this).attr('href', val + '?' + data);
+            } else {
+                val = val.slice(0, idx);
+                $(this).attr('href', val + '?' + data);
             }
         });
     });
