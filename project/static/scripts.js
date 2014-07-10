@@ -56,6 +56,20 @@ $(document).ready(function() {
         });
     }
     $("#id_post").click(post_func);
+
+    $('#id_mol_form input').change( function () {
+        var data = $('#id_mol_form').serialize();
+        $(".mol_setting").each( function () {
+            var val = $(this).attr('href');
+            var idx = val.indexOf('?')
+            if (idx === -1) {
+                $(this).attr('href', val + '?' + data);
+            } else {
+                val = val.slice(0, idx);
+                $(this).attr('href', val + '?' + data);
+            }
+        });
+    })
 });
 
 String.prototype.format = function () {
