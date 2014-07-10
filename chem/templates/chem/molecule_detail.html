@@ -80,7 +80,9 @@
         <a class="list-group-item collapse-data-btn" data-toggle="collapse" href="#mol_details">Molecule Form <b class="caret"></b></a>
         <div id="mol_details" class="{% if mol_form.errors %}in{% else %}collapse{% endif %}">
             <form id="id_mol_form">
-                {{ mol_form|crispy }}
+                <div id="id_form_input2">
+                    {{ mol_form|crispy }}
+                </div>
             </form>
         </div>
         <a class="list-group-item collapse-data-btn" data-toggle="collapse" href="#details">Job Form <b class="caret"></b></a>
