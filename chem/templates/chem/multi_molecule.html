@@ -15,7 +15,7 @@ function submitForm(name) {
 $(function() {
     $("#id_zip_download").click(function() {
         var data = $('#headerform').serialize();
-        if ($('#id_job').val() === 'on') {
+        if ($('#id_job').is(':checked')) {
             data += '&' + $('#id_job_form').serialize();
         }
         if ($("#id_unique").is(':checked')) {
