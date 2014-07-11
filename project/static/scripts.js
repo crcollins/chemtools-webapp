@@ -34,14 +34,17 @@ $(document).ready(function() {
     function post_func() {
         event.preventDefault();
         var a = $('#id_job_form').serialize();
-        a += "&html=true";
+        var b = $('#id_mol_form').serialize();
+        a += "&" + b + "&html=true";
         $.post('', a, function(data) {
             if (data.success) {
                 var dialog = $("#resultsModal .modal-body");
                 dialog.html(data.html);
                 $('#resultsModal').modal();
             } else {
-                $("#id_form_input").html(data.form_html);
+                $("#id_form_input").html(data.job_form_html);
+                if (data.mol_form_html)
+                    $("#id_form_input2").html(data.mol_form_html);
 
                 $("select#id_base_template").change(template_change_func);
                 $("#id_custom_template").change(custom_template_func);
@@ -54,6 +57,19 @@ $(document).ready(function() {
         });
     }
     $("#id_post").click(post_func);
+
+    $(".mol_setting").click( function () {
+        var data = $('#id_mol_form').serialize();
+        var val = $(this).attr('href');
+        var idx = val.indexOf('?')
+        if (idx === -1) {
+            $(this).attr('href', val + '?' + data);
+        } else {
+            val = val.slice(0, idx);
+            $(this).attr('href', val + '?' + data);
+        }
+    });
+
 });
 
 String.prototype.format = function () {

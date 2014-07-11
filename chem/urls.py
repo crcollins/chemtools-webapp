@@ -22,6 +22,6 @@ urlpatterns = patterns('chem.views',
     url(r"^(?P<string>[%s]*)/$" % multimolname, "multi_molecule"),
     url(r"^(?P<string>[%s]*)\.zip$" % multimolname, "multi_molecule_zip"),
 
-    url(r"^(?P<string>[%s]*)/check/$" % multimolname, "molecule_check"),
+    url(r"^(?P<string>[%s]*)/check/$" % multimolname, "molecule_check", name="molecule_check"),
 )
 

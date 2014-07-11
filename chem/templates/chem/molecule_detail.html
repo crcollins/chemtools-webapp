@@ -13,7 +13,7 @@
         <div class="alert alert-danger">{{ error_message }}</div>
     {% else %}
     <div class="col-lg text-center">
-        <img src="../{{ molecule }}.png" alt="{{ molecule }}"></img>
+        <img src="/chem/{{ molecule }}.png" alt="{{ molecule }}"></img>
     </div>
     <hr>
     <table class="table">
@@ -24,10 +24,6 @@
         <tr>
             <th>Exact Name (with spacers)</th>
             <td>{{ exact_name_spacers }}</td>
-        </tr>
-        <tr>
-            <th>Keywords</th>
-            <td>{% if keywords %}{{ keywords|escape }}{% else %}{{ default_keywords|escape }}{% endif %}</td>
         </tr>
     </table>
 
@@ -81,34 +77,41 @@
     </table>
     <hr>
     <div class="list-group">
-        <a class="list-group-item" href="../{{ molecule }}.gjf?{{ keywords|urlencode }}">{{ molecule }}.gjf</a>
-        <a class="list-group-item" href="../{{ molecule }}.mol2">{{ molecule }}.mol2</a>
+        <a class="list-group-item collapse-data-btn" data-toggle="collapse" href="#mol_details">Molecule Form <b class="caret"></b></a>
+        <div id="mol_details" class="{% if mol_form.errors %}in{% else %}collapse{% endif %}">
+            <form id="id_mol_form">
+                <div id="id_form_input2">
+                    {{ mol_form|crispy }}
+                </div>
+            </form>
+        </div>
         <a class="list-group-item collapse-data-btn" data-toggle="collapse" href="#details">Job Form <b class="caret"></b></a>
+        <div id="details" class="{% if form.errors %}in{% else %}collapse{% endif %}">
+            <form id="id_job_form" action="." method="get">
+                <div id="id_form_input">
+                    {{ job_form|crispy }}
+                </div>
+                <input type="hidden" id="id_molname" name="molname" value="">
+                <div class="row">
+                    <div class="col-xs-4">
+                        <button class="btn btn-lg btn-primary btn-block" type="submit">Get Job</button>
+                    </div>
+                    {% if user.is_authenticated %}
+                    <div class="col-xs-4">
+                        {% csrf_token %}
+                        <a id="id_post" class="btn btn-lg btn-primary btn-block">Submit Job</a>
+                    </div>
+                    {% endif %}
+                    <div class="col-xs-4">
+                        <button class="btn btn-lg btn-block" type="reset">Reset</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <a class="list-group-item mol_setting" href="/chem/{{ molecule }}.gjf">{{ molecule }}.gjf</a>
+        <a class="list-group-item mol_setting" href="/chem/{{ molecule }}.mol2">{{ molecule }}.mol2</a>
     </div>
 
-    <div id="details" class="{% if form.errors %}in{% else %}collapse{% endif %}">
-        <form id="id_job_form" action="." method="get">
-            <div id="id_form_input">
-                {{ form|crispy }}
-            </div>
-            {% if keywords %}<input type="hidden" name="keywords" value="{{ keywords }}">{% endif %}
-            <input type="hidden" id="id_molname" name="molname" value="">
-            <div class="row">
-                <div class="col-xs-4">
-                    <button class="btn btn-lg btn-primary btn-block" type="submit">Get Job</button>
-                </div>
-                {% if user.is_authenticated %}
-                <div class="col-xs-4">
-                    {% csrf_token %}
-                    <a id="id_post" class="btn btn-lg btn-primary btn-block">Submit Job</a>
-                </div>
-                {% endif %}
-                <div class="col-xs-4">
-                    <button class="btn btn-lg btn-block" type="reset">Reset</button>
-                </div>
-            </div>
-        </form>
-    </div>
 
     <div class="modal fade" id="resultsModal" tabindex="-1" role="dialog" aria-labelledby="resultsModalLabel" aria-hidden="true">
         <div class="modal-dialog">

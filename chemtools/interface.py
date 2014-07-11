@@ -10,14 +10,15 @@ import ml
 from data.models import JobTemplate
 
 
-def get_multi_molecule(molecules, keywords, options, form):
+def get_multi_molecule(molecules, options, mol_form, job_form):
     buff = StringIO()
     zfile = zipfile.ZipFile(buff, "w", zipfile.ZIP_DEFLATED)
+    mol_settings = dict(mol_form.cleaned_data)
 
     generrors = []
     for name in molecules:
         try:
-            out = gjfwriter.Benzobisazole(name, keywords=keywords)
+            out = gjfwriter.Benzobisazole(name, **mol_settings)
             others = False
 
             if "image" in options:
@@ -27,7 +28,7 @@ def get_multi_molecule(molecules, keywords, options, form):
                 zfile.writestr(name + ".mol2", out.get_mol2())
                 others = True
             if "job" in options:
-                dnew = form.get_single_data(name)
+                dnew = job_form.get_single_data(name)
                 zfile.writestr(name + ".job", JobTemplate.render(**dnew))
                 others = True
 

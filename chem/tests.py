@@ -570,7 +570,7 @@ class PostsFailTestCase(TestCase):
                                         HTTP_X_REQUESTED_WITH="XMLHttpRequest")
             results = simplejson.loads(response.content)
             self.assertFalse(results["success"])
-            self.assertIn("has-error", results["form_html"])
+            self.assertIn("has-error", results["job_form_html"])
 
     def test_post_single_ajax_fail_template(self):
         r = self.client.login(**SUPER_USER_LOGIN)
@@ -589,7 +589,7 @@ class PostsFailTestCase(TestCase):
             results = simplejson.loads(response.content)
             self.assertFalse(results["success"])
             message = "A template or base template is required."
-            self.assertIn(message, results["form_html"])
+            self.assertIn(message, results["job_form_html"])
 
     def test_post_multi_fail(self):
         r = self.client.login(**SUPER_USER_LOGIN)
@@ -646,7 +646,7 @@ class PostsFailTestCase(TestCase):
                                     HTTP_X_REQUESTED_WITH="XMLHttpRequest")
         results = simplejson.loads(response.content)
         self.assertFalse(results["success"])
-        self.assertIn("has-error", results["form_html"])
+        self.assertIn("has-error", results["job_form_html"])
 
     def test_post_multi_job_perm_fail(self):
         r = self.client.login(**USER_LOGIN)
@@ -694,7 +694,7 @@ class PostsFailTestCase(TestCase):
                                     HTTP_X_REQUESTED_WITH="XMLHttpRequest")
         results = simplejson.loads(response.content)
         self.assertFalse(results["success"])
-        self.assertIn("has-error", results["form_html"])
+        self.assertIn("has-error", results["job_form_html"])
 
     def test_gjf_reset_submit_fail(self):
         r = self.client.login(**SUPER_USER_LOGIN)
@@ -962,7 +962,6 @@ class UtilsTestCase(TestCase):
             'lumo': -2.1298787902985779,
             'homo': -5.6866366091077571,
             'exact_name': '24aaA_TON_A_A_n1_m1_x1_y1_z1',
-            'keywords': 'opt B3LYP/6-31g(d)',
             'band_gap': 3.4415766653971942,
             'limits': {
                 'm': [
@@ -1007,24 +1006,24 @@ class UtilsServerTestCase(TestCase):
         self.credential2.save()
 
     def test_run_standard_jobs_staff_error(self):
-        results = utils.run_standard_jobs(self.credential, [''])
+        results = utils.run_standard_jobs(self.credential, [''], {}, {})
         self.assertEqual(results["error"], SUBMIT_ERROR)
 
     def test_run_standard_jobs_invalid_credential(self):
-        results = utils.run_standard_jobs(None, [''])
+        results = utils.run_standard_jobs(None, [''], {}, {})
         self.assertEqual(results["error"], CRED_ERROR)
 
     def test_run_standard_jobs(self):
         job = 'sleep 10'
         names = "TON,CON"
-        results = utils.run_standard_jobs(self.credential2, names, jobstring=job)
+        results = utils.run_standard_jobs(self.credential2, names, {}, {'jobstring': job})
         self.assertEqual(results["error"], None)
         self.assertEqual(results["failed"], [])
 
     def test_run_standard_jobs_name_error(self):
         job = 'sleep 10'
         names = "E-N,C-N"
-        results = utils.run_standard_jobs(self.credential2, names, jobstring=job)
+        results = utils.run_standard_jobs(self.credential2, names, {}, {'jobstring': job})
         for name, error in results['failed']:
             self.assertEqual(error, "Bad Substituent Name(s): ['N']")
 

@@ -11,6 +11,7 @@ from data.models import JobTemplate
 from cluster.models import Credential
 from utils import run_standard_jobs
 from models import ErrorReport
+from chemtools.constants import KEYWORDS
 
 
 class MultiFileInput(forms.FileInput):
@@ -86,6 +87,21 @@ class UploadForm(forms.Form):
         'td_reset',
         'gjf_submit',
     )
+
+
+class MoleculeForm(forms.Form):
+    keywords = forms.CharField(max_length="200", initial=KEYWORDS, required=False)
+    memory = forms.IntegerField(initial=59, required=False)
+    nprocshared = forms.IntegerField(initial=16, required=False)
+    charge = forms.IntegerField(initial=0, required=False)
+    multiplicity = forms.IntegerField(initial=1, required=False)
+
+    def clean(self):
+        super(MoleculeForm, self).clean()
+        for field in self.fields:
+            if self.cleaned_data.get(field) in [None, '']:
+                self.cleaned_data[field] = self.fields[field].initial
+        return self.cleaned_data
 
 
 class JobForm(forms.Form):
@@ -164,22 +180,22 @@ class JobForm(forms.Form):
             raise forms.ValidationError("A template or base template is required.")
         return self.cleaned_data
 
-    def get_results(self, request, string):
-        d = dict(self.cleaned_data)
+    def get_results(self, request, string, mol_form):
+        job_settings = dict(self.cleaned_data)
+        mol_settings = dict(mol_form.cleaned_data)
         if request.method == "GET":
             if request.REQUEST.get('molname'):
-                d['name'] = request.REQUEST.get('molname')
-            job_string = JobTemplate.render(**d)
+                job_settings['name'] = request.REQUEST.get('molname')
+            job_string = JobTemplate.render(**job_settings)
             response = HttpResponse(job_string, content_type="text/plain")
             filename = '%s.job' % request.REQUEST.get("molname")
             add = "" if request.REQUEST.get("view") else "attachment; "
             response['Content-Disposition'] = add + 'filename=' + filename
             return response
         elif request.method == "POST":
-            d["keywords"] = request.REQUEST.get('keywords', '')
-            cred = d.pop("credential")
+            cred = job_settings.pop("credential")
             do_html = request.REQUEST.get("html", False)
-            results = run_standard_jobs(cred, string, **d)
+            results = run_standard_jobs(cred, string, mol_settings, job_settings)
             if results["failed"]:
                 failed_names = zip(*results['failed'])[0]
                 results["failed_mols"] = ','.join(failed_names)

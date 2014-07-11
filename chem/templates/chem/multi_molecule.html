@@ -1,5 +1,6 @@
 {% extends "chem/base.html" %}
 {% load crispy_forms_tags %}
+{% load url from future %}
 
 {% block title %}{{ pagename }}{% endblock %}
 
@@ -13,16 +14,23 @@ function submitForm(name) {
 
 $(function() {
     $("#id_zip_download").click(function() {
-        event.preventDefault();
-        var a = $('#headerform').serialize();
-        if ($('#id_job').val() === 'on') {
-            a += '&' + $('#id_job_form').serialize();
+        var data = $('#headerform').serialize();
+        if ($('#id_job').is(':checked')) {
+            data += '&' + $('#id_job_form').serialize();
         }
         if ($("#id_unique").is(':checked')) {
-            a += '&unique=on';
+            data += '&unique=on';
         }
-        a += "&{{ encoded_keywords }}";
-        window.location = "/chem/{{ pagename }}.zip?{0}".format(a);
+        data += '&' + $('#id_mol_form').serialize();
+
+        var val = $(this).attr('href');
+        var idx = val.indexOf('?')
+        if (idx === -1) {
+            $(this).attr('href', val + '?' + data);
+        } else {
+            val = val.slice(0, idx);
+            $(this).attr('href', val + '?' + data);
+        }
     });
 
     $("#id_unique").change(function () {
@@ -35,7 +43,7 @@ $(function() {
         }
     );
 
-    $.get('check/', {"unique": "{{ unique }}", "html": true}, function(data) {
+    $.get('{% url "molecule_check" pagename %}', {"unique": "{{ unique }}", "html": true}, function(data) {
         var table = $("table.table");
         html = table.html();
         html += data;
@@ -44,6 +52,17 @@ $(function() {
             img = $($(this).find("img"));
             if (!img.attr('src')) {
                 img.attr('src', img.attr('data-src'));
+            }
+        });
+        $("table.table .mol_setting").click( function () {
+            var data = $('#id_mol_form').serialize();
+            var val = $(this).attr('href');
+            var idx = val.indexOf('?')
+            if (idx === -1) {
+                $(this).attr('href', val + '?' + data);
+            } else {
+                val = val.slice(0, idx);
+                $(this).attr('href', val + '?' + data);
             }
         });
     });
@@ -65,14 +84,21 @@ $(function() {
         <label for="id_unique">Only Show Unique</label>
     </div>
     <div class="list-group">
-        <a class="list-group-item collapse-data-btn" data-toggle="collapse" href="#details">Job Form <b class="caret"></b></a>
+        <a class="list-group-item collapse-data-btn" data-toggle="collapse" href="#mol_details">Molecule Form <b class="caret"></b></a>
+        <div id="mol_details" class="{% if mol_form.errors %}in{% else %}collapse{% endif %}">
+            <form id="id_mol_form">
+                <div id="id_form_input2">
+                    {{ mol_form|crispy }}
+                </div>
+            </form>
+        </div>
+        <a class="list-group-item collapse-data-btn" data-toggle="collapse" href="#job_details">Job Form <b class="caret"></b></a>
 
-        <div id="details" class="{% if form.errors %}in{% else %}collapse{% endif %}">
+        <div id="job_details" class="{% if job_form.errors %}in{% else %}collapse{% endif %}">
             <form id="id_job_form" action="." method="get">
                 <div id="id_form_input">
-                    {{ form|crispy }}
+                    {{ job_form|crispy }}
                 </div>
-                {% if keywords %}<input type="hidden" name="keywords" value="{{ keywords }}">{% endif %}
                 <input type="hidden" id="id_molname" name="molname" value="">
                 <div class="row">
                     {% if user.is_authenticated %}
@@ -87,7 +113,7 @@ $(function() {
                 </div>
             </form>
         </div>
-        <a class="list-group-item collapse-data-btn"  href='../{{ pagename }}.zip' id="id_zip_download">Download All</a>
+        <a class="list-group-item collapse-data-btn"  href='/chem/{{ pagename }}.zip' id="id_zip_download">Download All</a>
     </div>
 </div>
 

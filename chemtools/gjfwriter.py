@@ -28,10 +28,8 @@ class Molecule(object):
     def __init__(self, name, **kwargs):
         self.name = name
         self.keywords = kwargs.get('keywords', KEYWORDS)
-        if self.keywords is None:
-            self.keywords = KEYWORDS
         self.nprocshared = kwargs.get('nprocshared', 16)
-        self.mem = kwargs.get('mem', '59GB')
+        self.mem = kwargs.get('memory', 59)
         self.charge = kwargs.get('charge', 0)
         self.multiplicty = kwargs.get('multiplicity', 1)
         self.structure = None
@@ -47,7 +45,7 @@ class Molecule(object):
         if self.nprocshared is not None:
             starter.append("%%nprocshared=%d" % self.nprocshared)
         starter.extend([
-                    "%%mem=%s" % self.mem,
+                    "%%mem=%dGB" % self.mem,
                     "%%chk=%s.chk" % self.name,
                     "# %s geom=connectivity" % self.keywords,
                     "",
