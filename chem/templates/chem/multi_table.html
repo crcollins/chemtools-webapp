@@ -5,16 +5,16 @@
     {% for name, warning, error, unique in molecules %}
         <tr {% if unique %}data-unique="true"{% endif %} {% if warning %}class="warning"{% elif error %}class="danger"{% endif %}>
             <td>
-                <a href="../{{ name }}">{{ name }}</a>
+                <a href="/chem/{{ name }}">{{ name }}</a>
             </td>
             {% if not error %}
-                <td><a class="mol_setting" href="../{{ name }}.gjf">gjf</a></td>
-                <td><a class="mol_setting" href="../{{ name }}.mol2">mol2</a></td>
+                <td><a class="mol_setting" href="/chem/{{ name }}.gjf">gjf</a></td>
+                <td><a class="mol_setting" href="/chem/{{ name }}.mol2">mol2</a></td>
                 <td>
                     <a class="delayimage" data-toggle="collapse" href="#{{ name }}">
                         Image
                         <div id="{{ name }}" class="collapse">
-                            <img data-src="../{{ name }}.png"></img>
+                            <img data-src="/chem/{{ name }}.png"></img>
                         </div>
                     </a>
                 </td>
@@ -22,7 +22,7 @@
             {% else %}
                 <td colspan="4">{{ error }}</td>
             {% endif %}
-            <td><a href="../{{ name }}/report/">Report</a></td>
+            <td><a href="/chem/{{ name }}/report/">Report</a></td>
         </tr>
     {% endfor %}
 {% endif %}
