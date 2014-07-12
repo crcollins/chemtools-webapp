@@ -29,18 +29,11 @@ from project.utils import StringIO
 
 def index(request):
     molecule = request.REQUEST.get("molecule")
-    keywords = request.REQUEST.get("keywords", None)
     if molecule:
         func = molecule_detail
         if set(",{}$") & set(molecule):
             func = multi_molecule
-
-        if keywords != KEYWORDS:
-            url = reverse(func, args=(molecule, ))
-            params = urllib.urlencode({"keywords": keywords})
-            return HttpResponseRedirect(url + '?' + params)
-        else:
-            return redirect(func, molecule)
+        return redirect(func, molecule)
     return render(request, "chem/index.html")
 
 
