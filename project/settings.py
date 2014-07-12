@@ -170,8 +170,15 @@ INSTALLED_APPS = (
     'data',
     'cluster',
     'crispy_forms',
-    'sslserver',
  )
+
+try:
+    import sslserver
+    INSTALLED_APPS = INSTALLED_APPS + ('sslserver', )
+except ImportError:
+    pass
+
+
 
 CRISPY_TEMPLATE_PACK = 'bootstrap3'
 
