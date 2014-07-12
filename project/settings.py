@@ -1,5 +1,3 @@
-# Django settings for project project.
-
 import os
 import random
 import hashlib
@@ -24,6 +22,9 @@ except ImportError:
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
+
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
 
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
