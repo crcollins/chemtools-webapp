@@ -18,6 +18,7 @@ $(function() {
             output += "<form id='{0}' action='/chem/jobs/{0}/kill/' method='post'>".format(cluster);
             output += "{% csrf_token %}";
 
+            output += "<div class='table-responsive'>";
             output += "<table class='table table-striped'>";
             output += "<tr>";
             for (var j = 0; j < columns.length; j++) {
@@ -46,7 +47,7 @@ $(function() {
                 output += "</tr>";
             }
             output += "<tr><td colspan={0}></td><td><input class='btn btn-sm btn-danger btn-block' value='Kill' type='submit' /></td></tr>".format(columns.length);
-            output += "</table></form><hr>";
+            output += "</table></div></form><hr>";
         }
         table.append(output);
     });

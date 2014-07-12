@@ -16,6 +16,7 @@
         <img src="/chem/{{ molecule }}.png" alt="{{ molecule }}"></img>
     </div>
     <hr>
+    <div class="table-responsive">
     <table class="table">
         <tr>
             <th>Exact Name</th>
@@ -26,8 +27,10 @@
             <td>{{ exact_name_spacers }}</td>
         </tr>
     </table>
+    </div>
 
     <a class="btn collapse-data-btn collapsed" data-toggle="collapse" href="#features">Feature Vectors</a>
+    <div class="table-responsive">
     <table id="features" class="table collapse">
         {% for feature in features %}
         <tr>
@@ -36,7 +39,9 @@
         </tr>
         {% endfor %}
     </table>
+    </div>
 
+    <div class="table-responsive">
     <table class="table">
         <thead>
             <tr>
@@ -75,6 +80,7 @@
             </tr>
         </tbody>
     </table>
+    </div>
     <hr>
     <div class="list-group">
         <a class="list-group-item collapse-data-btn" data-toggle="collapse" href="#mol_details">Molecule Form <b class="caret"></b></a>
