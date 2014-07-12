@@ -17,23 +17,28 @@ def get_multi_molecule(molecules, options, mol_form, job_form):
 
     generrors = []
     for name in molecules:
-        dnew = job_form.get_single_data(name)
+        try:
+            dnew = job_form.get_single_data(name)
+            mol_name = dnew['name']
+        except AttributeError:
+            mol_name = name
+
         try:
             out = gjfwriter.Benzobisazole(name, **mol_settings)
             others = False
 
             if "image" in options:
-                zfile.writestr(dnew['name'] + ".png", out.get_png(10))
+                zfile.writestr(mol_name + ".png", out.get_png(10))
                 others = True
             if "mol2" in options:
-                zfile.writestr(dnew['name'] + ".mol2", out.get_mol2())
+                zfile.writestr(mol_name + ".mol2", out.get_mol2())
                 others = True
             if "job" in options:
-                zfile.writestr(dnew['name'] + ".job", JobTemplate.render(**dnew))
+                zfile.writestr(mol_name + ".job", JobTemplate.render(**dnew))
                 others = True
 
             if "gjf" in options or not others:
-                zfile.writestr(dnew['name'] + ".gjf", out.get_gjf())
+                zfile.writestr(mol_name + ".gjf", out.get_gjf())
 
         except Exception as e:
             generrors.append("%s - %s" % (name, e))
