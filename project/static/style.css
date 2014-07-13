@@ -7,7 +7,6 @@
     height:     100%;
     width:      100%;
     background: rgba( 2, 2, 2, .5 )
-                /*url('/static/ajax-loader.gif')*/
                 50% 50%
                 no-repeat;
 }
