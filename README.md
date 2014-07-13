@@ -1,17 +1,15 @@
 ChemTools-WebApp
 ================
-A Django webapp built around the functionality of [chemtools [DEPRECATED]](https://github.com/crcollins/chemtools). This includes various utilities to parse Gaussian log files, creating benzobisazole structures, submitting jobs to Torque clusters, and predicting optoelectronic properties of benzobisazoles using machine learning.
+A Django webapp built around the functionality of [chemtools [DEPRECATED]](https://github.com/crcollins/chemtools). This includes various utilities to parse Gaussian log files, create benzobisazole structures, submit jobs to Torque clusters, and predict optoelectronic properties of benzobisazoles using machine learning.
 
 [Here is a demo site.](http://gauss.crcollins.com/)
 
 
-Setup
------
+Deploy
+------
 
-This setup assumes you are on a machine with the apt package manager.
+This setup assumes you are on a machine with the apt package manager. This will proceed to install the required dependencies and setup an nginx server to serve chemtools. Once this is done, you should be able to see it in your browser at http://localhost/.
 
-    $ sudo apt-get install git
-    $ git clone https://github.com/crcollins/chemtools-webapp
     $ cd chemtools-webapp
     $ source install.sh
 
@@ -19,6 +17,21 @@ To remove chemtools, run the following commands.
 
     $ cd chemtools-webapp
     $ souce install.sh remove
+
+
+Vagrant Deploy
+--------------
+
+This assumes that you already have vagrant and virtualbox installed.
+
+    $ cd chemtools-webapp/vagrant
+    $ vagrant up
+    # Warning: This includes the test key from project/media/tests by default. This key MUST be removed if you plan on opening this server up to the internet. If you want to change the port, just change the value in the vagrant/Vagrantfile and reboot the vm.
+    Go to http://localhost:4567/
+
+To spin up a vm from the local copy of chemtools-webapp can set the environmental variable `DEV` to `true`
+
+    $ DEV=true vagrant up
 
 
 Test
@@ -34,23 +47,7 @@ If you have coverage.py installed, you can also run the following commands to se
     $ coverage html
 
 
-
 Database
 --------
 
 The database used can be changed in by going in project/settings.py and changing the DATABASE dictionary.
-
-
-Vagrant Deploy
---------------
-
-This assumes that you already have vagrant and virtualbox installed.
-
-    $ cd chemtools-webapp/vagrant
-    $ vagrant up
-    # Warning: This includes the test key from project/media/tests by default. This key MUST be removed before opening this server up to the internet.
-    Go to http://localhost:4567/
-
-To spin up a vm from the local copy of chemtools-webapp can set the environmental variable `DEV` to `true`
-
-    $ DEV=true vagrant up
