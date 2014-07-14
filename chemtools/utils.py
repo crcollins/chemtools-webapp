@@ -56,7 +56,7 @@ def angle_between(vec1, vec2):
         # operations lose precision leading to sitations where -1.00000002 is
         # passed to acos which is not feasable, the quick fix is to just
         # constrain this value to the correct range.
-        return -math.acos(min(max(val,1), -1))
+        return -math.acos(min(max(val, -1), 1))
 
 
 def new_point(coord1=None, radius=None, coord2=None, angle=None, coord3=None, dihedral=None):
