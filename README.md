@@ -34,6 +34,27 @@ To spin up a vm from the local copy of chemtools-webapp can set the environmenta
     $ DEV=true vagrant up
 
 
+Development Setup
+-----------------
+
+There are two ways to get a dev setup, either you can do the vagrant deploy (the simplest). Or, you can manually install the components required for development. Really, this just just what the install.sh script does.
+
+    $ sudo apt-get update
+    $ sudo apt-get install -y git python2.7 python-dev gfortran liblapack-dev\
+                            libatlas-dev build-essential libfreetype6-dev\
+                            libpng-dev python-cairo python-pip
+    $ sudo pip install virtualenv
+    $ cd $CHEMTOOLS_DIR
+    $ virtualenv .
+    $ . bin/activate
+    $ ln -fs /usr/lib/python2.7/dist-packages/cairo/ lib/python2.7/site-packages/
+    $ pip install numpy==1.6.1
+    $ pip install -r requirements.txt
+    $ python manage.py syncdb
+    $ python manage.py runserver 0.0.0.0:8000
+    Go to http://localhost:8000/
+
+
 Test
 ----
 
