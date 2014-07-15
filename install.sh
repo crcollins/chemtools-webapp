@@ -8,7 +8,7 @@ dependencies() {
     sudo apt-get update
     sudo apt-get install -y git python2.7 python-dev gfortran liblapack-dev\
                             libatlas-dev build-essential libfreetype6-dev\
-                            libpng-dev python-cairo python-pip supervisor nginx
+                            libpng-dev python-cairo python-pip
     sudo pip install virtualenv
 }
 
@@ -20,17 +20,20 @@ install_chemtools() {
 
     pip install numpy==1.6.1
     pip install -r requirements.txt
-    pip install gunicorn
     python manage.py syncdb --noinput
+}
+
+setup_nginx() {
+    sudo apt-get update
+    sudo apt-get install -y supervisor nginx
+
+    cd $CHEMTOOLS_DIR
+    . bin/activate
+    pip install gunicorn
     sudo tee /etc/cron.d/chemtools <<EOF
 PATH=$CHEMTOOLS_DIR/bin
 0 3 * * * $INSTALL_USER cd $CHEMTOOLS_DIR && python -u $CHEMTOOLS_DIR/manage.py update_ml >> $CHEMTOOLS_DIR/ml_update.log
 EOF
-}
-
-setup_nginx() {
-    cd $CHEMTOOLS_DIR
-    . bin/activate
     sudo sed -e "s/\$INSTALL_USER/$INSTALL_USER/g"      \
              -e "s,\$CHEMTOOLS_DIR,$CHEMTOOLS_DIR,g"    \
              project/nginx_settings.conf                \
@@ -48,15 +51,6 @@ setup_nginx() {
     sudo service nginx restart
 }
 
-update() {
-    cd $CHEMTOOLS_DIR
-    . bin/activate
-    git pull
-    pip install -r requirements.txt
-    python manage.py syncdb --noinput
-    sudo supervisorctl restart chemtools
-}
-
 remove() {
     sudo rm -rf $CHEMTOOLS_DIR /etc/nginx/sites-available/chemtools \
                 /etc/nginx/sites-enabled/chemtools /etc/supervisor/conf.d/chemtools.conf \
@@ -65,8 +59,6 @@ remove() {
     sudo service nginx restart
 }
 
-
-
 if [ "$1" == "remove" ];
     then
     echo "Uninstalling"
@@ -74,5 +66,8 @@ if [ "$1" == "remove" ];
 else
     dependencies
     install_chemtools
-    setup_nginx
+    if [ "$1" != "dev"];
+        then
+        setup_nginx
+    fi
 fi
