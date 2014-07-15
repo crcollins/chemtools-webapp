@@ -46,6 +46,15 @@ There are two ways to get a dev setup, either you can do a vagrant deployment, o
     $ python manage.py runserver 0.0.0.0:8000
     Go to http://localhost:8000/
 
+To run the test server with ssl, you can run the following command:
+
+    $ python manage.py runsslserver\
+        --key=project/media/tests/server.key\
+        --certificate=project/media/tests/server.crt 0.0.0.0:8000
+    Go to https://localhost:8000/
+
+If you want to get rid of the warning message when you connect to it, you can add the certificate to your browsers certificate manager.
+
 
 Test
 ----
