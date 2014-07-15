@@ -49,4 +49,5 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.provision :shell, :inline => $setup_script, :privileged => false, :args => ENV["DEV"]
 
   config.vm.network :forwarded_port, host: 4567, guest: 80
+  config.vm.network :forwarded_port, host: 4568, guest: 443
 end
