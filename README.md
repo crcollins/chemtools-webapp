@@ -16,7 +16,7 @@ This setup assumes you are on a machine with the apt package manager. This will 
 To remove chemtools, run the following commands.
 
     $ cd chemtools-webapp
-    $ souce install.sh remove
+    $ source install.sh remove
 
 
 Vagrant Deploy
