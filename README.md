@@ -18,7 +18,7 @@ To remove chemtools, run the following commands.
     $ cd chemtools-webapp
     $ source install.sh remove
 
-In addition to parameter given to install.sh, there are also two environment variables that get used. `INSTALL_USER` is used to set the user that chemtools will install with (if no value is given this will default to `USER`). The other is `CHEMTOOLS_DIR` which sets the path where chemtools can be located (by default this is set to be the current directory).
+In addition to the parameter given to install.sh, there are also three environment variables that get used. They are `INSTALL_USER`, `CHEMTOOLS_DIR`, and `HTTPS`. `INSTALL_USER` is used to set the user that chemtools will install with (if no value is given this will default to `USER`). , `CHEMTOOLS_DIR` sets the path where chemtools is located (by default this is set to be the current directory). `HTTPS` specifices whether or not to use the https nginx config or not. This defaults to the regular nginx config. By giving `HTTPS` any non null value it will use the https configuration.
 
 
 Vagrant Deploy
