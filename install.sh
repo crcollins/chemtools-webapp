@@ -34,9 +34,15 @@ setup_nginx() {
 PATH=$CHEMTOOLS_DIR/bin
 0 3 * * * $INSTALL_USER cd $CHEMTOOLS_DIR && python -u $CHEMTOOLS_DIR/manage.py update_ml >> $CHEMTOOLS_DIR/ml_update.log
 EOF
+    if [ -z "$HTTPS" ];
+        then
+        NGINX_SETTINGS=nginx_settings.conf
+    else
+        NGINX_SETTINGS=nginx_settings_https.conf
+    fi
     sudo sed -e "s/\$INSTALL_USER/$INSTALL_USER/g"      \
              -e "s,\$CHEMTOOLS_DIR,$CHEMTOOLS_DIR,g"    \
-             project/nginx_settings.conf                \
+             project/$NGINX_SETTINGS                    \
              | sudo tee /etc/nginx/sites-available/chemtools
     sudo sed -e "s/\$INSTALL_USER/$INSTALL_USER/g"      \
              -e "s,\$CHEMTOOLS_DIR,$CHEMTOOLS_DIR,g"    \
