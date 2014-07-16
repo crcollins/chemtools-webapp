@@ -18,6 +18,8 @@ To remove chemtools, run the following commands.
     $ cd chemtools-webapp
     $ source install.sh remove
 
+In addition to parameter given to install.sh, there are also two environment variables that get used. `INSTALL_USER` is used to set the user that chemtools will install with (if no value is given this will default to `USER`). The other is `CHEMTOOLS_DIR` which sets the path where chemtools can be located (by default this is set to be the current directory).
+
 
 Vagrant Deploy
 --------------
