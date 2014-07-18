@@ -1,4 +1,5 @@
 import functools
+import collections
 
 import numpy
 from numpy.linalg import norm
@@ -102,6 +103,14 @@ class Molecule(object):
                 vector.append(data[i,j])
             end.append(data[i,i])
         return vector + end
+
+    def get_element_counts(self):
+        elems = [x.element for x in self.structure.atoms]
+        return collections.Counter(elems)
+
+    def get_formula(self):
+        values = self.get_element_counts()
+        return ''.join(key + str(values[key]) for key in sorted(values.keys()))
 
 
 class Benzobisazole(Molecule):
