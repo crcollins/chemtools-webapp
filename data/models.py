@@ -113,11 +113,11 @@ class JobTemplate(models.Model):
                 template = Template(kwargs.get("template", ''))
         c = Context({
             "name": kwargs.get("name", ''),
-            "email": kwargs.get("email"),
-            "nodes": kwargs.get("nodes"),
-            "ncpus": int(kwargs.get("nodes")) * 16,
-            "time": "%s:00:00" % kwargs.get("walltime"),
+            "email": kwargs.get("email", ''),
+            "nodes": kwargs.get("nodes", 1),
+            "ncpus": int(kwargs.get("nodes", 1)) * 16,
+            "time": "%s:00:00" % kwargs.get("walltime", '1'),
             "internal": kwargs.get("internal"),
-            "allocation": kwargs.get("allocation"),
+            "allocation": kwargs.get("allocation", ''),
             })
         return template.render(c)
