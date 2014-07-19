@@ -45,18 +45,12 @@ def project_plane(normal, vec):
 
 def angle_between(vec1, vec2):
     dot = (vec1.T * vec2)[0, 0]
-    len1 = numpy.linalg.norm(vec1)
-    len2 = numpy.linalg.norm(vec2)
+    cross = numpy.cross(vec1.T, vec2.T)
+    norm = numpy.linalg.norm(cross)
+    # This is more numerically stable than the expected equation
+    # angle = acos((a * b) / (|a| * |b|))
+    return math.atan2(norm, dot)
 
-    val = dot / (len1 * len2)
-    try:
-        return math.acos(val)
-    except:
-        # Note: This hack is required because sometimes the floating point
-        # operations lose precision leading to sitations where -1.00000002 is
-        # passed to acos which is not feasable, the quick fix is to just
-        # constrain this value to the correct range.
-        return -math.acos(min(max(val, -1), 1))
 
 
 def new_point(coord1=None, radius=None, coord2=None, angle=None, coord3=None, dihedral=None):
