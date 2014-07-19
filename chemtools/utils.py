@@ -52,6 +52,11 @@ def angle_between(vec1, vec2):
     return math.atan2(norm, dot)
 
 
+def get_dihedral(axis, coord1, coord2, coord3, coord4):
+    plane1 = project_plane(axis, coord4 - coord3)
+    plane2 = project_plane(axis, coord1 - coord2)
+    return angle_between(plane1, plane2)
+
 
 def new_point(coord1=None, radius=None, coord2=None, angle=None, coord3=None, dihedral=None):
     if coord1 is None:
@@ -79,9 +84,29 @@ def new_point(coord1=None, radius=None, coord2=None, angle=None, coord3=None, di
         return coord
 
     axis = (coord2 - coord1)
-    curr_angle = angle_between(project_plane(axis, coord3 - coord2), project_plane(axis, coord -  coord1))
-    rot = get_axis_rotation_matrix(axis, math.radians(dihedral) - curr_angle)
-    coord = rot * (coord - coord1) + coord1
+    curr_angle = get_dihedral(axis, coord, coord1, coord2, coord3)
+    r_dihedral = math.radians(dihedral)
+
+    neg_rotation_amount = math.radians(dihedral) - curr_angle
+    neg_rot = get_axis_rotation_matrix(axis, neg_rotation_amount)
+    neg_coord = neg_rot * (coord - coord1) + coord1
+    neg_angle = get_dihedral(axis, neg_coord, coord1, coord2, coord3)
+    neg_val = max(neg_angle, r_dihedral) - min(neg_angle, r_dihedral)
+    if neg_val > math.pi:
+        neg_val = (2 * math.pi) - neg_angle
+
+    pos_rotation_amount = curr_angle - math.radians(dihedral)
+    pos_rot = get_axis_rotation_matrix(axis, pos_rotation_amount)
+    pos_coord = pos_rot * (coord - coord1) + coord1
+    pos_angle = get_dihedral(axis, pos_coord, coord1, coord2, coord3)
+    pos_val = max(pos_angle, r_dihedral) - min(pos_angle, r_dihedral)
+    if pos_val > math.pi:
+        pos_val = (2 * math.pi) - pos_angle
+
+    if pos_val < neg_val:
+        coord = pos_coord
+    else:
+        coord = neg_coord
     return coord
 
 
