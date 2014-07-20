@@ -530,6 +530,18 @@ class BenzobisazoleTestCase(TestCase):
         value = obj.get_decay_distance_correction_feature_vector()
         self.assertEqual(value, DECAY_DISTANCE_CORRECTION_FEATURE_VECTOR)
 
+    def test_get_element_counts(self):
+        obj = gjfwriter.Benzobisazole("TON")
+        value = obj.get_element_counts()
+        expected = {'C': 8, 'H': 4, 'N': 2, 'O': 2}
+        self.assertEqual(value, expected)
+
+    def test_get_formula(self):
+        obj = gjfwriter.Benzobisazole("TON")
+        value = obj.get_formula()
+        expected = 'C8H4N2O2'
+        self.assertEqual(value, expected)
+
 
 class MolNameTestCase(TestCase):
     pairs = [
