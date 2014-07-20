@@ -30,27 +30,27 @@ def get_molecule_warnings(name):
     warn = ErrorReport.objects.filter(molecule=name)
     warning = True if warn else None
     exact_name = exact_spacers.replace('*', '')
-    unique = not DataPoint.objects.filter(exact_name=exact_name).exists()
-    return exact_spacers, warning, error, unique
+    new = not DataPoint.objects.filter(exact_name=exact_name).exists()
+    return exact_spacers, warning, error, new
 
 
 def get_multi_molecule_warnings(string):
     molecules = name_expansion(string)
-    unique_molecules = collections.OrderedDict()
+    new_molecules = collections.OrderedDict()
 
     start = time.time()
     for name in molecules:
         if time.time() - start > 1:
             raise ValueError("The operation has timed out.")
-        exact_spacer, warning, error, unique = get_molecule_warnings(name)
-        if exact_spacer not in unique_molecules:
-            unique_molecules[exact_spacer] = [name, warning, error, unique]
+        exact_spacer, warning, error, new = get_molecule_warnings(name)
+        if exact_spacer not in new_molecules:
+            new_molecules[exact_spacer] = [name, warning, error, new]
 
-    return zip(*unique_molecules.values())
+    return zip(*new_molecules.values())
 
 
 def get_molecule_info(molecule):
-    exactspacer, warning, error, unique = get_molecule_warnings(molecule)
+    exactspacer, warning, error, new = get_molecule_warnings(molecule)
     exactname = exactspacer.replace('*', '')
 
     features = ['', '']
@@ -86,7 +86,7 @@ def get_molecule_info(molecule):
         "homo": homo,
         "lumo": lumo,
         "band_gap": gap,
-        "unique": unique,
+        "new": new,
         "known_errors": warning,
         "error_message": error,
         "limits": limits,

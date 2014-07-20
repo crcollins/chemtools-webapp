@@ -2,8 +2,8 @@
 {% if error %}
     {{ error }}
 {% else %}
-    {% for name, warning, error, unique in molecules %}
-        <tr {% if unique %}data-unique="true"{% endif %} {% if warning %}class="warning"{% elif error %}class="danger"{% endif %}>
+    {% for name, warning, error, new in molecules %}
+        <tr {% if new %}data-new="true"{% endif %} {% if warning %}class="warning"{% elif error %}class="danger"{% endif %}>
             <td>
                 <a href="/chem/{{ name }}">{{ name }}</a>
             </td>

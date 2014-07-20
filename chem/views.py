@@ -90,9 +90,9 @@ def molecule_check(request, string):
         "error": None,
     }
     try:
-        molecules, warnings, errors, uniques = get_multi_molecule_warnings(
+        molecules, warnings, errors, news = get_multi_molecule_warnings(
                                                                         string)
-        a["molecules"] = zip(molecules, warnings, errors, uniques)
+        a["molecules"] = zip(molecules, warnings, errors, news)
     except ValueError as e:
         a["error"] = str(e)
         a["molecules"] = None
@@ -165,7 +165,7 @@ def multi_molecule(request, string):
 
 def multi_molecule_zip(request, string):
     try:
-        molecules, warnings, errors, uniques = get_multi_molecule_warnings(
+        molecules, warnings, errors, news = get_multi_molecule_warnings(
                                                                         string)
     except ValueError as e:
         c = Context({
@@ -194,8 +194,8 @@ def multi_molecule_zip(request, string):
 
     selection = ("image", "mol2", "job", "gjf")
     options = [x for x in selection if request.REQUEST.get(x)]
-    if request.REQUEST.get("unique", ''):
-        molecules = [x for i, x in enumerate(molecules) if uniques[i]]
+    if request.REQUEST.get("new", ''):
+        molecules = [x for i, x in enumerate(molecules) if news[i]]
     ret_zip = get_multi_molecule(molecules, options, mol_form, job_form)
 
     response = HttpResponse(ret_zip, mimetype="application/zip")

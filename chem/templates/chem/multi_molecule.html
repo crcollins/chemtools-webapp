@@ -18,8 +18,8 @@ $(function() {
         if ($('#id_job').is(':checked')) {
             data += '&' + $('#id_job_form').serialize();
         }
-        if ($("#id_unique").is(':checked')) {
-            data += '&unique=on';
+        if ($("#id_new").is(':checked')) {
+            data += '&new=on';
         }
         data += '&' + $('#id_mol_form').serialize();
 
@@ -33,17 +33,17 @@ $(function() {
         }
     });
 
-    $("#id_unique").change(function () {
+    $("#id_new").change(function () {
             $.each($("table tbody tr"), function(idx, value) {
-                var on = $("#id_unique").is(':checked');
-                if (!$(value).data()["unique"]) {
+                var on = $("#id_new").is(':checked');
+                if (!$(value).data()["new"]) {
                     on ? $(value).hide() : $(value).show()
                 }
             });
         }
     );
 
-    $.get('{% url "molecule_check" pagename %}', {"unique": "{{ unique }}", "html": true}, function(data) {
+    $.get('{% url "molecule_check" pagename %}', {"new": "{{ new }}", "html": true}, function(data) {
         var table = $("table.table");
         html = table.html();
         html += data;
@@ -80,8 +80,8 @@ $(function() {
 
 <div class="container">
     <div class="checkbox">
-        <input type="checkbox" id="id_unique" name="unique" />
-        <label for="id_unique">Only Show Unique</label>
+        <input type="checkbox" id="id_new" name="new" />
+        <label for="id_new">Only Show New Structures</label>
     </div>
     <div class="list-group">
         <a class="list-group-item collapse-data-btn" data-toggle="collapse" href="#mol_details">Molecule Form <b class="caret"></b></a>
