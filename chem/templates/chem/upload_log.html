@@ -80,8 +80,14 @@ $(function() {
                 {{ job_form|crispy }}
             </div>
         </div>
-        <input class="btn btn-primary" id="id_submit" type="submit" value="Upload!" />
-        <input class="btn" type="reset" value="Reset" />
+        <div class="row">
+            <div class="col-xs-6">
+                <button class="btn btn-lg btn-primary btn-block" id="id_submit" type="submit">Upload!</button>
+            </div>
+            <div class="col-xs-6">
+                <button class="btn btn-lg btn-block" type="reset">Reset</button>
+            </div>
+        </div>
     </form>
     <p>
         Files may be uploaded in zipped format (.zip, .tar.gz, .tar.bz2) or individually.
