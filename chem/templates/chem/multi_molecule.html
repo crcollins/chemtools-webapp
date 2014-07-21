@@ -41,7 +41,7 @@ $(function() {
         }
     );
 
-    $.get('{% url "mol_check" pagename %}', {"new": "{{ new }}", "html": true}, function(data) {
+    $.get('{% url "mol_check" pagename %}', {"html": true}, function(data) {
         var table = $("table.table");
         html = table.html();
         html += data;
