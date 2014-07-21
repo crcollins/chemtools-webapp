@@ -28,7 +28,8 @@ def _register(client, data):
     content = response.content
     start = content.index("Please click")
     end = content.index("this", start) - 2
-    key = content[start:end].split('href="')[1]
+    url = content[start:end].split('href="')[1]
+    key = url.split('register/')[1]
     response = client.get(reverse(views.activate_user, args=(key, )))
     assert response.status_code == 200
     v = client.login(username=data["username"], password=data["new_password1"])
