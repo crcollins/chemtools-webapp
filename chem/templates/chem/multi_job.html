@@ -90,7 +90,7 @@ $(function() {
             {{ form|crispy }}
         </div>
         <div class="row">
-            <div class="col-xs-4">
+            <div class="col-xs-{% if user.is_authenticated %}4{% else %}6{% endif %}">
                 <button class="btn btn-lg btn-primary btn-block" type="submit">Build Jobs</button>
             </div>
             {% if user.is_authenticated %}
@@ -98,7 +98,7 @@ $(function() {
                 <button id="id_multi_job_post" class="btn btn-lg btn-primary btn-block">Submit Jobs</button>
             </div>
             {% endif %}
-            <div class="col-xs-4">
+            <div class="col-xs-{% if user.is_authenticated %}4{% else %}6{% endif %}">
                 <button class="btn btn-lg btn-block" type="reset">Reset</button>
             </div>
         </div>
