@@ -1,4 +1,3 @@
-from cStringIO import StringIO
 import os
 import urllib
 import zipfile
@@ -20,10 +19,8 @@ from utils import parse_file_list, find_sets, convert_logs
 
 from chemtools import gjfwriter
 from chemtools import fileparser, dataparser
-from chemtools.constants import KEYWORDS
 from chemtools.interface import get_multi_molecule, get_multi_job
 import cluster.interface
-from data.models import JobTemplate
 from project.utils import StringIO
 
 
@@ -367,7 +364,6 @@ def reset_gjf(request):
 
         d = dict(job_form.cleaned_data)
         cred = d.pop("credential")
-        d["keywords"] = request.REQUEST.get("keywords", None)
         a = cluster.interface.run_jobs(cred, names, strings, **d)
         a["failed"].extend(errors)
         do_html = request.REQUEST.get("html", False)
