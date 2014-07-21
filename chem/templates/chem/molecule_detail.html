@@ -1,5 +1,6 @@
 {% extends "chem/base.html" %}
 {% load crispy_forms_tags %}
+{% load url from future %}
 
 {% block title %}{{ molecule }}{% endblock %}
 
@@ -13,7 +14,7 @@
         <div class="alert alert-danger">{{ error_message }}</div>
     {% else %}
     <div class="col-lg text-center">
-        <img src="/chem/{{ molecule }}.png" alt="{{ molecule }}"></img>
+        <img src="{% url 'mol_png' molecule %}" alt="{{ molecule }}"></img>
     </div>
     <hr>
     <div class="table-responsive">
@@ -114,8 +115,8 @@
                 </div>
             </form>
         </div>
-        <a class="list-group-item mol_setting" href="/chem/{{ molecule }}.gjf">{{ molecule }}.gjf</a>
-        <a class="list-group-item mol_setting" href="/chem/{{ molecule }}.mol2">{{ molecule }}.mol2</a>
+        <a class="list-group-item mol_setting" href="{% url 'mol_gjf' molecule %}">{{ molecule }}.gjf</a>
+        <a class="list-group-item mol_setting" href="{% url 'mol_mol2' molecule %}">{{ molecule }}.mol2</a>
     </div>
 
 

@@ -1,4 +1,5 @@
 {% extends "account/base.html" %}
+{% load url from future %}
 
 {% block title %}Settings{% endblock %}
 
@@ -14,7 +15,7 @@
     <div class="col-md-3">
         <div class="list-group" id="sidebar">
         {% for p in pages %}
-            <a href="/u/{{ request.user }}/{{ p }}/" class="list-group-item {% if page == p %}active{% endif %}">{{ p|title }}</a>
+            <a href="{% url 'account_page' request.user p %}" class="list-group-item {% if page == p %}active{% endif %}">{{ p|title }}</a>
         {% endfor %}
         </div>
     </div>
