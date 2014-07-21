@@ -35,6 +35,7 @@ class SettingsForm(forms.Form):
                                 required=False,
                                 label="XSEDE Username")
     new_ssh_keypair = forms.BooleanField(required=False)
+    public_key = forms.CharField(required=False, widget=forms.Textarea(attrs={"cols": 50, "rows": 6}))
 
 
 class UserProfileForm(forms.ModelForm):

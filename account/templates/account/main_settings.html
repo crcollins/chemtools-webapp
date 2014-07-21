@@ -5,12 +5,6 @@
 <form action='' method="post">
     {% csrf_token %}
     {{ form|crispy }}
-    <div class="form-group">
-        <label class="control-label" for="id_public_key">Public Key</label>
-        <div class="">
-            <textarea id="id_public_key" cols=50 rows=6 class=" form-control">{{ user.get_profile.public_key }}</textarea>
-        </div>
-    </div>
     <hr>
     <div class="row">
         <div class="col-xs-6">

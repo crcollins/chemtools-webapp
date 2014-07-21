@@ -98,6 +98,7 @@ def main_settings(request, username):
     initial = {
                 "email": request.user.email,
                 "xsede_username": user_profile.xsede_username,
+                "public_key": user_profile.public_key,
                 }
     settings_form = SettingsForm(request.POST or None, initial=initial)
     if settings_form.is_valid():
