@@ -9,7 +9,7 @@
 
 $(function() {
     function post_func() {
-        if (!$("#id_gjf_submit").is(':checked') || !$("#id_td_reset").is(':checked')) {
+        if (!$("#id_gjf_submit").is(':checked') && !$("#id_td_reset").is(':checked')) {
             $("#id_form").submit();
         }
         event.preventDefault();
