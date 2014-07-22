@@ -89,9 +89,8 @@ def _run_job(ssh, sftp, gjfstring, jobstring=None, **kwargs):
             return None, "folder - " + error
 
         name = kwargs.get("name", "chemtoolsjob")
-        cluster = kwargs.get("cluster", '')
         gjfname = "chemtools/%s.gjf" % name
-        jobname = "chemtools/%s.%sjob" % (name, cluster)
+        jobname = "chemtools/%s.job" % name
 
         f = sftp.open(gjfname, 'w')
         f.write(gjfstring)
@@ -103,7 +102,7 @@ def _run_job(ssh, sftp, gjfstring, jobstring=None, **kwargs):
         f2.write(jobstring)
         f2.close()
 
-        s = "cd chemtools; qsub " + "%s.%sjob" % (name, cluster)
+        s = "cd chemtools; qsub " + "%s.job" % name
         _, stdout, stderr = ssh.exec_command(s)
         stderr = stderr.readlines()
         if stderr:
