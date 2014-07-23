@@ -1,0 +1,40 @@
+{% for cluster in clusters %}
+    <h3>{{ cluster.name }}</h3>
+    <form id="{{ cluster.name }}" action="/chem/jobs/{{ cluster.name }}/kill/" method="post">
+        {% csrf_token %}
+        <div class='table-responsive'>
+        <table class='table table-striped'>
+        <tr>
+        {% for column in cluster.columns %}
+            <th>{{ column }}</th>
+        {% endfor %}
+            <th>Kill <input type='checkbox' class='check_all' /></th>
+        </tr>
+
+        {% for job in cluster.jobs %}
+            <tr>
+            {% for cell in job %}
+                {% if k == 0 %}
+                    <td><a href="/chem/jobs/{{ cluster }}/{{ cell }}/">{{ cell }}</a></td>
+                {% else %}
+                    <td>{{ cell }}</td>
+                {% endif %}
+            {% endfor %}
+                <td>
+                    <div class='checkbox'>
+                        <input type='checkbox' class='idRow' {% if job|last == 'C' %}disabled='disabled'{% endif %} name="{{ job.0 }}">
+                    </div>
+                </td>
+            </tr>
+        {% endfor %}
+            <tr>
+                <td colspan={{ cluster.columns|length }}></td>
+                <td>
+                    <input class='btn btn-sm btn-danger btn-block' value='Kill' type='submit' />
+                </td>
+            </tr>
+        </table>
+        </div>
+    </form>
+    <hr>
+{% endfor %}

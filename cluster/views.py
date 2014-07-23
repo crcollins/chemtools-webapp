@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.template import Context
 from django.http import HttpResponse
+from django.template.loader import render_to_string
 from django.contrib.auth.decorators import login_required
 from django.utils import simplejson
 
@@ -34,6 +35,9 @@ def get_job_list(request):
         "is_authenticated": request.user.is_authenticated(),
         "clusters": jobs,
     }
+    if request.REQUEST.get("html", ''):
+        html = render_to_string("cluster/job_table.html", a)
+        return HttpResponse(html)
     return HttpResponse(simplejson.dumps(a), mimetype="application/json")
 
 

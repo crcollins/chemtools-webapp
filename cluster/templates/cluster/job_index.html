@@ -5,51 +5,9 @@
 {% block script %}
 <script>
 $(function() {
-    $.getJSON('/chem/jobs/running.json{% if cluster %}?cluster={{ cluster }}{% endif %}', function(data) {
+    $.get('/chem/jobs/running.json', {"cluster": '{{ cluster }}', "html": true}, function(data) {
         var table = $("#id_jobs")
-        var output = '';
-
-        for (var i = 0; i < data.clusters.length; i++) { // clusters
-            var cluster = data.clusters[i].name;
-            var jobs = data.clusters[i].jobs;
-            var columns = data.clusters[i].columns;
-
-            output += "<h3>{0}</h3>".format(cluster);
-            output += "<form id='{0}' action='/chem/jobs/{0}/kill/' method='post'>".format(cluster);
-            output += "{% csrf_token %}";
-
-            output += "<div class='table-responsive'>";
-            output += "<table class='table table-striped'>";
-            output += "<tr>";
-            for (var j = 0; j < columns.length; j++) {
-                output += "<th>{0}</th>".format(columns[j]);
-            }
-            output += "<th>Kill <input type='checkbox' class='check_all' /></th></tr>";
-
-            for (var j = 0; j < jobs.length; j++) { // jobs
-                output += "<tr>";
-                var thisjob = jobs[j];
-                for (var k = 0; k < thisjob.length; k++) { // cells
-                    var cell = thisjob[k];
-
-                    if (k == 0) {
-                        output += "<td><a href=\'/chem/jobs/{0}/{1}/\'>{1}</td>".format(cluster, cell);
-                    } else {
-                        output += "<td>{0}</td>".format(cell);
-                    }
-                }
-
-                var disabled = ""
-                if (thisjob[thisjob.length-1] == "C") {
-                    disabled = "disabled='disabled'";
-                }
-                output += "<td><div class='checkbox'><input type='checkbox' class='idRow' {0} name='{1}'></div></td>".format(disabled, thisjob[0]);
-                output += "</tr>";
-            }
-            output += "<tr><td colspan={0}></td><td><input class='btn btn-sm btn-danger btn-block' value='Kill' type='submit' /></td></tr>".format(columns.length);
-            output += "</table></div></form><hr>";
-        }
-        table.append(output);
+        table.append(data);
     });
     $(document).on(' change','input.check_all',function() {
         $(this).closest("form").find("input.idRow:enabled").prop("checked" , this.checked);
