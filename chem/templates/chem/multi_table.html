@@ -1,3 +1,5 @@
+{% load url from future %}
+
 <tbody>
 {% if error %}
     {{ error }}
@@ -5,16 +7,16 @@
     {% for name, warning, error, new in molecules %}
         <tr {% if new %}data-new="true"{% endif %} {% if warning %}class="warning"{% elif error %}class="danger"{% endif %}>
             <td>
-                <a href="/chem/{{ name }}">{{ name }}</a>
+                <a href="{% url "mol_detail" name %}">{{ name }}</a>
             </td>
             {% if not error %}
-                <td><a class="mol_setting" href="/chem/{{ name }}.gjf">gjf</a></td>
-                <td><a class="mol_setting" href="/chem/{{ name }}.mol2">mol2</a></td>
+                <td><a class="mol_setting" href="{% url "mol_gjf" name %}">gjf</a></td>
+                <td><a class="mol_setting" href="{% url "mol_mol2" name %}">mol2</a></td>
                 <td>
                     <a class="delayimage" data-toggle="collapse" href="#{{ name }}">
                         Image
                         <div id="{{ name }}" class="collapse">
-                            <img data-src="/chem/{{ name }}.png"></img>
+                            <img data-src="{% url "mol_png" name %}"></img>
                         </div>
                     </a>
                 </td>
@@ -22,7 +24,7 @@
             {% else %}
                 <td colspan="4">{{ error }}</td>
             {% endif %}
-            <td><a href="/chem/{{ name }}/report/">Report</a></td>
+            <td><a href="{% url "mol_report" name %}">Report</a></td>
         </tr>
     {% endfor %}
 {% endif %}
