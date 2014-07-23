@@ -1113,7 +1113,7 @@ class UploadsTestCase(TestCase):
         with open(datatxt, 'r') as txt:
             data = {
                 "files": txt,
-                "options": "dataparse",
+                "options": "longchain",
             }
             response = self.client.post(reverse(views.upload_data), data)
             self.assertEqual(response.status_code, 200)
@@ -1128,7 +1128,7 @@ class UploadsTestCase(TestCase):
             with open(filepath, 'r') as zfile:
                 data = {
                     "files": zfile,
-                    "options": "dataparse",
+                    "options": "longchain",
                 }
                 response = self.client.post(reverse(views.upload_data), data)
                 self.assertEqual(response.status_code, 200)
@@ -1142,7 +1142,7 @@ class UploadsTestCase(TestCase):
         with open(filepath, 'r') as zfile:
             data = {
                 "files": zfile,
-                "options": "dataparse",
+                "options": "longchain",
             }
             response = self.client.post(reverse(views.upload_data), data)
             self.assertEqual(response.status_code, 200)

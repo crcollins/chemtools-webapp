@@ -252,7 +252,7 @@ def write_svg(request, molecule):
 def upload_data(request):
     switch = {
         "logparse": parse_log,
-        "dataparse": parse_data,
+        "longchain": long_chain_limit,
         "gjfreset": reset_gjf,
     }
 
@@ -279,7 +279,7 @@ def parse_log(request):
     return response
 
 
-def parse_data(request):
+def long_chain_limit(request):
     files = list(parse_file_list(request.FILES.getlist('files')))
     logsets, files = find_sets(files)
 

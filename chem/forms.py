@@ -71,8 +71,8 @@ class ErrorReportForm(forms.ModelForm):
 class UploadForm(forms.Form):
     CHOICES = (
                 ("logparse", "Log Parse"),
-                ("dataparse", 'Data Parse'),
-                ("gjfreset", 'Gjf Reset')
+                ("longchain", "Long Chain Limit"),
+                ("gjfreset", "Gjf Reset")
             )
     files = MultiFileField()
     options = forms.ChoiceField(widget=forms.RadioSelect, choices=CHOICES)

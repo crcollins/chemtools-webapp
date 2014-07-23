@@ -252,9 +252,9 @@ If you are logged in, and have set up your credentials, then under the [Running]
 This takes normal Gaussian log files and will output a text file comma delimited with various useful values from the log file (Name, HOMO, LUMO, HomoOrbital, Dipole, Energy, Excited, Time).
 
 
-#### Data Parse ####
+#### Long Chain Limit ####
 
-This takes a file formated like this:
+To calculate the long chain limit, a file formated like this is needed:
 
     # 1/n values
     0.09091, 0.04545, 0.0303, 0.02273
@@ -267,7 +267,7 @@ This takes a file formated like this:
 
 Where lines starting with "#" are comments. The `n` values can be given as either `n` or `1/n`. This will return a zipped file with a text file listing the fit parameters as well as two graphs plotting the HOMO/LUMO and the Gap values.
 
-Data parsing can also be done now using just the log files. If you upload a set of log files with `n1, n2, ... nN` somewhere in the filename these logs will be put together. Once together they will be parsed for the relevant data parse data. This simplifies the process by not requiring the creation of a separate file just for the data.
+The actual reading of information can also be done now using just the log files. If you upload a set of log files with `n1, n2, ... nN` somewhere in the filename these logs will be put together. Once together they will be parsed for the relevant data and the long chain limit will be calculated. This simplifies the process by not requiring the creation of a separate file just for the data.
 
 
 #### Gjf Reset ####
