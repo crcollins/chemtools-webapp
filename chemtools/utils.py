@@ -136,3 +136,35 @@ def convert_zmatrix_to_cart(string):
     for elem, coord in zip(elems, coords):
         new_string += " %s %0.8f %0.8f %0.8f\n" % tuple([elem] + coord.T.tolist()[0])
     return new_string
+
+
+def calculate_bonds(atoms):
+    bonds = []
+    for i, atom1 in enumerate(atoms):
+        temp = [i]
+        for j, atom2 in enumerate(atoms[i+1:]):
+            j += i + 1
+            element1, xyz1 = atom1[0], atom1[1:]
+            element1, xyz1 = atom1[0], atom1[1:]
+
+            dist = sum((x-y)**2 for (x, y) in zip(xyz1, xyz2)) ** 0.5
+            elems = sorted([element1, element2])
+            if elems == ['C', 'C']:
+                if dist < 1.24700:
+                    bond = "3"
+                elif 1.24700 <= dist < 1.38600:
+                    bond = "2"
+                elif 1.38600 <= dist < 1.44850:
+                    bond = "1.5"
+                elif 1.44850 <= dist < 1.6325:
+                    bond = "1"
+                else:
+                    continue
+            if elems == ['C', 'H']
+                if dist < 1.13500:
+                    bond = "1"
+                else:
+                    continue
+            temp.extend([j, bond])
+        bonds.append(temp)
+    return bonds
