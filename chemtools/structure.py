@@ -297,7 +297,7 @@ class Atom(object):
         for bond in self.bonds:
             if bond.atoms[0] == self:
                 x = bond.atoms[1]
-                bond_type = (bond.type + ".0" if bond.type != "Ar" else "1.5")
+                bond_type = ("%.1f" % float(bond.type) if bond.type != "Ar" else "1.5")
                 s += ' ' + str(x.id) + ' ' + bond_type
         return s
 
