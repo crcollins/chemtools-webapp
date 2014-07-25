@@ -11,6 +11,23 @@ from utils import get_full_rotation_matrix, get_angles
 from project.utils import StringIO
 
 
+def from_xyz(file):
+    atoms = []
+    bonds = []
+    state = 0
+    for line in file:
+        if line == "\n":
+            state = 1
+        elif state == 0:
+            e, x, y, z = line.split()[-4:]
+            atoms.append(Atom(x, y, z, e, atoms))
+        elif state == 1:
+            a1, a2, t = line.split()
+            bonds.append(Bond((atoms[int(a1) - 1], atoms[int(a2) - 1]), t, bonds))
+    file.close()
+    return Structure(atoms, bonds)
+
+
 def from_data(filename):
     '''Reads basic data files.'''
     atomtypes = {'C': '4', 'N': '3', 'O': '2', 'P': '3', 'S': '2'}
@@ -33,22 +50,12 @@ def from_data(filename):
     else:
         raise Exception(3, "Bad Substituent Name: %s" % filename)
 
-    atoms = []
-    bonds = []
-    state = 0
-    for line in f:
-        if line == "\n":
-            state = 1
-        elif state == 0:
-            e, x, y, z = line.split()[-4:]
-            if len(filename) == 3 and e in convert:
-                e = convert[e]
-            atoms.append(Atom(x, y, z, e, atoms))
-        elif state == 1:
-            a1, a2, t = line.split()
-            bonds.append(Bond((atoms[int(a1) - 1], atoms[int(a2) - 1]), t, bonds))
-    f.close()
-    return Structure(atoms, bonds)
+    structure = from_xyz(f)
+    if len(filename) == 3:
+        for atom in structure.atoms:
+            if atom.element in convert:
+                atom.element = convert[atom.element]
+    return structure
 
 
 def from_gjf(file):
