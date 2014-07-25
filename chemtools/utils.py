@@ -3,6 +3,7 @@ import numpy
 
 from constants import BOND_LENGTHS
 
+
 def get_axis_rotation_matrix(axis, theta):
     # http://stackoverflow.com/questions/6721544/circular-rotation-around-an-arbitrary-axis
     ct = math.cos(theta)
@@ -147,7 +148,10 @@ def get_bond(element1, element2, dist):
             continue
 
 
-def calculate_bonds(atoms):
+def calculate_bonds(string):
+    temp = [x.split() for x in string.split('\n') if x.strip()]
+    atoms = [[ele, float(x), float(y), float(z)] for ele, x, y, z in temp]
+
     bonds = []
     for i, atom1 in enumerate(atoms):
         temp = [i]
