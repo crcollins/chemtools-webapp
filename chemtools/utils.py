@@ -111,8 +111,7 @@ def new_point(coord1=None, radius=None, coord2=None, angle=None, coord3=None, di
     return coord
 
 
-def replace_geom_vars(string):
-    geom, variables = string.split("\n\n")
+def replace_geom_vars(geom, variables):
     if variables:
         d = dict([x.strip().split() for x in variables.split('\n') if x])
 
