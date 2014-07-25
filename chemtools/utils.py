@@ -1,6 +1,7 @@
 import math
 import numpy
 
+from constants import BOND_LENGTHS
 
 def get_axis_rotation_matrix(axis, theta):
     # http://stackoverflow.com/questions/6721544/circular-rotation-around-an-arbitrary-axis
@@ -138,6 +139,15 @@ def convert_zmatrix_to_cart(string):
     return new_string
 
 
+def get_bond(element1, element2, dist):
+    for key in ["3", "2", "1.5", "1"]:
+        try:
+            if dist < (BOND_LENGTHS[element1][key] + BOND_LENGTHS[element2][key]):
+                return key
+        except KeyError:
+            continue
+
+
 def calculate_bonds(atoms):
     bonds = []
     for i, atom1 in enumerate(atoms):
@@ -145,26 +155,13 @@ def calculate_bonds(atoms):
         for j, atom2 in enumerate(atoms[i+1:]):
             j += i + 1
             element1, xyz1 = atom1[0], atom1[1:]
-            element1, xyz1 = atom1[0], atom1[1:]
+            element2, xyz2 = atom2[0], atom2[1:]
 
             dist = sum((x-y)**2 for (x, y) in zip(xyz1, xyz2)) ** 0.5
             elems = sorted([element1, element2])
-            if elems == ['C', 'C']:
-                if dist < 1.24700:
-                    bond = "3"
-                elif 1.24700 <= dist < 1.38600:
-                    bond = "2"
-                elif 1.38600 <= dist < 1.44850:
-                    bond = "1.5"
-                elif 1.44850 <= dist < 1.6325:
-                    bond = "1"
-                else:
-                    continue
-            if elems == ['C', 'H']
-                if dist < 1.13500:
-                    bond = "1"
-                else:
-                    continue
-            temp.extend([j, bond])
+
+            bond = get_bond(element1, element2, dist)
+            if bond is not None:
+                temp.extend([j, bond])
         bonds.append(temp)
     return bonds
