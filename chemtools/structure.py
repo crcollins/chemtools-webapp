@@ -1,13 +1,15 @@
 import os
 import math
 import copy
+import string
 
 import numpy
 import cairo
 
 from constants import COLORS, COLORS2, CONNECTIONS, DATAPATH, ARYL, XGROUPS, MASSES
 from mol_name import parse_name
-from utils import get_full_rotation_matrix, get_angles
+from utils import get_full_rotation_matrix, get_angles, replace_geom_vars, \
+                    convert_zmatrix_to_cart, calculate_bonds
 from project.utils import StringIO
 
 
@@ -59,7 +61,82 @@ def from_data(filename):
 
 
 def from_gjf(file):
-    pass
+    data = file.read().replace('\r', '')
+    parts = data.split("\n\n")
+
+    header = parts[0].strip()
+    assert "#" in header
+
+    header_lines = header.split('\n')
+
+    if "#" in header_lines[-1]:
+        has_bonds = "connectivity" in header_lines[-1]
+        has_redundant = "modredundant" in header_lines[-1]
+    else:
+        raise Exception()
+
+    # title = parts[1].strip()
+    other = [x for x in parts[3:] if x.strip()]
+    if len(other) < (has_bonds + has_redundant):
+        raise Exception()
+
+    letter_first = []
+    number_first = []
+    for part in other:
+        if part.strip()[0] in string.letters:
+            letter_first.append(part)
+        elif part.strip()[0] in string.digits:
+            number_first.append(part)
+
+    if has_redundant:
+        if len(letter_first) > 1:
+            variables, redundant = letter_first
+        else:
+            redundant = letter_first[0]
+            variables = ''
+    else:
+        if len(letter_first) == 1:
+            variables = letter_first[0]
+            redundant = ''
+        elif len(letter_first) < 1:
+            variables = ''
+            redundant = ''
+        else:
+            raise Exception()
+
+    if has_bonds:
+        temp = number_first[0]
+        bonds = []
+        for line in temp.split('\n'):
+            comp = line.strip().split()
+            if len(comp) < 3:
+                continue
+
+            main = comp[0]
+            comp = comp[1:]
+            for i, x in enumerate(comp[::2]):
+                bonds.append("%s %s %s" % (main, x, comp[2 * i + 1]))
+        print bonds
+        bonds_string = "\n".join(bonds)
+    else:
+        bonds_string = ''
+
+    body = parts[2].strip()
+    start = body.index('\n')
+    charge, multiplicity = body[0:start].strip().split()
+    geom = body[start+1:]
+
+    if variables:
+        geom = replace_geom_vars(geom, variables)
+
+    if len(geom[:geom.index("\n")].strip().split()) < 4:
+        geom = convert_zmatrix_to_cart(geom)
+
+    if not has_bonds:
+        bonds_string = calculate_bonds(geom)
+    print [geom, bonds_string]
+    f = StringIO(geom + "\n\n" + bonds_string)
+    return from_xyz(f)
 
 
 def from_log(file):
