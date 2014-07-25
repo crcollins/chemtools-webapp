@@ -154,7 +154,6 @@ def calculate_bonds(string):
 
     bonds = []
     for i, atom1 in enumerate(atoms):
-        temp = [i]
         for j, atom2 in enumerate(atoms[i+1:]):
             j += i + 1
             element1, xyz1 = atom1[0], atom1[1:]
@@ -165,6 +164,5 @@ def calculate_bonds(string):
 
             bond = get_bond(element1, element2, dist)
             if bond is not None:
-                temp.extend([j, bond])
-        bonds.append(temp)
-    return bonds
+                bonds.append("%d %d %s" % (i + 1, j + 1, bond))
+    return "\n".join(bonds)
