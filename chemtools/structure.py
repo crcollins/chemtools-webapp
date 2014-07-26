@@ -139,10 +139,6 @@ def from_gjf(file):
     return from_xyz(f)
 
 
-def from_log(file):
-    pass
-
-
 def _load_fragments(coreset):
     corename, (leftparsed, middleparsed, rightparsed) = coreset
     # molecule, name, parent
