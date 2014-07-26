@@ -140,7 +140,7 @@ def convert_zmatrix_to_cart(string):
 
 
 def get_bond(element1, element2, dist):
-    for key in ["3", "2", "1.5", "1"]:
+    for key in ["3", "2", "Ar", "1"]:
         try:
             if dist < (BOND_LENGTHS[element1][key] + BOND_LENGTHS[element2][key]):
                 return key
