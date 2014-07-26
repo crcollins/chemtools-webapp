@@ -116,7 +116,6 @@ def from_gjf(file):
             comp = comp[1:]
             for i, x in enumerate(comp[::2]):
                 bonds.append("%s %s %s" % (main, x, comp[2 * i + 1]))
-        print bonds
         bonds_string = "\n".join(bonds)
     else:
         bonds_string = ''
@@ -134,7 +133,6 @@ def from_gjf(file):
 
     if not has_bonds:
         bonds_string = calculate_bonds(geom)
-    print [geom, bonds_string]
     f = StringIO(geom + "\n\n" + bonds_string)
     return from_xyz(f)
 
