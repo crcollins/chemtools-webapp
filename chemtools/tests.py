@@ -427,6 +427,36 @@ class StructureTestCase(TestCase):
         with self.assertRaises(Exception):
             structure.read_data("filename")
 
+    def test_from_gjf(self):
+        path = os.path.join(settings.MEDIA_ROOT, "tests", "A_TON_A_A.gjf")
+        s = structure.from_gjf(open(path, 'r'))
+        self.assertEqual([x.strip() for x in s.gjf.split()], [x.strip() for x in STRUCTURE_GJF.split()])
+
+    def test_from_gjf_no_bonds(self):
+        string = "%chk=chk.chk\n# hf\n\nTitle\n\n0 1" + METHANE_REPLACED
+        f = StringIO(string)
+        s = structure.from_gjf(f)
+        self.assertEqual([x.strip() for x in s.gjf.split()], [x.strip() for x in METHANE_ALL.split()])
+
+    def test_from_gjf_bonds(self):
+        string = "%chk=chk.chk\n# hf geom=connectivity\n\nTitle\n\n0 1" + STRUCTURE_GJF
+        f = StringIO(string)
+        s = structure.from_gjf(f)
+        self.assertEqual([x.strip() for x in s.gjf.split()], [x.strip() for x in STRUCTURE_GJF.split()])
+
+    def test_from_gjf_parameters(self):
+        string = "%chk=chk.chk\n# hf\n\nTitle\n\n0 1" + METHANE
+        f = StringIO(string)
+        s = structure.from_gjf(f)
+        self.assertEqual([x.strip() for x in s.gjf.split()], [x.strip() for x in METHANE_ALL.split()])
+
+    def test_from_gjf_zmatrix(self):
+        string = "%chk=chk.chk\n# hf\n\nTitle\n\n0 1" + METHANE
+        f = StringIO(string)
+        s = structure.from_gjf(f)
+        self.assertEqual([x.strip() for x in s.gjf.split()], [x.strip() for x in METHANE_ALL.split()])
+
+
     def test_cores(self):
         for core in self.cores:
             structure.from_name(core)
