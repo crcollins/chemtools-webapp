@@ -1009,16 +1009,19 @@ BENZENE_CART = """
 
 class UtilsTestCase(TestCase):
     def test_replace_geom_vars(self):
-        results = utils.replace_geom_vars(METHANE.strip())
+        geom, variables = METHANE.strip().split("\n\n")
+        results = utils.replace_geom_vars(geom, variables)
         self.assertEqual(METHANE_REPLACED.strip(), results)
 
     def test_convert_zmatrix_to_cart_meth(self):
-        string = utils.replace_geom_vars(METHANE.strip())
+        geom, variables = METHANE.strip().split("\n\n")
+        string = utils.replace_geom_vars(geom, variables)
         results = utils.convert_zmatrix_to_cart(string)
         self.assertEqual(METHANE_CART.strip(), results.strip())
 
     def test_convert_zmatrix_to_cart_benz(self):
-        string = utils.replace_geom_vars(BENZENE.strip())
+        geom, variables = BENZENE.strip().split("\n\n")
+        string = utils.replace_geom_vars(geom, variables)
         results = utils.convert_zmatrix_to_cart(string)
         self.assertEqual(BENZENE_CART.strip(), results.strip())
 
