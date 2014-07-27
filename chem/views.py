@@ -254,6 +254,7 @@ def upload_data(request):
         "logparse": parse_log,
         "longchain": long_chain_limit,
         "gjfreset": reset_gjf,
+        "gjfview": view_gjf,
     }
 
     if request.method == "POST":
@@ -390,6 +391,16 @@ def reset_gjf(request):
 
     response = HttpResponse(ret_zip, mimetype="application/zip")
     response["Content-Disposition"] = "attachment; filename=output.zip"
+    return response
+
+
+def view_gjf(request):
+    scale = request.REQUEST.get("scale", 10)
+    f = request.FILES.getlist('files')[0]
+    out = gjfwriter.Molecule(f.name)
+    out.from_gjf(f)
+    response = HttpResponse(out.get_png(int(scale)), content_type="image/png")
+    response['Content-Disposition'] = 'filename=%s.png' % f.name
     return response
 
 ###########################################################

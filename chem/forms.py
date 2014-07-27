@@ -72,7 +72,8 @@ class UploadForm(forms.Form):
     CHOICES = (
                 ("logparse", "Log Parse"),
                 ("longchain", "Long Chain Limit"),
-                ("gjfreset", "Gjf Reset")
+                ("gjfview", "Gjf View"),
+                ("gjfreset", "Gjf Reset"),
             )
     files = MultiFileField()
     options = forms.ChoiceField(widget=forms.RadioSelect, choices=CHOICES)
