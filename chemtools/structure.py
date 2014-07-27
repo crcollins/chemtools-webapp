@@ -73,12 +73,12 @@ def from_gjf(file):
         has_bonds = "connectivity" in header_lines[-1]
         has_redundant = "modredundant" in header_lines[-1]
     else:
-        raise Exception()
+        raise Exception("The header is missing a #")
 
     # title = parts[1].strip()
     other = [x for x in parts[3:] if x.strip()]
     if len(other) < (has_bonds + has_redundant):
-        raise Exception()
+        raise Exception("Either the bonds data or redundant coords are missing")
 
     letter_first = []
     number_first = []
@@ -102,7 +102,7 @@ def from_gjf(file):
             variables = ''
             redundant = ''
         else:
-            raise Exception()
+            raise Exception("Too many letter first groups")
 
     if has_bonds:
         temp = number_first[0]
