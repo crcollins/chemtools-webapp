@@ -378,6 +378,27 @@ Title Card Required
 
 B 5 1 F
 """
+METHANE_FREEZE2 = r"""
+%chk=t.chk
+# hf/3-21g geom=(modredundant,connectivity)
+
+Title Card Required
+
+0 1
+ C
+ H                  1            1.07000000
+ H                  1            1.07000000    2            109.47120255
+ H                  1            1.07000000    3            109.47125080    2            -119.99998525    0
+ H                  1            1.07000000    3            109.47121829    2            120.00000060    0
+
+ 1 2 1.0 3 1.0 4 1.0 5 1.0
+ 2
+ 3
+ 4
+ 5
+
+B 5 1 F
+"""
 
 class StructureTestCase(TestCase):
     templates = [
@@ -493,6 +514,11 @@ class StructureTestCase(TestCase):
         s = structure.from_gjf(f)
         self.assertEqual([x.strip() for x in s.gjf.split()], [x.strip() for x in METHANE_ALL.split()])
 
+    def test_from_gjf_redundant_no_parameters(self):
+        string = METHANE_FREEZE2
+        f = StringIO(string)
+        s = structure.from_gjf(f)
+        self.assertEqual([x.strip() for x in s.gjf.split()], [x.strip() for x in METHANE_ALL.split()])
 
     def test_cores(self):
         for core in self.cores:
