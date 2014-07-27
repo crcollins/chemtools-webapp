@@ -347,6 +347,37 @@ H 0.685059 5.376147 -0.000043
 14
 15
 16"""
+METHANE_FREEZE = r"""
+%chk=t.chk
+# hf/3-21g geom=(modredundant,connectivity)
+
+Title Card Required
+
+0 1
+ C
+ H                  1            B1
+ H                  1            B2    2            A1
+ H                  1            B3    3            A2    2            D1    0
+ H                  1            B4    3            A3    2            D2    0
+
+   B1             1.07000000
+   B2             1.07000000
+   B3             1.07000000
+   B4             1.07000000
+   A1           109.47120255
+   A2           109.47125080
+   A3           109.47121829
+   D1          -119.99998525
+   D2           120.00000060
+
+ 1 2 1.0 3 1.0 4 1.0 5 1.0
+ 2
+ 3
+ 4
+ 5
+
+B 5 1 F
+"""
 
 class StructureTestCase(TestCase):
     templates = [
@@ -452,6 +483,12 @@ class StructureTestCase(TestCase):
 
     def test_from_gjf_zmatrix(self):
         string = "%chk=chk.chk\n# hf\n\nTitle\n\n0 1" + METHANE
+        f = StringIO(string)
+        s = structure.from_gjf(f)
+        self.assertEqual([x.strip() for x in s.gjf.split()], [x.strip() for x in METHANE_ALL.split()])
+
+    def test_from_gjf_redundant(self):
+        string = METHANE_FREEZE
         f = StringIO(string)
         s = structure.from_gjf(f)
         self.assertEqual([x.strip() for x in s.gjf.split()], [x.strip() for x in METHANE_ALL.split()])
