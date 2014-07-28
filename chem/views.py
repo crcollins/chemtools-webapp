@@ -1,6 +1,7 @@
 import os
 import urllib
 import zipfile
+import base64
 
 from django.shortcuts import render, redirect
 from django.template import Context, RequestContext
@@ -396,12 +397,19 @@ def reset_gjf(request):
 
 def view_gjf(request):
     scale = request.REQUEST.get("scale", 10)
-    f = request.FILES.getlist('files')[0]
-    out = gjfwriter.Molecule(f.name)
-    out.from_gjf(f)
-    response = HttpResponse(out.get_png(int(scale)), content_type="image/png")
-    response['Content-Disposition'] = 'filename=%s.png' % f.name
-    return response
+
+    images = []
+    for f in request.FILES.getlist('files'):
+        out = gjfwriter.Molecule(f.name)
+        out.from_gjf(f)
+
+        image = out.get_png(int(scale))
+        images.append(base64.b64encode(image))
+
+    c = Context({
+        "images": images,
+        })
+    return render(request, "chem/gjf_view.html", c)
 
 ###########################################################
 ###########################################################
