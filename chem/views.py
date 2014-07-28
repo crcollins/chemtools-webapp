@@ -1,7 +1,6 @@
 import os
 import urllib
 import zipfile
-import base64
 
 from django.shortcuts import render, redirect
 from django.template import Context, RequestContext
@@ -402,9 +401,7 @@ def view_gjf(request):
     for f in request.FILES.getlist('files'):
         out = gjfwriter.Molecule(f.name)
         out.from_gjf(f)
-
-        image = out.get_png(int(scale))
-        images.append(base64.b64encode(image))
+        images.append(out.get_png_data_url())
 
     c = Context({
         "images": images,

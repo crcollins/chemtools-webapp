@@ -1,5 +1,6 @@
 import functools
 import collections
+import base64
 
 import numpy
 from numpy.linalg import norm
@@ -67,8 +68,16 @@ class Molecule(object):
     def get_png(self, size=10):
         return self.structure.draw(size).getvalue()
 
+    def get_png_data_url(self, size=10):
+        string = "data:image/png;base64,"
+        return string + base64.b64encode(self.get_png(size))
+
     def get_svg(self, size=10):
         return self.structure.draw(size, svg=True).getvalue()
+
+    def get_svg_data_url(self, size=10):
+        string = "data:image/svg;base64,"
+        return string + base64.b64encode(self.get_svg(size))
 
     @cache
     def get_coulomb_matrix(self):
