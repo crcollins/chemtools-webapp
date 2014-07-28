@@ -25,6 +25,11 @@ def from_xyz(file):
             atoms.append(Atom(x, y, z, e, atoms))
         elif state == 1:
             a1, a2, t = line.split()
+            if '.' in t:
+                if t == "1.5":
+                    t = "Ar"
+                else:
+                    t = t.split('.')[0]
             bonds.append(Bond((atoms[int(a1) - 1], atoms[int(a2) - 1]), t, bonds))
     file.close()
     return Structure(atoms, bonds)
