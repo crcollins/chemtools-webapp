@@ -12,7 +12,8 @@ from chemtools import fileparser
 from chemtools.constants import KEYWORDS
 from chemtools.ml import get_properties_from_decay_with_predictions, \
                         get_naive_feature_vector, \
-                        get_decay_feature_vector
+                        get_decay_feature_vector, \
+                        get_decay_distance_correction_feature_vector
 from chemtools.mol_name import name_expansion, get_exact_name
 from chemtools.interface import get_property_limits
 from data.models import DataPoint
@@ -53,7 +54,7 @@ def get_molecule_info(molecule):
     exactspacer, warning, error, new = get_molecule_warnings(molecule)
     exactname = exactspacer.replace('*', '')
 
-    features = ['', '']
+    features = ['', '', '']
     homo, lumo, gap = None, None, None
     datapoint = None
 
@@ -62,6 +63,7 @@ def get_molecule_info(molecule):
             features = [
                         get_naive_feature_vector(exactspacer),
                         get_decay_feature_vector(exactspacer),
+                        get_decay_distance_correction_feature_vector(exactspacer),
                     ]
             homo, lumo, gap = get_properties_from_decay_with_predictions(
                                                                 features[1]
