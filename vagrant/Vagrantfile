@@ -36,7 +36,11 @@ path = File.join("..", "project", "media", "tests")
 id_rsa_ssh_key_pub = File.read(File.join(path, "id_rsa.pub"))
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-  config.vm.box = "precise32"
+  if File.file?("chemtools-precise32.box")
+    config.vm.box = "chemtools-precise32"
+  else
+    config.vm.box = "precise32"
+  endq
   config.vm.synced_folder "../", "/tmp/chemtools-webapp"
 
 
