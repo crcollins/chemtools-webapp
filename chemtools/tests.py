@@ -347,7 +347,7 @@ H 0.685059 5.376147 -0.000043
 14
 15
 16"""
-METHANE_FREEZE = r"""
+METHANE_FREEZE = """
 %chk=t.chk
 # hf/3-21g geom=(modredundant,connectivity)
 
@@ -378,7 +378,7 @@ Title Card Required
 
 B 5 1 F
 """
-METHANE_FREEZE2 = r"""
+METHANE_FREEZE2 = """
 %chk=t.chk
 # hf/3-21g geom=(modredundant,connectivity)
 
