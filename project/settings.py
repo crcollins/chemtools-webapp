@@ -22,12 +22,14 @@ except ImportError:
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
+SSL = False
 
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTOCOL', 'https')
-os.environ['wsgi.scheme'] = 'https'
-os.environ['HTTPS'] = 'on'
+if SSL:
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTOCOL', 'https')
+    os.environ['wsgi.scheme'] = 'https'
+    os.environ['HTTPS'] = 'on'
 
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
