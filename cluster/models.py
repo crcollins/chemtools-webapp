@@ -131,6 +131,12 @@ class CredentialForm(CredentialAdminForm):
 class Job(models.Model):
     credential = models.ForeignKey(Credential)
 
+    keywords = models.CharField(max_length=200)
+    memory = models.IntegerField()
+    nprocshared = models.IntegerField()
+    charge = models.IntegerField()
+    multiplicity = models.IntegerField()
+
     molecule = models.CharField(max_length=400)
     name = models.CharField(max_length=400)
     email = models.EmailField()
