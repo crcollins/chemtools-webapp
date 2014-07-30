@@ -129,6 +129,7 @@ class CredentialForm(CredentialAdminForm):
 
 
 class Job(models.Model):
+    UNKNOWN = -4
     KILLED = -3
     FAILED = -2
     WALLTIME = -1
@@ -136,6 +137,7 @@ class Job(models.Model):
     RUNNING = 1
     COMPLETED = 2
     JOB_STATES = (
+        (UKNOWN, "Uknown"),  # If the job falls out of the queue before check
         (KILLED, "Killed"),
         (FAILED, "Failed"),
         (WALLTIME, "Walltime"),
