@@ -137,6 +137,7 @@ class Job(models.Model):
     nodes = models.IntegerField()
     walltime = models.IntegerField()
     allocation = models.CharField(max_length=20)
+    template = models.TextField()
 
     jobid = models.CharField(max_length=400)
     created = models.DateTimeField(auto_now=True)
