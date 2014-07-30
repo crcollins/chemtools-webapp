@@ -129,13 +129,19 @@ class CredentialForm(CredentialAdminForm):
 
 
 class Job(models.Model):
+    KILLED = -3
+    FAILED = -2
+    WALLTIME = -1
+    QUEUED = 0
+    RUNNING = 1
+    COMPLETED = 2
     JOB_STATES = (
-        (-3, "Killed"),
-        (-2, "Failed"),
-        (-1, "Walltime"),
-        (0, "Queued"),
-        (1, "Running"),
-        (2, "Completed"),
+        (KILLED, "Killed"),
+        (FAILED, "Failed"),
+        (WALLTIME, "Walltime"),
+        (QUEUED, "Queued"),
+        (RUNNING, "Running"),
+        (COMPLETED, "Completed"),
     )
     credential = models.ForeignKey(Credential)
 
