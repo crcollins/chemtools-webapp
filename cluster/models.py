@@ -129,6 +129,14 @@ class CredentialForm(CredentialAdminForm):
 
 
 class Job(models.Model):
+    JOB_STATES = (
+        (-3, "Killed"),
+        (-2, "Failed"),
+        (-1, "Walltime"),
+        (0, "Queued"),
+        (1, "Running"),
+        (2, "Completed"),
+    )
     credential = models.ForeignKey(Credential)
 
     keywords = models.CharField(max_length=200)
@@ -146,6 +154,7 @@ class Job(models.Model):
     template = models.TextField()
 
     jobid = models.CharField(max_length=400)
+    state = models.IntegerField(choices=JOB_STATES)
     created = models.DateTimeField(auto_now=True)
     started = models.DateTimeField(auto_now=False, null=True)
     ended = models.DateTimeField(auto_now=False, null=True)
