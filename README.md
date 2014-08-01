@@ -1,6 +1,6 @@
 ChemTools-WebApp
 ================
-A Django webapp built around the functionality of [chemtools [DEPRECATED]](https://github.com/crcollins/chemtools). This includes various utilities for parsing Gaussian log files, creating benzobisazole structures, submitting jobs to Torque clusters, and predicting optoelectronic properties of benzobisazoles using machine learning.
+A Django webapp built around the functionality of [chemtools [DEPRECATED]](https://github.com/crcollins/chemtools). This includes various utilities for parsing Gaussian log files, creating benzobisazole structures, submitting jobs to Torque clusters, and predicting optoelectronic properties of benzobisazoles using machine learning. These tools can be used through a django interface, or some of the tools can also just be used on the command line.
 
 [Here is a demo site.](http://gauss.crcollins.com/)
 
