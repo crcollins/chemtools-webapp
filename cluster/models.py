@@ -171,3 +171,8 @@ class Job(models.Model):
         fields = set([x.name for x in Job._meta.fields])
         newkwargs = {k: v for k, v in kwargs.items() if k in fields}
         super(Job, self).__init__(*args, **newkwargs)
+
+    @classmethod
+    def get_running_jobs(cls, credential):
+        return Job.objects.filter(credential=credential,
+                                state__in=[QUEUED, RUNNING])
