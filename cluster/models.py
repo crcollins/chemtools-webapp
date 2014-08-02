@@ -162,7 +162,7 @@ class Job(models.Model):
     template = models.TextField()
 
     jobid = models.CharField(max_length=400)
-    state = models.IntegerField(choices=JOB_STATES)
+    state = models.IntegerField(choices=JOB_STATES, default=QUEUED)
     created = models.DateTimeField(auto_now=True)
     started = models.DateTimeField(auto_now=False, null=True)
     ended = models.DateTimeField(auto_now=False, null=True)
