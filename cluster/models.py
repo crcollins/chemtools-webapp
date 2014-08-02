@@ -176,3 +176,12 @@ class Job(models.Model):
     def get_running_jobs(cls, credential):
         return Job.objects.filter(credential=credential,
                                 state__in=[QUEUED, RUNNING])
+
+    @classmethod
+    def _update_states(cls, credential, jobids, state):
+        Job.objects.filter(credential=credential, jobid__in=jobids).update(state=state)
+
+    @classmethod
+    def update_states(cls, credential, state_ids):
+        for state, jobids in state_ids.items():
+            Job._update_states(credential, jobids, state)
