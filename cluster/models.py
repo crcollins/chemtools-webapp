@@ -165,6 +165,7 @@ class Job(models.Model):
     state = models.IntegerField(choices=JOB_STATES, default=QUEUED)
     created = models.DateTimeField(auto_now=True)
     started = models.DateTimeField(auto_now=False, null=True)
+    last_update = models.DateTimeField(auto_now=True)
     ended = models.DateTimeField(auto_now=False, null=True)
 
     def __init__(self, *args, **kwargs):
