@@ -395,12 +395,15 @@ class Geometry(LineParser):
                 start = self.value.index('#')
                 end = self.value.index("{0}Version".format(self.delimiter), start)
 
-                d = {',': ' ', self.delimiter: '\n',
-                    "geom=connectivity": "",
-                }
                 value = self.value[start:end]
-                for i, j in d.iteritems():
-                    value = value.replace(i, j)
+
+                index = value.index(self.delimiter + self.delimiter)
+                second = value[index:].replace(',', ' ')
+                value = value[:index] + second
+
+                value = value.replace(self.delimiter, '\n')
+                value = value.replace("geom=connectivity", '')
+
                 lines = [x.strip() for x in value.split('\n')]
                 self.value = '\n'.join(lines) + '\n'
                 self.done = True
