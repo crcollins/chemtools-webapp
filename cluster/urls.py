@@ -1,8 +1,8 @@
 from django.conf.urls import patterns, url
-
 from django.contrib import admin
-admin.autodiscover()
 
+
+admin.autodiscover()
 urlpatterns = patterns('cluster.views',
     url(r"^$", "job_index"),
     url(r"^running.json$", "get_job_list"),

@@ -1,8 +1,8 @@
 from django.conf.urls import patterns, url
-
 from django.contrib import admin
-admin.autodiscover()
 
+
+admin.autodiscover()
 urlpatterns = patterns('docs.views',
     url(r'^$', "index", name="docs"),
     url(r'^errors/$', "common_errors", name="errors_docs"),

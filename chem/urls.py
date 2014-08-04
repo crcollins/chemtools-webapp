@@ -1,8 +1,8 @@
 from django.conf.urls import patterns, url
-
 from django.contrib import admin
-admin.autodiscover()
 
+
+admin.autodiscover()
 molname = "A-Za-z0-9_\-"
 multimolname = molname + ",\-\{\}\$\."
 

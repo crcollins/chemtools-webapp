@@ -1,8 +1,8 @@
 from django.conf.urls import patterns, url
-
 from django.contrib import admin
-admin.autodiscover()
 
+
+admin.autodiscover()
 urlpatterns = patterns('account.views',
     url(r"^(?P<username>[\w.@+-]+)/id_rsa.pub$",
         "get_public_key",
