@@ -2,8 +2,9 @@ from django.conf.urls import patterns, include, url
 from django.contrib import admin
 from django.conf import settings
 from django.conf.urls.static import static
-admin.autodiscover()
 
+
+admin.autodiscover()
 urlpatterns = patterns('',
     url(r'^$', "chem.views.index"),
     url(r'^u/', include("account.urls")),
