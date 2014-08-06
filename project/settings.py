@@ -1,5 +1,3 @@
-# Django settings for project project.
-
 import os
 import random
 import hashlib
@@ -24,6 +22,14 @@ except ImportError:
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
+SSL = False
+
+if SSL:
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTOCOL', 'https')
+    os.environ['wsgi.scheme'] = 'https'
+    os.environ['HTTPS'] = 'on'
 
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
@@ -167,6 +173,14 @@ INSTALLED_APPS = (
     'cluster',
     'crispy_forms',
  )
+
+try:
+    import sslserver
+    INSTALLED_APPS = INSTALLED_APPS + ('sslserver', )
+except ImportError:
+    pass
+
+
 
 CRISPY_TEMPLATE_PACK = 'bootstrap3'
 

@@ -18,7 +18,7 @@ To remove chemtools, run the following commands.
     $ cd chemtools-webapp
     $ source install.sh remove
 
-In addition to parameter given to install.sh, there are also two environment variables that get used. `INSTALL_USER` is used to set the user that chemtools will install with (if no value is given this will default to `USER`). The other is `CHEMTOOLS_DIR` which sets the path where chemtools can be located (by default this is set to be the current directory).
+In addition to the parameter given to install.sh, there are also three environment variables that get used. They are `INSTALL_USER`, `CHEMTOOLS_DIR`, and `HTTPS`. `INSTALL_USER` is used to set the user that chemtools will install with (if no value is given this will default to `USER`). , `CHEMTOOLS_DIR` sets the path where chemtools is located (by default this is set to be the current directory). `HTTPS` specifices whether or not to use the https nginx config or not. This defaults to the regular nginx config. By giving `HTTPS` any non null value it will use the https configuration.
 
 
 Vagrant Deploy
@@ -45,6 +45,15 @@ There are two ways to get a dev setup, either you can do a vagrant deployment, o
     $ source install.sh dev
     $ python manage.py runserver 0.0.0.0:8000
     Go to http://localhost:8000/
+
+To run the test server with ssl, you can run the following command:
+
+    $ python manage.py runsslserver\
+        --key=project/media/tests/server.key\
+        --certificate=project/media/tests/server.crt 0.0.0.0:8000
+    Go to https://localhost:8000/
+
+If you want to get rid of the warning message when you connect to it, you can add the certificate to your browsers certificate manager.
 
 
 Test
