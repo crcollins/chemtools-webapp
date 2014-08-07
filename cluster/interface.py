@@ -204,6 +204,9 @@ def get_log_data(credential, names):
             results["error"] = err
             return results
 
+        # this is partially for security, and partially to not just give the
+        # file parser a massive block of filenames.
+        # TODO: Make this thread safe
         with sftp.open("chemtools/files", 'w') as f:
             for filename in names:
                 f.write('chemtools/done/%s.log\n' % filename)
