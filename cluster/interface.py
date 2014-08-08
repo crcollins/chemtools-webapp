@@ -221,3 +221,43 @@ def get_log_data(credential, names):
 
         results["results"] = stdout.read()
     return results
+
+
+def get_log_status(credential, names):
+    results = {
+        "results": None,
+        "error": None,
+    }
+    try:
+        results["cluster"] = credential.cluster.name
+        ssh = credential.get_ssh_connection()
+        sftp = credential.get_sftp
+    except:
+        results["error"] = "Invalid credential"
+        results["cluster"] = None
+        return results
+
+    with ssh, sftp:
+        err = add_fileparser(ssh, sftp)
+        if err:
+            results["error"] = err
+            return results
+
+
+        status = []
+        for name in names:
+            path = "chemtools/done/%s" % name
+            _, stdout, stderr = ssh.exec_command("tail -n1 " + path)
+            if "Normal termination of Gaussian" in line:
+                status.append((name, "Done"))
+            elif "tail: cannot open `%s'" % path in line:
+                pass
+                # not done
+
+        err = stderr.read()
+        if err:
+            results["error"] = err
+            return results
+
+        results["results"] = stdout.read()
+    return results
