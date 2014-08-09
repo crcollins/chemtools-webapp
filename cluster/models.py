@@ -129,13 +129,13 @@ class CredentialForm(CredentialAdminForm):
 
 
 class Job(models.Model):
-    UNKNOWN = -4
-    KILLED = -3
-    FAILED = -2
-    WALLTIME = -1
-    QUEUED = 0
-    RUNNING = 1
-    COMPLETED = 2
+    UNKNOWN = 'U'
+    KILLED = 'K'
+    FAILED = 'F'
+    WALLTIME = 'W'
+    QUEUED = 'Q'
+    RUNNING = 'R'
+    COMPLETED = 'C'
     JOB_STATES = (
         (UNKNOWN, "Uknown"),  # If the job falls out of the queue before check
         (KILLED, "Killed"),
@@ -162,7 +162,7 @@ class Job(models.Model):
     template = models.TextField()
 
     jobid = models.CharField(max_length=400)
-    state = models.IntegerField(choices=JOB_STATES, default=QUEUED)
+    state = models.CharField(max_length=1, choices=JOB_STATES, default=QUEUED)
     created = models.DateTimeField(auto_now=True)
     started = models.DateTimeField(auto_now=False, null=True)
     last_update = models.DateTimeField(auto_now=True)
@@ -180,7 +180,7 @@ class Job(models.Model):
 
     @classmethod
     def _update_states(cls, credential, jobids, state):
-        Job.objects.filter(credential=credential, jobid__in=jobids).update(state=state)
+        Job.objects.filter(credential=credential, jobid__in=jobids).update(state=state.upper())
 
     @classmethod
     def update_states(cls, credential, state_ids):
