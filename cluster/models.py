@@ -137,7 +137,7 @@ class Job(models.Model):
     RUNNING = 'R'
     COMPLETED = 'C'
     JOB_STATES = (
-        (UNKNOWN, "Uknown"),  # If the job falls out of the queue before check
+        (UNKNOWN, "Unknown"),  # If the job falls out of the queue before check
         (KILLED, "Killed"),
         (FAILED, "Failed"),
         (WALLTIME, "Walltime"),
