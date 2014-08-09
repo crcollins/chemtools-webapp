@@ -243,17 +243,18 @@ def get_log_status(credential, names):
             results["error"] = err
             return results
 
-
         status = []
         for name in names:
             path = "chemtools/done/%s" % name
             # TODO: Make this safer
             _, stdout, stderr = ssh.exec_command("tail -n1 " + path)
             if "Normal termination of Gaussian" in stdout.read():
-                status.append((name, Job.COMPLETED))
+                status.append(Job.COMPLETED)
             elif "tail: cannot open" % path in stderr.read():
-                continue # no file
+                # continue # no file
+                # might be walltime
+                status.append(Job.WALLTIME)
             else:
-                status.append((name, Job.FAILED))
+                status.append(Job.FAILED)
             results["results"] = status
     return results
