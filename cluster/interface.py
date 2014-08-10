@@ -231,7 +231,7 @@ def get_log_status(credential, names):
     try:
         results["cluster"] = credential.cluster.name
         ssh = credential.get_ssh_connection()
-        sftp = credential.get_sftp
+        sftp = credential.get_sftp_connection()
     except:
         results["error"] = "Invalid credential"
         results["cluster"] = None
@@ -245,12 +245,12 @@ def get_log_status(credential, names):
 
         status = []
         for name in names:
-            path = "chemtools/done/%s" % name
+            path = "chemtools/done/%s.log" % name
             # TODO: Make this safer
             _, stdout, stderr = ssh.exec_command("tail -n1 " + path)
             if "Normal termination of Gaussian" in stdout.read():
                 status.append(Job.COMPLETED)
-            elif "tail: cannot open" % path in stderr.read():
+            elif "tail: cannot open" in stderr.read():
                 # continue # no file
                 # might be walltime
                 status.append(Job.WALLTIME)
