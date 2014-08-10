@@ -1,12 +1,14 @@
 from django.contrib.auth.models import User
 
-from models import Job
+from models import Credential, Job
 from interface import get_all_jobs, get_log_status
 
 
 def run_all():
     for cred in Job.objects.values('credential').distinct():
-        jobs = Job.objects.filter(credential=cred, status=Job.UNKNOWN)
+        cred = Credential.objects.get(id=cred["credential"])
+        jobs = Job.objects.filter(credential=cred, state=Job.UNKNOWN)
+
         jobids, names = zip(*jobs.values_list('jobid', 'name'))
         status = get_log_status(cred, names)
 
