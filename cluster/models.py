@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
 from django.db import models
 from django import forms
+from django.utils import timezone
 
 from project.utils import get_ssh_connection, get_sftp_connection, StringIO, \
                         AESCipher
@@ -194,10 +195,23 @@ class Job(models.Model):
             return Job.objects.filter(state__in=cls.RUNNING_STATES)
 
     @classmethod
-    def _update_states(cls, credential, jobids, state):
-        Job.objects.filter(credential=credential, jobid__in=jobids).update(state=state.upper())
+    def _update_states(cls, credential, jobids, state, now):
+        update = {
+                "state": state.upper(),
+                "last_update": now,
+        }
+        if state in cls.POST_STATES:
+            update["ended"] = now
+        jobs = Job.objects.filter(credential=credential, jobid__in=jobids)
+        jobs.update(**update)
+
+        if state == cls.RUNNING or state in cls.POST_STATES:
+            jobs.filter(started=None).update(started=now)
+
 
     @classmethod
     def update_states(cls, credential, state_ids):
+        now = timezone.now()
         for state, jobids in state_ids.items():
-            Job._update_states(credential, jobids, state)
+            Job._update_states(credential, jobids, state, now)
+
