@@ -9,6 +9,9 @@ def run_all():
         cred = Credential.objects.get(id=cred["credential"])
         jobs = Job.objects.filter(credential=cred, state=Job.UNKNOWN)
 
+        if not jobs:
+            continue
+
         jobids, names = zip(*jobs.values_list('jobid', 'name'))
         status = get_log_status(cred, names)
 
