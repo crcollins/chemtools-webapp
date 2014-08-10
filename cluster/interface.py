@@ -25,9 +25,16 @@ def run_job(credential, gjfstring, jobstring=None, **kwargs):
         return results
 
     with ssh, sftp:
-        temp = _run_job(ssh, sftp, gjfstring, jobstring, **kwargs)
-        results["jobid"] = temp[0]
-        results["error"] = temp[1]
+        jobid, error = _run_job(ssh, sftp, gjfstring, jobstring, **kwargs)
+        results["jobid"] = jobid
+        results["error"] = error
+        if not error:
+            job = Job(
+                credential=credential,
+                jobid=jobid,
+                **kwargs
+            )
+            job.save()
         return results
 
 
@@ -49,15 +56,24 @@ def run_jobs(credential, names, gjfstrings, jobstring=None, **kwargs):
         results["cluster"] = None
         return results
 
+    jobs = []
     with ssh, sftp:
         for name, gjf in zip(names, gjfstrings):
             dnew = kwargs.copy()
             dnew["name"] = re.sub(r"{{\s*name\s*}}", name, dnew.get("name", ''))
-            temp = _run_job(ssh, sftp, gjf, jobstring, **dnew)
-            if temp[1] is None:
-                results["worked"].append((name, temp[0]))
+            jobid, error = _run_job(ssh, sftp, gjf, jobstring, **dnew)
+            if error is None:
+                results["worked"].append((name, jobid))
+                job = Job(
+                    credential=credential,
+                    molecule=name,
+                    jobid=jobid,
+                    **dnew
+                )
+                jobs.append(job)
             else:
-                results["failed"].append((name, temp[1]))
+                results["failed"].append((name, error))
+    Job.objects.bulk_create(jobs)
     return results
 
 
