@@ -184,6 +184,7 @@ def get_all_log_data(credential):
         results["results"] = stdout.read()
     return results
 
+
 def get_log_data(credential, names):
     results = {
         "results": None,
@@ -238,11 +239,6 @@ def get_log_status(credential, names):
         return results
 
     with ssh, sftp:
-        err = add_fileparser(ssh, sftp)
-        if err:
-            results["error"] = err
-            return results
-
         status = []
         for name in names:
             path = "chemtools/done/%s.log" % name
