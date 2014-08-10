@@ -145,6 +145,18 @@ class Job(models.Model):
         (RUNNING, "Running"),
         (COMPLETED, "Completed"),
     )
+    RUNNING_STATES = set((
+        QUEUED,
+        RUNNING,
+    ))
+    POST_STATES = set((
+        UNKNOWN,
+        KILLED,
+        FAILED,
+        WALLTIME,
+        COMPLETED,
+    ))
+
     credential = models.ForeignKey(Credential)
 
     keywords = models.CharField(max_length=200)
@@ -174,9 +186,12 @@ class Job(models.Model):
         super(Job, self).__init__(*args, **newkwargs)
 
     @classmethod
-    def get_running_jobs(cls, credential):
-        return Job.objects.filter(credential=credential,
-                                state__in=[QUEUED, RUNNING])
+    def get_running_jobs(cls, credential=None):
+        if credential is not None:
+            return Job.objects.filter(credential=credential,
+                                    state__in=cls.RUNNING_STATES)
+        else:
+            return Job.objects.filter(state__in=cls.RUNNING_STATES)
 
     @classmethod
     def _update_states(cls, credential, jobids, state):
