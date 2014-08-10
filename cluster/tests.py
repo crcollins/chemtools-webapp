@@ -6,11 +6,14 @@ from django.test import Client, TestCase
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from django.utils import simplejson
+from django.core.management import call_command
 
 import views
 import models
 import utils
 import interface
+import update_jobs
+import update_unknown
 from account.views import account_page
 from project.utils import get_sftp_connection, get_ssh_connection, AESCipher
 from project.utils import SSHClient, SFTPClient, server_exists
@@ -633,3 +636,52 @@ class InterfaceTestCase(TestCase):
     def test_get_log_data_invalid_credential(self):
         results = interface.get_log_data(None, "24a_TON")
         self.assertEqual(results["error"], CRED_ERROR)
+
+
+class ManagementTestCase(TestCase):
+    def setUp(self):
+        super_user = User.objects.create_superuser(**SUPER_USER)
+        super_user.save()
+
+        self.cluster = models.Cluster(**CLUSTER)
+        self.cluster.save()
+        self.credential = models.Credential(user=super_user, cluster=self.cluster, **CREDENTIAL)
+        self.credential.save()
+
+    def test_update_jobs(self):
+        job = models.Job(credential=self.credential,
+            jobid="1",
+            name="not_a_real_job")
+        job.save()
+        update_jobs.run_all()
+        updated = models.Job.objects.get(id=job.id)
+        self.assertEqual(updated.state, models.Job.UNKNOWN)
+
+    def test_update_jobs_command(self):
+        job = models.Job(credential=self.credential,
+            jobid="1",
+            name="not_a_real_job")
+        job.save()
+        call_command("update_jobs")
+        updated = models.Job.objects.get(id=job.id)
+        self.assertEqual(updated.state, models.Job.UNKNOWN)
+
+    def test_update_unknown(self):
+        job = models.Job(credential=self.credential,
+            jobid="1",
+            name="not_a_real_job",
+            state=models.Job.UNKNOWN)
+        job.save()
+        update_unknown.run_all()
+        updated = models.Job.objects.get(id=job.id)
+        self.assertEqual(updated.state, models.Job.WALLTIME)
+
+    def test_update_unknown_command(self):
+        job = models.Job(credential=self.credential,
+            jobid="1",
+            name="not_a_real_job",
+            state=models.Job.UNKNOWN)
+        job.save()
+        call_command("update_unknown")
+        updated = models.Job.objects.get(id=job.id)
+        self.assertEqual(updated.state, models.Job.WALLTIME)
