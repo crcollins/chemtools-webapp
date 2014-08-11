@@ -692,7 +692,7 @@ class ManagementTestCase(TestCase):
         updated = models.Job.objects.get(id=job.id)
         self.assertEqual(updated.state, models.Job.UNKNOWN)
 
-    def test_update_unknown(self):
+    def test_update_unknown_walltime(self):
         job = models.Job(credential=self.credential,
             jobid="1",
             name="walltime",
