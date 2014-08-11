@@ -670,6 +670,9 @@ class ManagementTestCase(TestCase):
         self.credential.save()
         with self.credential.get_ssh_connection() as ssh:
             ssh.exec_command("touch chemtools/walltime.log")
+            ssh.exec_command("touch chemtools/done/failed.log")
+            c = "echo 'Normal termination of Gaussian' > chemtools/done/completed.log"
+            ssh.exec_command(c)
 
     def test_update_jobs(self):
         job = models.Job(credential=self.credential,
@@ -698,6 +701,26 @@ class ManagementTestCase(TestCase):
         update_unknown.run_all()
         updated = models.Job.objects.get(id=job.id)
         self.assertEqual(updated.state, models.Job.WALLTIME)
+
+    def test_update_unknown_completed(self):
+        job = models.Job(credential=self.credential,
+            jobid="1",
+            name="completed",
+            state=models.Job.UNKNOWN)
+        job.save()
+        update_unknown.run_all()
+        updated = models.Job.objects.get(id=job.id)
+        self.assertEqual(updated.state, models.Job.COMPLETED)
+
+    def test_update_unknown_failed(self):
+        job = models.Job(credential=self.credential,
+            jobid="1",
+            name="failed",
+            state=models.Job.UNKNOWN)
+        job.save()
+        update_unknown.run_all()
+        updated = models.Job.objects.get(id=job.id)
+        self.assertEqual(updated.state, models.Job.FAILED)
 
     def test_update_unknown_missing(self):
         job = models.Job(credential=self.credential,
