@@ -683,6 +683,16 @@ class ManagementTestCase(TestCase):
         updated = models.Job.objects.get(id=job.id)
         self.assertEqual(updated.state, models.Job.WALLTIME)
 
+    def test_update_unknown_missing(self):
+        job = models.Job(credential=self.credential,
+            jobid="1",
+            name="missing",
+            state=models.Job.UNKNOWN)
+        job.save()
+        update_unknown.run_all()
+        updated = models.Job.objects.get(id=job.id)
+        self.assertEqual(updated.state, models.Job.MISSING)
+
     def test_update_unknown_command(self):
         job = models.Job(credential=self.credential,
             jobid="1",
