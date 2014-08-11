@@ -137,6 +137,7 @@ class Job(models.Model):
     QUEUED = 'Q'
     RUNNING = 'R'
     COMPLETED = 'C'
+    MISSING = 'M'
     JOB_STATES = (
         (UNKNOWN, "Unknown"),  # If the job falls out of the queue before check
         (KILLED, "Killed"),
@@ -145,6 +146,7 @@ class Job(models.Model):
         (QUEUED, "Queued"),
         (RUNNING, "Running"),
         (COMPLETED, "Completed"),
+        (MISSING, "Missing"),
     )
     RUNNING_STATES = set((
         QUEUED,
@@ -156,6 +158,7 @@ class Job(models.Model):
         FAILED,
         WALLTIME,
         COMPLETED,
+        MISSING,
     ))
 
     credential = models.ForeignKey(Credential)
