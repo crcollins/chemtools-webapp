@@ -1,5 +1,6 @@
 import os
 from unittest import skipUnless
+import time
 
 from django.conf import settings
 from django.test import Client, TestCase
@@ -578,6 +579,20 @@ class InterfaceTestCase(TestCase):
         job = 'sleep 0'
         results = interface.run_jobs(self.credential2, names, gjfs, jobstring=job)
         self.assertEqual(results["error"], None)
+
+    def test_run_job_states(self):
+        results = interface.run_job(self.credential2, '', jobstring='sleep 10')
+        jobid = results["jobid"]
+        self.assertEqual(results["error"], None)
+        job = models.Job.objects.get(jobid=jobid)
+        self.assertEqual(job.state, models.Job.QUEUED)
+        update_jobs.run_all()
+        job = models.Job.objects.get(jobid=jobid)
+        self.assertEqual(job.state, models.Job.RUNNING)
+        time.sleep(10)
+        update_jobs.run_all()
+        job = models.Job.objects.get(jobid=jobid)
+        self.assertEqual(job.state, models.Job.COMPLETED)
 
     def test_kill_jobs_staff_error(self):
         results = interface.kill_jobs(self.credential, [''])
