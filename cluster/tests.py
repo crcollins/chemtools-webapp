@@ -652,6 +652,8 @@ class ManagementTestCase(TestCase):
         self.cluster.save()
         self.credential = models.Credential(user=super_user, cluster=self.cluster, **CREDENTIAL)
         self.credential.save()
+        with self.credential.get_ssh_connection() as ssh:
+            ssh.exec_command("touch chemtools/walltime.log")
 
     def test_update_jobs(self):
         job = models.Job(credential=self.credential,
@@ -674,7 +676,7 @@ class ManagementTestCase(TestCase):
     def test_update_unknown(self):
         job = models.Job(credential=self.credential,
             jobid="1",
-            name="not_a_real_job",
+            name="walltime",
             state=models.Job.UNKNOWN)
         job.save()
         update_unknown.run_all()
@@ -684,7 +686,7 @@ class ManagementTestCase(TestCase):
     def test_update_unknown_command(self):
         job = models.Job(credential=self.credential,
             jobid="1",
-            name="not_a_real_job",
+            name="walltime",
             state=models.Job.UNKNOWN)
         job.save()
         call_command("update_unknown")
