@@ -65,7 +65,7 @@ CRED_ERROR = "Invalid credential"
 
 def run_fake_job(credential):
     gjfstring = "EMPTY"
-    jobstring = "sleep 10"
+    jobstring = "sleep 0"
     results = interface.run_job(credential, gjfstring, jobstring)
     return results["jobid"]
 
@@ -561,7 +561,7 @@ class InterfaceTestCase(TestCase):
         self.assertEqual(results["error"], CRED_ERROR)
 
     def test_run_job(self):
-        results = interface.run_job(self.credential2, '', jobstring='sleep 10')
+        results = interface.run_job(self.credential2, '', jobstring='sleep 0')
         self.assertEqual(results["error"], None)
 
     def test_run_jobs_staff_error(self):
@@ -575,7 +575,7 @@ class InterfaceTestCase(TestCase):
     def test_run_jobs(self):
         names = ['test', 'test2']
         gjfs = ['', '']
-        job = 'sleep 10'
+        job = 'sleep 0'
         results = interface.run_jobs(self.credential2, names, gjfs, jobstring=job)
         self.assertEqual(results["error"], None)
 
