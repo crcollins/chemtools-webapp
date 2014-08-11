@@ -637,7 +637,12 @@ class InterfaceTestCase(TestCase):
         results = interface.get_log_data(None, "24a_TON")
         self.assertEqual(results["error"], CRED_ERROR)
 
+    def test_get_log_status_invalid_credential(self):
+        results = interface.get_log_status(None, ["24a_TON"])
+        self.assertEqual(results["error"], CRED_ERROR)
 
+
+@skipUnless(server_exists(**SERVER), "Requires external test server.")
 class ManagementTestCase(TestCase):
     def setUp(self):
         super_user = User.objects.create_superuser(**SUPER_USER)
