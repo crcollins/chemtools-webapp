@@ -603,6 +603,7 @@ class InterfaceTestCase(TestCase):
 
     def test_get_all_jobs(self):
         results = interface.get_all_jobs(self.user)
+        results[0]["jobs"] = []
         expected = [
             {
                 'jobs': [],
