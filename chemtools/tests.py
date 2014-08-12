@@ -1208,5 +1208,8 @@ class GraphTestCase(TestCase):
         # side types
         self.assertEqual(graph.run_name("TON__23456789"), set(["TON", '2', '3', '4', '5', '6', '7', '8', '9']))
 
+        # side types
+        self.assertEqual(graph.run_name("TON__10111213"), set(["TON", '10', '11', '12', '13']))
+
         # big
         self.assertEqual(graph.run_name("TON_7_CCC_94_EON"), set(["TON", '7', "CCC", '9', '4', "E/ZON"]))
