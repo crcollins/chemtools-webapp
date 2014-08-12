@@ -65,6 +65,10 @@ class Log(object):
             for k, v in Log.PARSERS.items():
                 self.parsers[k] = v(self)
 
+            # This initialization is just in case the file is empty
+            # If the file is empty, then line will not be defined causing a
+            # UnboundLocalError when it does the check for normal termination.
+            line = ''
             for i, line in enumerate(f):
                 for k, parser in self.parsers.items():
                     parser.parse(line.replace('\r', ''))
