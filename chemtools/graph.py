@@ -166,6 +166,9 @@ def identify_noncycle_types(noncycles):
             for bond in carbon_bonds:
                 if bond.type in '23':
                     types.append(bond.type)
+        elif atom.element == "O" and len(bonds) == 1:
+            if bonds[0].type == '2':
+                types.append('11')
     return types
 
 
@@ -235,8 +238,7 @@ def identify_cycle_types(structure, cycles):
                 types.append(core)
             elif lengths == [6, 5, 6]:
                 types.append("7")
-            else:
-                raise ValueError("Ring of type 10 is not valid")
+            elif lengths == [5, 5, 5]:
                 types.append("10")
         elif len(lengths) == 2:
             if lengths == [6, 5]:
@@ -304,10 +306,15 @@ def identify_single_ring(ring):
     if 'S' in elements:
         ring_type = '5'
     elif 'N' in elements:
-        if elements.count('N') > 1:
-            ring_type = '8'
+        if len(elements) == 5:
+            ring_type = '13'
         else:
-            ring_type = '6'
+            if elements.count('N') > 1:
+                ring_type = '8'
+            else:
+                ring_type = '6'
+    elif 'O' in elements:
+        ring_type = '12'
     return ring_type
 
 
