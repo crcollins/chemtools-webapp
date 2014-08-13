@@ -5,8 +5,7 @@ from models import Job, Cluster, Credential, CredentialAdminForm
 
 class JobAdmin(admin.ModelAdmin):
     date_hierarchy = "created"
-    list_display = ("molecule", "name", "email", "credential", "nodes",
-                    "walltime", "jobid", "created", "started", "ended")
+    list_display = ("jobid", "molecule", "name", "email", "credential")
 
 
 class ClusterAdmin(admin.ModelAdmin):
@@ -16,6 +15,7 @@ class ClusterAdmin(admin.ModelAdmin):
 class CredentialAdmin(admin.ModelAdmin):
     list_display = ("user", "cluster", "username")
     form = CredentialAdminForm
+
 
 admin.site.register(Job, JobAdmin)
 admin.site.register(Cluster, ClusterAdmin)
