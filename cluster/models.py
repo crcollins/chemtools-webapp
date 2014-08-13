@@ -190,8 +190,11 @@ class Job(models.Model):
         super(Job, self).__init__(*args, **newkwargs)
 
     @classmethod
-    def get_running_jobs(cls, credential=None):
-        if credential is not None:
+    def get_running_jobs(cls, credential=None, user=None):
+        if user is not None:
+            return Job.objects.filter(credential__user=user,
+                                    state__in=cls.RUNNING_STATES)
+        elif credential is not None:
             return Job.objects.filter(credential=credential,
                                     state__in=cls.RUNNING_STATES)
         else:
