@@ -189,6 +189,9 @@ class Job(models.Model):
         newkwargs = {k: v for k, v in kwargs.items() if k in fields}
         super(Job, self).__init__(*args, **newkwargs)
 
+    def __unicode__(self):
+        return "%s - %s - %s" % (self.credential, self.jobid, self.state)
+
     @classmethod
     def get_running_jobs(cls, credential=None, user=None):
         if user is not None:
