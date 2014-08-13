@@ -35,7 +35,9 @@
                         <li><a href="/chem/multi_job/">Jobs</a></li>
                     </ul>
                 </li>
-                {% if user.is_authenticated %}<li><a href="/chem/jobs/">Running</a></li>{% endif %}
+                {% if user.is_authenticated %}<li><a href="/chem/jobs/">Running
+                {% if running_jobs != None %}<span class="badge">{{ running_jobs }}</span>{% endif %}
+                </a></li>{% endif %}
                 <li><a href="/chem/upload/">Upload</a></li>
 
                 <li class="dropdown">
