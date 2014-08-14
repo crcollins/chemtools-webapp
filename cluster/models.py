@@ -204,6 +204,14 @@ class Job(models.Model):
             return Job.objects.filter(state__in=cls.RUNNING_STATES)
 
     @classmethod
+    def get_oldest_update_time(cls, **kwargs):
+        jobs = Job.get_running_jobs(**kwargs)
+        if jobs:
+            return jobs.order_by("last_update")[0].last_update
+        else:
+            return timezone.now()
+
+    @classmethod
     def _update_states(cls, credential, jobids, state, now):
         update = {
                 "state": state.upper(),
@@ -216,7 +224,6 @@ class Job(models.Model):
 
         if state == cls.RUNNING or state in cls.POST_STATES:
             jobs.filter(started=None).update(started=now)
-
 
     @classmethod
     def update_states(cls, credential, state_ids):
