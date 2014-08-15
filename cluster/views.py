@@ -36,8 +36,8 @@ def get_job_list(request):
         "clusters": jobs,
     }
     if request.REQUEST.get("html", ''):
-        html = render_to_string("cluster/job_table.html", a)
-        return HttpResponse(html)
+        c = Context(a)
+        return render(request, "cluster/job_table.html", c)
     return HttpResponse(simplejson.dumps(a), mimetype="application/json")
 
 
