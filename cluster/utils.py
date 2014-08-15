@@ -102,6 +102,7 @@ def _run_job(ssh, sftp, gjfstring, jobstring=None, **kwargs):
         f2.write(jobstring)
         f2.close()
 
+        # TODO: Make this safer
         s = "cd chemtools; qsub " + "%s.job" % name
         _, stdout, stderr = ssh.exec_command(s)
         stderr = stderr.readlines()
@@ -141,6 +142,7 @@ def _get_jobs(cred, cluster, i, results):
         ssh = cred.get_ssh_connection()
 
         with ssh:
+            # TODO: Make this safer
             _, stdout, stderr = ssh.exec_command("qstat -u %s" % cred.username)
             # seems to need this slight delay to display the jobs
             stderr.readlines()
