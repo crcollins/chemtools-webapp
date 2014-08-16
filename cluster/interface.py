@@ -1,10 +1,9 @@
 import os
 import re
-import threading
 
 from models import Job
 from utils import get_ssh_connection_obj, get_sftp_connection_obj, _run_job, \
-                _get_jobs, add_fileparser
+                get_jobs, add_fileparser
 
 
 def run_job(credential, gjfstring, jobstring=None, **kwargs):
@@ -120,20 +119,12 @@ def get_all_jobs(user, cluster=None):
     else:
         creds = user.credentials.all()
 
-    threads = []
-    # results is a mutable object, so as the threads complete they save their
-    # results into this object. This method is used in lieu of messing with
-    # multiple processes
-    results = [None] * len(creds)
-    for i, cred in enumerate(creds):
-        t = threading.Thread(target=_get_jobs,
-                            args=(cred, cred.cluster.name, i, results))
-        t.start()
-        threads.append(t)
-
-    for t in threads:
-        t.join(20)
-    return [x for x in results if x]
+    # TUNABLE: change time constraint
+    if True: #(now - last_update) > 1 min:
+        jobs = get_jobs(creds)
+    else:
+        pass
+    return jobs
 
 
 def get_specific_jobs(credential, jobids):

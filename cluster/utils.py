@@ -1,6 +1,7 @@
 import os
 import bz2
 import time
+import threading
 
 from project.utils import StringIO, SSHClient, SFTPClient
 
@@ -174,3 +175,20 @@ def _get_jobs(cred, cluster, i, results):
         results[i] = {"name": cluster, "columns": wantedcols, "jobs": jobs}
     except Exception as e:
         results[i] = {"name": cluster, "columns": wantedcols, "jobs": []}
+
+
+def get_jobs(credentials):
+    threads = []
+    # results is a mutable object, so as the threads complete they save their
+    # results into this object. This method is used in lieu of messing with
+    # multiple processes
+    results = [None] * len(credentials)
+    for i, cred in enumerate(credentials):
+        t = threading.Thread(target=_get_jobs,
+                            args=(cred, cred.cluster.name, i, results))
+        t.start()
+        threads.append(t)
+
+    for t in threads:
+        t.join(20)
+    return [x for x in results if x]
