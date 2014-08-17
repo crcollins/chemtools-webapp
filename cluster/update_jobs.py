@@ -1,13 +1,13 @@
 from django.contrib.auth.models import User
 
 from models import Job
-from interface import get_all_jobs
+from utils import get_jobs
 
 
 def run_all():
     for user in User.objects.all():
         creds = user.credentials.all()
-        for i, cluster in enumerate(get_all_jobs(user)):
+        for i, cluster in enumerate(get_jobs(creds)):
             cred = creds[i]
             jobs = {}
             jobids = []
