@@ -123,7 +123,21 @@ def get_all_jobs(user, cluster=None):
     if True: #(now - last_update) > 1 min:
         jobs = get_jobs(creds)
     else:
-        pass
+        jobs = []
+        for cred in creds:
+            objs = Job.get_running_jobs()
+            temp = [(x.jobid,
+                    x.credential.username,
+                    x.name,
+                    x.memory,
+                    x.walltime,
+                    '---',
+                    x.state) for x in objs]
+            jobs.append({
+                "name": cred.cluster.name,
+                "columns": wantedcols,
+                "jobs": temp,
+            })
     return jobs
 
 
