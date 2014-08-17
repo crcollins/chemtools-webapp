@@ -158,7 +158,7 @@ def get_specific_jobs(credential, jobids):
     if not jobids:
         return results
 
-    all_jobs = get_all_jobs(credential.user, credential.cluster.name)
+    all_jobs = get_jobs([credential])
     cluster_jobs = all_jobs[0]
 
     running_jobs = cluster_jobs["jobs"]
