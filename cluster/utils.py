@@ -9,6 +9,10 @@ from models import Credential
 from data.models import JobTemplate
 
 
+WANTED_COLS = ["Job ID", "Username", "Jobname", "Req'd Memory", "Req'd Time",
+            "Elap Time", "S"]
+
+
 def get_ssh_connection_obj(obj):
     if isinstance(obj, Credential):
         try:
@@ -137,8 +141,6 @@ def _get_columns(lines):
 
 
 def _get_jobs(cred, cluster, i, results):
-    wantedcols = ["Job ID", "Username", "Jobname", "Req'd Memory",
-                "Req'd Time", 'Elap Time', 'S']
     try:
         ssh = cred.get_ssh_connection()
 
@@ -153,7 +155,7 @@ def _get_jobs(cred, cluster, i, results):
 
             cols = _get_columns(lines[:5])
             colsidx = []
-            for x in wantedcols:
+            for x in WANTED_COLS:
                 try:
                     colsidx.append(cols.index(x))
                 except IndexError:
@@ -172,9 +174,9 @@ def _get_jobs(cred, cluster, i, results):
                     temp.append(t[idx])
                 temp[0] = temp[0].split('.')[0]
                 jobs.append(temp)
-        results[i] = {"name": cluster, "columns": wantedcols, "jobs": jobs}
+        results[i] = {"name": cluster, "columns": WANTED_COLS, "jobs": jobs}
     except Exception as e:
-        results[i] = {"name": cluster, "columns": wantedcols, "jobs": []}
+        results[i] = {"name": cluster, "columns": WANTED_COLS, "jobs": []}
 
 
 def get_jobs(credentials):

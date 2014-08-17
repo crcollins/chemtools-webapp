@@ -3,7 +3,7 @@ import re
 
 from models import Job
 from utils import get_ssh_connection_obj, get_sftp_connection_obj, _run_job, \
-                get_jobs, add_fileparser
+                get_jobs, add_fileparser, WANTED_COLS
 
 
 def run_job(credential, gjfstring, jobstring=None, **kwargs):
@@ -135,7 +135,7 @@ def get_all_jobs(user, cluster=None):
                     x.state) for x in objs]
             jobs.append({
                 "name": cred.cluster.name,
-                "columns": wantedcols,
+                "columns": WANTED_COLS,
                 "jobs": temp,
             })
     return jobs
