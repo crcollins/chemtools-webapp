@@ -5,7 +5,7 @@ import threading
 
 from project.utils import StringIO, SSHClient, SFTPClient
 
-from models import Credential
+from models import Credential, Job
 from data.models import JobTemplate
 
 
@@ -193,4 +193,25 @@ def get_jobs(credentials):
 
     for t in threads:
         t.join(20)
-    return [x for x in results if x]
+
+    clusters = [x for x in results if x]
+    for cred, cluster in zip(credentials, clusters):
+        jobs = {}
+        jobids = []
+        new_jobs = []
+        for job in cluster["jobs"]:
+            status = job[-1]
+            job_id = job[0]
+            jobids.append(job_id)
+            if not Job.objects.filter(jobid=job_id, credential=cred):
+                continue  # outside submited jobs not allowed
+            if status in jobs:
+                jobs[status].append(job_id)
+            else:
+                jobs[status] = [job_id]
+        running = Job.get_running_jobs(credential=cred)
+        unknown = running.exclude(jobid__in=set(jobids)).values_list('jobid', flat=True)
+        if unknown:
+            jobs[Job.UNKNOWN] = list(unknown)
+        Job.update_states(cred, jobs)
+    return clusters

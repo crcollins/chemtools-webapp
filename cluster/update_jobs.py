@@ -7,23 +7,7 @@ from utils import get_jobs
 def run_all():
     for user in User.objects.all():
         creds = user.credentials.all()
-        for i, cluster in enumerate(get_jobs(creds)):
-            cred = creds[i]
-            jobs = {}
-            jobids = []
-            for job in cluster["jobs"]:
-                status = job[-1]
-                job_id = job[0]
-                jobids.append(job_id)
-                if status in jobs:
-                    jobs[status].append(job_id)
-                else:
-                    jobs[status] = [job_id]
-            running = Job.get_running_jobs(credential=cred)
-            unknown = running.exclude(jobid__in=set(jobids)).values_list('jobid', flat=True)
-            if unknown:
-                jobs[Job.UNKNOWN] = list(unknown)
-            Job.update_states(cred, jobs)
+        get_jobs(creds)
 
 
 if __name__ == "__main__":
