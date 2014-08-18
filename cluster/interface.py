@@ -1,6 +1,8 @@
 import os
 import re
 
+from django.utils import timezone
+
 from models import Job
 from utils import get_ssh_connection_obj, get_sftp_connection_obj, _run_job, \
                 get_jobs, add_fileparser, WANTED_COLS
@@ -120,7 +122,8 @@ def get_all_jobs(user, cluster=None):
         creds = user.credentials.all()
 
     # TUNABLE: change time constraint
-    if True: #(now - last_update) > 1 min:
+    temp = Job.get_oldest_update_time(user=user)
+    if (timezone.now() - temp).seconds > 60:
         jobs = get_jobs(creds)
     else:
         jobs = []
