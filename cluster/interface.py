@@ -168,7 +168,6 @@ def get_specific_jobs(credential, jobids):
         if job not in running_jobids:
             pair = (job, "That job number is not running.")
             results["failed"].append(pair)
-            continue
         else:
             pair = (job, running_jobs[running_jobids.index(job)])
             results["worked"].append(pair)
