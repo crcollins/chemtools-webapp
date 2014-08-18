@@ -162,22 +162,22 @@ class Job(models.Model):
     ))
 
     credential = models.ForeignKey(Credential)
+    name = models.CharField(max_length=400)
+    jobid = models.CharField(max_length=400)
 
-    keywords = models.CharField(max_length=200)
+    keywords = models.CharField(max_length=200, null=True, blank=True)
     memory = models.IntegerField(null=True, blank=True)
     nprocshared = models.IntegerField(null=True, blank=True)
     charge = models.IntegerField(null=True, blank=True)
     multiplicity = models.IntegerField(null=True, blank=True)
 
     molecule = models.CharField(max_length=400, null=True, blank=True)
-    name = models.CharField(max_length=400)
     email = models.EmailField(null=True, blank=True)
     nodes = models.IntegerField(null=True, blank=True)
     walltime = models.IntegerField(null=True, blank=True)
     allocation = models.CharField(max_length=20, null=True, blank=True)
     template = models.TextField(null=True, blank=True)
 
-    jobid = models.CharField(max_length=400)
     state = models.CharField(max_length=1, choices=JOB_STATES, default=QUEUED)
     created = models.DateTimeField(auto_now=True)
     started = models.DateTimeField(auto_now=False, null=True)
