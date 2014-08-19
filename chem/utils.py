@@ -124,7 +124,8 @@ def run_standard_jobs(credential, string, mol_settings, job_settings):
             continue
 
     if names:
-        temp = run_jobs(credential, names, gjfs, **job_settings)
+        settings = {k: v for k,v in job_settings.items()+mol_settings.items()}
+        temp = run_jobs(credential, names, gjfs, **settings)
         results["worked"] = temp["worked"]
         results["failed"].extend(temp["failed"])
         results["error"] = temp["error"]
