@@ -129,13 +129,7 @@ def get_all_jobs(user, cluster=None):
         jobs = []
         for cred in creds:
             objs = Job.get_running_jobs()
-            temp = [(x.jobid,
-                    x.credential.username,
-                    x.name,
-                    x.memory,
-                    x.walltime,
-                    '---',
-                    x.state) for x in objs]
+            temp = [x.format() for x in objs]
             jobs.append({
                 "name": cred.cluster.name,
                 "columns": WANTED_COLS,

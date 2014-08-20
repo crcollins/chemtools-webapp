@@ -231,3 +231,20 @@ class Job(models.Model):
         for state, jobids in state_ids.items():
             Job._update_states(credential, jobids, state, now)
 
+    def format(self):
+        if self.started:
+            t = self.last_update - self.started
+            hours, remainder = divmod(t.seconds, 3600)
+            minutes, _ = divmod(remainder, 60)
+            runtime = '%d:%d' % (hours, minutes)
+        else:
+            runtime = '---'
+        return (
+                self.jobid,
+                self.credential.username,
+                self.name,
+                self.memory,
+                self.walltime,
+                runtime,
+                self.state,
+            )
