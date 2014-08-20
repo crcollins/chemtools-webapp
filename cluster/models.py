@@ -236,7 +236,7 @@ class Job(models.Model):
             t = self.last_update - self.started
             hours, remainder = divmod(t.seconds, 3600)
             minutes, _ = divmod(remainder, 60)
-            runtime = '%d:%d' % (hours, minutes)
+            runtime = "%02d:%02d" % (hours, minutes)
         else:
             runtime = '---'
         return (
