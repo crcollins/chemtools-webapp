@@ -238,7 +238,7 @@ class Job(models.Model):
             minutes, _ = divmod(remainder, 60)
             runtime = "%02d:%02d" % (hours, minutes)
         else:
-            runtime = '---'
+            runtime = '--'
         return (
                 self.jobid,
                 self.credential.username,
