@@ -6,7 +6,7 @@ from django.conf import settings
 from django.test import Client, TestCase
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
-from django.utils import simplejson
+from django.utils import simplejson, timezone
 from django.core.management import call_command
 
 import views
@@ -741,3 +741,26 @@ class ManagementTestCase(TestCase):
         call_command("update_unknown")
         updated = models.Job.objects.get(id=job.id)
         self.assertEqual(updated.state, models.Job.WALLTIME)
+
+
+class ModelTestCase(TestCase):
+    def setUp(self):
+        super_user = User.objects.create_superuser(**SUPER_USER)
+        super_user.save()
+
+        self.cluster = models.Cluster(**CLUSTER)
+        self.cluster.save()
+        self.credential = models.Credential(user=super_user, cluster=self.cluster, **CREDENTIAL)
+        self.credential.save()
+
+    def test_job_format(self):
+        job = models.Job(
+                jobid='1',
+                credential=self.credential,
+                name="test",
+                memory="59GB",
+                walltime="1:00",
+                state=models.Job.QUEUED,
+                )
+        expected = ('1', 'vagrant', 'test', '59GB', '1:00', '--', 'Q')
+        self.assertEqual(job.format(), expected)
