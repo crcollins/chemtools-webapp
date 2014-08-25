@@ -580,6 +580,13 @@ class InterfaceTestCase(TestCase):
         results = interface.run_jobs(self.credential2, names, gjfs, jobstring=job)
         self.assertEqual(results["error"], None)
 
+    def test_run_jobs_qsub_error(self):
+        names = ['benz; ls files.gjf']
+        gjfs = ['']
+        job = 'sleep 0'
+        results = interface.run_jobs(self.credential2, names, gjfs, jobstring=job)
+        self.assertIn("qsub -", results["failed"][0][1])
+
     def test_run_job_states(self):
         results = interface.run_job(self.credential2, '', jobstring='sleep 10')
         jobid = results["jobid"]
