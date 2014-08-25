@@ -61,7 +61,7 @@ def run_jobs(credential, names, gjfstrings, jobstring=None, **kwargs):
     with ssh, sftp:
         for name, gjf in zip(names, gjfstrings):
             dnew = kwargs.copy()
-            dnew["name"] = re.sub(r"{{\s*name\s*}}", name, dnew.get("name", ''))
+            dnew["name"] = re.sub(r"{{\s*name\s*}}", name, dnew.get("name", "{{ name }}"))
             jobid, error = _run_job(ssh, sftp, gjf, jobstring, **dnew)
             if error is None:
                 results["worked"].append((name, jobid))
