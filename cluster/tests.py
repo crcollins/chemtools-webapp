@@ -553,6 +553,13 @@ class InterfaceTestCase(TestCase):
         self.credential2.save()
         self.client = Client()
 
+    def test_run_job_folder_error(self):
+        with self.credential2.get_ssh_connection() as ssh:
+            ssh.exec_command("sudo chown root:root chemtools; sudo chmod 700 chemtools")
+            results = interface.run_job(self.credential2, '', jobstring='sleep 0')
+            ssh.exec_command("sudo chown vagrant:vagrant chemtools; chmod 775 chemtools")
+            self.assertIn('mkdir: cannot create directory', results["error"])
+
     def test_run_job_staff_error(self):
         results = interface.run_job(self.credential, '', jobstring=None)
         self.assertEqual(results["error"], SUBMIT_ERROR)
