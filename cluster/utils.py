@@ -59,10 +59,10 @@ def get_credentials_from_request(request):
 
 def _make_folders(ssh):
     folder = 'chemtools/done/'
-    _, _, testerr2 = ssh.exec_command("mkdir -p %s" % folder)
-    testerr2 = testerr2.readlines()
-    if testerr2:
-        return testerr2[0]
+    _, _, err = ssh.exec_command("mkdir -p %s" % folder)
+    err = err.readlines()
+    if err:
+        return err[0]
     return None
 
 
