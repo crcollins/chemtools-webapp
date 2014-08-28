@@ -67,9 +67,13 @@ def _make_folders(ssh):
 
 
 def add_fileparser(ssh, sftp):
-    with sftp.open("chemtools/fileparser.py", 'w') as f:
-        with open("chemtools/fileparser.py", 'r') as f2:
-            f.write(f2.read())
+
+    command = "ls chemtools/fileparser.py"
+    _, stdout, stderr = ssh.exec_command(command)
+    if stderr.read():
+        with sftp.open("chemtools/fileparser.py", 'w') as f:
+            with open("chemtools/fileparser.py", 'r') as f2:
+                f.write(f2.read())
 
     command = "python chemtools/fileparser.py -"
     _, stdout, stderr = ssh.exec_command(command)
