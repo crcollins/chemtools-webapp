@@ -655,6 +655,19 @@ class InterfaceTestCase(TestCase):
         self.assertEqual(results["error"], None)
         self.assertIn("Filename", results["results"])
 
+    def test_get_all_log_data_argparse(self):
+        with self.credential2.get_sftp_connection() as sftp:
+            with sftp.open("chemtools/fileparser.py", 'w') as f:
+                f.write("from __future__ import print_function\n")
+                f.write("import sys\n")
+                f.write("print('No module named argparse', file=sys.stderr)")
+
+        results = interface.get_all_log_data(self.credential2)
+        self.assertIn("No module named argparse", results["error"])
+
+        with self.credential2.get_ssh_connection() as ssh:
+            ssh.exec_command("rm chemtools/fileparser.py")
+
     def test_get_all_log_data_invalid_credential(self):
         results = interface.get_all_log_data(None)
         self.assertEqual(results["error"], CRED_ERROR)
