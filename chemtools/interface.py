@@ -72,7 +72,7 @@ def get_multi_job(string, form):
     return ret_zip
 
 
-def get_property_limits(exact_name):
+def get_property_limits(name):
     results = {
                 "n": [None, None, None],
                 "m": [None, None, None]
@@ -82,15 +82,15 @@ def get_property_limits(exact_name):
             groups = []
             xvals = range(1, 5)
             for j in xvals:
-                if direction in exact_name:
+                if direction in name:
                     exp = "%s\d+" % direction
                     replace = "%s%d" % (direction, j)
-                    temp_name = re.sub(exp, replace, exact_name)
+                    temp_name = re.sub(exp, replace, name)
                 else:
-                    temp_name = exact_name + "_%s%d" % (direction, j)
+                    temp_name = name + "_%s%d" % (direction, j)
 
-                temp_exact = mol_name.get_exact_name(temp_name, spacers=True)
-                temp = ml.get_decay_feature_vector(temp_exact)
+                exact_name = mol_name.get_exact_name(temp_name, spacers=True)
+                temp = ml.get_decay_feature_vector(exact_name)
                 groups.append(ml.get_properties_from_decay_with_predictions(
                                                                 temp
                                                                 ))
