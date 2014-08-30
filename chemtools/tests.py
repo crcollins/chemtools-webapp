@@ -16,6 +16,7 @@ import ml
 import structure
 import fileparser
 import graph
+import interface
 from project.utils import StringIO
 
 # TON
@@ -1213,3 +1214,21 @@ class GraphTestCase(TestCase):
 
         # big
         self.assertEqual(graph.run_name("TON_7_CCC_94_EON"), set(["TON", '7', "CCC", '9', '4', "E/ZON"]))
+
+
+class InterfaceTestCase(TestCase):
+    def test_get_property_limits(self):
+        expected = {
+            'm': [-5.5869186860636297, -2.3643993898975104, 2.8965423408215436],
+            'n': [-5.8448639927073103, -3.0465275857469756, 2.5353557258137798],
+        }
+        results = interface.get_property_limits("24b_TON")
+        self.assertEqual(expected, results)
+
+    def test_get_property_limits_polymer(self):
+        expected = {
+            'm': [None, None, None],
+            'n': [-5.8448639927073103, -3.0465275857469756, 2.5353557258137798]
+        }
+        results = interface.get_property_limits("24b_TON_n2")
+        self.assertEqual(expected, results)
