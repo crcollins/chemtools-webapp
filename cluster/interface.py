@@ -107,7 +107,7 @@ def kill_jobs(credential, jobids):
                 continue
 
             try:
-                job = Job.objects.filter(jobid=jobid)[0]
+                job = Job.objects.filter(credential=credential, jobid=jobid)[0]
                 job.delete()
             except IndexError:
                 pass
