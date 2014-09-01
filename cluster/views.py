@@ -26,11 +26,8 @@ def cluster_job_index(request, cluster):
 
 @login_required
 def get_job_list(request):
-    try:
-        cluster = request.REQUEST.get("cluster", "")
-        jobs = interface.get_all_jobs(request.user, cluster)
-    except Exception as e:
-        jobs = []
+    cluster = request.REQUEST.get("cluster", "")
+    jobs = interface.get_all_jobs(request.user, cluster)
     a = {
         "is_authenticated": request.user.is_authenticated(),
         "clusters": jobs,
