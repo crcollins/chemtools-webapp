@@ -150,6 +150,14 @@ class SSHPageTestCase(TestCase):
         data = simplejson.loads(response.content)
         self.assertTrue(data["is_authenticated"])
 
+    def test_get_job_list_html(self):
+        r = self.client.login(**USER_LOGIN)
+        self.assertTrue(r)
+
+        url = reverse(views.get_job_list) + "?html=true"
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
     @skipUnless(server_exists(**SERVER), "Requires external test server.")
     def test_kill_job(self):
         url = reverse(views.kill_job, args=(CLUSTER['name'], ))
