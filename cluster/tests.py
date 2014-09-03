@@ -624,6 +624,19 @@ class InterfaceTestCase(TestCase):
         results = interface.kill_jobs(None, [''])
         self.assertEqual(results["error"], CRED_ERROR)
 
+    def test_kill_jobs_run_through(self):
+        results = interface.run_job(self.credential2, '', jobstring='sleep 10')
+        jobid = results["jobid"]
+        results = interface.kill_jobs(self.credential2, [jobid])
+        self.assertEqual(results["error"], None)
+
+    def test_kill_jobs_run_through_no_job(self):
+        results = interface.run_job(self.credential2, '', jobstring='sleep 10')
+        jobid = results["jobid"]
+        models.Job.objects.filter(credential=self.credential2, jobid=jobid).delete()
+        results = interface.kill_jobs(self.credential2, [jobid])
+        self.assertEqual(results["error"], None)
+
     def test_get_specific_jobs_invalid_credential(self):
         results = interface.get_specific_jobs(None, [])
         self.assertEqual(results["error"], CRED_ERROR)
