@@ -476,9 +476,9 @@ class StructureTestCase(TestCase):
         result = struct.get_moment_of_inertia(direction=direction)
         self.assertAlmostEqual(result, 170.56126165978225)
 
-    def test_load_data_invalid(self):
+    def test_from_data_invalid(self):
         with self.assertRaises(Exception):
-            structure.read_data("filename")
+            structure.from_data("filename")
 
     def test_from_gjf(self):
         path = os.path.join(settings.MEDIA_ROOT, "tests", "A_TON_A_A.gjf")
