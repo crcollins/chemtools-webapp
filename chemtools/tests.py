@@ -491,6 +491,18 @@ class StructureTestCase(TestCase):
         s = structure.from_gjf(f)
         self.assertEqual([x.strip() for x in s.gjf.split()], [x.strip() for x in METHANE_ALL.split()])
 
+    def test_from_gjf_invalid_header(self):
+        string = "%chk=c#hk.chk\nasd\n\nTitle\n\n0 1" + METHANE_REPLACED
+        f = StringIO(string)
+        with self.assertRaises(Exception):
+            s = structure.from_gjf(f)
+
+    def test_from_gjf_invalid_sectons(self):
+        string = "%chk=chk.chk\n# hf geom=(connectivity,modredundant)\n\nTitle\n\n0 1"
+        f = StringIO(string)
+        with self.assertRaises(Exception):
+            s = structure.from_gjf(f)
+
     def test_from_gjf_bonds(self):
         string = "%chk=chk.chk\n# hf geom=connectivity\n\nTitle\n\n0 1" + STRUCTURE_GJF
         f = StringIO(string)
