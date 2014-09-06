@@ -435,6 +435,14 @@ class StructureTestCase(TestCase):
         result = struct.get_mass()
         self.assertAlmostEqual(result, 160.1316)
 
+    def test_draw_no_hydrogen(self):
+        struct = structure.from_name("TON")
+        result = struct.draw(10, hydrogens=False)
+
+    def test_draw_no_fancy_bonds(self):
+        struct = structure.from_name("TON")
+        result = struct.draw(10, fancy_bonds=False)
+
     def test_get_center(self):
         struct = structure.from_name("TON")
         result = struct.get_center()
