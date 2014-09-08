@@ -1152,6 +1152,16 @@ class UploadsTestCase(TestCase):
                         with zfile2.open(folder + "output.txt") as f2:
                             self.assertIn("Errors (0)", f2.read())
 
+    def test_view_gjf(self):
+        base = os.path.join(settings.MEDIA_ROOT, "tests", "A_TON_A_A")
+        with open(base + ".log", 'r') as log, open(base + ".gjf", 'r') as gjf:
+            data = {
+                "files": log,
+                "options": "gjfview",
+            }
+            response = self.client.post(reverse(views.upload_data), data)
+            self.assertEqual(response.status_code, 200)
+
     # def test_data_parse_log(self):
     #     test_path = os.path.join(settings.MEDIA_ROOT, "tests")
     #     with open(os.path.join(test_path, "A_TON_A_A.log"), 'r') as f:
