@@ -1153,8 +1153,8 @@ class UploadsTestCase(TestCase):
                             self.assertIn("Errors (0)", f2.read())
 
     def test_view_gjf(self):
-        base = os.path.join(settings.MEDIA_ROOT, "tests", "A_TON_A_A")
-        with open(base + ".log", 'r') as log, open(base + ".gjf", 'r') as gjf:
+        name = os.path.join(settings.MEDIA_ROOT, "tests", "A_TON_A_A.gjf")
+        with open(name, 'r') as log:
             data = {
                 "files": log,
                 "options": "gjfview",
