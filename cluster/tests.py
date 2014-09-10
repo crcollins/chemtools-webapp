@@ -111,19 +111,20 @@ class SSHPageTestCase(TestCase):
     @skipUnless(server_exists(**SERVER), "Requires external test server.")
     def test_job_detail(self):
         user = User.objects.get(username=USER["username"])
-        results = interface.get_all_jobs(self.user, self.cluster.name)
-        try:
-            jobid = results[0]["jobs"][0][0]
-            url = reverse(views.job_detail, args=(self.cluster.name, jobid))
-            response = self.client.get(url)
-            self.assertEqual(response.status_code, 302)
 
-            r = self.client.login(**USER_LOGIN)
-            self.assertTrue(r)
-            response = self.client.get(url)
-            self.assertEqual(response.status_code, 200)
-        except IndexError:
-            pass
+        interface.run_job(self.credential2, '', 'sleep 10')
+        results = interface.get_all_jobs(self.user, self.cluster.name)
+
+        jobid = results[0]["jobs"][0][0]
+        url = reverse(views.job_detail, args=(self.cluster.name, jobid))
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 302)
+
+        r = self.client.login(**USER_LOGIN)
+        self.assertTrue(r)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
 
     @skipUnless(server_exists(**SERVER), "Requires external test server.")
     def test_job_detail_fail(self):
