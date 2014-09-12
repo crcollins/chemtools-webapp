@@ -505,7 +505,7 @@ class StructureTestCase(TestCase):
         with self.assertRaises(Exception):
             s = structure.from_gjf(f)
 
-    def test_from_gjf_invalid_sectons(self):
+    def test_from_gjf_invalid_sections(self):
         string = "%chk=chk.chk\n# hf geom=(connectivity,modredundant)\n\nTitle\n\n0 1"
         f = StringIO(string)
         with self.assertRaises(Exception):
