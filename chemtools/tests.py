@@ -541,6 +541,12 @@ class StructureTestCase(TestCase):
         s = structure.from_gjf(f)
         self.assertEqual([x.strip() for x in s.gjf.split()], [x.strip() for x in METHANE_ALL.split()])
 
+    def test_from_gjf_too_many_first(self):
+        string = METHANE_FREEZE.replace("modredundant", "") + METHANE
+        f = StringIO(string)
+        with self.assertRaises(Exception):
+            s = structure.from_gjf(f)
+
     def test_cores(self):
         for core in self.cores:
             structure.from_name(core)
