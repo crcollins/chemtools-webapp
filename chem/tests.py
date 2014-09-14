@@ -981,6 +981,11 @@ class UtilsTestCase(TestCase):
         }
         self.assertEqual(results, expected)
 
+    def test_StringIO_size(self):
+        string = "some test string"
+        s = StringIO(string)
+        self.assertEqual(s.size, len(string))
+
 
 @skipUnless(server_exists(**SERVER), "Requires external test server.")
 class UtilsServerTestCase(TestCase):
