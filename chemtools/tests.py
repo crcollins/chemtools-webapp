@@ -1029,6 +1029,9 @@ class ExtractorTestCase(TestCase):
     def test_run_all(self):
         extractor.run_all()
 
+    def test_extractor_command(self):
+        call_command("extract")
+
 
 class MLTestCase(TestCase):
     def test_get_core_features(self):
