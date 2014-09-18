@@ -70,6 +70,11 @@ $(function() {
 {% endblock %}
 
 {% block content %}
+
+{% if error %}
+<p id="error_1_id_something" class="help-block"><strong>{{ error }}</strong></p>
+{% endif %}
+
     <form multiple enctype="multipart/form-data" id="id_form" role="form" action="." method="post">
         {% csrf_token %}
         <div id="id_upload_form">

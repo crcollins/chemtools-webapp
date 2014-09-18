@@ -281,6 +281,9 @@ def parse_log(request):
 
 
 def long_chain_limit(request):
+    job_form = JobForm.get_form(request, "{{ name }}")
+    upload_form = UploadForm(request.POST, files=request.FILES)
+
     files = list(parse_file_list(request.FILES.getlist('files')))
     logsets, files = find_sets(files)
 
@@ -288,7 +291,12 @@ def long_chain_limit(request):
 
     num = len(files)
     if not num:
-        raise ValueError("There are no data files to parse.")
+        c = Context({
+            "upload_form": upload_form,
+            "job_form": JobForm.get_form(request, "{{ name }}", initial=True),
+            "error": "There are no data files to parse."
+            })
+        return render(request, "chem/upload_log.html", c)
 
     buff = StringIO()
     zfile = zipfile.ZipFile(buff, 'w', zipfile.ZIP_DEFLATED)
