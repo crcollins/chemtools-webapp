@@ -272,7 +272,7 @@ def upload_data(request):
 
 def parse_log(request):
     parser = fileparser.LogSet()
-    for f in parse_file_list(request.FILES.getlist('files')):
+    for f in upload_form.files:
         parser.parse_file(f)
 
     f = StringIO(parser.format_output())
@@ -284,23 +284,9 @@ def long_chain_limit(request):
     job_form = JobForm.get_form(request, "{{ name }}")
     upload_form = UploadForm(request.POST, files=request.FILES)
 
-    files = list(parse_file_list(request.FILES.getlist('files')))
-    logsets, files = find_sets(files)
-
-    files.extend(convert_logs(logsets))
-
-    num = len(files)
-    if not num:
-        c = Context({
-            "upload_form": upload_form,
-            "job_form": JobForm.get_form(request, "{{ name }}", initial=True),
-            "error": "There are no data files to parse."
-            })
-        return render(request, "chem/upload_log.html", c)
-
     buff = StringIO()
     zfile = zipfile.ZipFile(buff, 'w', zipfile.ZIP_DEFLATED)
-    for f in files:
+    for f in upload_form.files:
         parser = dataparser.DataParser(f)
         homolumo, gap = parser.get_graphs()
 
@@ -337,7 +323,7 @@ def reset_gjf(request):
     errors = []
     strings = []
     names = []
-    for f in parse_file_list(request.FILES.getlist('files')):
+    for f in upload_form.files:
         try:
             parser = fileparser.Log(f)
 
@@ -406,7 +392,7 @@ def view_gjf(request):
     scale = request.REQUEST.get("scale", 10)
 
     images = []
-    for f in request.FILES.getlist('files'):
+    for f in upload_form.files:
         out = gjfwriter.Molecule(f.name)
         out.from_gjf(f)
         images.append(out.get_png_data_url())

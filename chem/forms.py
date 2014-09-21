@@ -9,7 +9,7 @@ from crispy_forms.layout import Layout
 
 from data.models import JobTemplate
 from cluster.models import Credential
-from utils import run_standard_jobs
+from utils import run_standard_jobs, convert_logs, parse_file_list, find_sets
 from models import ErrorReport
 from chemtools.constants import KEYWORDS
 
@@ -88,6 +88,16 @@ class UploadForm(forms.Form):
         'td_reset',
         'gjf_submit',
     )
+
+    def clean(self):
+        files = parse_file_list(self.cleaned_data["files"])
+        if self.cleaned_data["options"] == "longchain":
+            logsets, files = find_sets(files)
+            files.extend(convert_logs(logsets))
+            if not len(files):
+                raise forms.ValidationError("There are no data files to parse.")
+            self.cleaned_data["files"] = files
+        return self.cleaned_data
 
 
 class MoleculeForm(forms.Form):
