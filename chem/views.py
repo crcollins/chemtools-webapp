@@ -272,7 +272,9 @@ def upload_data(request):
 
 def parse_log(request):
     parser = fileparser.LogSet()
-    for f in upload_form.files:
+    upload_form = UploadForm(request.POST, files=request.FILES)
+    upload_form.is_valid()
+    for f in upload_form.cleaned_data["files"]:
         parser.parse_file(f)
 
     f = StringIO(parser.format_output())
@@ -283,10 +285,11 @@ def parse_log(request):
 def long_chain_limit(request):
     job_form = JobForm.get_form(request, "{{ name }}")
     upload_form = UploadForm(request.POST, files=request.FILES)
+    upload_form.is_valid()
 
     buff = StringIO()
     zfile = zipfile.ZipFile(buff, 'w', zipfile.ZIP_DEFLATED)
-    for f in upload_form.files:
+    for f in upload_form.cleaned_data["files"]:
         parser = dataparser.DataParser(f)
         homolumo, gap = parser.get_graphs()
 
@@ -323,7 +326,7 @@ def reset_gjf(request):
     errors = []
     strings = []
     names = []
-    for f in upload_form.files:
+    for f in upload_form.cleaned_data["files"]:
         try:
             parser = fileparser.Log(f)
 
@@ -391,8 +394,11 @@ def reset_gjf(request):
 def view_gjf(request):
     scale = request.REQUEST.get("scale", 10)
 
+    upload_form = UploadForm(request.POST, files=request.FILES)
+    upload_form.is_valid()
+
     images = []
-    for f in upload_form.files:
+    for f in upload_form.cleaned_data["files"]:
         out = gjfwriter.Molecule(f.name)
         out.from_gjf(f)
         images.append(out.get_png_data_url())
