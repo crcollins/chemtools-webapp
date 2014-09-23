@@ -90,13 +90,14 @@ class UploadForm(forms.Form):
     )
 
     def clean(self):
-        files = parse_file_list(self.cleaned_data["files"])
-        if self.cleaned_data["options"] == "longchain":
+        files = parse_file_list(self.cleaned_data.get("files"))
+        if self.cleaned_data.get("options") == "longchain":
+            print files
             logsets, files = find_sets(files)
             files.extend(convert_logs(logsets))
             if not len(files):
                 raise forms.ValidationError("There are no data files to parse.")
-            self.cleaned_data["files"] = files
+        self.cleaned_data["files"] = files
         return self.cleaned_data
 
 
