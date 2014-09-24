@@ -260,7 +260,7 @@ def upload_data(request):
     if request.method == "POST":
         upload_form = UploadForm(request.POST or None, files=request.FILES)
         if upload_form.is_valid():
-            return switch[request.POST["options"]](request)
+            return switch[request.POST["options"]](request, upload_form)
     else:
         upload_form = UploadForm()
     c = Context({
@@ -270,10 +270,8 @@ def upload_data(request):
     return render(request, "chem/upload_log.html", c)
 
 
-def parse_log(request):
+def parse_log(request, upload_form):
     parser = fileparser.LogSet()
-    upload_form = UploadForm(request.POST, files=request.FILES)
-    upload_form.is_valid()
     for f in upload_form.cleaned_data["files"]:
         parser.parse_file(f)
 
@@ -282,10 +280,8 @@ def parse_log(request):
     return response
 
 
-def long_chain_limit(request):
+def long_chain_limit(request, upload_form):
     job_form = JobForm.get_form(request, "{{ name }}")
-    upload_form = UploadForm(request.POST, files=request.FILES)
-    upload_form.is_valid()
 
     buff = StringIO()
     zfile = zipfile.ZipFile(buff, 'w', zipfile.ZIP_DEFLATED)
@@ -316,12 +312,8 @@ def long_chain_limit(request):
     return response
 
 
-def reset_gjf(request):
+def reset_gjf(request, upload_form):
     job_form = JobForm.get_form(request, "{{ name }}")
-    upload_form = UploadForm(request.POST, files=request.FILES)
-
-    # this should be fine because it already passed the first layer
-    upload_form.is_valid()
 
     errors = []
     strings = []
@@ -391,11 +383,8 @@ def reset_gjf(request):
     return response
 
 
-def view_gjf(request):
+def view_gjf(request, upload_form):
     scale = request.REQUEST.get("scale", 10)
-
-    upload_form = UploadForm(request.POST, files=request.FILES)
-    upload_form.is_valid()
 
     images = []
     for f in upload_form.cleaned_data["files"]:
