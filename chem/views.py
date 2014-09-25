@@ -281,8 +281,6 @@ def parse_log(request, upload_form):
 
 
 def long_chain_limit(request, upload_form):
-    job_form = JobForm.get_form(request, "{{ name }}")
-
     buff = StringIO()
     zfile = zipfile.ZipFile(buff, 'w', zipfile.ZIP_DEFLATED)
     for f in upload_form.cleaned_data["files"]:
