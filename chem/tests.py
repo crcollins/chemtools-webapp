@@ -1142,6 +1142,18 @@ class UploadsTestCase(TestCase):
                         with zfile2.open("output.txt") as f2:
                             self.assertIn("Errors (0)", f2.read())
 
+    def test_data_parse_set_invalid(self):
+        filepath = os.path.join(settings.MEDIA_ROOT, "tests", "A_TON_A_A.log")
+        with open(filepath, 'r') as file:
+            data = {
+                "files": file,
+                "options": "longchain",
+            }
+            response = self.client.post(reverse(views.upload_data), data)
+            self.assertEqual(response.status_code, 200)
+            msg = "There are no data files to parse."
+            self.assertIn(msg, response.content)
+
     def test_data_parse_multi_set(self):
         filepath = os.path.join(settings.MEDIA_ROOT, "tests", "both.zip")
         with open(filepath, 'r') as zfile:
