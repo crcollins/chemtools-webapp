@@ -95,7 +95,8 @@ class UploadForm(forms.Form):
             logsets, files = find_sets(files)
             files.extend(convert_logs(logsets))
             if not len(files):
-                raise forms.ValidationError("There are no data files to parse.")
+                msg = "There are no data files or set of logs to parse."
+                raise forms.ValidationError(msg)
         self.cleaned_data["files"] = files
         return self.cleaned_data
 

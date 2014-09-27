@@ -1151,7 +1151,7 @@ class UploadsTestCase(TestCase):
             }
             response = self.client.post(reverse(views.upload_data), data)
             self.assertEqual(response.status_code, 200)
-            msg = "There are no data files to parse."
+            msg = "There are no data files or set of logs to parse."
             self.assertIn(msg, response.content)
 
     def test_data_parse_multi_set(self):
