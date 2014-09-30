@@ -25,8 +25,9 @@ from project.utils import StringIO
 
 
 def index(request):
-    molecule = request.REQUEST.get("molecule")
-    if molecule:
+    molecules = [x for x in request.REQUEST.getlist("molecules[]") if x]
+    if molecules:
+        molecule = ','.join(molecules)
         func = molecule_detail
         if set(",{}$") & set(molecule):
             func = multi_molecule

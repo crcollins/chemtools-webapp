@@ -70,6 +70,25 @@ $(document).ready(function() {
         }
     });
 
+    $(document).on('click', '.btn-add', function(e) {
+        e.preventDefault();
+
+        var controlForm = $(this).parents('form:first');
+        var currentEntry = $(this).parents('.entry:first');
+        var controlGroup = $(this).parents('.control-group')
+        var newEntry = $(currentEntry.clone()).appendTo(controlGroup);
+
+        newEntry.find('input').val('');
+        controlForm.find('.entry:not(:last) .btn-add')
+            .removeClass('btn-add').addClass('btn-remove')
+            .removeClass('btn-primary').addClass('btn-danger')
+            .html('<span class="glyphicon glyphicon-minus"></span>');
+    }).on('click', '.btn-remove', function (e) {
+        $(this).parents('.entry:first').remove();
+
+        e.preventDefault();
+        return false;
+    });
 });
 
 String.prototype.format = function () {
