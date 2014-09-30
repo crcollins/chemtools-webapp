@@ -22,7 +22,7 @@ except ImportError:
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
-SSL = False
+SSL = os.environ.get('HTTPS')
 
 if SSL:
     SESSION_COOKIE_SECURE = True
