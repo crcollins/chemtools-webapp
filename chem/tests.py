@@ -124,7 +124,7 @@ class MainPageTestCase(TestCase):
     def test_index_redirect(self):
         for name in NAMES + MULTI_NAMES:
             for keywords in KEYWORDS_SET:
-                params = "?molecule=%s&keywords=%s" % (name, keywords)
+                params = "?molecules[]=%s&keywords=%s" % (name, keywords)
                 url = reverse("chem_index") + params
                 response = self.client.get(url)
                 self.assertEqual(response.status_code, 302)
