@@ -14,11 +14,6 @@ def main(csvfile):
         if row == []:
             continue
         try:
-            band_gap = row[10]
-            if band_gap == '---':
-                band_gap = None
-            options = row[4]
-
             try:
                 exact_name = get_exact_name(row[1])
                 try:
@@ -28,6 +23,7 @@ def main(csvfile):
             except:
                 exact_name = None
                 decay_feature = None
+
             data = {
                 "name": row[1],
                 "options": row[4],
@@ -36,7 +32,7 @@ def main(csvfile):
                 "homo_orbital": row[7],
                 "dipole": row[8],
                 "energy": row[9],
-                "band_gap": band_gap,
+                "band_gap": row[10] if row[10] != '---' else None,
                 "exact_name": exact_name,
             }
             point = DataPoint(**data)
