@@ -58,11 +58,15 @@ class VectorField(models.TextField):
 
 
 class FeatureVector(models.Model):
+    NAIVE = 0
+    DECAY = 1
+    DECAY_LENGTH = 2
+    COULOMB = 3
     VECTOR_NAMES = (
-                    (0, "Naive"),
-                    (1, "Decay"),
-                    (2, "Decay_Length"),
-                    (3, "Coulomb")
+                    (NAIVE, "Naive"),
+                    (DECAY, "Decay"),
+                    (DECAY_LENGTH, "Decay_Length"),
+                    (COULOMB, "Coulomb")
                     )
     type = models.IntegerField(choices=VECTOR_NAMES)
     datapoint = models.ForeignKey(DataPoint, related_name='vectors', null=True, blank=True)
