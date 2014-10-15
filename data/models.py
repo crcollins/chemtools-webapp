@@ -4,12 +4,13 @@ import cPickle
 
 from django.db import models
 from django.template import Template, Context
+from django.utils import timezone
 
 
 class DataPoint(models.Model):
     name = models.CharField(max_length=600)
     exact_name = models.CharField(max_length=1000, null=True, blank=True)
-    created = models.DateTimeField(auto_now_add=True)
+    created = models.DateTimeField()
 
     options = models.CharField(max_length=100)
     homo = models.FloatField()
@@ -24,6 +25,12 @@ class DataPoint(models.Model):
 
     def __unicode__(self):
         return unicode(self.name)
+
+    def save(self, *args, **kwargs):
+        # Hack to get around the fact that you can not overwrite auto_now_add
+        if not self.id and not self.created:
+            self.created = timezone.now()
+        return super(DataPoint, self).save(*args, **kwargs)
 
     @classmethod
     def get_all_data(cls, type=1):
