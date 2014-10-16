@@ -8,7 +8,7 @@ class DataPointAdmin(admin.ModelAdmin):
 
 
 class FeatureVectorAdmin(admin.ModelAdmin):
-    list_display = ("datapoint", "type")
+    list_display = ("exact_name", "type")
 
 
 class PredictorAdmin(admin.ModelAdmin):
