@@ -78,6 +78,13 @@ class FeatureVector(models.Model):
     type = models.IntegerField(choices=VECTOR_NAMES)
     datapoint = models.ForeignKey(DataPoint, related_name='vectors', null=True, blank=True)
     vector = VectorField()
+    created = models.DateTimeField()
+
+    def save(self, *args, **kwargs):
+        # Hack to get around the fact that you can not overwrite auto_now_add
+        if not self.id and not self.created:
+            self.created = timezone.now()
+        return super(FeatureVector, self).save(*args, **kwargs)
 
 
 class Predictor(models.Model):
