@@ -19,6 +19,7 @@ class DataPoint(models.Model):
     energy = models.FloatField()
     dipole = models.FloatField()
     band_gap = models.FloatField(null=True, blank=True)
+    vectors = models.ManyToManyField('FeatureVector')
 
     class Meta:
         get_latest_by = "created"
@@ -76,7 +77,7 @@ class FeatureVector(models.Model):
                     (COULOMB, "Coulomb")
                     )
     type = models.IntegerField(choices=VECTOR_NAMES)
-    datapoint = models.ForeignKey(DataPoint, related_name='vectors', null=True, blank=True)
+    exact_name = models.CharField(max_length=1000, null=True, blank=True)
     vector = VectorField()
     created = models.DateTimeField()
 
