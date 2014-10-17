@@ -27,21 +27,23 @@ def main(csvfile):
             try:
                 exact_name = get_exact_name(row[1])
                 try:
+                    decay_feature = get_decay_feature_vector(exact_name)
+                    feature_vector = True
                     if exact_name not in names and exact_name not in preexist:
-                        decay_feature = get_decay_feature_vector(exact_name)
-                        feature_vector = FeatureVector(
+                        temp = FeatureVector(
                                                     exact_name=exact_name,
                                                     type=FeatureVector.DECAY,
                                                     vector=decay_feature,
                                                     created=now)
 
-                        feature_vector.clean_fields()
-                        feature_vectors.append(feature_vector)
+                        temp.clean_fields()
+                        feature_vectors.append(temp)
                         names.add(exact_name)
 
                         if len(feature_vectors) > 150:
                             FeatureVector.objects.bulk_create(feature_vectors)
                             feature_vectors = []
+
                 except Exception as e:
                     feature_vector = None
             except Exception as e:
