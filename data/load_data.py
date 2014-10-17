@@ -82,7 +82,7 @@ def main(csvfile):
     Through = DataPoint.vectors.through
 
     temp = DataPoint.objects.filter(created=now).values_list("pk", "exact_name")
-    temp2 = FeatureVector.objects.filter(created=now).values_list("exact_name", "pk")
+    temp2 = FeatureVector.objects.all().values_list("exact_name", "pk")
     groups = dict(temp2)
 
     final = []
