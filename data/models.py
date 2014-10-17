@@ -81,6 +81,9 @@ class FeatureVector(models.Model):
     vector = VectorField()
     created = models.DateTimeField()
 
+    def __unicode__(self):
+        return unicode(self.exact_name) + ' ' + unicode(self.VECTOR_NAMES[self.type][1])
+
     def save(self, *args, **kwargs):
         # Hack to get around the fact that you can not overwrite auto_now_add
         if not self.id and not self.created:
