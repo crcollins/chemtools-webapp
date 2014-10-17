@@ -79,6 +79,7 @@ class UploadForm(forms.Form):
     options = forms.ChoiceField(widget=forms.RadioSelect, choices=CHOICES)
     td_reset = forms.BooleanField(required=False, label="TD Reset")
     gjf_submit = forms.BooleanField(required=False,  label="GJF Submit")
+    store = forms.BooleanField(required=False,  label="Store Log File")
 
     helper = FormHelper()
     helper.form_class = 'form-horizontal'

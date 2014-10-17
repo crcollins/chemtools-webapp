@@ -22,6 +22,7 @@ from chemtools import fileparser, dataparser
 from chemtools.interface import get_multi_molecule, get_multi_job
 import cluster.interface
 from project.utils import StringIO
+from data import load_data
 
 
 def index(request):
@@ -277,6 +278,10 @@ def parse_log(request, upload_form):
         parser.parse_file(f)
 
     f = StringIO(parser.format_output())
+    f2 = StringIO(parser.format_output())
+
+    if upload_form.cleaned_data['store'] and request.user.is_staff:
+        print load_data.main(f2), "datapoint(s) added."
     response = HttpResponse(FileWrapper(f), content_type="text/plain")
     return response
 
