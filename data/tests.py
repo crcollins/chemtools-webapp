@@ -58,6 +58,10 @@ class TemplateTestCase(TestCase):
 
 class ModelTestCase(TestCase):
     def setUp(self):
+        new_vector = models.FeatureVector(type=1, exact_name="A_TON_A_A_n1_m1_x1_y1_z1", vector=[1,2,3])
+        new_vector.save()
+        new_vector2 = models.FeatureVector(type=2, exact_name="Garbage", vector=[1])
+        new_vector2.save()
         new_data = models.DataPoint(
                                 name="A_TON_A_A",
                                 exact_name="A_TON_A_A_n1_m1_x1_y1_z1",
@@ -68,6 +72,8 @@ class ModelTestCase(TestCase):
                                 dipole=0.0006,
                                 energy=-567.1965205,
                                 band_gap=4.8068)
+        new_data.save()
+        new_data.vectors.add(new_vector)
         new_data.save()
         new_data2 = models.DataPoint(
                                 name="Garbage",
@@ -80,10 +86,8 @@ class ModelTestCase(TestCase):
                                 energy=100.0,
                                 band_gap=2.0)
         new_data2.save()
-        new_vector = models.FeatureVector(type=1, datapoint=new_data2, vector=[1,2,3])
-        new_vector.save()
-        new_vector2 = models.FeatureVector(type=2, datapoint=new_data, vector=[1])
-        new_vector2.save()
+        new_data2.vectors.add(new_vector2)
+        new_data2.save()
 
     def test_datapoint_unicode(self):
         string = str(models.DataPoint.objects.all()[0])
@@ -92,16 +96,16 @@ class ModelTestCase(TestCase):
     def test_get_all_data(self):
         FEATURE, HOMO, LUMO, GAP = models.DataPoint.get_all_data()
         self.assertTrue((FEATURE == numpy.matrix([[1,2,3]])).all())
-        self.assertTrue((HOMO == numpy.matrix([[1.0]])).all())
-        self.assertTrue((LUMO == numpy.matrix([[2.0]])).all())
-        self.assertTrue((GAP == numpy.matrix([[2.0]])).all())
+        self.assertTrue((HOMO == numpy.matrix([[-6.460873931]])).all())
+        self.assertTrue((LUMO == numpy.matrix([[-1.31976745]])).all())
+        self.assertTrue((GAP == numpy.matrix([[4.8068]])).all())
 
     def test_get_all_data_no_default(self):
         FEATURE, HOMO, LUMO, GAP = models.DataPoint.get_all_data(type=2)
         self.assertTrue((FEATURE == numpy.matrix([[1]])).all())
-        self.assertTrue((HOMO == numpy.matrix([[-6.460873931]])).all())
-        self.assertTrue((LUMO == numpy.matrix([[-1.31976745]])).all())
-        self.assertTrue((GAP == numpy.matrix([[4.8068]])).all())
+        self.assertTrue((HOMO == numpy.matrix([[1.0]])).all())
+        self.assertTrue((LUMO == numpy.matrix([[2.0]])).all())
+        self.assertTrue((GAP == numpy.matrix([[2.0]])).all())
 
     def test_jobtemplate(self):
         data = OPTIONS.copy()
