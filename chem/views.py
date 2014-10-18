@@ -277,11 +277,15 @@ def parse_log(request, upload_form):
     for f in upload_form.cleaned_data["files"]:
         parser.parse_file(f)
 
-    f = StringIO(parser.format_output())
-    f2 = StringIO(parser.format_output())
+    output = parser.format_output()
+    f2 = StringIO(output)
 
     if upload_form.cleaned_data['store'] and request.user.is_staff:
-        print load_data.main(f2), "datapoint(s) added."
+        number_added = load_data.main(f2)
+        print number_added, "datapoint(s) added to database."
+        output += "\n\n\n%d datapoint(s) added to database." % number_added
+
+    f = StringIO(output)
     response = HttpResponse(FileWrapper(f), content_type="text/plain")
     return response
 
