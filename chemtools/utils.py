@@ -166,3 +166,33 @@ def calculate_bonds(string):
             if bond is not None:
                 bonds.append("%d %d %s" % (i + 1, j + 1, bond))
     return "\n".join(bonds)
+
+
+def factorize(n):
+    max_val = int(n**0.5) + 1
+    temp = set(reduce(list.__add__, ([i, n / i] for i in xrange(1, max_val) if not n % i)))
+    return sorted(list(temp))
+
+
+def find_repeating(string):
+    '''
+    >>> find_repeating("4")
+    ('4', 1)
+    >>> find_repeating("44")
+    ('4', 2)
+    >>> find_repeating("4444")
+    ('4', 4)
+    >>> find_repeating("4a4a")
+    ('4a', 2)
+    >>> find_repeating("4ab4ab4ab")
+    ('4ab', 3)
+    >>> find_repeating("4ab4ab5")
+    ('4ab4ab5', 1)
+    >>> find_repeating("4ab54ab5")
+    ('4ab5', 2)
+    '''
+    for factor in factorize(len(string)):
+        items = [string[x:x+factor] for x in xrange(0,len(string),factor)]
+        if all(items[0] == x for x in items):
+            break
+    return string[:factor], len(string)/ factor
