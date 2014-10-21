@@ -568,6 +568,16 @@ class StructureTestCase(TestCase):
             name = template.format(group)
             structure.from_name(name)
 
+    def test_single_side_reduction(self):
+        sets = [
+            ['2', '23', '4aa', '6cc4bb'],
+            [2, 3, 4],
+        ]
+        for group, num in product(*sets):
+            exact_name = mol_name.get_exact_name(group * num)
+            expected = group + "_n%d_m1_x1_y1_z1" % num
+            self.assertEqual(exact_name, expected)
+
     def test_invalid_sides(self):
         sets = [
             self.templates,

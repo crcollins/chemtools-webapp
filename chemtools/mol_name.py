@@ -4,6 +4,7 @@ import collections
 
 from constants import SCORES, DCORES, CORES, RGROUPS, XGROUPS, ARYL, ARYL0, \
                     ARYL2, ALL, NEEDSPACE, TURNING, VALID_SIDE_TOKENS
+from utils import find_repeating
 
 
 def name_expansion(string):
@@ -335,9 +336,13 @@ def get_exact_name(name, spacers=False):
         parts = []
         for f, end in zip(sidefuncs, ends):
             endname = ''
-            if end:
+            if end is not None:
                 # [char, conn, flip?]
                 endname = ''.join([x[0] + '-' if x[2] else x[0] for x in end])
+
+                if core is None:
+                    endname, num_repeats = find_repeating(endname)
+                    nm = max(nm[0], 1) * num_repeats, nm[1]
 
             if not endname or endname[-1] not in XGROUPS:
                 if f(num):
