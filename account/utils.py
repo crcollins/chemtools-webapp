@@ -6,7 +6,6 @@ from Crypto.PublicKey import RSA
 from Crypto import Random
 
 from project.utils import StringIO, get_ssh_connection
-from cluster.models import Credential
 
 
 def generate_key_pair(username=None):
@@ -24,8 +23,8 @@ def generate_key_pair(username=None):
 
 
 def update_all_ssh_keys(user, new_public):
-    for cred in Credential.objects.filter(user=user, use_password=False):
-        with cred.get_ssh_connection() as ssh:
+    for cred in user.credentials.filter(use_password=False):
+        with cred.get_ssh_connection() as ssh, cred.get_sftp_connection() as sftp:
             s = "cp ~/.ssh/authorized_keys ~/.ssh/authorized_keys.bak"
             _, _, err = ssh.exec_command(s)
             a = err.readlines()
