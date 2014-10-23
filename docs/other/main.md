@@ -231,6 +231,8 @@ All of the following forms of output are possible for all of the molecules gener
 
 In addition to the files, the page for each structure also includes the exact name, the feature vector, and estimates for the HOMO, LUMO, and Band Gap energies. These estimates are calculated using a support vector machines predictor which was trained on about 1100 single core benzobisazole structures with side lengths less than 5 aryl groups.
 
+Currently the system implemented updates the predictors every night if there have been more structures added to the database.
+
 
 ### Jobs ###
 #### Generating Job Files ####
