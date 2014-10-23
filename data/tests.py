@@ -140,11 +140,13 @@ class ModelTestCase(TestCase):
 class LoadDataTestCase(TestCase):
     def test_load_data(self):
         path = os.path.join(settings.MEDIA_ROOT, "tests", "data.csv")
-        load_data.main(path)
+        with open(path, 'r') as f:
+            load_data.main(f)
 
     def test_load_data_long(self):
         path = os.path.join(settings.MEDIA_ROOT, "tests", "data_long.csv")
-        load_data.main(path)
+        with open(path, 'r') as f:
+            load_data.main(f)
 
     def test_load_data_command(self):
         path = os.path.join(settings.MEDIA_ROOT, "tests", "data.csv")
