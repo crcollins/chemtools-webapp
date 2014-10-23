@@ -31,13 +31,15 @@ def update_all_ssh_keys(user, new_public):
             if a:
                 raise Exception(str(a))
 
-            # _ is used because ssh keys can have / in them
-            s1 = "sed ~/.ssh/authorized_keys.bak -e 's_ssh-rsa "
-            s2 = ".* %s@chemtools-webapp_%s_' > ~/.ssh/authorized_keys"
-            _, _, err = ssh.exec_command(s1 + s2 % (user.username, new_public))
-            a = err.readlines()
-            if a:
-                raise Exception(str(a))
+            _, out, err = ssh.exec_command('echo $HOME')
+            base = out.read().strip()
+
+            with sftp.open("%s/.ssh/authorized_keys.bak" % base, 'r') as f1:
+                with sftp.open("%s/.ssh/authorized_keys" % base, 'w') as f2:
+                    for line in f1:
+                        if "chemtools-webapp" in line:
+                            line = new_public
+                        f2.write(line)
 
 
 def generate_key(text):
