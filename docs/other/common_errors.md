@@ -51,7 +51,7 @@ Sometimes the job files require an added `ppn=16` on with the nodes specificatio
 #### Fix #####
 This problem can be fixed by adding that option to the job file. This can either be done with a text editor, or with `sed`.
 
-    sed -i $JOBFILE -e s/nodes=1/nodes=1:ppn=16/'
+    sed -i $JOBFILE -e 's/nodes=1/nodes=1:ppn=16/'
 
 ___________________________________________________________
 
