@@ -258,6 +258,22 @@ class Options(LineParser):
 
 
 @Log.add_parser
+class ChargeMultiplicity(LineParser):
+    def __init__(self, *args, **kwargs):
+        super(ChargeMultiplicity, self).__init__(*args, **kwargs)
+        self.value = ''
+
+    @is_done
+    def parse(self, line):
+        # " Charge =  0 Multiplicity = 1"
+        if "Charge = " in line and "Multiplicity = " in line:
+            charge = line.split()[2]
+            multiplicity = line.split()[-1]
+            self.value = '%s %s' % (charge, multiplicity)
+            self.done = True
+
+
+@Log.add_parser
 class HomoOrbital(LineParser):
     def __init__(self, *args, **kwargs):
         super(HomoOrbital, self).__init__(*args, **kwargs)
