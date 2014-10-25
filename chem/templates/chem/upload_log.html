@@ -9,10 +9,11 @@
 
 $(function() {
     function post_func() {
+        event.preventDefault();
         if (!$("#id_gjf_submit").is(':checked')) {
             $("#id_form").submit();
+            return;
         }
-        event.preventDefault();
         var a = new FormData($("#id_form")[0]);
         a.append("html", true);
 
