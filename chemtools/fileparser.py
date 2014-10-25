@@ -418,6 +418,57 @@ class Geometry(LineParser):
                 self.value += line.strip('\n')
 
 
+SYMBOLS = {
+    '1': 'H',
+    '6': 'C',
+    '7': 'N',
+    '8': 'O',
+    '9': 'F',
+    '14': 'Si',
+    '15': 'P',
+    '16': 'S',
+    '17': 'Cl',
+    '35': 'Br',
+}
+
+@Log.add_parser
+class PartialGeometry(LineParser):
+    def __init__(self, *args, **kwargs):
+        super(PartialGeometry, self).__init__(*args, **kwargs)
+        self.value = ''
+        self.start = False
+        self.dashes = False
+        newfile = ''
+
+    @is_done
+    def parse(self, line):
+         # "Number     Number       Type             X           Y           Z"
+         # "---------------------------------------------------------------------"
+         # "     1          6           0       -3.185124    1.196727    0.001793"
+         # ...
+         # "---------------------------------------------------------------------"
+         # Note: This occurs multiple times in an optimization
+
+        if "X           Y           Z" in line:
+            self.start = True
+            return
+
+        if self.start:
+            if "--------------" in line:
+                # dashed lines toggle the selection area
+                self.dashes = not self.dashes
+                if self.dashes:
+                    self.value = ''
+                else:
+                    self.start = False
+                return
+
+            if self.dashes:
+                temp = line.strip().split()
+                use = [SYMBOLS[temp[1]]] + temp[3:]
+                self.value += ' '.join(use) + '\n'
+
+
 @Log.add_parser
 class Header(LineParser):
     def __init__(self, *args, **kwargs):
