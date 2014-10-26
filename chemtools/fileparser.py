@@ -94,14 +94,22 @@ class Log(object):
     def format_gjf(self, td=False):
         if td:
             header = self["Header"].replace(".chk", "_TD.chk")
-            geometry = self["Geometry"].replace("opt", "td").replace("OPT", "td")
+            options = self["Options"].lower().replace("opt", "td")
         else:
             header = self["Header"]
-            geometry = self["Geometry"]
-        if not geometry or not header:
+            options = self["Options"]
+        if not self["Geometry"] or not header or not options:
             raise Exception("The log file was invalid")
-        s = header
-        s += geometry
+        s = '\n'.join([
+            header,
+            "# " + options,
+            '',
+            self.name,
+            '',
+            self["ChargeMultiplicity"],
+            self["Geometry"],
+            '',
+            ])
         return s
 
     def format_data(self):
@@ -427,6 +435,10 @@ class Geometry(LineParser):
                 value = value.replace("geom=connectivity", '')
 
                 lines = [x.strip() for x in value.split('\n')]
+
+                assert len(lines[4].split()) == 2
+                lines = lines[5:-1]
+
                 self.value = '\n'.join(lines) + '\n'
                 self.done = True
             if not self.done:
@@ -505,6 +517,7 @@ class Header(LineParser):
                 self.value += line + "\n"
             elif line.startswith("-"):
                 self.done = True
+                self.value = self.value.strip()
 
 
 @Log.add_parser
