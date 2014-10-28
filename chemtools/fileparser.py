@@ -102,7 +102,7 @@ class Log(object):
             raise Exception("The log file was invalid")
         s = '\n'.join([
             header,
-            "# " + options,
+            "# " + options.replace("geom=connectivity", '').strip(),
             '',
             self.name,
             '',
@@ -432,7 +432,6 @@ class Geometry(LineParser):
                 value = value[:index] + second
 
                 value = value.replace(self.delimiter, '\n')
-                value = value.replace("geom=connectivity", '')
 
                 lines = [x.strip() for x in value.split('\n')]
 
