@@ -1078,7 +1078,7 @@ class UploadsTestCase(TestCase):
             with StringIO(response.content) as f:
                 with zipfile.ZipFile(f, "r") as zfile:
                     with zfile.open("A_TON_A_A.gjf") as f2:
-                        self.assertEqual(f2.read(), gjf.read())
+                        self.assertEqual(f2.read().lower(), gjf.read().lower())
 
     def test_gjf_reset_td(self):
         base = os.path.join(settings.MEDIA_ROOT, "tests", "A_TON_A_A")
@@ -1095,7 +1095,7 @@ class UploadsTestCase(TestCase):
             with StringIO(response.content) as f:
                 with zipfile.ZipFile(f, "r") as zfile:
                     with zfile.open("A_TON_A_A_TD.gjf") as f2:
-                        self.assertEqual(f2.read(), gjf.read())
+                        self.assertEqual(f2.read().lower(), gjf.read().lower())
 
     def test_gjf_reset_fail(self):
         base = os.path.join(settings.MEDIA_ROOT, "tests", "A_TON_A_A")
