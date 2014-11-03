@@ -719,7 +719,8 @@ class BenzobisazoleTestCase(TestCase):
         "{0}",
     ]
     valid_polymer_sides = ['2', '4b', '22', '24', '4bc', '44bc', '4b4',
-                        '5-', '5-5', '55-', '5-a', '5-ab4-', '4b114b', '3']
+                        '5-', '5-5', '55-', '5-a', '5-ab4-', '4b114b', '3',
+                        '11']
     invalid_polymer_sides = ['B', '2B']
     valid_sides = valid_polymer_sides + invalid_polymer_sides
 
@@ -1205,6 +1206,21 @@ class UtilsTestCase(TestCase):
         string = utils.replace_geom_vars(geom, variables)
         results = utils.convert_zmatrix_to_cart(string)
         self.assertEqual(BENZENE_CART.strip(), results.strip())
+
+    def test_find_repeating(self):
+        tests = (
+            ("4", ('4', 1)),
+            ("44", ('4', 2)),
+            ("4444", ('4', 4)),
+            ("4a4a", ('4a', 2)),
+            ("4ab4ab4ab", ('4ab', 3)),
+            ("4ab4ab5", ('4ab4ab5', 1)),
+            ("4ab54ab5", ('4ab5', 2)),
+            (["11", "12"], (["11", "12"], 1))
+        )
+        for value, expected in tests:
+            result = utils.find_repeating(value)
+            self.assertEqual(result, expected)
 
 
 class GraphTestCase(TestCase):
