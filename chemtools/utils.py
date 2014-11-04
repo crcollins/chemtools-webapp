@@ -195,4 +195,4 @@ def find_repeating(string):
         items = [string[x:x+factor] for x in xrange(0,len(string),factor)]
         if all(items[0] == x for x in items):
             break
-    return string[:factor], len(string)/ factor
+    return string[:factor], len(string) / factor
