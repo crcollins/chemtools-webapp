@@ -1207,20 +1207,20 @@ class UtilsTestCase(TestCase):
         results = utils.convert_zmatrix_to_cart(string)
         self.assertEqual(BENZENE_CART.strip(), results.strip())
 
-    def test_find_repeating(self):
-        tests = (
-            ("4", ('4', 1)),
-            ("44", ('4', 2)),
-            ("4444", ('4', 4)),
-            ("4a4a", ('4a', 2)),
-            ("4ab4ab4ab", ('4ab', 3)),
-            ("4ab4ab5", ('4ab4ab5', 1)),
-            ("4ab54ab5", ('4ab5', 2)),
-            (["11", "12"], (["11", "12"], 1))
-        )
-        for value, expected in tests:
-            result = utils.find_repeating(value)
-            self.assertEqual(result, expected)
+    # def test_find_repeating(self):
+    #     tests = (
+    #         ("4", ('4', 1)),
+    #         ("44", ('4', 2)),
+    #         ("4444", ('4', 4)),
+    #         ("4a4a", ('4a', 2)),
+    #         ("4ab4ab4ab", ('4ab', 3)),
+    #         ("4ab4ab5", ('4ab4ab5', 1)),
+    #         ("4ab54ab5", ('4ab5', 2)),
+    #         (["11", "12"], (["11", "12"], 1))
+    #     )
+    #     for value, expected in tests:
+    #         result = utils.find_repeating(value)
+    #         self.assertEqual(result, expected)
 
 
 class GraphTestCase(TestCase):
