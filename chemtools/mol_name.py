@@ -92,7 +92,7 @@ def name_expansion(string, rand=None):
             braces.append(part)
     temp = collections.OrderedDict(zip(braces, itertools.repeat(True)))
 
-    if rand is not None:
+    if rand is not None and rand < len(temp.keys()):
         return random.sample(temp.keys(), rand)
     else:
         return temp.keys()
