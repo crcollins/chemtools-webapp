@@ -1,13 +1,14 @@
 import re
 import itertools
 import collections
+import random
 
 from constants import SCORES, DCORES, CORES, RGROUPS, XGROUPS, ARYL, ARYL0, \
                     ARYL2, ALL, NEEDSPACE, TURNING, VALID_SIDE_TOKENS
 from utils import find_repeating
 
 
-def name_expansion(string):
+def name_expansion(string, rand=None):
     braceparse = re.compile(r"""(\{[^\{\}]*\})""")
     varparse = re.compile(r"\$\w*")
 
@@ -90,7 +91,11 @@ def name_expansion(string):
         else:
             braces.append(part)
     temp = collections.OrderedDict(zip(braces, itertools.repeat(True)))
-    return temp.keys()
+
+    if rand is not None:
+        return random.sample(temp.keys(), rand)
+    else:
+        return temp.keys()
 
 
 def parse_options(parts):

@@ -19,6 +19,7 @@ from utils import parse_file_list, find_sets, convert_logs
 
 from chemtools import gjfwriter
 from chemtools import fileparser, dataparser
+from chemtools.mol_name import name_expansion
 from chemtools.interface import get_multi_molecule, get_multi_job
 import cluster.interface
 from project.utils import StringIO
@@ -135,6 +136,10 @@ def molecule_detail_json(request, molecule):
 
 
 def multi_molecule(request, string):
+    if request.REQUEST.get("random"):
+        amount = int(request.REQUEST.get("random"))
+        string = ','.join(name_expansion(string, rand=amount))
+
     job_form = JobForm.get_form(request, "{{ name }}")
     mol_form = MoleculeForm(request.REQUEST)
 
