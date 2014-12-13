@@ -9,7 +9,8 @@ import cairo
 from constants import COLORS, COLORS2, CONNECTIONS, DATAPATH, ARYL, XGROUPS, MASSES
 from mol_name import parse_name
 from utils import get_full_rotation_matrix, get_angles, replace_geom_vars, \
-                    convert_zmatrix_to_cart, calculate_bonds
+                    convert_zmatrix_to_cart, calculate_bonds, \
+                    get_axis_rotation_matrix
 from project.utils import StringIO
 
 
@@ -160,7 +161,7 @@ def _load_fragments(coreset):
                 struct = from_data(char)
                 temp.append((struct, char, parentid))
                 if flip:
-                    struct.reflect_ends()
+                    struct.reflect_ends(angle=flip)
         else:
             temp.append(None)
         fragments.append(temp)
@@ -489,10 +490,13 @@ class Structure(object):
             vdotn = normal.T * atom.xyz
             atom.xyz -= 2 * (vdotn / ndotn)[0, 0] * normal
 
-    def reflect_ends(self):
+    def reflect_ends(self, angle=180):
         bonds = self.open_ends('~')
         normal = bonds[0].atoms[1].xyz - bonds[1].atoms[1].xyz
-        self.reflect(normal)
+        # self.reflect(normal)
+        mat = get_axis_rotation_matrix(normal, math.radians(angle))
+        temp = numpy.matrix([0, 0, 0]).T
+        self.rotate_3d(mat, temp, temp)
 
     def bounding_box(self):
         '''Returns the bounding box of the structure.'''

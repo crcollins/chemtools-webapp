@@ -3,7 +3,7 @@ from django.contrib import admin
 
 
 admin.autodiscover()
-molname = "A-Za-z0-9_\-"
+molname = "\(\)A-Za-z0-9_\-"
 multimolname = molname + ",\-\{\}\$\."
 
 urlpatterns = patterns('chem.views',

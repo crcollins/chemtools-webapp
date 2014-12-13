@@ -133,11 +133,11 @@ def parse_cores(parts):
 
 def tokenize(string):
     rxgroups = ''.join(XGROUPS + RGROUPS)
-    match = '(1?\d|-|[%s])' % rxgroups
+    match = '(1?\d|\(-?\d+\)|-|[%s])' % rxgroups
     tokens = [x for x in re.split(match, string) if x and x != '_']
 
     VALID_SIDE_TOKENS = set(XGROUPS + ARYL + RGROUPS + ['-'])
-    invalid_idxs = [x for i, x in enumerate(tokens) if x not in VALID_SIDE_TOKENS]
+    invalid_idxs = [x for i, x in enumerate(tokens) if x not in VALID_SIDE_TOKENS and not x.startswith("(")]
     if invalid_idxs:
         raise ValueError("Bad Substituent Name(s): %s" % str(invalid_idxs))
     return tokens
@@ -160,10 +160,13 @@ def parse_end_name(name):
         else:
             flip = 0
 
-        if token == "-":
+        if token.startswith('(') or token == "-":
             previous = parts[lastconnect]
             if previous[0] in ARYL0 + ARYL2:
-                parts[lastconnect] = (previous[0], previous[1], not previous[2])
+                if token.startswith('('):
+                    parts[lastconnect] = (previous[0], previous[1], int(token[1:-1]))
+                else:
+                    parts[lastconnect] = (previous[0], previous[1], not previous[2])
                 continue
             else:
                 raise ValueError("reflection only allowed for aryl groups")
