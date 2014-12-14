@@ -346,7 +346,16 @@ def get_exact_name(name, spacers=False):
             endname = ''
             if end is not None:
                 # [char, conn, flip?]
-                endname = ''.join([x[0] + '-' if x[2] else x[0] for x in end])
+
+                nameparts = []
+                for x in end:
+                    if x[2] is True:
+                        nameparts.append(x[0] + '-')
+                    elif x[2] is False:
+                        nameparts.append(x[0])
+                    else:
+                        nameparts.append(x[0] + '(%d)' % x[2])
+                endname = ''.join(nameparts)
 
                 # if core is None:
                 #     endname, num_repeats = find_repeating(tokenize(endname))
