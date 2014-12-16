@@ -618,7 +618,7 @@ class Structure(object):
         '''Returns a structure with x,y,z stacking.'''
         frags = [self]
         bb = self.bounding_box()
-        size = tuple(maxv - minv for minv, maxv in zip(bb[0], bb[1]))
+        size = (bb[1] - bb[0]).T.tolist()[0]
         for i, axis in enumerate((x, y, z)):
             #means there is nothing to stack
             if axis <= 1:
