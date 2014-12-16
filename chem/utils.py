@@ -79,7 +79,7 @@ def get_molecule_info(molecule):
 
     limits = get_property_limits(molecule)
 
-    a = {
+    return {
         "molecule": molecule,
         "exact_name": exactname,
         "exact_name_spacers": exactspacer,
@@ -92,8 +92,7 @@ def get_molecule_info(molecule):
         "known_errors": warning,
         "error_message": error,
         "limits": limits,
-        }
-    return a
+    }
 
 
 def run_standard_jobs(credential, string, mol_settings, job_settings):
