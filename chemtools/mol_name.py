@@ -155,10 +155,10 @@ def parse_end_name(name):
     for i, token in enumerate(tokens):
         # Alternate flipping structures
         if token in TURNING:
-            flip = turns % 2
+            flip = bool(turns % 2)
             turns += 1
         else:
-            flip = 0
+            flip = False
 
         if token.startswith('(') or token == "-":
             previous = parts[lastconnect]
