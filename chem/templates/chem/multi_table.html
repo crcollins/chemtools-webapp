@@ -4,7 +4,7 @@
 {% if error %}
     {{ error }}
 {% else %}
-    {% for name, warning, error, new in molecules %}
+    {% for name, warning, error, new, name_id in molecules %}
         <tr {% if new %}data-new="true"{% endif %} {% if warning %}class="warning"{% elif error %}class="danger"{% endif %}>
             <td>
                 <a href="{% url "mol_detail" name %}">{{ name }}</a>
@@ -13,9 +13,9 @@
                 <td><a class="mol_setting" href="{% url "mol_gjf" name %}">gjf</a></td>
                 <td><a class="mol_setting" href="{% url "mol_mol2" name %}">mol2</a></td>
                 <td>
-                    <a class="delayimage" data-toggle="collapse" href="#{{ name }}">
+                    <a class="delayimage" data-toggle="collapse" href="#{{ name_id }}">
                         Image
-                        <div id="{{ name }}" class="collapse">
+                        <div id="{{ name_id }}" class="collapse">
                             <img data-src="{% url "mol_png" name %}"></img>
                         </div>
                     </a>
