@@ -151,6 +151,8 @@ class LogSet(Output):
         self.header = self.logs[0].format_header()
         for log in self.logs:
             self.write(log.format_data())
+        pool.close()
+        pool.join()
 
     def format_output(self, errors=True):
         s = self.header + "\n"
