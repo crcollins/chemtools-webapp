@@ -92,6 +92,8 @@ def molecule_check(request, string):
     try:
         molecules, warnings, errors, news = get_multi_molecule_warnings(
                                                                         string)
+        # This is used to fix the issue with ( and ) not being allowed for
+        # the id of an HTML tag.
         name_ids = [x.replace('(', 'z').replace(')', 'z') for x in molecules]
         a["molecules"] = zip(molecules, warnings, errors, news, name_ids)
     except ValueError as e:
