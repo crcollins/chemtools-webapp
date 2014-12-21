@@ -771,8 +771,8 @@ class BenzobisazoleTestCase(TestCase):
 
     def test_get_coulomb_matrix_feature(self):
         obj = gjfwriter.Benzobisazole("TON")
-        self.assertEqual(obj.get_coulomb_matrix_feature(),
-                        COULOMB_MATRIX_FEATURE)
+        self.assertTrue(numpy.allclose(obj.get_coulomb_matrix_feature(),
+                                    COULOMB_MATRIX_FEATURE))
 
     def test_get_exact_name(self):
         obj = gjfwriter.Benzobisazole("TON")
