@@ -467,7 +467,6 @@ class PartialGeometry(LineParser):
         self.value = ''
         self.start = False
         self.dashes = False
-        newfile = ''
 
     @is_done
     def parse(self, line):
