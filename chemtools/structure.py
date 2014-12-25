@@ -480,16 +480,6 @@ class Structure(object):
         for atom in self.atoms:
             atom.xyz += displacement
 
-    def reflect(self, normal):
-        '''Reflect structure across arbitrary plane'''
-        ndotn = normal.T * normal
-        if ndotn == 0:
-            ndotn = 1.0
-
-        for atom in self.atoms:
-            vdotn = normal.T * atom.xyz
-            atom.xyz -= 2 * (vdotn / ndotn)[0, 0] * normal
-
     def reflect_ends(self, angle=180):
         bonds = self.open_ends('~')
         normal = bonds[0].atoms[1].xyz - bonds[1].atoms[1].xyz
