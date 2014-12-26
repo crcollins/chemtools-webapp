@@ -162,6 +162,12 @@ class MainPageTestCase(TestCase):
         options["name"] = NAMES[0]
         self.assertEqual(response.content, JOB_STRING.format(**options))
 
+    def test_multi_molecule_random(self):
+        string = ','.join(NAMES)
+        url = reverse(views.multi_molecule, args=(string, )) + "?random=1"
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
     def test_multi_molecule_zip(self):
         string = ','.join(NAMES)
         gjf_names = set([name + ".gjf" for name in NAMES])
