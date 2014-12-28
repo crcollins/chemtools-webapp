@@ -925,6 +925,8 @@ class MolNameTestCase(TestCase):
             ('TON_4b__m2', 'A**_TON_4bb_A**_n1_m2'),
             ('TON_4bc__m2', 'A**_TON_4bc_A**_n1_m2'),
             ('TON_44bc__m2', 'A**_TON_4aa4bc_A**_n1_m2'),
+
+            ('TON__4(20)', 'A**_TON_A**_4(20)aaA**_n1_m1'),
         ]
 
     def test_brace_expansion(self):
