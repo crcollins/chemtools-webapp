@@ -46,10 +46,16 @@ class Molecule(object):
         starter = []
         if self.nprocshared is not None:
             starter.append("%%nprocshared=%d" % self.nprocshared)
+
+        if self.structure.frozen:
+            geom = "geom=(modredundant,connectivity)"
+        else:
+            geom = "geom=connectivity"
+
         starter.extend([
                     "%%mem=%dGB" % self.mem,
                     "%%chk=%s.chk" % self.name,
-                    "# %s geom=connectivity" % self.keywords,
+                    "# %s %s" % (self.keywords, geom),
                     "",
                     self.name,
                     "",

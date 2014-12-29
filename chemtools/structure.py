@@ -159,9 +159,12 @@ def _load_fragments(coreset):
                 if all(x is not None for x in core):
                     parentid += 1  # offset for core
                 struct = from_data(char)
-                temp.append((struct, char, parentid))
+                freeze = False
                 if flip:
                     struct.reflect_ends(angle=flip)
+                    if flip not in [True, False]:
+                        freeze = True
+                temp.append((struct, char, parentid, freeze))
         else:
             temp.append(None)
         fragments.append(temp)
@@ -209,7 +212,7 @@ def from_name(name):
                 continue
 
             this = [core] + side
-            for (part, char, parentid) in side:
+            for (part, char, parentid, freeze) in side:
                 bondb = part.next_open()
                 if not parentid and not null_core:
                     bonda = cends[j]
@@ -227,7 +230,7 @@ def from_name(name):
                     bonda = this[parentid][0].next_open(c, skip=skip)
 
                 if bonda and bondb:
-                    this[parentid][0].merge(bonda, bondb, part)
+                    this[parentid][0].merge(bonda, bondb, part, freeze=freeze)
                 else:
                     raise Exception(6, "Part not connected")
 
@@ -301,6 +304,14 @@ class Atom(object):
                 s += ' ' + str(x.id) + ' ' + bond_type
         return s
 
+    def connected_atoms(self):
+        atoms = []
+        for bond in self.bonds:
+            for atom in bond.atoms:
+                if atom != self:
+                    atoms.append(atom)
+        return atoms
+
     def __str__(self):
         return self.element + " %f %f %f" % self.xyz_tuple
 
@@ -361,6 +372,7 @@ class Structure(object):
     def __init__(self, atoms, bonds):
         self.atoms = atoms
         self.bonds = bonds
+        self.frozen = []
 
     @classmethod
     def concatenate(cls, structures):
@@ -372,6 +384,7 @@ class Structure(object):
             for bond in frag.bonds:
                 bond.parent = struct.bonds
                 struct.bonds.append(bond)
+            struct.frozen.extend(frag.frozen)
         return struct
 
     ###########################################################################
@@ -464,6 +477,23 @@ class Structure(object):
         '''Returns a string with the in the proper .gjf format.'''
         string = "\n".join([x.gjf_atoms for x in self.atoms]) + "\n\n"
         string += "\n".join([x.gjf_bonds for x in self.atoms])
+
+        if self.frozen:
+            string += "\n\n"
+            for (a, b) in self.frozen:
+                ids = [a.id, b.id]
+
+                for atom in a.connected_atoms():
+                    if atom.id not in ids:
+                        ids = [atom.id] + ids
+                        break
+
+                for atom in b.connected_atoms():
+                    if atom.id not in ids:
+                        ids.append(atom.id)
+                        break
+
+                string += ' '.join(['D'] + [str(x) for x in ids] + ['F']) + '\n'
         return string
 
     ###########################################################################
@@ -532,7 +562,7 @@ class Structure(object):
             if atom.element[0] in CONNECTIONS:
                 atom.element = "H"
 
-    def merge(self, bond1, bond2, fragment):
+    def merge(self, bond1, bond2, fragment, freeze=False):
         '''Merges two bonds. Bond1 is the bond being bonded to.'''
         # bond1 <= (bond2 from frag)
         # find the part to change
@@ -570,6 +600,9 @@ class Structure(object):
             bond1.atoms = (C1, C2)
         #remove the extension parts
         [x.remove() for x in (bond2, R1, R2)]
+
+        if freeze:
+            self.frozen.append(bond1.atoms)
 
     def chain(self, fragments):
         # fragments = (
