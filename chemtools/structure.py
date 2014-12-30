@@ -2,6 +2,7 @@ import os
 import math
 import copy
 import string
+from itertools import product
 
 import numpy
 import cairo
@@ -482,18 +483,19 @@ class Structure(object):
             string += "\n\n"
             for (a, b) in self.frozen:
                 ids = [a.id, b.id]
+                lefts = []
 
                 for atom in a.connected_atoms():
                     if atom.id not in ids:
-                        ids = [atom.id] + ids
-                        break
+                        lefts.append(atom.id)
 
+                rights = []
                 for atom in b.connected_atoms():
                     if atom.id not in ids:
-                        ids.append(atom.id)
-                        break
+                        rights.append(atom.id)
 
-                string += ' '.join(['D'] + [str(x) for x in ids] + ['F']) + '\n'
+                for left, right in product(lefts, rights):
+                    string += ' '.join(['D'] + [str(x) for x in [left] + ids + [right]] + ['F']) + '\n'
         return string
 
     ###########################################################################
