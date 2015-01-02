@@ -160,28 +160,54 @@ Beyond multicore names, there is also the ability to build chains just from the 
 From this example, you might also notice that there is no distinct direction that the chain goes in. This is due to the fact that each of these structures on their own does not have a defined orientation like they would have if they were being built from a core.
 
 
-### Flipping ####
+### Rotating/Flipping ####
 
 A little less obvious of a problem that arises from this naming scheme is how to handle rotations (a group can be rotated 180 degrees around the bond axis). This problem has been solved by the addition of a meta character `-`.
 
-    TON_55
+    55
 
-![/chem/TON_55](/chem/TON_55.png)
+![/chem/55](/chem/55.png)
 
-    TON_5-5
+    5-5
 
-![/chem/TON_5-5](/chem/TON_5-5.png)
+![/chem/5-5](/chem/5-5.png)
 
 This character applies to the the Aryl group directly preceding the character. So the following names are all equivalent.
 
-    TON_5-b
-    TON_5b-
-    TON_5-bb
-    TON_5b-b
-    TON_5bb-
+    5-b
+    5b-
+    5-bb
+    5b-b
+    5bb-
 
-![/chem/TON_5b-](/chem/TON_5b-.png)
+![/chem/55b-5](/chem/55b-5.png)
+![/chem/55b5](/chem/55b5.png)
 
+In addition to being able to flip the Aryl groups 180 degrees, there is also the ability to freeze the dihedral angles between two Aryl groups. This is done by adding `(x)` after the Aryl group that needs to be rotated (where `x` is some angle in degrees). Note that the `-` token is not required with this.
+
+    44
+
+![/chem/44](/chem/44.png)
+
+    44(70)
+
+![/chem/44\(70\)](/chem/44\(70\).png)
+
+The angles between groups are all relative to the previous Aryl group, so creating a spiral affect is simple.
+
+    44(20)4(20)4(20)4(20)4(20)
+
+![/chem/44\(20\)4\(20\)4\(20\)4\(20\)4\(20\)](/chem/44\(20\)4\(20\)4\(20\)4\(20\)4\(20\).png)
+
+In addition to positive angles, negative angles are also supported.
+
+    55(35)
+
+![/chem/55\(35\)](/chem/55\(35\).png)
+
+    55(-35)
+
+![/chem/55\(-35\)](/chem/55\(-35\).png)
 
 ### Other Examples ####
 
