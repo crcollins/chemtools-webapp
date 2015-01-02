@@ -156,15 +156,23 @@ def _load_fragments(coreset):
     for side in [middleparsed] * 2 + [rightparsed, leftparsed]:
         temp = []
         if side is not None:
+            angle_total = 0
             for (char, parentid, flip) in side:
                 if all(x is not None for x in core):
                     parentid += 1  # offset for core
                 struct = from_data(char)
                 freeze = False
-                if flip:
-                    struct.reflect_ends(angle=flip)
+                if flip or (angle_total and char in ARYL):
                     if flip not in [True, False]:
                         freeze = True
+                        angle_total += flip
+                        flip = angle_total
+                    elif flip is True:
+                        flip = angle_total + 180
+                    elif flip is False:
+                        flip = angle_total
+
+                    struct.reflect_ends(angle=flip)
                 temp.append((struct, char, parentid, freeze))
         else:
             temp.append(None)
