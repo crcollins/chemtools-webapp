@@ -488,6 +488,10 @@ Just like with single molecules, it is possible to set the keywords to be someth
 
     /chem/$NAME1,$NAME2,$NAME3/?keywords=HF/3-21G
 
+In addition to getting all of the structures given, there is also the ability to randomly sample the structures using the `random` parameter. The following will return two random structures from the three given.
+
+    /chem/$NAME1,$NAME2,$NAME3/?random=2
+
 
 #### Brace Expansion ####
 
