@@ -96,7 +96,13 @@ class Log(object):
         else:
             header = self["Header"]
             options = self["Options"]
-        if not self["Geometry"] or not header or not options:
+
+        if self["Geometry"] is None:
+            geometry = self["PartialGeometry"]
+        else:
+            geometry = self["Geometry"]
+
+        if not geometry or not header or not options:
             raise Exception("The log file was invalid")
         s = '\n'.join([
             header,
@@ -105,7 +111,7 @@ class Log(object):
             self.name,
             '',
             self["ChargeMultiplicity"],
-            self["Geometry"],
+            geometry,
             '',
             ])
         return s
