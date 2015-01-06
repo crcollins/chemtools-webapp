@@ -1155,7 +1155,9 @@ class FileParserTestCase(TestCase):
                     '0.0']
             for line in reader:
                 pass
-            self.assertEqual(expected, line[1:])
+            actual = [x.lower() for x in line[1:]]
+            expected = [x.lower() for x in expected]
+            self.assertEqual(expected, actual)
 
     def test_parse_nonbenzo_windows_td(self):
         name = "methane_td_windows.log"
@@ -1170,7 +1172,9 @@ class FileParserTestCase(TestCase):
                     '0.0']
             for line in reader:
                 pass
-            self.assertEqual(expected, line[1:])
+            actual = [x.lower() for x in line[1:]]
+            expected = [x.lower() for x in expected]
+            self.assertEqual(expected, actual)
 
     def test_Output_newline(self):
         out = fileparser.Output()
