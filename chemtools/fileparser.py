@@ -74,8 +74,6 @@ class Log(object):
                     parser.parse(line.replace('\r', ''))
 
             if "Normal termination of Gaussian" not in line:
-                for parser in self.parsers:
-                    self.parsers[parser].value = '---'
                 self.parsers["Geometry"].value = None
 
             # major memory saver by deleting all the line parser objects
