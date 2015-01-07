@@ -73,13 +73,13 @@ class Log(object):
                 for k, parser in self.parsers.items():
                     parser.parse(line.replace('\r', ''))
 
-            if "Normal termination of Gaussian" not in line:
-                self.parsers["Geometry"].value = None
+        if "Normal termination of Gaussian" not in line:
+            self.parsers["Geometry"].value = None
 
-            # major memory saver by deleting all the line parser objects
-            for parser in self.parsers:
-                self.parsers[parser] = (self.parsers[parser].value,
-                                        self.parsers[parser].done)
+        # major memory saver by deleting all the line parser objects
+        for parser in self.parsers:
+            self.parsers[parser] = (self.parsers[parser].value,
+                                    self.parsers[parser].done)
 
     @classmethod
     def add_parser(cls, parser):
