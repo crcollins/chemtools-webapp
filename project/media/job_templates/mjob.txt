@@ -1,26 +1,22 @@
 #!/bin/bash
-##PBS -q mercury
-#PBS -l mem=59GB
+#PBS -q mercury
+#PBS -l mem=38GB
 #PBS -l nodes={{ nodes }}:ppn=16
 #PBS -l walltime={{ time }}
 #PBS -j oe
 #PBS -o {{ name }}.out
 #PBS -V
-#PBS -M {{ email }}
 
-name={{ name }}
-base=$HOME{% if internal %}/chemtools{% endif %}
-temp=$PBS_O_WORKDIR
+set echo
+cd $PBS_O_WORKDIR
 
-cp $base/$name.gjf $temp
-export GAUSS_SCRDIR=$temp
+export name={{ name }}
+export base=`pwd`
 
-gaussian=`which g09`
-formchk=`which formchk`
+export gaussian=`which g09`
+export formchk=`which formchk`
 
-cd $temp
-
-/usr/bin/time $gaussian < $name.gjf > $name.log
+$gaussian $name.gjf
 $formchk $name.chk $name.fchk
 
 mkdir -p $base/done/
