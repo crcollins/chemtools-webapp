@@ -513,7 +513,6 @@ class Dipole(LineParser):
         line = line.strip()
         if line.startswith("X="):
             self.value = line.split()[-1]
-            self.done = True
 
 
 ##############################################################################
