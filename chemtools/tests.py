@@ -1100,7 +1100,7 @@ class FileParserTestCase(TestCase):
                         ["A_TON_A_A", "A_TON_A_A_n1_m1_x1_y1_z1",
                         "opt B3LYP/6-31g(d) geom=connectivity",
                         "-6.46079886952", "-1.31975211714", "41",
-                        "0.0006", "-567.1965205", "---", "0.35"],
+                        "0.0001", "-567.1965205", "---", "0.35"],
                         ["A_TON_A_A", "A_TON_A_A_n1_m1_x1_y1_z1",
                         "td B3LYP/6-31g(d)", "-6.46079886952",
                         "-1.31975211714", "41", "0.0001",
@@ -1123,7 +1123,7 @@ class FileParserTestCase(TestCase):
                 ["A_TON_A_A", "A_TON_A_A_n1_m1_x1_y1_z1",
                 "opt B3LYP/6-31g(d) geom=connectivity",
                 "-6.46079886952", "-1.31975211714", "41",
-                "0.0006", "-567.1965205", "---", "0.35"],
+                "0.0001", "-567.1965205", "---", "0.35"],
                 ]
             lines = [x[1:3] + x[4:] for x in reader]
             self.assertEqual(expected, lines)
