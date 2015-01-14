@@ -1,11 +1,8 @@
 import random
 import hashlib
-import functools
 
 from Crypto.PublicKey import RSA
 from Crypto import Random
-
-from project.utils import StringIO, get_ssh_connection
 
 
 def generate_key_pair(username=None):

@@ -1,7 +1,5 @@
-from django.contrib.auth.models import User
-
 from models import Credential, Job
-from interface import get_all_jobs, get_log_status
+from interface import get_log_status
 
 
 def run_all():

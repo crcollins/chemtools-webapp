@@ -1,5 +1,3 @@
-import math
-
 from numpy.linalg import norm
 import numpy
 

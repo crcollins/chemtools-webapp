@@ -160,7 +160,6 @@ def calculate_bonds(string):
             element2, xyz2 = atom2[0], atom2[1:]
 
             dist = sum((x-y)**2 for (x, y) in zip(xyz1, xyz2)) ** 0.5
-            elems = sorted([element1, element2])
 
             bond = get_bond(element1, element2, dist)
             if bond is not None:

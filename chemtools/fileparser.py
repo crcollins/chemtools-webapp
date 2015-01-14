@@ -1,5 +1,4 @@
 import os
-from cStringIO import StringIO
 import multiprocessing
 
 

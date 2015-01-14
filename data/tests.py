@@ -10,7 +10,7 @@ from django.core.management import call_command
 import views
 import models
 import load_data
-from chemtools.constants import RGROUPS, XGROUPS, ARYL
+from chemtools.constants import RGROUPS, ARYL
 
 
 OPTIONS = {

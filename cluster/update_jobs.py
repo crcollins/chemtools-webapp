@@ -1,6 +1,5 @@
 from django.contrib.auth.models import User
 
-from models import Job
 from utils import get_jobs
 
 

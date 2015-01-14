@@ -1,5 +1,4 @@
 import os
-import binascii
 from unittest import skipUnless
 
 from django.test import Client, TestCase

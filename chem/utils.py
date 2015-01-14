@@ -1,5 +1,4 @@
 import time
-import bz2
 import zipfile
 import tarfile
 import re
@@ -9,7 +8,6 @@ from models import ErrorReport
 
 from chemtools import gjfwriter
 from chemtools import fileparser
-from chemtools.constants import KEYWORDS
 from chemtools.ml import get_properties_from_decay_with_predictions, \
                         get_naive_feature_vector, \
                         get_decay_feature_vector, \
@@ -17,7 +15,7 @@ from chemtools.ml import get_properties_from_decay_with_predictions, \
 from chemtools.mol_name import name_expansion, get_exact_name
 from chemtools.interface import get_property_limits
 from data.models import DataPoint
-from cluster.interface import run_job, run_jobs
+from cluster.interface import run_jobs
 from project.utils import StringIO
 
 

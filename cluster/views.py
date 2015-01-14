@@ -1,12 +1,11 @@
 from django.shortcuts import render, redirect
 from django.template import Context
 from django.http import HttpResponse
-from django.template.loader import render_to_string
 from django.contrib.auth.decorators import login_required
 from django.utils import simplejson
 
 from account.utils import add_account_page, PAGES
-from models import Job, CredentialForm, ClusterForm, Cluster, Credential
+from models import CredentialForm, ClusterForm, Cluster, Credential
 import interface
 from utils import get_credentials_from_request
 

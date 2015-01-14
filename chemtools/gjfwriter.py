@@ -4,12 +4,10 @@ import base64
 
 import numpy
 from numpy.linalg import norm
-from scipy.spatial.distance import pdist
 
 import structure
-from constants import KEYWORDS, NUMBERS, MASSES
+from constants import KEYWORDS, NUMBERS
 from mol_name import get_exact_name
-from project.utils import StringIO
 from ml import get_decay_distance_correction_feature_vector, \
             get_naive_feature_vector, get_decay_feature_vector
 

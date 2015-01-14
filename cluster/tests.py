@@ -6,7 +6,7 @@ from django.conf import settings
 from django.test import Client, TestCase
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
-from django.utils import simplejson, timezone
+from django.utils import simplejson
 from django.core.management import call_command
 
 import views
@@ -110,8 +110,6 @@ class SSHPageTestCase(TestCase):
 
     @skipUnless(server_exists(**SERVER), "Requires external test server.")
     def test_job_detail(self):
-        user = User.objects.get(username=USER["username"])
-
         interface.run_job(self.credential2, '', 'sleep 10')
         results = interface.get_all_jobs(self.user, self.cluster.name)
 

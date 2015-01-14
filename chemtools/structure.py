@@ -7,7 +7,7 @@ from itertools import product
 import numpy
 import cairo
 
-from constants import COLORS, COLORS2, CONNECTIONS, DATAPATH, ARYL, XGROUPS, MASSES
+from constants import COLORS2, CONNECTIONS, DATAPATH, ARYL, XGROUPS, MASSES
 from mol_name import parse_name
 from utils import get_full_rotation_matrix, get_angles, replace_geom_vars, \
                     convert_zmatrix_to_cart, calculate_bonds, \

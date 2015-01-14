@@ -97,6 +97,6 @@ def get_property_limits(name):
             lim_results = dataparser.predict_values(xvals, *zip(*groups))
             properties = ["homo", "lumo", "gap"]
             results[direction] = [lim_results[x][0] for x in properties]
-        except Exception as e:
+        except Exception:
             pass
     return results

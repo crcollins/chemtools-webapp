@@ -44,9 +44,9 @@ def main(csvfile):
                             FeatureVector.objects.bulk_create(feature_vectors)
                             feature_vectors = []
 
-                except Exception as e:
+                except Exception:
                     feature_vector = None
-            except Exception as e:
+            except Exception:
                 feature_vector = None
                 exact_name = None
 
@@ -73,7 +73,7 @@ def main(csvfile):
                 idxs.add(count)
 
             count += 1
-        except Exception as e:
+        except Exception:
             pass
 
     DataPoint.objects.bulk_create(points)

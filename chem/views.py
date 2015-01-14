@@ -1,13 +1,11 @@
 import os
-import urllib
 import zipfile
 
 from django.shortcuts import render, redirect
 from django.template import Context, RequestContext
 from django.template.loader import render_to_string
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse
 from django.core.servers.basehttp import FileWrapper
-from django.core.urlresolvers import reverse
 from django.core.serializers.json import DjangoJSONEncoder
 from django.utils import simplejson
 from crispy_forms.utils import render_crispy_form
@@ -15,7 +13,6 @@ from crispy_forms.utils import render_crispy_form
 from models import ErrorReport
 from forms import ErrorReportForm, JobForm, UploadForm, MoleculeForm
 from utils import get_multi_molecule_warnings, get_molecule_info
-from utils import parse_file_list, find_sets, convert_logs
 
 from chemtools import gjfwriter
 from chemtools import fileparser, dataparser

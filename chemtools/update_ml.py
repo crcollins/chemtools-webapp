@@ -9,7 +9,6 @@ from sklearn import svm
 from sklearn import cross_validation
 from sklearn.metrics import mean_absolute_error
 
-from constants import DATAPATH
 from data.models import DataPoint, Predictor
 from project.utils import StringIO
 

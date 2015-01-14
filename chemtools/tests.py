@@ -1,5 +1,5 @@
 import os
-from itertools import product, permutations
+from itertools import product
 import csv
 
 from django.test import TestCase

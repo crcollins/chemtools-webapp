@@ -4,8 +4,7 @@ import collections
 import random
 
 from constants import SCORES, DCORES, CORES, RGROUPS, XGROUPS, ARYL, ARYL0, \
-                    ARYL2, ALL, NEEDSPACE, TURNING, VALID_SIDE_TOKENS
-from utils import find_repeating
+                    ARYL2, NEEDSPACE, TURNING, VALID_SIDE_TOKENS
 
 
 def name_expansion(string, rand=None):
@@ -80,8 +79,8 @@ def name_expansion(string, rand=None):
                 currentvalues.append(x)
             out.append(currentvalues)
 
-        return [''.join(sum(zip(withoutbrace, x), ()) + (swapped[-1], ))
-                                                                for x in out]
+        return [''.join(sum(zip(withoutbrace, y), ()) + (swapped[-1], ))
+                                                                for y in out]
 
     braces = []
     for part in split_molecules(string):
@@ -136,7 +135,6 @@ def tokenize(string):
     match = '(1?\d|\(-?\d+\)|-|[%s])' % rxgroups
     tokens = [x for x in re.split(match, string) if x and x != '_']
 
-    VALID_SIDE_TOKENS = set(XGROUPS + ARYL + RGROUPS + ['-'])
     invalid_idxs = [x for i, x in enumerate(tokens) if x not in VALID_SIDE_TOKENS and not x.startswith("(")]
     if invalid_idxs:
         raise ValueError("Bad Substituent Name(s): %s" % str(invalid_idxs))

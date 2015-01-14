@@ -202,7 +202,6 @@ def get_fused_cycles(cycles):
 def sort_fused_cycles(cycles):
     sorted_cycles = []
     for fused_cycle in cycles:
-        means = []
         if len(fused_cycle) == 1:
             sorted_cycles.append(fused_cycle)
             continue
@@ -277,7 +276,6 @@ def identify_core(structure, fused_cycle):
 
 
 def identify_core_side(pairs):
-    core_elements = set(sum(CORE_COMBO, []))
     lower, upper = [zip(x,y) for x, y in zip(CORE_COMBO, CORE_FREE)]
 
     results = []

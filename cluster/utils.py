@@ -1,9 +1,6 @@
-import os
-import bz2
-import time
 import threading
 
-from project.utils import StringIO, SSHClient, SFTPClient
+from project.utils import SSHClient, SFTPClient
 
 from models import Credential, Job
 from data.models import JobTemplate
@@ -52,7 +49,7 @@ def get_credentials_from_request(request):
                             cluster__hostname=hostname,
                             cluster__port=int(port))
                 creds.append(cred)
-            except Exception as e:
+            except Exception:
                 pass
     return creds
 
@@ -179,7 +176,7 @@ def _get_jobs(cred, cluster, i, results):
                 temp[0] = temp[0].split('.')[0]
                 jobs.append(temp)
         results[i] = {"name": cluster, "columns": WANTED_COLS, "jobs": jobs}
-    except Exception as e:
+    except Exception:
         results[i] = {"name": cluster, "columns": WANTED_COLS, "jobs": []}
 
 
@@ -202,7 +199,6 @@ def get_jobs(credentials):
     for cred, cluster in zip(credentials, clusters):
         jobs = {}
         jobids = []
-        new_jobs = []
         for job in cluster["jobs"]:
             status = job[-1]
             job_id = job[0]
