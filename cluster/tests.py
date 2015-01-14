@@ -437,6 +437,7 @@ class SSHSettingsTestCase(TestCase):
     @skipUnless(server_exists(**SERVER), "Requires external test server.")
     def test_get_ssh_connection_obj(self):
         ssh = self.credential.get_ssh_connection()
+        self.assertTrue(isinstance(ssh, SSHClient))
         obj = utils.get_ssh_connection_obj(self.credential)
         self.assertTrue(isinstance(obj, SSHClient))
 
@@ -453,6 +454,7 @@ class SSHSettingsTestCase(TestCase):
     @skipUnless(server_exists(**SERVER), "Requires external test server.")
     def test_get_sftp_connection_obj(self):
         sftp = self.credential.get_sftp_connection()
+        self.assertTrue(isinstance(sftp, SFTPClient))
         obj = utils.get_sftp_connection_obj(self.credential)
         self.assertTrue(isinstance(obj, SFTPClient))
 
