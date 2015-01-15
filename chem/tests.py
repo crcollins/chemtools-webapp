@@ -180,7 +180,6 @@ class MainPageTestCase(TestCase):
 
     def test_multi_molecule_zip_keywords(self):
         string = ','.join(NAMES)
-        gjf_names = set([name + ".gjf" for name in NAMES])
         header = "%%nprocshared=16\n%%mem=59GB\n"
         header += "%%chk=%s.chk\n# %s geom=connectivity"
 
@@ -285,7 +284,6 @@ class MainPageTestCase(TestCase):
         options = OPTIONS.copy()
         options["email"] = "test.com"
         names = ','.join(NAMES)
-        jobnames = set([name + ".job" for name in NAMES])
         url = reverse(views.multi_molecule_zip, args=(names, ))
         encoded_options = '?' + urllib.urlencode(options)
         response = self.client.get(url + encoded_options)
