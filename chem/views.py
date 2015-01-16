@@ -1,5 +1,6 @@
 import os
 import zipfile
+import logging
 
 from django.shortcuts import render, redirect
 from django.template import Context, RequestContext
@@ -21,6 +22,10 @@ from chemtools.interface import get_multi_molecule, get_multi_job
 import cluster.interface
 from project.utils import StringIO
 from data import load_data
+
+
+
+logger = logging.getLogger(__name__)
 
 
 def index(request):
@@ -94,6 +99,7 @@ def molecule_check(request, string):
         name_ids = [x.replace('(', 'z').replace(')', 'z') for x in molecules]
         a["molecules"] = zip(molecules, warnings, errors, news, name_ids)
     except ValueError as e:
+        logger.warn(str(e))
         a["error"] = str(e)
         a["molecules"] = None
     if request.REQUEST.get("html", ''):
@@ -172,6 +178,7 @@ def multi_molecule_zip(request, string):
         molecules, warnings, errors, news = get_multi_molecule_warnings(
                                                                         string)
     except ValueError as e:
+        logger.warn(str(e))
         c = Context({
             "error": str(e)
             })
@@ -343,6 +350,7 @@ def reset_gjf(request, upload_form):
             strings.append(parser.format_gjf(td=td))
             names.append(name)
         except Exception as e:
+            logger.warn(str(e))
             errors.append((f.name, e))
 
     if request.REQUEST.get("gjf_submit"):

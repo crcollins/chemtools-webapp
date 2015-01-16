@@ -1,3 +1,5 @@
+import logging
+
 from django.shortcuts import render, redirect
 from django.template import Context
 from django.http import HttpResponse
@@ -8,6 +10,9 @@ from account.utils import add_account_page, PAGES
 from models import CredentialForm, ClusterForm, Cluster, Credential
 import interface
 from utils import get_credentials_from_request
+
+
+logger = logging.getLogger(__name__)
 
 
 @login_required
@@ -69,6 +74,7 @@ def kill_job(request, cluster):
             int(key)
             jobids.append(key)
         except ValueError:
+            logger.warn("Invalid key %s" % key)
             pass
     credential = Credential.objects.get(user=request.user, cluster__name=cluster)
     result = interface.kill_jobs(credential, jobids)

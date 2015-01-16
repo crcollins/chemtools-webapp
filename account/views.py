@@ -1,3 +1,5 @@
+import logging
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.template import Context
 from django.contrib.auth.models import User
@@ -10,6 +12,9 @@ from account.models import UserProfile
 from account.forms import RegistrationForm, SettingsForm
 
 import utils
+
+
+logger = logging.getLogger(__name__)
 
 
 def register_user(request):
@@ -71,6 +76,7 @@ def get_public_key(request, username):
         user_profile, _ = UserProfile.objects.get_or_create(user=user)
         pubkey = user_profile.public_key + "\n"
     except:
+        logger.info("%s does not have a public key." % username)
         pass
     return HttpResponse(pubkey, content_type="text/plain")
 
@@ -112,7 +118,7 @@ def main_settings(request, username):
                 try:
                     utils.update_all_ssh_keys(request.user, keys["public"])
                 except Exception as e:
-                    print e
+                    logger.warn(str(e))
                     pass
             user_profile.public_key = keys["public"]
             user_profile.private_key = keys["private"]
