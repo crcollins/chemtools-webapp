@@ -3,6 +3,7 @@ import zipfile
 import tarfile
 import re
 import collections
+import logging
 
 from models import ErrorReport
 
@@ -18,6 +19,7 @@ from data.models import DataPoint
 from cluster.interface import run_jobs
 from project.utils import StringIO
 
+logger = logging.getLogger(__name__)
 
 def get_molecule_warnings(name):
     try:
@@ -26,6 +28,7 @@ def get_molecule_warnings(name):
     except Exception as e:
         exact_spacers = ''
         error = str(e)
+        logger.warn("%s -- %s" % (name, error))
     warn = ErrorReport.objects.filter(molecule=name)
     warning = True if warn else None
     exact_name = exact_spacers.replace('*', '')
@@ -40,6 +43,7 @@ def get_multi_molecule_warnings(string):
     start = time.time()
     for name in molecules:
         if time.time() - start > 1:
+            logger.warn("%s -- The operation timed out" % (string))
             raise ValueError("The operation has timed out.")
         exact_spacer, warning, error, new = get_molecule_warnings(name)
         if exact_spacer not in new_molecules:
@@ -66,7 +70,8 @@ def get_molecule_info(molecule):
             homo, lumo, gap = get_properties_from_decay_with_predictions(
                                                                 features[1]
                                                                 )
-        except ValueError:
+        except ValueError as e:
+            logger.warn("%s -- %s" % (molecule, e))
             # multi core and other non-ML structures
             pass
 
@@ -117,6 +122,7 @@ def run_standard_jobs(credential, string, mol_settings, job_settings):
             names.append(mol)
             gjfs.append(out.get_gjf())
         except Exception as e:
+            logger.warn("Failed gjf write -- %s -- %s" % (mol, e))
             results["failed"].append((mol, str(e)))
             continue
 
