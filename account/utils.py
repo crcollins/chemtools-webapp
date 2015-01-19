@@ -1,8 +1,12 @@
 import random
 import hashlib
+import logging
 
 from Crypto.PublicKey import RSA
 from Crypto import Random
+
+
+logger = logging.getLogger(__name__)
 
 
 def generate_key_pair(username=None):
@@ -26,6 +30,7 @@ def update_all_ssh_keys(user, new_public):
             _, _, err = ssh.exec_command(s)
             a = err.readlines()
             if a:
+                logger.warn("Unable to update ssh key: %s - %s" % (cred, a))
                 raise Exception(str(a))
 
             _, out, err = ssh.exec_command('echo $HOME')
