@@ -71,8 +71,8 @@ def get_molecule_info(molecule):
                                                                 features[1]
                                                                 )
         except ValueError as e:
-            logger.warn("%s -- %s" % (molecule, e))
             # multi core and other non-ML structures
+            logger.warn("%s -- %s" % (molecule, e))
             pass
 
         temp = DataPoint.objects.filter(exact_name=exactname,

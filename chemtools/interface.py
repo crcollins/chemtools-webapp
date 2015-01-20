@@ -2,12 +2,16 @@ import os
 import re
 from cStringIO import StringIO
 import zipfile
+import logging
 
 import gjfwriter
 import mol_name
 import dataparser
 import ml
 from data.models import JobTemplate
+
+
+logger = logging.getLogger(__name__)
 
 
 def get_multi_molecule(molecules, options, mol_form, job_form):
@@ -41,6 +45,7 @@ def get_multi_molecule(molecules, options, mol_form, job_form):
                 zfile.writestr(mol_name + ".gjf", out.get_gjf())
 
         except Exception as e:
+            logger.warn("Multigen error: %s - %s" % (name, e))
             generrors.append("%s - %s" % (name, e))
     if generrors:
         zfile.writestr("errors.txt", '\n'.join(generrors))
@@ -98,5 +103,6 @@ def get_property_limits(name):
             properties = ["homo", "lumo", "gap"]
             results[direction] = [lim_results[x][0] for x in properties]
         except Exception:
+            logger.info("Improper property limits: %s - %s" % (name, direction))
             pass
     return results

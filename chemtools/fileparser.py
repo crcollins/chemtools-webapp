@@ -1,8 +1,10 @@
 import os
 import multiprocessing
+import logging
 
 
 HARTREETOEV = 27.211383858491185
+logger = logging.getLogger(__name__)
 
 
 def catch(fn):
@@ -11,6 +13,7 @@ def catch(fn):
         try:
             return fn(self, *args, **kwargs)
         except Exception as e:
+            logger.info(repr(e))
             self.errors.append(repr(e))
     return wrapper
 
@@ -102,6 +105,7 @@ class Log(object):
             geometry = self["Geometry"]
 
         if not geometry or not header or not options:
+            logger.info("The log file was invalid")
             raise Exception("The log file was invalid")
         s = '\n'.join([
             header,
@@ -622,7 +626,7 @@ if __name__ == "__main__":
                         with open(log.name + ending, 'w') as outputfile:
                             outputfile.write(string)
                     except Exception as e:
-                        print log.name, str(e)
+                        logger.info("Problem parsing file: %s - %s" (log.name, str(e)))
             else:
                 if self.outputfilename:
                     with open(self.outputfilename, 'w') as outputfile:

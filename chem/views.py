@@ -294,7 +294,7 @@ def parse_log(request, upload_form):
 
     if upload_form.cleaned_data['store'] and request.user.is_staff:
         number_added = load_data.main(f2)
-        print number_added, "datapoint(s) added to database."
+        logger.info("%d datapoint(s) added to database" % number_added)
         output += "\n\n\n%d datapoint(s) added to database." % number_added
 
     f = StringIO(output)
