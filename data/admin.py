@@ -12,7 +12,8 @@ class FeatureVectorAdmin(admin.ModelAdmin):
 
 
 class PredictorAdmin(admin.ModelAdmin):
-    list_display = ("pickle", "homo_error", "lumo_error", "gap_error", "created")
+    list_display = (
+        "pickle", "homo_error", "lumo_error", "gap_error", "created")
 
 
 admin.site.register(DataPoint, DataPointAdmin)

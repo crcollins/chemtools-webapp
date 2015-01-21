@@ -14,9 +14,9 @@ def get_axis_rotation_matrix(axis, theta):
     uy = axis[1, 0] / r
     uz = axis[2, 0] / r
     rot = numpy. matrix([
-        [ct+ux**2*nct, ux*uy*nct-uz*st, ux*uz*nct+uy*st],
-        [uy*ux*nct+uz*st, ct+uy**2*nct, uy*uz*nct-ux*st],
-        [uz*ux*nct-uy*st, uz*uy*nct+ux*st, ct+uz**2*nct],
+        [ct + ux ** 2 * nct, ux * uy * nct - uz * st, ux * uz * nct + uy * st],
+        [uy * ux * nct + uz * st, ct + uy ** 2 * nct, uy * uz * nct - ux * st],
+        [uz * ux * nct - uy * st, uz * uy * nct + ux * st, ct + uz ** 2 * nct],
     ])
     return rot
 
@@ -42,7 +42,7 @@ def get_full_rotation_matrix(vector, azimuth, altitude):
 
 def project_plane(normal, vec):
     n = normal / numpy.linalg.norm(normal)
-    return vec - (vec.T * n)[0,0] * n
+    return vec - (vec.T * n)[0, 0] * n
 
 
 def angle_between(vec1, vec2):
@@ -75,7 +75,7 @@ def new_point(coord1=None, radius=None, coord2=None, angle=None, coord3=None, di
         # ; however, this does not account for the sign of the zero! This extra
         # bit of information determines which side of the zero point to go from
         # and can mean the difference in the correct result and garbage.
-        if float(axis[2,0]) is -0.0:
+        if float(axis[2, 0]) is -0.0:
             axis = numpy.matrix([0., 0.,  -1.]).T
         else:
             axis = numpy.matrix([0., 0.,  -1.]).T
@@ -128,14 +128,15 @@ def convert_zmatrix_to_cart(string):
         items = line.split()
         elems.append(items[0])
         use = items[1:7]
-        use[0::2] = [coords[int(x)-1] for x in use[0::2]]
+        use[0::2] = [coords[int(x) - 1] for x in use[0::2]]
         use[1::2] = [float(x) for x in use[1::2]]
         point = new_point(*use)
         coords.append(point)
 
     new_string = ''
     for elem, coord in zip(elems, coords):
-        new_string += " %s %0.8f %0.8f %0.8f\n" % tuple([elem] + coord.T.tolist()[0])
+        new_string += " %s %0.8f %0.8f %0.8f\n" % tuple(
+            [elem] + coord.T.tolist()[0])
     return new_string
 
 
@@ -154,12 +155,12 @@ def calculate_bonds(string):
 
     bonds = []
     for i, atom1 in enumerate(atoms):
-        for j, atom2 in enumerate(atoms[i+1:]):
+        for j, atom2 in enumerate(atoms[i + 1:]):
             j += i + 1
             element1, xyz1 = atom1[0], atom1[1:]
             element2, xyz2 = atom2[0], atom2[1:]
 
-            dist = sum((x-y)**2 for (x, y) in zip(xyz1, xyz2)) ** 0.5
+            dist = sum((x - y) ** 2 for (x, y) in zip(xyz1, xyz2)) ** 0.5
 
             bond = get_bond(element1, element2, dist)
             if bond is not None:
@@ -168,8 +169,9 @@ def calculate_bonds(string):
 
 
 def factorize(n):
-    max_val = int(n**0.5) + 1
-    temp = set(reduce(list.__add__, ([i, n / i] for i in xrange(1, max_val) if not n % i)))
+    max_val = int(n ** 0.5) + 1
+    temp = set(reduce(list.__add__, ([i, n / i]
+                                     for i in xrange(1, max_val) if not n % i)))
     return sorted(list(temp))
 
 
@@ -191,7 +193,7 @@ def find_repeating(string):
     ('4ab5', 2)
     '''
     for factor in factorize(len(string)):
-        items = [string[x:x+factor] for x in xrange(0,len(string),factor)]
+        items = [string[x:x + factor] for x in xrange(0, len(string), factor)]
         if all(items[0] == x for x in items):
             break
     return string[:factor], len(string) / factor

@@ -13,7 +13,7 @@ def get_random_layer(components):
 
 
 def get_number_of_layers(distributions, max_layers=4):
-    temp = distributions[max_layers-1]
+    temp = distributions[max_layers - 1]
     y = random.random()
     return sum(y > x for x in temp) + 1
 
@@ -22,7 +22,7 @@ def get_all_s_layer():
     all_r = 'aefildhg'
     non_s = 'aefildh'
     only_s = 'g'
-    aryl = ['6','4','13','12']
+    aryl = ['6', '4', '13', '12']
     aryl_s = ['5']
     for group in product(aryl, non_s, only_s):
         yield ''.join(group)
@@ -55,17 +55,18 @@ def random_names(aryl, rgroups, flip=None, n=250, max_layers=4):
     components1 = [aryl, rgroups, rgroups, flip]
     size1 = reduce(operator.mul, [len(x) for x in components1], 1)
 
-    totals = [size0*size1**i for i in xrange(max_layers)]
+    totals = [size0 * size1 ** i for i in xrange(max_layers)]
     cumsum = [totals[0]]
     for x in totals[1:]:
-        cumsum.append(cumsum[-1]+x)
+        cumsum.append(cumsum[-1] + x)
 
     distributions = []
     for x in cumsum:
         distributions.append([y / float(x) for y in totals if y <= x])
 
     for i in xrange(n):
-        number_of_layers = get_number_of_layers(distributions, max_layers=max_layers)
+        number_of_layers = get_number_of_layers(
+            distributions, max_layers=max_layers)
         layers = []
         for j in xrange(number_of_layers):
             if not j:
@@ -79,16 +80,16 @@ def random_names(aryl, rgroups, flip=None, n=250, max_layers=4):
 def save_names(names):
     for name in names:
         struct = gjfwriter.Benzobisazole(
-                            name,
-                            keywords="opt B3LYP/6-31g(d,p)",
-                            nprocshared=12,
-                            memory=30,
-                        )
-        with open(name+".gjf", 'w') as f:
+            name,
+            keywords="opt B3LYP/6-31g(d,p)",
+            nprocshared=12,
+            memory=30,
+        )
+        with open(name + ".gjf", 'w') as f:
             f.write(struct.get_gjf())
 
 
-ARYL = ['4','6','12','13']
+ARYL = ['4', '6', '12', '13']
 RGROUPS = 'adefhil'
 FLIP = [''] + ['(%d)' % x for x in xrange(10, 360, 10)]
 

@@ -15,7 +15,8 @@ def main(csvfile):
 
     idxs = set()
     names = set()
-    preexist = set(FeatureVector.objects.all().values_list("exact_name", flat=True))
+    preexist = set(
+        FeatureVector.objects.all().values_list("exact_name", flat=True))
 
     now = timezone.now()
 
@@ -31,10 +32,10 @@ def main(csvfile):
                     feature_vector = True
                     if exact_name not in names and exact_name not in preexist:
                         temp = FeatureVector(
-                                                    exact_name=exact_name,
-                                                    type=FeatureVector.DECAY,
-                                                    vector=decay_feature,
-                                                    created=now)
+                            exact_name=exact_name,
+                            type=FeatureVector.DECAY,
+                            vector=decay_feature,
+                            created=now)
 
                         temp.clean_fields()
                         feature_vectors.append(temp)
@@ -81,14 +82,16 @@ def main(csvfile):
 
     Through = DataPoint.vectors.through
 
-    temp = DataPoint.objects.filter(created=now).values_list("pk", "exact_name")
+    temp = DataPoint.objects.filter(
+        created=now).values_list("pk", "exact_name")
     temp2 = FeatureVector.objects.all().values_list("exact_name", "pk")
     groups = dict(temp2)
 
     final = []
     for i, (pk, name) in enumerate(temp):
         if i in idxs:
-            final.append(Through(datapoint_id=pk, featurevector_id=groups[name]))
+            final.append(
+                Through(datapoint_id=pk, featurevector_id=groups[name]))
 
             if len(final) > 200:
                 Through.objects.bulk_create(final)
@@ -96,5 +99,3 @@ def main(csvfile):
     Through.objects.bulk_create(final)
 
     return count
-
-

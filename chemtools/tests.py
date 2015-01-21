@@ -21,146 +21,146 @@ from project.utils import StringIO
 
 # TON
 NAIVE_FEATURE_VECTOR = [
-             1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0,
-             0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-             0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-             1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-             0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,
-             0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-             0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-             0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0,
-             0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,
-             0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-             0, 1, 1, 1, 1, 1, 1
+    1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 1, 1, 1, 1, 1, 1
 ]
 # TON
 DECAY_FEATURE_VECTOR = [
-            1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 1.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 1.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            1.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 1.0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 1.0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 1.0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1.0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 1.0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 1.0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1
+    1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 1.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 1.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    1.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 1.0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 1.0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 1.0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1.0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 1.0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 1.0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1
 ]
 # TON_2435254
 DECAY_DISTANCE_CORRECTION_FEATURE_VECTOR = [
-            1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 1.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            1.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1.0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            1.1666306666987287, 0.30601135800974139, 0,
-            0, 0.77061831219939703, 0.46543587033877482,
-            0, 0, 0.11239806193044281, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 1.5558012811957163,
-            0.84648729633515529, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 1.5558012811957163,
-            0.84648729633515529, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1.0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 1.0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 1.0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1
+    1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 1.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    1.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1.0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    1.1666306666987287, 0.30601135800974139, 0,
+    0, 0.77061831219939703, 0.46543587033877482,
+    0, 0, 0.11239806193044281, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 1.5558012811957163,
+    0.84648729633515529, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 1.5558012811957163,
+    0.84648729633515529, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1.0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 1.0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 1.0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1
 ]
 # TON
 COULOMB_MATRIX = numpy.matrix(
-        [[ 36.8581052 ,  25.51381999,  25.71219465,  14.4674589,
-          15.51848995,  13.38415617,  16.49312061,   8.18689298,
-           1.05325885,   1.76633212,   2.46808597,   1.63666773,
-          11.88906105,  34.95485128,  11.46799759,  18.47111897],
-        [ 25.51381999,  36.8581052 ,  14.36787622,  25.37864133,
-          13.13643918,  15.51848989,  16.86273837,   8.11490871,
-           1.05335045,   1.75543962,   1.60970972,   2.5368206 ,
-          13.14901456,  21.47162653,  10.24509259,  30.35203248],
-        [ 25.71219465,  14.36787622,  36.8581052 ,  11.95368919,
-          25.37766316,  14.46694797,  10.13237096,  10.22561377,
-           1.2569598 ,   1.27566702,   4.61525543,   1.39207841,
-          13.34489976,  19.33035418,  16.67792226,  11.57802071],
-        [ 14.4674589 ,  25.37864133,  11.95368919,  36.8581052 ,
-          14.36838785,  25.71327603,  10.22561373,  10.13237096,
-           1.27566702,   1.2569598 ,   1.39207841,   4.61525543,
-          19.33048812,  13.34516629,  11.57825681,  16.67800836],
-        [ 15.51848995,  13.13643918,  25.37766316,  14.36838785,
-          36.8581052 ,  25.51381973,   8.11494283,  16.86297235,
-           1.75545099,   1.05335274,   2.53672652,   1.60975067,
-          21.47162647,  13.14901457,  30.35203248,  10.24509259],
-        [ 13.38415617,  15.51848989,  14.46694797,  25.71327603,
-          25.51381973,  36.8581052 ,   8.18686824,  16.49285094,
-           1.7663221 ,   1.05325655,   1.63662528,   2.46817466,
-          34.95485138,  11.88906103,  18.47111882,  11.46799756],
-        [ 16.49312061,  16.86273837,  10.13237096,  10.22561373,
-           8.11494283,   8.18686824,  36.8581052 ,   5.62457787,
-           0.78003835,   4.61525404,   1.38350558,   1.43808836,
-           8.33761071,  34.75172852,   7.22969261,  32.21235729],
-        [  8.18689298,   8.11490871,  10.22561377,  10.13237096,
-          16.86297235,  16.49285094,   5.62457787,  36.8581052 ,
-           4.61525404,   0.78003835,   1.43808837,   1.38350558,
-          34.74958591,   8.3376354 ,  32.21440465,   7.22966528],
-        [  1.05325885,   1.05335045,   1.2569598 ,   1.27566702,
-           1.75545099,   1.7663221 ,   0.78003835,   4.61525404,
-           0.5       ,   0.11128601,   0.18902774,   0.18858387,
-           3.51444073,   1.13410221,   2.97209629,   0.99202052],
-        [  1.76633212,   1.75543962,   1.27566702,   1.2569598 ,
-           1.05335274,   1.05325655,   4.61525404,   0.78003835,
-           0.11128601,   0.5       ,   0.18858387,   0.18902774,
-           1.13409969,   3.51451212,   0.99202281,   2.97203175],
-        [  2.46808597,   1.60970972,   4.61525543,   1.39207841,
-           2.53672652,   1.63662528,   1.38350558,   1.43808837,
-           0.18902774,   0.18858387,   0.5       ,   0.17827527,
-           1.74239089,   2.63464316,   2.38367685,   1.48987923],
-        [  1.63666773,   2.5368206 ,   1.39207841,   4.61525543,
-           1.60975067,   2.46817466,   1.43808836,   1.38350558,
-           0.18858387,   0.18902774,   0.17827527,   0.5       ,
-           2.63469249,   1.74242299,   1.48990611,   2.3837218 ],
-        [ 11.88906105,  13.14901456,  13.34489976,  19.33048812,
-          21.47162647,  34.95485138,   8.33761071,  34.74958591,
-           3.51444073,   1.13409969,   1.74239089,   2.63469249,
-          73.51669472,  11.85661079,  24.81932589,  11.32684852],
-        [ 34.95485128,  21.47162653,  19.33035418,  13.34516629,
-          13.14901457,  11.88906103,  34.75172852,   8.3376354 ,
-           1.13410221,   3.51451212,   2.63464316,   1.74242299,
-          11.85661079,  73.51669472,  11.32684854,  24.81932611],
-        [ 11.46799759,  10.24509259,  16.67792226,  11.57825681,
-          30.35203248,  18.47111882,   7.22969261,  32.21440465,
-           2.97209629,   0.99202281,   2.38367685,   1.48990611,
-          24.81932589,  11.32684854,  53.3587074 ,   8.95634859],
-        [ 18.47111897,  30.35203248,  11.57802071,  16.67800836,
-          10.24509259,  11.46799756,  32.21235729,   7.22966528,
-           0.99202052,   2.97203175,   1.48987923,   2.3837218 ,
-          11.32684852,  24.81932611,   8.95634859,  53.3587074 ]])
+    [[36.8581052,  25.51381999,  25.71219465,  14.4674589,
+      15.51848995,  13.38415617,  16.49312061,   8.18689298,
+      1.05325885,   1.76633212,   2.46808597,   1.63666773,
+      11.88906105,  34.95485128,  11.46799759,  18.47111897],
+     [25.51381999,  36.8581052,  14.36787622,  25.37864133,
+      13.13643918,  15.51848989,  16.86273837,   8.11490871,
+      1.05335045,   1.75543962,   1.60970972,   2.5368206,
+      13.14901456,  21.47162653,  10.24509259,  30.35203248],
+     [25.71219465,  14.36787622,  36.8581052,  11.95368919,
+      25.37766316,  14.46694797,  10.13237096,  10.22561377,
+      1.2569598,   1.27566702,   4.61525543,   1.39207841,
+      13.34489976,  19.33035418,  16.67792226,  11.57802071],
+     [14.4674589,  25.37864133,  11.95368919,  36.8581052,
+      14.36838785,  25.71327603,  10.22561373,  10.13237096,
+      1.27566702,   1.2569598,   1.39207841,   4.61525543,
+      19.33048812,  13.34516629,  11.57825681,  16.67800836],
+     [15.51848995,  13.13643918,  25.37766316,  14.36838785,
+      36.8581052,  25.51381973,   8.11494283,  16.86297235,
+      1.75545099,   1.05335274,   2.53672652,   1.60975067,
+      21.47162647,  13.14901457,  30.35203248,  10.24509259],
+     [13.38415617,  15.51848989,  14.46694797,  25.71327603,
+      25.51381973,  36.8581052,   8.18686824,  16.49285094,
+      1.7663221,   1.05325655,   1.63662528,   2.46817466,
+      34.95485138,  11.88906103,  18.47111882,  11.46799756],
+     [16.49312061,  16.86273837,  10.13237096,  10.22561373,
+      8.11494283,   8.18686824,  36.8581052,   5.62457787,
+      0.78003835,   4.61525404,   1.38350558,   1.43808836,
+      8.33761071,  34.75172852,   7.22969261,  32.21235729],
+     [8.18689298,   8.11490871,  10.22561377,  10.13237096,
+      16.86297235,  16.49285094,   5.62457787,  36.8581052,
+      4.61525404,   0.78003835,   1.43808837,   1.38350558,
+      34.74958591,   8.3376354,  32.21440465,   7.22966528],
+     [1.05325885,   1.05335045,   1.2569598,   1.27566702,
+      1.75545099,   1.7663221,   0.78003835,   4.61525404,
+      0.5,   0.11128601,   0.18902774,   0.18858387,
+      3.51444073,   1.13410221,   2.97209629,   0.99202052],
+     [1.76633212,   1.75543962,   1.27566702,   1.2569598,
+      1.05335274,   1.05325655,   4.61525404,   0.78003835,
+      0.11128601,   0.5,   0.18858387,   0.18902774,
+      1.13409969,   3.51451212,   0.99202281,   2.97203175],
+     [2.46808597,   1.60970972,   4.61525543,   1.39207841,
+      2.53672652,   1.63662528,   1.38350558,   1.43808837,
+      0.18902774,   0.18858387,   0.5,   0.17827527,
+      1.74239089,   2.63464316,   2.38367685,   1.48987923],
+     [1.63666773,   2.5368206,   1.39207841,   4.61525543,
+      1.60975067,   2.46817466,   1.43808836,   1.38350558,
+      0.18858387,   0.18902774,   0.17827527,   0.5,
+      2.63469249,   1.74242299,   1.48990611,   2.3837218],
+     [11.88906105,  13.14901456,  13.34489976,  19.33048812,
+      21.47162647,  34.95485138,   8.33761071,  34.74958591,
+      3.51444073,   1.13409969,   1.74239089,   2.63469249,
+      73.51669472,  11.85661079,  24.81932589,  11.32684852],
+     [34.95485128,  21.47162653,  19.33035418,  13.34516629,
+      13.14901457,  11.88906103,  34.75172852,   8.3376354,
+      1.13410221,   3.51451212,   2.63464316,   1.74242299,
+      11.85661079,  73.51669472,  11.32684854,  24.81932611],
+     [11.46799759,  10.24509259,  16.67792226,  11.57825681,
+      30.35203248,  18.47111882,   7.22969261,  32.21440465,
+      2.97209629,   0.99202281,   2.38367685,   1.48990611,
+      24.81932589,  11.32684854,  53.3587074,   8.95634859],
+     [18.47111897,  30.35203248,  11.57802071,  16.67800836,
+      10.24509259,  11.46799756,  32.21235729,   7.22966528,
+      0.99202052,   2.97203175,   1.48987923,   2.3837218,
+      11.32684852,  24.81932611,   8.95634859,  53.3587074]])
 
 # TON
 COULOMB_MATRIX_FEATURE = [
@@ -401,6 +401,7 @@ Title Card Required
 B 5 1 F
 """
 
+
 class StructureTestCase(TestCase):
     templates = [
         "{0}_TON",
@@ -415,16 +416,16 @@ class StructureTestCase(TestCase):
     cores = constants.CORES
     invalid_cores = ["cao", "bo", "CONA", "asD"]
     valid_polymer_sides = ['2', '4b', '22', '24', '4bc', '44bc', '4b4',
-                        '5-', '5-5', '55-', '5-a', '5-ab4-', '4b114b']
+                           '5-', '5-5', '55-', '5-a', '5-ab4-', '4b114b']
     invalid_polymer_sides = ['B', '2B']
     valid_sides = valid_polymer_sides + invalid_polymer_sides
     invalid_sides = ['~', 'b', 'c', 'BB', 'TON', 'Dc', '4aaa',
-                    '24C2', 'awr', 'A-', '5B-', '2a', '4abc']
+                     '24C2', 'awr', 'A-', '5B-', '2a', '4abc']
     valid_polymer_options = ['_n1', '_n2', '_n3',
-                            '_m1', '_m2', '_m3',
-                            '_n1_m1']
+                             '_m1', '_m2', '_m3',
+                             '_n1_m1']
     invalid_polymer_options = ['_n2_m2', '_n3_m3', '_m2_n2', '_m3_n3',
-                            '_n0', '_m0', '_n0_m0']
+                               '_n0', '_m0', '_n0_m0']
 
     def test_atom_print(self):
         atom = structure.Atom(0, 0, 0, "C")
@@ -469,7 +470,7 @@ class StructureTestCase(TestCase):
         direction = numpy.matrix([0, 1, 0]).T
         offset = numpy.matrix([0, 0, 0]).T
         result = struct.get_moment_of_inertia(direction=direction,
-                                            offset=offset)
+                                              offset=offset)
         self.assertAlmostEqual(result, 239.74162427124799)
 
     def test_get_moment_of_inertia_no_direction(self):
@@ -491,13 +492,15 @@ class StructureTestCase(TestCase):
     def test_from_gjf(self):
         path = os.path.join(settings.MEDIA_ROOT, "tests", "A_TON_A_A.gjf")
         s = structure.from_gjf(open(path, 'r'))
-        self.assertEqual([x.strip() for x in s.gjf.split()], [x.strip() for x in STRUCTURE_GJF.split()])
+        self.assertEqual(
+            [x.strip() for x in s.gjf.split()], [x.strip() for x in STRUCTURE_GJF.split()])
 
     def test_from_gjf_no_bonds(self):
         string = "%chk=chk.chk\n# hf\n\nTitle\n\n0 1" + METHANE_REPLACED
         f = StringIO(string)
         s = structure.from_gjf(f)
-        self.assertEqual([x.strip() for x in s.gjf.split()], [x.strip() for x in METHANE_ALL.split()])
+        self.assertEqual(
+            [x.strip() for x in s.gjf.split()], [x.strip() for x in METHANE_ALL.split()])
 
     def test_from_gjf_invalid_header(self):
         string = "%chk=c#hk.chk\nasd\n\nTitle\n\n0 1" + METHANE_REPLACED
@@ -512,34 +515,40 @@ class StructureTestCase(TestCase):
             s = structure.from_gjf(f)
 
     def test_from_gjf_bonds(self):
-        string = "%chk=chk.chk\n# hf geom=connectivity\n\nTitle\n\n0 1" + STRUCTURE_GJF
+        string = "%chk=chk.chk\n# hf geom=connectivity\n\nTitle\n\n0 1" + \
+            STRUCTURE_GJF
         f = StringIO(string)
         s = structure.from_gjf(f)
-        self.assertEqual([x.strip() for x in s.gjf.split()], [x.strip() for x in STRUCTURE_GJF.split()])
+        self.assertEqual(
+            [x.strip() for x in s.gjf.split()], [x.strip() for x in STRUCTURE_GJF.split()])
 
     def test_from_gjf_parameters(self):
         string = "%chk=chk.chk\n# hf\n\nTitle\n\n0 1" + METHANE
         f = StringIO(string)
         s = structure.from_gjf(f)
-        self.assertEqual([x.strip() for x in s.gjf.split()], [x.strip() for x in METHANE_ALL.split()])
+        self.assertEqual(
+            [x.strip() for x in s.gjf.split()], [x.strip() for x in METHANE_ALL.split()])
 
     def test_from_gjf_zmatrix(self):
         string = "%chk=chk.chk\n# hf\n\nTitle\n\n0 1" + METHANE
         f = StringIO(string)
         s = structure.from_gjf(f)
-        self.assertEqual([x.strip() for x in s.gjf.split()], [x.strip() for x in METHANE_ALL.split()])
+        self.assertEqual(
+            [x.strip() for x in s.gjf.split()], [x.strip() for x in METHANE_ALL.split()])
 
     def test_from_gjf_redundant(self):
         string = METHANE_FREEZE
         f = StringIO(string)
         s = structure.from_gjf(f)
-        self.assertEqual([x.strip() for x in s.gjf.split()], [x.strip() for x in METHANE_ALL.split()])
+        self.assertEqual(
+            [x.strip() for x in s.gjf.split()], [x.strip() for x in METHANE_ALL.split()])
 
     def test_from_gjf_redundant_no_parameters(self):
         string = METHANE_FREEZE2
         f = StringIO(string)
         s = structure.from_gjf(f)
-        self.assertEqual([x.strip() for x in s.gjf.split()], [x.strip() for x in METHANE_ALL.split()])
+        self.assertEqual(
+            [x.strip() for x in s.gjf.split()], [x.strip() for x in METHANE_ALL.split()])
 
     def test_from_gjf_too_many_first(self):
         string = METHANE_FREEZE.replace("modredundant", "") + METHANE
@@ -624,7 +633,7 @@ class StructureTestCase(TestCase):
             ['x', 'y', 'z'],
             ['1', '2', '3']
         ]
-        for group, axis, num  in product(*sets):
+        for group, axis, num in product(*sets):
             name = self.templates[0].format(group) + '_' + axis + num
             structure.from_name(name)
 
@@ -719,8 +728,8 @@ class BenzobisazoleTestCase(TestCase):
         "{0}",
     ]
     valid_polymer_sides = ['2', '4b', '22', '24', '4bc', '44bc', '4b4',
-                        '5-', '5-5', '55-', '5-a', '5-ab4-', '4b114b', '3',
-                        '11']
+                           '5-', '5-5', '55-', '5-a', '5-ab4-', '4b114b', '3',
+                           '11']
     invalid_polymer_sides = ['B', '2B']
     valid_sides = valid_polymer_sides + invalid_polymer_sides
 
@@ -767,12 +776,12 @@ class BenzobisazoleTestCase(TestCase):
     def test_get_coulomb_matrix(self):
         obj = gjfwriter.Benzobisazole("TON")
         self.assertTrue(numpy.allclose(obj.get_coulomb_matrix(),
-                        COULOMB_MATRIX))
+                                       COULOMB_MATRIX))
 
     def test_get_coulomb_matrix_feature(self):
         obj = gjfwriter.Benzobisazole("TON")
         self.assertTrue(numpy.allclose(obj.get_coulomb_matrix_feature(),
-                                    COULOMB_MATRIX_FEATURE))
+                                       COULOMB_MATRIX_FEATURE))
 
     def test_get_exact_name(self):
         obj = gjfwriter.Benzobisazole("TON")
@@ -863,71 +872,71 @@ class MolNameTestCase(TestCase):
         ('TON_44bc__TON_44bc_', 'A**_TON_4aa4bcA**__TON_4aa4bcA**_A**'),
     ]
     polymer_pairs = [
-            ('TON_n2', '_TON_A**__n2_m1'),
+        ('TON_n2', '_TON_A**__n2_m1'),
 
-            ('2_TON_n2', '2**_TON_A**__n2_m1'),
-            ('4_TON_n2', '4aa_TON_A**__n2_m1'),
-            ('4b_TON_n2', '4bb_TON_A**__n2_m1'),
-            ('4bc_TON_n2', '4bc_TON_A**__n2_m1'),
-            ('44bc_TON_n2', '4aa4bc_TON_A**__n2_m1'),
+        ('2_TON_n2', '2**_TON_A**__n2_m1'),
+        ('4_TON_n2', '4aa_TON_A**__n2_m1'),
+        ('4b_TON_n2', '4bb_TON_A**__n2_m1'),
+        ('4bc_TON_n2', '4bc_TON_A**__n2_m1'),
+        ('44bc_TON_n2', '4aa4bc_TON_A**__n2_m1'),
 
-            ('TON_2_n2', '_TON_A**_2**_n2_m1'),
-            ('TON_4_n2', '_TON_A**_4aa_n2_m1'),
-            ('TON_4b_n2', '_TON_A**_4bb_n2_m1'),
-            ('TON_4bc_n2', '_TON_A**_4bc_n2_m1'),
-            ('TON_44bc_n2', '_TON_A**_4aa4bc_n2_m1'),
+        ('TON_2_n2', '_TON_A**_2**_n2_m1'),
+        ('TON_4_n2', '_TON_A**_4aa_n2_m1'),
+        ('TON_4b_n2', '_TON_A**_4bb_n2_m1'),
+        ('TON_4bc_n2', '_TON_A**_4bc_n2_m1'),
+        ('TON_44bc_n2', '_TON_A**_4aa4bc_n2_m1'),
 
-            ('TON_2__n2', '_TON_2**A**__n2_m1'),
-            ('TON_4__n2', '_TON_4aaA**__n2_m1'),
-            ('TON_4b__n2', '_TON_4bbA**__n2_m1'),
-            ('TON_4bc__n2', '_TON_4bcA**__n2_m1'),
-            ('TON_44bc__n2', '_TON_4aa4bcA**__n2_m1'),
+        ('TON_2__n2', '_TON_2**A**__n2_m1'),
+        ('TON_4__n2', '_TON_4aaA**__n2_m1'),
+        ('TON_4b__n2', '_TON_4bbA**__n2_m1'),
+        ('TON_4bc__n2', '_TON_4bcA**__n2_m1'),
+        ('TON_44bc__n2', '_TON_4aa4bcA**__n2_m1'),
 
-            ('TON_2_TON_2_n2', '_TON_A**_2**_TON_A**_2**_n2_m1'),
-            ('TON_4_TON_4_n2', '_TON_A**_4aa_TON_A**_4aa_n2_m1'),
-            ('TON_4b_TON_4b_n2', '_TON_A**_4bb_TON_A**_4bb_n2_m1'),
-            ('TON_4bc_TON_4bc_n2', '_TON_A**_4bc_TON_A**_4bc_n2_m1'),
-            ('TON_44bc_TON_44bc_n2', '_TON_A**_4aa4bc_TON_A**_4aa4bc_n2_m1'),
+        ('TON_2_TON_2_n2', '_TON_A**_2**_TON_A**_2**_n2_m1'),
+        ('TON_4_TON_4_n2', '_TON_A**_4aa_TON_A**_4aa_n2_m1'),
+        ('TON_4b_TON_4b_n2', '_TON_A**_4bb_TON_A**_4bb_n2_m1'),
+        ('TON_4bc_TON_4bc_n2', '_TON_A**_4bc_TON_A**_4bc_n2_m1'),
+        ('TON_44bc_TON_44bc_n2', '_TON_A**_4aa4bc_TON_A**_4aa4bc_n2_m1'),
 
-            ('TON_2_TON_2_TON_2_n2',
-                '_TON_A**_2**_TON_A**_2**_TON_A**_2**_n2_m1'),
-            ('TON_4_TON_4_TON_4_n2',
-                '_TON_A**_4aa_TON_A**_4aa_TON_A**_4aa_n2_m1'),
-            ('TON_4b_TON_4b_TON_4b_n2',
-                '_TON_A**_4bb_TON_A**_4bb_TON_A**_4bb_n2_m1'),
-            ('TON_4bc_TON_4bc_TON_4bc_n2',
-                '_TON_A**_4bc_TON_A**_4bc_TON_A**_4bc_n2_m1'),
-            ('TON_44bc_TON_44bc_TON_44bc_n2',
-                '_TON_A**_4aa4bc_TON_A**_4aa4bc_TON_A**_4aa4bc_n2_m1'),
+        ('TON_2_TON_2_TON_2_n2',
+         '_TON_A**_2**_TON_A**_2**_TON_A**_2**_n2_m1'),
+        ('TON_4_TON_4_TON_4_n2',
+         '_TON_A**_4aa_TON_A**_4aa_TON_A**_4aa_n2_m1'),
+        ('TON_4b_TON_4b_TON_4b_n2',
+         '_TON_A**_4bb_TON_A**_4bb_TON_A**_4bb_n2_m1'),
+        ('TON_4bc_TON_4bc_TON_4bc_n2',
+         '_TON_A**_4bc_TON_A**_4bc_TON_A**_4bc_n2_m1'),
+        ('TON_44bc_TON_44bc_TON_44bc_n2',
+         '_TON_A**_4aa4bc_TON_A**_4aa4bc_TON_A**_4aa4bc_n2_m1'),
 
-            ('TON_2__TON_2__n2', '_TON_2**A**__TON_2**A**__n2_m1'),
-            ('TON_4__TON_4__n2', '_TON_4aaA**__TON_4aaA**__n2_m1'),
-            ('TON_4b__TON_4b__n2', '_TON_4bbA**__TON_4bbA**__n2_m1'),
-            ('TON_4bc__TON_4bc__n2', '_TON_4bcA**__TON_4bcA**__n2_m1'),
-            ('TON_44bc__TON_44bc__n2', '_TON_4aa4bcA**__TON_4aa4bcA**__n2_m1'),
+        ('TON_2__TON_2__n2', '_TON_2**A**__TON_2**A**__n2_m1'),
+        ('TON_4__TON_4__n2', '_TON_4aaA**__TON_4aaA**__n2_m1'),
+        ('TON_4b__TON_4b__n2', '_TON_4bbA**__TON_4bbA**__n2_m1'),
+        ('TON_4bc__TON_4bc__n2', '_TON_4bcA**__TON_4bcA**__n2_m1'),
+        ('TON_44bc__TON_44bc__n2', '_TON_4aa4bcA**__TON_4aa4bcA**__n2_m1'),
 
-            ('TON_m2', 'A**_TON__A**_n1_m2'),
+        ('TON_m2', 'A**_TON__A**_n1_m2'),
 
-            ('2_TON_m2', '2**A**_TON__A**_n1_m2'),
-            ('4_TON_m2', '4aaA**_TON__A**_n1_m2'),
-            ('4b_TON_m2', '4bbA**_TON__A**_n1_m2'),
-            ('4bc_TON_m2', '4bcA**_TON__A**_n1_m2'),
-            ('44bc_TON_m2', '4aa4bcA**_TON__A**_n1_m2'),
+        ('2_TON_m2', '2**A**_TON__A**_n1_m2'),
+        ('4_TON_m2', '4aaA**_TON__A**_n1_m2'),
+        ('4b_TON_m2', '4bbA**_TON__A**_n1_m2'),
+        ('4bc_TON_m2', '4bcA**_TON__A**_n1_m2'),
+        ('44bc_TON_m2', '4aa4bcA**_TON__A**_n1_m2'),
 
-            ('TON_2_m2', 'A**_TON__2**A**_n1_m2'),
-            ('TON_4_m2', 'A**_TON__4aaA**_n1_m2'),
-            ('TON_4b_m2', 'A**_TON__4bbA**_n1_m2'),
-            ('TON_4bc_m2', 'A**_TON__4bcA**_n1_m2'),
-            ('TON_44bc_m2', 'A**_TON__4aa4bcA**_n1_m2'),
+        ('TON_2_m2', 'A**_TON__2**A**_n1_m2'),
+        ('TON_4_m2', 'A**_TON__4aaA**_n1_m2'),
+        ('TON_4b_m2', 'A**_TON__4bbA**_n1_m2'),
+        ('TON_4bc_m2', 'A**_TON__4bcA**_n1_m2'),
+        ('TON_44bc_m2', 'A**_TON__4aa4bcA**_n1_m2'),
 
-            ('TON_2__m2', 'A**_TON_2**_A**_n1_m2'),
-            ('TON_4__m2', 'A**_TON_4aa_A**_n1_m2'),
-            ('TON_4b__m2', 'A**_TON_4bb_A**_n1_m2'),
-            ('TON_4bc__m2', 'A**_TON_4bc_A**_n1_m2'),
-            ('TON_44bc__m2', 'A**_TON_4aa4bc_A**_n1_m2'),
+        ('TON_2__m2', 'A**_TON_2**_A**_n1_m2'),
+        ('TON_4__m2', 'A**_TON_4aa_A**_n1_m2'),
+        ('TON_4b__m2', 'A**_TON_4bb_A**_n1_m2'),
+        ('TON_4bc__m2', 'A**_TON_4bc_A**_n1_m2'),
+        ('TON_44bc__m2', 'A**_TON_4aa4bc_A**_n1_m2'),
 
-            ('TON__4(20)', 'A**_TON_A**_4(20)aaA**_n1_m1'),
-        ]
+        ('TON__4(20)', 'A**_TON_A**_4(20)aaA**_n1_m1'),
+    ]
 
     def test_brace_expansion(self):
         names = [
@@ -943,7 +952,7 @@ class MolNameTestCase(TestCase):
             ("{a,b}e{c,d}", ["aec", "bec", "aed", "bed"]),
             ("{a,b}{c,d}e", ["ace", "bce", "ade", "bde"]),
             ("{a,b}{c,d}{e,f}", ["ace", "acf", "ade", "adf",
-                                "bce", "bcf", "bde", "bdf"]),
+                                 "bce", "bcf", "bde", "bdf"]),
         ]
         for name, result in names:
             self.assertEqual(set(mol_name.name_expansion(name)), set(result))
@@ -986,13 +995,13 @@ class MolNameTestCase(TestCase):
         names = [
             ("24{$RGROUPS}_{$CORES}",
                 ["24" + '_'.join(x) for x in product(constants.RGROUPS,
-                                                    constants.CORES)]),
+                                                     constants.CORES)]),
             ("24{$XGROUPS}_{$CORES}",
                 ["24" + '_'.join(x) for x in product(constants.XGROUPS,
-                                                    constants.CORES)]),
+                                                     constants.CORES)]),
             ("24{$ARYL}_{$CORES}",
                 ["24" + '_'.join(x) for x in product(constants.ARYL,
-                                                    constants.CORES)]),
+                                                     constants.CORES)]),
         ]
         for name, result in names:
             self.assertEqual(set(mol_name.name_expansion(name)), set(result))
@@ -1039,6 +1048,7 @@ class MolNameTestCase(TestCase):
 
 
 class ExtractorTestCase(TestCase):
+
     def test_run_all(self):
         extractor.run_all()
 
@@ -1047,6 +1057,7 @@ class ExtractorTestCase(TestCase):
 
 
 class MLTestCase(TestCase):
+
     def test_get_core_features(self):
         cores = [
             ("TON", [1, 1, 0, 0, 0, 0, 1, 0, 0]),
@@ -1073,20 +1084,21 @@ class MLTestCase(TestCase):
     def test_get_naive_feature_vector(self):
         name = "A**_TON_A**_A**_n1_m1_x1_y1_z1"
         self.assertEqual(ml.get_naive_feature_vector(name),
-                        NAIVE_FEATURE_VECTOR)
+                         NAIVE_FEATURE_VECTOR)
 
     def test_get_decay_feature_vector(self):
         name = "A**_TON_A**_A**_n1_m1_x1_y1_z1"
         self.assertEqual(ml.get_decay_feature_vector(name),
-                        DECAY_FEATURE_VECTOR)
+                         DECAY_FEATURE_VECTOR)
 
     def test_get_decay_distance_correction_feature_vector(self):
         name = "A**_TON_2**4aa3**5aa2**5aa4aaA**_A**_n1_m1_x1_y1_z1"
         self.assertEqual(ml.get_decay_distance_correction_feature_vector(name),
-                        DECAY_DISTANCE_CORRECTION_FEATURE_VECTOR)
+                         DECAY_DISTANCE_CORRECTION_FEATURE_VECTOR)
 
 
 class FileParserTestCase(TestCase):
+
     def test_parse_files(self):
         base = os.path.join(settings.MEDIA_ROOT, "tests")
         files = ["A_TON_A_A.log", "A_TON_A_A_TD.log", "A_CON_A_A_TDDFT.log"]
@@ -1097,19 +1109,19 @@ class FileParserTestCase(TestCase):
         with StringIO(logset.format_output(errors=False)) as f:
             reader = csv.reader(f, delimiter=',', quotechar='"')
             expected = [
-                        ["A_TON_A_A", "A_TON_A_A_n1_m1_x1_y1_z1",
-                        "opt B3LYP/6-31g(d) geom=connectivity",
-                        "-6.46079886952", "-1.31975211714", "41",
-                        "0.0001", "-567.1965205", "---", "0.35"],
-                        ["A_TON_A_A", "A_TON_A_A_n1_m1_x1_y1_z1",
-                        "td B3LYP/6-31g(d)", "-6.46079886952",
-                        "-1.31975211714", "41", "0.0001",
-                        "-567.1965205", "4.8068", "0.15"],
-                        ["A_CON_A_A", "A_CON_A_A_n1_m1_x1_y1_z1",
-                        "td B3LYP/6-31g(d)", "-6.59495099194",
-                        "-1.19594032058", "41", "2.1565",
-                        "-567.1958243", "4.7914", "0.15"],
-                ]
+                ["A_TON_A_A", "A_TON_A_A_n1_m1_x1_y1_z1",
+                 "opt B3LYP/6-31g(d) geom=connectivity",
+                 "-6.46079886952", "-1.31975211714", "41",
+                 "0.0001", "-567.1965205", "---", "0.35"],
+                ["A_TON_A_A", "A_TON_A_A_n1_m1_x1_y1_z1",
+                 "td B3LYP/6-31g(d)", "-6.46079886952",
+                 "-1.31975211714", "41", "0.0001",
+                 "-567.1965205", "4.8068", "0.15"],
+                ["A_CON_A_A", "A_CON_A_A_n1_m1_x1_y1_z1",
+                 "td B3LYP/6-31g(d)", "-6.59495099194",
+                 "-1.19594032058", "41", "2.1565",
+                 "-567.1958243", "4.7914", "0.15"],
+            ]
             lines = [x[1:3] + x[4:] for i, x in enumerate(reader) if i]
             self.assertEqual(expected, lines)
 
@@ -1121,10 +1133,10 @@ class FileParserTestCase(TestCase):
             reader = csv.reader(f, delimiter=',', quotechar='"')
             expected = [
                 ["A_TON_A_A", "A_TON_A_A_n1_m1_x1_y1_z1",
-                "opt B3LYP/6-31g(d) geom=connectivity",
-                "-6.46079886952", "-1.31975211714", "41",
-                "0.0001", "-567.1965205", "---", "0.35"],
-                ]
+                 "opt B3LYP/6-31g(d) geom=connectivity",
+                 "-6.46079886952", "-1.31975211714", "41",
+                 "0.0001", "-567.1965205", "---", "0.35"],
+            ]
             lines = [x[1:3] + x[4:] for x in reader]
             self.assertEqual(expected, lines)
 
@@ -1135,9 +1147,9 @@ class FileParserTestCase(TestCase):
         with StringIO(log.format_data()) as f:
             reader = csv.reader(f, delimiter=',', quotechar='"')
             expected = ['1_04_0', '---', '[]',
-                    'opt b3lyp/6-31g(d) geom=connectivity', '-4.28307181933',
-                    '-1.27539756145', '257', '0.0666', '-4507.6791248', '---',
-                    '1.43333333333']
+                        'opt b3lyp/6-31g(d) geom=connectivity', '-4.28307181933',
+                        '-1.27539756145', '257', '0.0666', '-4507.6791248', '---',
+                        '1.43333333333']
             for line in reader:
                 pass
             self.assertEqual(expected, line[1:])
@@ -1150,9 +1162,9 @@ class FileParserTestCase(TestCase):
         with StringIO(log.format_data()) as f:
             reader = csv.reader(f, delimiter=',', quotechar='"')
             expected = ['methane_windows', '---', '[]',
-                    'OPT B3LYP/3-21G GEOM=CONNECTIVITY', '-10.5803302719',
-                    '3.96823610808', '5', '0.0000', '-40.3016014', '---',
-                    '0.0']
+                        'OPT B3LYP/3-21G GEOM=CONNECTIVITY', '-10.5803302719',
+                        '3.96823610808', '5', '0.0000', '-40.3016014', '---',
+                        '0.0']
             for line in reader:
                 pass
             actual = [x.lower() for x in line[1:]]
@@ -1167,9 +1179,9 @@ class FileParserTestCase(TestCase):
         with StringIO(log.format_data()) as f:
             reader = csv.reader(f, delimiter=',', quotechar='"')
             expected = ['methane_td_windows', '---', '[]',
-                    'TD RB3LYP/3-21G GEOM=CONNECTIVITY', '-10.5803302719',
-                    '3.96823610808', '5', '0.0000', '-40.3016014', '13.3534',
-                    '0.0']
+                        'TD RB3LYP/3-21G GEOM=CONNECTIVITY', '-10.5803302719',
+                        '3.96823610808', '5', '0.0000', '-40.3016014', '13.3534',
+                        '0.0']
             for line in reader:
                 pass
             actual = [x.lower() for x in line[1:]]
@@ -1185,6 +1197,7 @@ class FileParserTestCase(TestCase):
 
     def test_catch(self):
         class TestIt(fileparser.Output):
+
             @fileparser.catch
             def get_fail(self):
                 raise ValueError("some string")
@@ -1196,6 +1209,7 @@ class FileParserTestCase(TestCase):
 
 
 class UtilsTestCase(TestCase):
+
     def test_replace_geom_vars(self):
         geom, variables = METHANE.strip().split("\n\n")
         results = utils.replace_geom_vars(geom, variables)
@@ -1230,6 +1244,7 @@ class UtilsTestCase(TestCase):
 
 
 class GraphTestCase(TestCase):
+
     def test_graph(self):
         # doesn't break
         self.assertEqual(graph.run_name("TON"), set(["TON"]))
@@ -1262,22 +1277,27 @@ class GraphTestCase(TestCase):
         self.assertEqual(graph.run_name("TON_45_"), set(["TON", '4', '5']))
 
         # all sides
-        self.assertEqual(graph.run_name("45_TON_67_89"), set(["TON", '4', '5', '6', '7', '8', '9']))
+        self.assertEqual(
+            graph.run_name("45_TON_67_89"), set(["TON", '4', '5', '6', '7', '8', '9']))
 
         # sides and cores
         self.assertEqual(graph.run_name("TON__4_TON"), set(["TON", '4']))
 
         # side types
-        self.assertEqual(graph.run_name("TON__23456789"), set(["TON", '2', '3', '4', '5', '6', '7', '8', '9']))
+        self.assertEqual(graph.run_name("TON__23456789"), set(
+            ["TON", '2', '3', '4', '5', '6', '7', '8', '9']))
 
         # side types
-        self.assertEqual(graph.run_name("TON__10111213"), set(["TON", '10', '11', '12', '13']))
+        self.assertEqual(
+            graph.run_name("TON__10111213"), set(["TON", '10', '11', '12', '13']))
 
         # big
-        self.assertEqual(graph.run_name("TON_7_CCC_94_EON"), set(["TON", '7', "CCC", '9', '4', "E/ZON"]))
+        self.assertEqual(graph.run_name("TON_7_CCC_94_EON"), set(
+            ["TON", '7', "CCC", '9', '4', "E/ZON"]))
 
 
 class InterfaceTestCase(TestCase):
+
     def test_get_property_limits(self):
         expected = {
             'm': [-5.5869186860636297, -2.3643993898975104, 2.8965423408215436],

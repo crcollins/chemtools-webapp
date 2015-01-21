@@ -10,8 +10,8 @@ import cairo
 from constants import COLORS2, CONNECTIONS, DATAPATH, ARYL, XGROUPS, MASSES
 from mol_name import parse_name
 from utils import get_full_rotation_matrix, get_angles, replace_geom_vars, \
-                    convert_zmatrix_to_cart, calculate_bonds, \
-                    get_axis_rotation_matrix
+    convert_zmatrix_to_cart, calculate_bonds, \
+    get_axis_rotation_matrix
 from project.utils import StringIO
 
 
@@ -32,7 +32,8 @@ def from_xyz(file):
                     t = "Ar"
                 else:
                     t = t.split('.')[0]
-            bonds.append(Bond((atoms[int(a1) - 1], atoms[int(a2) - 1]), t, bonds))
+            bonds.append(
+                Bond((atoms[int(a1) - 1], atoms[int(a2) - 1]), t, bonds))
     file.close()
     return Structure(atoms, bonds)
 
@@ -42,8 +43,9 @@ def from_data(filename):
     atomtypes = {'C': '4', 'N': '3', 'O': '2', 'P': '3', 'S': '2'}
     if len(filename) == 3:
         convert = {"XX": filename[1], "YY": filename[2]}
-        filename = filename[0] + atomtypes[convert["XX"]] + atomtypes[convert["YY"]]
-    #try to load file with lowercase name then upper
+        filename = filename[0] + \
+            atomtypes[convert["XX"]] + atomtypes[convert["YY"]]
+    # try to load file with lowercase name then upper
     paths = [
         os.path.join(DATAPATH, filename),
         os.path.join(DATAPATH, filename.lower()),
@@ -85,7 +87,8 @@ def from_gjf(file):
     # title = parts[1].strip()
     other = [x for x in parts[3:] if x.strip()]
     if len(other) < (has_bonds + has_redundant):
-        raise Exception("Either the bonds data or redundant coords are missing")
+        raise Exception(
+            "Either the bonds data or redundant coords are missing")
 
     letter_first = []
     number_first = []
@@ -130,7 +133,7 @@ def from_gjf(file):
     body = parts[2].strip()
     start = body.index('\n')
     charge, multiplicity = body[0:start].strip().split()
-    geom = body[start+1:]
+    geom = body[start + 1:]
 
     if variables:
         geom = replace_geom_vars(geom, variables)
@@ -211,7 +214,7 @@ def from_name(name):
             ends.append(cends[0])
             cends = cends[1:]
 
-        #bond all of the fragments together
+        # bond all of the fragments together
         for j, side in enumerate(fragments):
             if not side or side[0] is None:
                 # This conditional is for edge cases like when it is just an
@@ -227,7 +230,7 @@ def from_name(name):
                     bonda = cends[j]
                 else:
                     c = bondb.connection()
-                    #enforces lowercase to be r-group
+                    # enforces lowercase to be r-group
                     if char.islower():
                         c = "+"
                     elif char.isupper():
@@ -256,13 +259,13 @@ def from_name(name):
                 furthest = max(x[2] for x in side)
                 ends.append(this[furthest][0].next_open('~',  skip=skip))
 
-        #merge the fragments into single molecule
+        # merge the fragments into single molecule
         temp = _concatenate_fragments(core[0], fragments)
         structures.append((temp, ends))
 
     structure, final_ends = structures[0][0].chain(structures)
 
-    #multiplication of molecule/chain
+    # multiplication of molecule/chain
     horizontal_ends = final_ends[2:]
     structure = structure.polymerize(horizontal_ends, nm[0])
     vertical_ends = final_ends[:2]
@@ -276,6 +279,7 @@ def from_name(name):
 
 
 class Atom(object):
+
     def __init__(self, x, y, z, element, parent=None):
         self.parent = parent
         self.element = element
@@ -296,8 +300,8 @@ class Atom(object):
     @property
     def mol2(self):
         return "{0} {1}{0} {2} {3} {4} {1}".format(self.id,
-                                                self.element,
-                                                *self.xyz_tuple)
+                                                   self.element,
+                                                   *self.xyz_tuple)
 
     @property
     def gjf_atoms(self):
@@ -309,7 +313,8 @@ class Atom(object):
         for bond in self.bonds:
             if bond.atoms[0] == self:
                 x = bond.atoms[1]
-                bond_type = ("%.1f" % float(bond.type) if bond.type != "Ar" else "1.5")
+                bond_type = ("%.1f" %
+                             float(bond.type) if bond.type != "Ar" else "1.5")
                 s += ' ' + str(x.id) + ' ' + bond_type
         return s
 
@@ -326,6 +331,7 @@ class Atom(object):
 
 
 class Bond(object):
+
     def __init__(self, atoms, type_, parent=None):
         self.parent = parent
 
@@ -378,6 +384,7 @@ class Bond(object):
 
 
 class Structure(object):
+
     def __init__(self, atoms, bonds):
         self.atoms = atoms
         self.bonds = bonds
@@ -401,25 +408,25 @@ class Structure(object):
     ###########################################################################
 
     def draw(self, scale, svg=False, hydrogens=True, colors=True,
-            fancy_bonds=True):
+             fancy_bonds=True):
         '''Draws a basic image of the molecule.'''
         offset = 0.25
         mins, maxs = self.bounding_box()
-        mins = (mins-offset).T.tolist()[0]
+        mins = (mins - offset).T.tolist()[0]
         dimensions = self.get_dimensions() + 2 * offset
         dimensions *= scale
 
-        WIDTH = int(dimensions[1,0])
-        HEIGHT = int(dimensions[0,0])
+        WIDTH = int(dimensions[1, 0])
+        HEIGHT = int(dimensions[0, 0])
 
         f = StringIO()
         surface = cairo.SVGSurface(f, WIDTH, HEIGHT)
         ctx = cairo.Context(surface)
 
         ctx.scale(scale, scale)
-        ctx.rotate(math.pi/2)
+        ctx.rotate(math.pi / 2)
         # hack to fix the translation from the rotation
-        ctx.translate(0, -dimensions[1,0]/scale)
+        ctx.translate(0, -dimensions[1, 0] / scale)
         ctx.translate(-mins[0], -mins[1])
         ctx.set_line_width(0.1)
 
@@ -441,7 +448,7 @@ class Structure(object):
 
             temp = (coords2 - coords1)
             mag = numpy.linalg.norm(temp)
-            unit = numpy.matrix([-temp[1,0]/mag, temp[0,0]/mag]).T
+            unit = numpy.matrix([-temp[1, 0] / mag, temp[0, 0] / mag]).T
             if fancy_bonds:
                 if bond.type == '2':
                     draw_bond(ctx, coords1, coords2, unit, [0.1, -0.1])
@@ -462,7 +469,7 @@ class Structure(object):
                 continue
             ctx.set_source_rgb(*COLORS2[atom.element])
             point = atom.xyz_tuple
-            ctx.arc(point[0], point[1], 0.25, 0, 2*math.pi)
+            ctx.arc(point[0], point[1], 0.25, 0, 2 * math.pi)
             ctx.fill()
 
         if svg:
@@ -477,8 +484,8 @@ class Structure(object):
         string = "%d %d" % (len(self.atoms), len(self.bonds))
         string += "\nSMALL\nNO_CHARGES\n\n@<TRIPOS>ATOM\n"
         string += "\n".join([x.mol2 for x in self.atoms] +
-                        ["@<TRIPOS>BOND", ] +
-                        [x.mol2 for x in self.bonds])
+                            ["@<TRIPOS>BOND", ] +
+                            [x.mol2 for x in self.bonds])
         return string
 
     @property
@@ -503,7 +510,8 @@ class Structure(object):
                         rights.append(atom.id)
 
                 for left, right in product(lefts, rights):
-                    string += ' '.join(['D'] + [str(x) for x in [left] + ids + [right]] + ['F']) + '\n'
+                    string += ' '.join(['D'] + [str(x)
+                                                for x in [left] + ids + [right]] + ['F']) + '\n'
         return string
 
     ###########################################################################
@@ -589,7 +597,7 @@ class Structure(object):
         else:
             raise Exception(6, "bad bond")
 
-        #saved to prevent overwriting them
+        # saved to prevent overwriting them
         R2xyz = R2.xyz.copy()
         C1xyz = C1.xyz.copy()
 
@@ -600,7 +608,7 @@ class Structure(object):
         vec1_angles = numpy.matrix(get_angles(vec1))
         vec2_angles = numpy.matrix(get_angles(vec2))
         diff = vec1_angles - vec2_angles
-        #angle of 1 - angle of 2 = angle to rotate
+        # angle of 1 - angle of 2 = angle to rotate
         rot = get_full_rotation_matrix(vec2, -diff[0, 0], -diff[0, 1])
         fragment.rotate_3d(rot, R2xyz, C1xyz)
 
@@ -608,7 +616,7 @@ class Structure(object):
             bond1.atoms = (C2, C1)
         else:
             bond1.atoms = (C1, C2)
-        #remove the extension parts
+        # remove the extension parts
         [x.remove() for x in (bond2, R1, R2)]
 
         if freeze:
@@ -653,7 +661,7 @@ class Structure(object):
         bb = self.bounding_box()
         size = (bb[1] - bb[0]).T.tolist()[0]
         for i, axis in enumerate((x, y, z)):
-            #means there is nothing to stack
+            # means there is nothing to stack
             if axis <= 1:
                 continue
             axisfrags = copy.deepcopy(frags)
@@ -695,6 +703,7 @@ class Structure(object):
 
         total = 0
         for atom in self.atoms:
-            dist = numpy.linalg.norm(numpy.cross((atom.xyz - offset).T, direction.T))
+            dist = numpy.linalg.norm(
+                numpy.cross((atom.xyz - offset).T, direction.T))
             total += MASSES[atom.element] * dist ** 2
         return total

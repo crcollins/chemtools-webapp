@@ -8,5 +8,3 @@ class ErrorReport(models.Model):
     email = models.EmailField()
     urgency = models.IntegerField(choices=URGENCY_CHOICES)
     message = models.TextField()
-
-

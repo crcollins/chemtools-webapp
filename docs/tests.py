@@ -5,6 +5,7 @@ import views
 
 
 class DocsTestCase(TestCase):
+
     def setUp(self):
         self.client = Client()
 

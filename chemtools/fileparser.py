@@ -9,6 +9,7 @@ logger = logging.getLogger(__name__)
 
 def catch(fn):
     '''Decorator to catch all exceptions and log them.'''
+
     def wrapper(self, *args, **kwargs):
         try:
             return fn(self, *args, **kwargs)
@@ -19,6 +20,7 @@ def catch(fn):
 
 
 class Output(object):
+
     def __init__(self):
         self.errors = []
         self.output = []
@@ -46,7 +48,7 @@ class Output(object):
 class Log(object):
     PARSERS = dict()
     order = ["ExactName", "Features", "Options", "HOMO", "LUMO",
-            "HomoOrbital", "Dipole", "Energy", "BandGap", "Time"]
+             "HomoOrbital", "Dipole", "Energy", "BandGap", "Time"]
 
     def __init__(self, f, fname=None):
         if not hasattr(f, "read"):  # filename
@@ -116,7 +118,7 @@ class Log(object):
             self["ChargeMultiplicity"],
             geometry,
             '',
-            ])
+        ])
         return s
 
     def format_data(self):
@@ -137,6 +139,7 @@ class Log(object):
 
 
 class LogSet(Output):
+
     def __init__(self):
         super(LogSet, self).__init__()
         self.logs = []
@@ -181,6 +184,7 @@ def is_done(fn):
 
 
 class LineParser(object):
+
     def __init__(self, log):
         self.log = log
         self.done = False
@@ -199,6 +203,7 @@ class LineParser(object):
 
 @Log.add_parser
 class ExactName(LineParser):
+
     def __init__(self, *args, **kwargs):
         super(ExactName, self).__init__(*args, **kwargs)
         try:
@@ -213,17 +218,19 @@ class ExactName(LineParser):
     def parse(self, line):
         return
 
+
 @Log.add_parser
 class Features(LineParser):
+
     def __init__(self, *args, **kwargs):
         super(Features, self).__init__(*args, **kwargs)
         try:
             from mol_name import get_exact_name
             from ml import get_decay_distance_correction_feature_vector, \
-                        get_naive_feature_vector, get_decay_feature_vector
+                get_naive_feature_vector, get_decay_feature_vector
 
             spacer = get_exact_name(self.log.name, spacers=True)
-            exactname = spacer.replace('*', '')
+            #exactname = spacer.replace('*', '')
             self.value = '"' + str([
                 get_naive_feature_vector(spacer),
                 get_decay_feature_vector(spacer),
@@ -240,6 +247,7 @@ class Features(LineParser):
 
 @Log.add_parser
 class Options(LineParser):
+
     def __init__(self, *args, **kwargs):
         super(Options, self).__init__(*args, **kwargs)
         self.value = ''
@@ -255,6 +263,7 @@ class Options(LineParser):
 
 @Log.add_parser
 class ChargeMultiplicity(LineParser):
+
     def __init__(self, *args, **kwargs):
         super(ChargeMultiplicity, self).__init__(*args, **kwargs)
         self.value = ''
@@ -271,6 +280,7 @@ class ChargeMultiplicity(LineParser):
 
 @Log.add_parser
 class HomoOrbital(LineParser):
+
     def __init__(self, *args, **kwargs):
         super(HomoOrbital, self).__init__(*args, **kwargs)
         self.value = 0
@@ -290,6 +300,7 @@ class HomoOrbital(LineParser):
 
 @Log.add_parser
 class Energy(LineParser):
+
     def __init__(self, *args, **kwargs):
         super(Energy, self).__init__(*args, **kwargs)
         self.start = False
@@ -321,6 +332,7 @@ class Energy(LineParser):
 
 @Log.add_parser
 class Time(LineParser):
+
     def __init__(self, *args, **kwargs):
         super(Time, self).__init__(*args, **kwargs)
 
@@ -336,6 +348,7 @@ class Time(LineParser):
 
 @Log.add_parser
 class BandGap(LineParser):
+
     def __init__(self, *args, **kwargs):
         super(BandGap, self).__init__(*args, **kwargs)
 
@@ -349,6 +362,7 @@ class BandGap(LineParser):
 
 @Log.add_parser
 class HOMO(LineParser):
+
     def __init__(self, *args, **kwargs):
         super(HOMO, self).__init__(*args, **kwargs)
         self.prevline = ''
@@ -366,6 +380,7 @@ class HOMO(LineParser):
 
 @Log.add_parser
 class LUMO(LineParser):
+
     def __init__(self, *args, **kwargs):
         super(LUMO, self).__init__(*args, **kwargs)
         self.prevline = ''
@@ -383,6 +398,7 @@ class LUMO(LineParser):
 
 @Log.add_parser
 class Geometry(LineParser):
+
     def __init__(self, *args, **kwargs):
         super(Geometry, self).__init__(*args, **kwargs)
         self.value = ''
@@ -411,7 +427,8 @@ class Geometry(LineParser):
             if '{0}{0}@'.format(self.delimiter) in modline:
                 # select only the gjf part of the results
                 start = self.value.index('#')
-                end = self.value.index("{0}Version".format(self.delimiter), start)
+                end = self.value.index(
+                    "{0}Version".format(self.delimiter), start)
 
                 value = self.value[start:end]
 
@@ -446,8 +463,10 @@ SYMBOLS = {
     '35': 'Br',
 }
 
+
 @Log.add_parser
 class PartialGeometry(LineParser):
+
     def __init__(self, *args, **kwargs):
         super(PartialGeometry, self).__init__(*args, **kwargs)
         self.value = ''
@@ -485,6 +504,7 @@ class PartialGeometry(LineParser):
 
 @Log.add_parser
 class Header(LineParser):
+
     def __init__(self, *args, **kwargs):
         super(Header, self).__init__(*args, **kwargs)
         self.value = ''
@@ -508,6 +528,7 @@ class Header(LineParser):
 
 @Log.add_parser
 class Dipole(LineParser):
+
     def __init__(self, *args, **kwargs):
         super(Dipole, self).__init__(*args, **kwargs)
 
@@ -526,7 +547,6 @@ if __name__ == "__main__":
     import argparse
     import sys
 
-
     def worker(work_queue, done_queue):
         for f in iter(work_queue.get, 'STOP'):
             done_queue.put(Log(f).format_data())
@@ -543,7 +563,8 @@ if __name__ == "__main__":
             work_queue.put(f)
 
         for w in xrange(workers):
-            p = multiprocessing.Process(target=worker, args=(work_queue, done_queue))
+            p = multiprocessing.Process(
+                target=worker, args=(work_queue, done_queue))
             p.start()
             processes.append(p)
             work_queue.put('STOP')
@@ -559,8 +580,8 @@ if __name__ == "__main__":
         for p in processes:
             p.join()
 
-
     class StandAlone(object):
+
         def __init__(self, args):
             self.errors = []
             self.outputfilename = args.outputfile
@@ -568,8 +589,10 @@ if __name__ == "__main__":
             self.paths = args.paths | args.verbose | args.rel
             self.rel = args.rel
             self.files = self.check_input_files(args.files
-                                + self.convert_files(args.listfiles)
-                                + self.convert_folders(args.folders))
+                                                +
+                                                self.convert_files(
+                                                    args.listfiles)
+                                                + self.convert_folders(args.folders))
             if args.logs:
                 self.files = [x for x in self.files if x.endswith(".log")]
             self.output_gjf = args.gjf | args.td
@@ -579,7 +602,8 @@ if __name__ == "__main__":
             files = []
             for x in filelist:
                 if not os.path.isfile(x):
-                    path = os.path.relpath(x) if self.rel else os.path.abspath(x)
+                    path = os.path.relpath(
+                        x) if self.rel else os.path.abspath(x)
                     self.errors.append("Invalid filename:  '" + path + "'")
                 else:
                     files.append(x)
@@ -626,7 +650,8 @@ if __name__ == "__main__":
                         with open(log.name + ending, 'w') as outputfile:
                             outputfile.write(string)
                     except Exception as e:
-                        logger.info("Problem parsing file: %s - %s" (log.name, str(e)))
+                        logger.info(
+                            "Problem parsing file: %s - %s" (log.name, str(e)))
             else:
                 if self.outputfilename:
                     with open(self.outputfilename, 'w') as outputfile:
@@ -635,7 +660,7 @@ if __name__ == "__main__":
                     print logs.format_output(errors=self.error)
 
     parser = argparse.ArgumentParser(
-            description="This program extracts data from Gaussian log files.")
+        description="This program extracts data from Gaussian log files.")
     parser.add_argument('files', metavar='file', type=str, nargs='*',
                         help='The name of single file.')
     parser.add_argument('-i', metavar='list_file', action="store", nargs='*',

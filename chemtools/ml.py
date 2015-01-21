@@ -67,7 +67,8 @@ def get_end_features2(left, center, right, power=1, H=1, lacunarity=1):
             idx = both.index(char)
             if char in second and part == 2:
                 idx = both.index(char, idx + 1)
-            partfeatures[idx] += decay_function(count + 1, power=power, H=H, lacunarity=lacunarity)
+            partfeatures[
+                idx] += decay_function(count + 1, power=power, H=H, lacunarity=lacunarity)
         endfeatures.extend(partfeatures)
     return endfeatures
 
@@ -107,7 +108,8 @@ def get_end_features3(left, center, right, power=1, H=1, lacunarity=1):
                 else:
                     distance = 1
 
-            partfeatures[idx] += decay_function(distance, power=power, H=H, lacunarity=lacunarity)
+            partfeatures[
+                idx] += decay_function(distance, power=power, H=H, lacunarity=lacunarity)
         endfeatures.extend(partfeatures)
     return endfeatures
 
@@ -122,7 +124,8 @@ def get_naive_feature_vector(exactname, limit=4):
 
 def get_decay_feature_vector(exactname, power=1, H=1, lacunarity=1):
     left, core, center, right, n, m, x, y, z = exactname.split('_')
-    endfeatures = get_end_features2(left, center, right, power=power, H=H, lacunarity=lacunarity)
+    endfeatures = get_end_features2(
+        left, center, right, power=power, H=H, lacunarity=lacunarity)
     corefeatures = get_core_features(core)
     extrafeatures = get_extra_features(n, m, x, y, z)
     return corefeatures + endfeatures + extrafeatures + [1]
@@ -130,7 +133,8 @@ def get_decay_feature_vector(exactname, power=1, H=1, lacunarity=1):
 
 def get_decay_distance_correction_feature_vector(exactname, power=1, H=1, lacunarity=1):
     left, core, center, right, n, m, x, y, z = exactname.split('_')
-    endfeatures = get_end_features3(left, center, right, power=power, H=H, lacunarity=lacunarity)
+    endfeatures = get_end_features3(
+        left, center, right, power=power, H=H, lacunarity=lacunarity)
     corefeatures = get_core_features(core)
     extrafeatures = get_extra_features(n, m, x, y, z)
     return corefeatures + endfeatures + extrafeatures + [1]

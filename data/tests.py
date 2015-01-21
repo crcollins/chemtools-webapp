@@ -14,16 +14,18 @@ from chemtools.constants import RGROUPS, ARYL
 
 
 OPTIONS = {
-        "name": "{{ name }}",
-        "email": "test@test.com",
-        "nodes": 1,
-        "walltime": 48,
-        "allocation": "TG-CHE120081",
-        "template":
+    "name": "{{ name }}",
+    "email": "test@test.com",
+    "nodes": 1,
+    "walltime": 48,
+    "allocation": "TG-CHE120081",
+    "template":
             "{{ name }} {{ email }} {{ nodes }} {{ time }} {{ allocation }}",
 }
 
+
 class FragmentTestCase(TestCase):
+
     def setUp(self):
         self.client = Client()
 
@@ -38,7 +40,7 @@ class FragmentTestCase(TestCase):
 
     def test_frag_redirect(self):
         response = self.client.get(reverse(views.get_frag,
-                                            args=("notafragment", )))
+                                           args=("notafragment", )))
         self.assertEqual(response.status_code, 302)
 
     def test_detail_cores(self):
@@ -48,6 +50,7 @@ class FragmentTestCase(TestCase):
 
 
 class TemplateTestCase(TestCase):
+
     def setUp(self):
         self.client = Client()
 
@@ -57,34 +60,37 @@ class TemplateTestCase(TestCase):
 
 
 class ModelTestCase(TestCase):
+
     def setUp(self):
-        new_vector = models.FeatureVector(type=1, exact_name="A_TON_A_A_n1_m1_x1_y1_z1", vector=[1,2,3])
+        new_vector = models.FeatureVector(
+            type=1, exact_name="A_TON_A_A_n1_m1_x1_y1_z1", vector=[1, 2, 3])
         new_vector.save()
-        new_vector2 = models.FeatureVector(type=2, exact_name="Garbage", vector=[1])
+        new_vector2 = models.FeatureVector(
+            type=2, exact_name="Garbage", vector=[1])
         new_vector2.save()
         new_data = models.DataPoint(
-                                name="A_TON_A_A",
-                                exact_name="A_TON_A_A_n1_m1_x1_y1_z1",
-                                options="td B3LYP/6-31g(d) geom=connectivity",
-                                homo=-6.460873931,
-                                lumo=-1.31976745,
-                                homo_orbital=41,
-                                dipole=0.0006,
-                                energy=-567.1965205,
-                                band_gap=4.8068)
+            name="A_TON_A_A",
+            exact_name="A_TON_A_A_n1_m1_x1_y1_z1",
+            options="td B3LYP/6-31g(d) geom=connectivity",
+            homo=-6.460873931,
+            lumo=-1.31976745,
+            homo_orbital=41,
+            dipole=0.0006,
+            energy=-567.1965205,
+            band_gap=4.8068)
         new_data.save()
         new_data.vectors.add(new_vector)
         new_data.save()
         new_data2 = models.DataPoint(
-                                name="Garbage",
-                                exact_name="Garbage",
-                                options="Nothing",
-                                homo=1.0,
-                                lumo=2.0,
-                                homo_orbital=42,
-                                dipole=0.0,
-                                energy=100.0,
-                                band_gap=2.0)
+            name="Garbage",
+            exact_name="Garbage",
+            options="Nothing",
+            homo=1.0,
+            lumo=2.0,
+            homo_orbital=42,
+            dipole=0.0,
+            energy=100.0,
+            band_gap=2.0)
         new_data2.save()
         new_data2.vectors.add(new_vector2)
         new_data2.save()
@@ -95,7 +101,7 @@ class ModelTestCase(TestCase):
 
     def test_get_all_data(self):
         FEATURE, HOMO, LUMO, GAP = models.DataPoint.get_all_data()
-        self.assertTrue((FEATURE == numpy.matrix([[1,2,3]])).all())
+        self.assertTrue((FEATURE == numpy.matrix([[1, 2, 3]])).all())
         self.assertTrue((HOMO == numpy.matrix([[-6.460873931]])).all())
         self.assertTrue((LUMO == numpy.matrix([[-1.31976745]])).all())
         self.assertTrue((GAP == numpy.matrix([[4.8068]])).all())
@@ -117,7 +123,8 @@ class ModelTestCase(TestCase):
     def test_jobtemplate_base(self):
         data = OPTIONS.copy()
         data["custom_template"] = False
-        data['base_template'] = models.JobTemplate.objects.get(name="Localhost")
+        data['base_template'] = models.JobTemplate.objects.get(
+            name="Localhost")
         data['template'] = None
         string = models.JobTemplate.render(**data)
         self.assertIn(data["name"], string)
@@ -138,6 +145,7 @@ class ModelTestCase(TestCase):
 
 
 class LoadDataTestCase(TestCase):
+
     def test_load_data(self):
         path = os.path.join(settings.MEDIA_ROOT, "tests", "data.csv")
         with open(path, 'r') as f:

@@ -10,9 +10,9 @@ from models import ErrorReport
 from chemtools import gjfwriter
 from chemtools import fileparser
 from chemtools.ml import get_properties_from_decay_with_predictions, \
-                        get_naive_feature_vector, \
-                        get_decay_feature_vector, \
-                        get_decay_distance_correction_feature_vector
+    get_naive_feature_vector, \
+    get_decay_feature_vector, \
+    get_decay_distance_correction_feature_vector
 from chemtools.mol_name import name_expansion, get_exact_name
 from chemtools.interface import get_property_limits
 from data.models import DataPoint
@@ -20,6 +20,7 @@ from cluster.interface import run_jobs
 from project.utils import StringIO
 
 logger = logging.getLogger(__name__)
+
 
 def get_molecule_warnings(name):
     try:
@@ -63,13 +64,13 @@ def get_molecule_info(molecule):
     if not error:
         try:
             features = [
-                        get_naive_feature_vector(exactspacer),
-                        get_decay_feature_vector(exactspacer),
-                        get_decay_distance_correction_feature_vector(exactspacer),
-                    ]
+                get_naive_feature_vector(exactspacer),
+                get_decay_feature_vector(exactspacer),
+                get_decay_distance_correction_feature_vector(exactspacer),
+            ]
             homo, lumo, gap = get_properties_from_decay_with_predictions(
-                                                                features[1]
-                                                                )
+                features[1]
+            )
         except ValueError as e:
             # multi core and other non-ML structures
             logger.warn("%s -- %s" % (molecule, e))
@@ -127,7 +128,8 @@ def run_standard_jobs(credential, string, mol_settings, job_settings):
             continue
 
     if names:
-        settings = {k: v for k,v in job_settings.items()+mol_settings.items()}
+        settings = {
+            k: v for k, v in job_settings.items() + mol_settings.items()}
         temp = run_jobs(credential, names, gjfs, **settings)
         results["worked"] = temp["worked"]
         results["failed"].extend(temp["failed"])
@@ -149,7 +151,7 @@ def parse_file_list(files):
                 for name in tfile.getnames():
                     if tfile.getmember(name).isfile():
                         newfile = StringIO(tfile.extractfile(name).read(),
-                                            name=name)
+                                           name=name)
                         yield newfile
         else:
             yield f

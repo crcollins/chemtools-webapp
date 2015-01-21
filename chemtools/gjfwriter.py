@@ -9,7 +9,7 @@ import structure
 from constants import KEYWORDS, NUMBERS
 from mol_name import get_exact_name
 from ml import get_decay_distance_correction_feature_vector, \
-            get_naive_feature_vector, get_decay_feature_vector
+    get_naive_feature_vector, get_decay_feature_vector
 
 
 def cache(f):
@@ -25,6 +25,7 @@ def cache(f):
 
 
 class Molecule(object):
+
     def __init__(self, name, **kwargs):
         self.name = name
         self.keywords = kwargs.get('keywords', KEYWORDS)
@@ -51,15 +52,15 @@ class Molecule(object):
             geom = "geom=connectivity"
 
         starter.extend([
-                    "%%mem=%dGB" % self.mem,
-                    "%%chk=%s.chk" % self.name,
-                    "# %s %s" % (self.keywords, geom),
-                    "",
-                    self.name,
-                    "",
-                    "%d %d" % (self.charge, self.multiplicty),
-                    ""
-                    ])
+            "%%mem=%dGB" % self.mem,
+            "%%chk=%s.chk" % self.name,
+            "# %s %s" % (self.keywords, geom),
+            "",
+            self.name,
+            "",
+            "%d %d" % (self.charge, self.multiplicty),
+            ""
+        ])
         string = "\n".join(starter)
         string += self.structure.gjf
         return string
@@ -96,7 +97,7 @@ class Molecule(object):
         data = numpy.matrix(numpy.zeros((N, N)))
         for i, x in enumerate(coords):
             for j, y in enumerate(coords[:i]):
-                val = (other[i]*other[j])/norm(x-y)
+                val = (other[i] * other[j]) / norm(x - y)
                 data[i, j] = val
                 data[j, i] = val
 
@@ -112,9 +113,9 @@ class Molecule(object):
         vector = []
         end = []
         for i in xrange(data.shape[0]):
-            for j in xrange(0,i):
-                vector.append(data[i,j])
-            end.append(data[i,i])
+            for j in xrange(0, i):
+                vector.append(data[i, j])
+            end.append(data[i, i])
         return vector + end
 
     def get_element_counts(self):
@@ -127,6 +128,7 @@ class Molecule(object):
 
 
 class Benzobisazole(Molecule):
+
     def __init__(self, name, **kwargs):
         super(Benzobisazole, self).__init__(name, **kwargs)
         self.structure = structure.from_name(name)

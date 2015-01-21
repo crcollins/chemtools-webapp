@@ -10,6 +10,7 @@ from settings import AES_KEY
 
 
 class StringIO(object):
+
     def __init__(self, *args, **kwargs):
         self.s = cStringIO.StringIO(*args)
         self.name = kwargs.get("name", '')
@@ -37,6 +38,7 @@ class StringIO(object):
 
 
 class SSHClient(paramiko.SSHClient):
+
     def __init__(self, *args, **kwargs):
         super(SSHClient, self).__init__(*args, **kwargs)
         self.base = ""
@@ -53,6 +55,7 @@ class SSHClient(paramiko.SSHClient):
 
 
 class SFTPClient(paramiko.SFTPClient):
+
     def __init__(self, *args, **kwargs):
         super(SFTPClient, self).__init__(*args, **kwargs)
 
@@ -86,11 +89,11 @@ def get_ssh_connection(hostname, username, key=None, password=None, port=22):
     if key:
         pkey = paramiko.RSAKey.from_private_key(key)
         client.connect(hostname, username=username, pkey=pkey, port=port,
-                    allow_agent=False, look_for_keys=False, compress=True)
+                       allow_agent=False, look_for_keys=False, compress=True)
     else:
         client.connect(hostname, username=username, password=password,
-                    port=port, allow_agent=False, look_for_keys=False,
-                    compress=True)
+                       port=port, allow_agent=False, look_for_keys=False,
+                       compress=True)
     bases = [". ~/.bash_profile; ", "source .login; ", ". ~/.bashrc; "]
     for base in bases:
         _, _, err = client.exec_command(base)
@@ -120,7 +123,7 @@ class AESCipher(object):
         return s + pad
 
     def _unpad(self, s):
-        return  s[0:-ord(s[-1])]
+        return s[0:-ord(s[-1])]
 
     def encrypt(self, plain_text):
         raw = self._pad(plain_text)

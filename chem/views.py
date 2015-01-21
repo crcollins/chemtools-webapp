@@ -24,7 +24,6 @@ from project.utils import StringIO
 from data import load_data
 
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -50,10 +49,11 @@ def multi_job(request):
 
     c = Context({
         "form": form,
-        })
+    })
     if not form.is_valid(request.method):
         if request.is_ajax():
-            job_form_html = render_crispy_form(form, context=RequestContext(request))
+            job_form_html = render_crispy_form(
+                form, context=RequestContext(request))
             a = {
                 "success": False,
                 "job_form_html": job_form_html,
@@ -93,7 +93,7 @@ def molecule_check(request, string):
     }
     try:
         molecules, warnings, errors, news = get_multi_molecule_warnings(
-                                                                        string)
+            string)
         # This is used to fix the issue with ( and ) not being allowed for
         # the id of an HTML tag.
         name_ids = [x.replace('(', 'z').replace(')', 'z') for x in molecules]
@@ -119,8 +119,10 @@ def molecule_detail(request, molecule):
     if job_is_valid and mol_is_valid:
         return job_form.get_results(request, molecule, mol_form)
     elif request.is_ajax():
-        job_form_html = render_crispy_form(job_form, context=RequestContext(request))
-        mol_form_html = render_crispy_form(mol_form, context=RequestContext(request))
+        job_form_html = render_crispy_form(
+            job_form, context=RequestContext(request))
+        mol_form_html = render_crispy_form(
+            mol_form, context=RequestContext(request))
         a = {
             "success": False,
             "job_form_html": job_form_html,
@@ -138,7 +140,7 @@ def molecule_detail(request, molecule):
 def molecule_detail_json(request, molecule):
     a = get_molecule_info(molecule)
     return HttpResponse(simplejson.dumps(a, cls=DjangoJSONEncoder),
-                    mimetype="application/json")
+                        mimetype="application/json")
 
 
 def multi_molecule(request, string):
@@ -155,8 +157,10 @@ def multi_molecule(request, string):
     if job_is_valid and mol_is_valid:
         return job_form.get_results(request, string, mol_form)
     elif request.is_ajax():
-        job_form_html = render_crispy_form(job_form, context=RequestContext(request))
-        mol_form_html = render_crispy_form(mol_form, context=RequestContext(request))
+        job_form_html = render_crispy_form(
+            job_form, context=RequestContext(request))
+        mol_form_html = render_crispy_form(
+            mol_form, context=RequestContext(request))
         a = {
             "success": False,
             "job_form_html": job_form_html,
@@ -169,19 +173,19 @@ def multi_molecule(request, string):
         "job_form": job_form,
         "mol_form": MoleculeForm(),
         "gjf": "checked",
-        })
+    })
     return render(request, "chem/multi_molecule.html", c)
 
 
 def multi_molecule_zip(request, string):
     try:
         molecules, warnings, errors, news = get_multi_molecule_warnings(
-                                                                        string)
+            string)
     except ValueError as e:
         logger.warn(str(e))
         c = Context({
             "error": str(e)
-            })
+        })
         return render(request, "chem/multi_molecule.html", c)
 
     mol_form = MoleculeForm(request.REQUEST)
@@ -198,7 +202,7 @@ def multi_molecule_zip(request, string):
                 "mol2": f("mol2"),
                 "image": f("image"),
                 "job": f("job"),
-                })
+            })
             return render(request, "chem/multi_molecule.html", c)
     else:
         job_form = None
@@ -253,7 +257,8 @@ def write_svg(request, molecule):
     scale = request.REQUEST.get("scale", 10)
 
     out = gjfwriter.Benzobisazole(molecule)
-    response = HttpResponse(out.get_svg(int(scale)), content_type="image/svg+xml")
+    response = HttpResponse(
+        out.get_svg(int(scale)), content_type="image/svg+xml")
     response['Content-Disposition'] = 'filename=%s.svg' % molecule
     return response
 
@@ -262,6 +267,7 @@ def write_svg(request, molecule):
 # Upload
 ###########################################################
 ###########################################################
+
 
 def upload_data(request):
     switch = {
@@ -280,7 +286,7 @@ def upload_data(request):
     c = Context({
         "upload_form": upload_form,
         "job_form": JobForm.get_form(request, "{{ name }}", initial=True),
-        })
+    })
     return render(request, "chem/upload_log.html", c)
 
 
@@ -357,9 +363,9 @@ def reset_gjf(request, upload_form):
         if not job_form.is_valid(request.method):
             if request.is_ajax():
                 upload_form_html = render_crispy_form(upload_form,
-                                            context=RequestContext(request))
+                                                      context=RequestContext(request))
                 job_form_html = render_crispy_form(job_form,
-                                            context=RequestContext(request))
+                                                   context=RequestContext(request))
                 a = {
                     "success": False,
                     "job_form_html": job_form_html,
@@ -370,7 +376,7 @@ def reset_gjf(request, upload_form):
             c = Context({
                 "job_form": job_form,
                 "upload_form": upload_form,
-                })
+            })
             return render(request, "chem/upload_log.html", c)
 
         d = dict(job_form.cleaned_data)
@@ -415,7 +421,7 @@ def view_gjf(request, upload_form):
 
     c = Context({
         "images": images,
-        })
+    })
     return render(request, "chem/gjf_view.html", c)
 
 ###########################################################
@@ -423,6 +429,7 @@ def view_gjf(request, upload_form):
 # Other
 ###########################################################
 ###########################################################
+
 
 def report(request, molecule):
     if request.user.is_authenticated():
@@ -433,8 +440,8 @@ def report(request, molecule):
     if request.method == "POST":
         report = ErrorReport(molecule=molecule)
         form = ErrorReportForm(request.POST,
-            instance=report,
-            initial={"email": email})
+                               instance=report,
+                               initial={"email": email})
         if form.is_valid():
             form.save()
             return redirect(molecule_detail, molecule)
@@ -444,5 +451,5 @@ def report(request, molecule):
     c = Context({
         "form": form,
         "molecule": molecule
-        })
+    })
     return render(request, "chem/report.html", c)

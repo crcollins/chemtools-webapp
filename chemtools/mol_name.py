@@ -4,7 +4,7 @@ import collections
 import random
 
 from constants import SCORES, DCORES, CORES, RGROUPS, XGROUPS, ARYL, ARYL0, \
-                    ARYL2, NEEDSPACE, TURNING, VALID_SIDE_TOKENS
+    ARYL2, NEEDSPACE, TURNING, VALID_SIDE_TOKENS
 
 
 def name_expansion(string, rand=None):
@@ -57,7 +57,7 @@ def name_expansion(string, rand=None):
         # remove {} from x and split
         cleaned = [x[1:-1].split(',') for x in withbrace]
         operations = {
-            "":  lambda x: x,
+            "": lambda x: x,
             "L": lambda x: x.lower(),
             "U": lambda x: x.upper()
         }
@@ -80,7 +80,7 @@ def name_expansion(string, rand=None):
             out.append(currentvalues)
 
         return [''.join(sum(zip(withoutbrace, y), ()) + (swapped[-1], ))
-                                                                for y in out]
+                for y in out]
 
     braces = []
     for part in split_molecules(string):
@@ -135,7 +135,8 @@ def tokenize(string):
     match = '(1?\d|\(-?\d+\)|-|[%s])' % rxgroups
     tokens = [x for x in re.split(match, string) if x and x != '_']
 
-    invalid_idxs = [x for i, x in enumerate(tokens) if x not in VALID_SIDE_TOKENS and not x.startswith("(")]
+    invalid_idxs = [x for i, x in enumerate(
+        tokens) if x not in VALID_SIDE_TOKENS and not x.startswith("(")]
     if invalid_idxs:
         raise ValueError("Bad Substituent Name(s): %s" % str(invalid_idxs))
     return tokens
@@ -162,9 +163,11 @@ def parse_end_name(name):
             previous = parts[lastconnect]
             if previous[0] in ARYL0 + ARYL2:
                 if token.startswith('('):
-                    parts[lastconnect] = (previous[0], previous[1], int(token[1:-1]))
+                    parts[lastconnect] = (
+                        previous[0], previous[1], int(token[1:-1]))
                 else:
-                    parts[lastconnect] = (previous[0], previous[1], not previous[2])
+                    parts[lastconnect] = (
+                        previous[0], previous[1], not previous[2])
                 continue
             else:
                 raise ValueError("reflection only allowed for aryl groups")
@@ -233,7 +236,7 @@ def parse_end_name(name):
 def check_sides(parsedsides, numsets, idx, nm):
     side_names = ["left", "middle", "right"]
     m_bool = [0, 1, 0]
-    for xside, idx, name in zip(parsedsides, m_bool , side_names):
+    for xside, idx, name in zip(parsedsides, m_bool, side_names):
         if xside and xside[-1][0] in XGROUPS:
             if nm[idx] > 1:
                 msg = "can not do nm expansion with xgroup on %s" % name
@@ -336,7 +339,7 @@ def get_exact_name(name, spacers=False):
         lambda num: num == 0 and nm[0] == 1,
         lambda num: nm[1] == 1,
         lambda num: num == (len(output) - 1) and nm[0] == 1,
-        )
+    )
     sets = []
     for num, (core, ends) in enumerate(output):
         parts = []
@@ -367,7 +370,7 @@ def get_exact_name(name, spacers=False):
             endname = endname.replace("J", "4aaA")
             if spacers:
                 endname = ''.join([token + "**" if token in NEEDSPACE else token
-                                             for token in tokenize(endname)])
+                                   for token in tokenize(endname)])
             parts.append(endname)
 
         # only first set will have left sides

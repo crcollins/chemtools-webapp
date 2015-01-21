@@ -15,6 +15,7 @@ from chemtools.constants import KEYWORDS
 
 
 class MultiFileInput(forms.FileInput):
+
     def render(self, name, value, attrs={}):
         attrs['multiple'] = 'multiple'
         return super(MultiFileInput, self).render(name, None, attrs=attrs)
@@ -31,7 +32,7 @@ class MultiFileField(forms.FileField):
     default_error_messages = {
         'min_num': u"Ensure at least %(min_num)s file is uploaded (received %(num_files)s).",
         'max_num': u"Ensure at most %(max_num)s files are uploaded (received %(num_files)s).",
-        'file_size' : u"File: %(uploaded_file_name)s, exceeded maximum upload size."}
+        'file_size': u"File: %(uploaded_file_name)s, exceeded maximum upload size."}
 
     def __init__(self, *args, **kwargs):
         self.min_num = kwargs.pop('min_num', 1)
@@ -53,16 +54,20 @@ class MultiFileField(forms.FileField):
             num_files = 0
 
         if num_files < self.min_num:
-            raise forms.ValidationError(self.error_messages['min_num'] % {'min_num': self.min_num, 'num_files': num_files})
-        elif self.max_num and  num_files > self.max_num:
-            raise forms.ValidationError(self.error_messages['max_num'] % {'max_num': self.max_num, 'num_files': num_files})
+            raise forms.ValidationError(
+                self.error_messages['min_num'] % {'min_num': self.min_num, 'num_files': num_files})
+        elif self.max_num and num_files > self.max_num:
+            raise forms.ValidationError(
+                self.error_messages['max_num'] % {'max_num': self.max_num, 'num_files': num_files})
 
         for uploaded_file in data:
             if uploaded_file.size > self.maximum_file_size and self.maximum_file_size:
-                raise forms.ValidationError(self.error_messages['file_size'] % { 'uploaded_file_name': uploaded_file.name})
+                raise forms.ValidationError(
+                    self.error_messages['file_size'] % {'uploaded_file_name': uploaded_file.name})
 
 
 class ErrorReportForm(forms.ModelForm):
+
     class Meta:
         model = ErrorReport
         fields = ("email", "urgency", "message")
@@ -70,11 +75,11 @@ class ErrorReportForm(forms.ModelForm):
 
 class UploadForm(forms.Form):
     CHOICES = (
-                ("logparse", "Log Parse"),
-                ("longchain", "Long Chain Limit"),
-                ("gjfview", "Gjf View"),
-                ("gjfreset", "Gjf Reset"),
-            )
+        ("logparse", "Log Parse"),
+        ("longchain", "Long Chain Limit"),
+        ("gjfview", "Gjf View"),
+        ("gjfreset", "Gjf Reset"),
+    )
     files = MultiFileField()
     options = forms.ChoiceField(widget=forms.RadioSelect, choices=CHOICES)
     td_reset = forms.BooleanField(required=False, label="TD Reset")
@@ -103,7 +108,8 @@ class UploadForm(forms.Form):
 
 
 class MoleculeForm(forms.Form):
-    keywords = forms.CharField(max_length="200", initial=KEYWORDS, required=False)
+    keywords = forms.CharField(
+        max_length="200", initial=KEYWORDS, required=False)
     memory = forms.IntegerField(initial=59, required=False)
     nprocshared = forms.IntegerField(initial=16, required=False)
     charge = forms.IntegerField(initial=0, required=False)
@@ -125,25 +131,25 @@ class JobForm(forms.Form):
     allocation = forms.CharField(max_length=12)
     custom_template = forms.BooleanField(required=False)
     base_template = forms.ModelChoiceField(
-                                            queryset=JobTemplate.objects.all(),
-                                            to_field_name="template",
-                                            required=False,
-                                            )
+        queryset=JobTemplate.objects.all(),
+        to_field_name="template",
+        required=False,
+    )
     template = forms.CharField(
-                        widget=forms.Textarea(
-                                            attrs={
-                                                    'cols': 50,
-                                                    'rows': 26,
-                                                    'disabled': True
-                                                }),
-                        required=False,
-                        )
+        widget=forms.Textarea(
+            attrs={
+                'cols': 50,
+                'rows': 26,
+                'disabled': True
+            }),
+        required=False,
+    )
 
     credential = forms.ModelChoiceField(
-                        queryset=Credential.objects.none(),
-                        required=False,
-                        widget=forms.HiddenInput(),
-                        help_text="Only required if you are submitting a job.")
+        queryset=Credential.objects.none(),
+        required=False,
+        widget=forms.HiddenInput(),
+        help_text="Only required if you are submitting a job.")
 
     def __init__(self,  *args, **kwargs):
         super(JobForm, self).__init__(*args, **kwargs)
@@ -170,7 +176,7 @@ class JobForm(forms.Form):
                 "allocation": "TG-CHE120081",
                 "walltime": 48,
                 "nodes": 1,
-                })
+            })
         if request.user.is_authenticated():
             f = form.fields['credential']
             f.widget = forms.Select()
@@ -190,7 +196,8 @@ class JobForm(forms.Form):
     def clean(self):
         if not (self.cleaned_data.get("base_template") or
                 self.cleaned_data.get("template")):
-            raise forms.ValidationError("A template or base template is required.")
+            raise forms.ValidationError(
+                "A template or base template is required.")
         return self.cleaned_data
 
     def get_results(self, request, string, mol_form):
@@ -208,7 +215,8 @@ class JobForm(forms.Form):
         elif request.method == "POST":
             cred = job_settings.pop("credential")
             do_html = request.REQUEST.get("html", False)
-            results = run_standard_jobs(cred, string, mol_settings, job_settings)
+            results = run_standard_jobs(
+                cred, string, mol_settings, job_settings)
             if results["failed"]:
                 failed_names = zip(*results['failed'])[0]
                 results["failed_mols"] = ','.join(failed_names)

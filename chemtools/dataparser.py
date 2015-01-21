@@ -50,6 +50,7 @@ def predict_values(xvals, homovals, lumovals, gapvals):
 
 
 class DataParser(Output):
+
     def __init__(self, f):
         super(DataParser, self).__init__()
         self.plots = (StringIO(), StringIO())
@@ -62,7 +63,8 @@ class DataParser(Output):
         out = []
         for line in f:
             if not line.startswith("#") and line.strip():
-                out.append([float(x.strip()) for x in line.replace(' ', '').split(',') if x])
+                out.append([float(x.strip())
+                            for x in line.replace(' ', '').split(',') if x])
         return out
 
     @catch

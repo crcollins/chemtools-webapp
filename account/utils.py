@@ -50,6 +50,7 @@ def generate_key(text):
 
 
 class Pages(object):
+
     def __init__(self):
         self.__registry = dict()
 

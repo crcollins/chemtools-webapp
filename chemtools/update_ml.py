@@ -52,7 +52,7 @@ def scan(X, y, function, params):
     keys = params.keys()
     values = params.values()
     for group in itertools.product(*values):
-        idx = tuple([a.index(b) for a,b in zip(values, group) if len(a) > 1])
+        idx = tuple([a.index(b) for a, b in zip(values, group) if len(a) > 1])
         a = dict(zip(keys, group))
         clf = function(**a)
         train, test = test_clf_kfold(X, y, clf)
@@ -62,6 +62,7 @@ def scan(X, y, function, params):
 
 
 class OptimizedCLF(object):
+
     def __init__(self, X, y, func, params):
         self.params = params
         self.func = func
@@ -83,8 +84,8 @@ class OptimizedCLF(object):
             return self.optimized_clf
         items = self.params.items()
         types = set([list, tuple])
-        listparams = dict((k,v) for k,v in items if type(v) in types)
-        itemparams = dict((k,v) for k,v in items if type(v) not in types)
+        listparams = dict((k, v) for k, v in items if type(v) in types)
+        itemparams = dict((k, v) for k, v in items if type(v) not in types)
         listvalues = []
         itemvalues = []
         if listparams:
@@ -104,7 +105,7 @@ class OptimizedCLF(object):
                 epsilon=0.1,
                 maxiter=15,
                 maxfun=30,
-                )
+            )
             itemvalues = results[0].tolist()
         keys = listparams.keys() + itemparams.keys()
         values = listvalues + itemvalues
@@ -172,11 +173,11 @@ def save_clfs(clfs, pred_clfs):
 
         homo, lumo, gap = pred_clfs
         pred = Predictor(
-                homo_error=homo.test_error[0],
-                lumo_error=lumo.test_error[0],
-                gap_error=gap.test_error[0],
-                pickle=File(f),
-                )
+            homo_error=homo.test_error[0],
+            lumo_error=lumo.test_error[0],
+            gap_error=gap.test_error[0],
+            pickle=File(f),
+        )
         pred.save()
 
 

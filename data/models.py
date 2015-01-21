@@ -71,11 +71,11 @@ class FeatureVector(models.Model):
     DECAY_LENGTH = 2
     COULOMB = 3
     VECTOR_NAMES = (
-                    (NAIVE, "Naive"),
-                    (DECAY, "Decay"),
-                    (DECAY_LENGTH, "Decay_Length"),
-                    (COULOMB, "Coulomb")
-                    )
+        (NAIVE, "Naive"),
+        (DECAY, "Decay"),
+        (DECAY_LENGTH, "Decay_Length"),
+        (COULOMB, "Coulomb")
+    )
     type = models.IntegerField(choices=VECTOR_NAMES)
     exact_name = models.CharField(max_length=1000, null=True, blank=True)
     vector = VectorField()
@@ -141,5 +141,5 @@ class JobTemplate(models.Model):
             "time": "%s:00:00" % kwargs.get("walltime", '1'),
             "internal": kwargs.get("internal"),
             "allocation": kwargs.get("allocation", ''),
-            })
+        })
         return template.render(c)

@@ -30,7 +30,7 @@ def register_user(request):
     if temp1 and temp2:
         d = dict(
             reg_form.cleaned_data.items() + pass_form.cleaned_data.items()
-            )
+        )
 
         new_user = User.objects.create_user(d["username"],
                                             d["email"],
@@ -48,14 +48,14 @@ def register_user(request):
         profile.save()
         c = Context({
             "key": activation_key,
-            })
+        })
         return render(request, "account/post_register.html", c)
 
     c = Context({
         "state": state,
         "reg_form": reg_form,
         "pass_form": pass_form,
-        })
+    })
     return render(request, "account/register.html", c)
 
 
@@ -101,10 +101,10 @@ def main_settings(request, username):
 
     changed = False
     initial = {
-                "email": request.user.email,
-                "xsede_username": user_profile.xsede_username,
-                "public_key": user_profile.public_key,
-                }
+        "email": request.user.email,
+        "xsede_username": user_profile.xsede_username,
+        "public_key": user_profile.public_key,
+    }
     settings_form = SettingsForm(request.POST or None, initial=initial)
     if settings_form.is_valid():
         d = dict(settings_form.cleaned_data)

@@ -7,7 +7,7 @@ from data.models import JobTemplate
 
 
 WANTED_COLS = ["Job ID", "Username", "Jobname", "Req'd Memory", "Req'd Time",
-            "Elap Time", "S"]
+               "Elap Time", "S"]
 
 
 def get_ssh_connection_obj(obj):
@@ -44,10 +44,10 @@ def get_credentials_from_request(request):
             port, id_ = port.split('-')
             try:
                 cred = usercreds.get(
-                            id=id_,
-                            username=username,
-                            cluster__hostname=hostname,
-                            cluster__port=int(port))
+                    id=id_,
+                    username=username,
+                    cluster__hostname=hostname,
+                    cluster__port=int(port))
                 creds.append(cred)
             except Exception:
                 pass
@@ -188,7 +188,7 @@ def get_jobs(credentials):
     results = [None] * len(credentials)
     for i, cred in enumerate(credentials):
         t = threading.Thread(target=_get_jobs,
-                            args=(cred, cred.cluster.name, i, results))
+                             args=(cred, cred.cluster.name, i, results))
         t.start()
         threads.append(t)
 
@@ -210,7 +210,8 @@ def get_jobs(credentials):
             else:
                 jobs[status] = [job_id]
         running = Job.get_running_jobs(credential=cred)
-        unknown = running.exclude(jobid__in=set(jobids)).values_list('jobid', flat=True)
+        unknown = running.exclude(
+            jobid__in=set(jobids)).values_list('jobid', flat=True)
         if unknown:
             jobs[Job.UNKNOWN] = list(unknown)
         Job.update_states(cred, jobs)

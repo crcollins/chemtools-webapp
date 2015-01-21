@@ -24,7 +24,7 @@ def job_index(request):
 def cluster_job_index(request, cluster):
     c = Context({
         "cluster": cluster,
-        })
+    })
     return render(request, "cluster/job_index.html", c)
 
 
@@ -44,7 +44,8 @@ def get_job_list(request):
 
 @login_required
 def job_detail(request, cluster, jobid):
-    credential = Credential.objects.get(user=request.user, cluster__name=cluster)
+    credential = Credential.objects.get(
+        user=request.user, cluster__name=cluster)
     results = interface.get_specific_jobs(credential, [jobid])
     if results["error"]:
         e = results["error"]
@@ -59,7 +60,7 @@ def job_detail(request, cluster, jobid):
         "job": job,
         "cluster": cluster,
         "error_message": e,
-        })
+    })
     return render(request, "cluster/job_detail.html", c)
 
 
@@ -76,7 +77,8 @@ def kill_job(request, cluster):
         except ValueError:
             logger.warn("Invalid key %s" % key)
             pass
-    credential = Credential.objects.get(user=request.user, cluster__name=cluster)
+    credential = Credential.objects.get(
+        user=request.user, cluster__name=cluster)
     result = interface.kill_jobs(credential, jobids)
     if result["error"] is None:
         return redirect(job_index)
@@ -124,7 +126,7 @@ def credential_settings(request, username):
         "form": form,
         "failing_creds": failing_creds,
         "working_creds": working_creds,
-        })
+    })
     return render(request, "cluster/credential_settings.html", c)
 
 
@@ -149,5 +151,5 @@ def cluster_settings(request, username):
         "state": state,
         "form": form,
         "clusters": Cluster.objects.all(),
-        })
+    })
     return render(request, "cluster/cluster_settings.html", c)

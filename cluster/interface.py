@@ -4,7 +4,7 @@ from django.utils import timezone
 
 from models import Job
 from utils import get_ssh_connection_obj, get_sftp_connection_obj, _run_job, \
-                get_jobs, add_fileparser, WANTED_COLS
+    get_jobs, add_fileparser, WANTED_COLS
 
 
 def run_job(credential, gjfstring, jobstring=None, **kwargs):
@@ -60,7 +60,8 @@ def run_jobs(credential, names, gjfstrings, jobstring=None, **kwargs):
     with ssh, sftp:
         for name, gjf in zip(names, gjfstrings):
             dnew = kwargs.copy()
-            dnew["name"] = re.sub(r"{{\s*name\s*}}", name, dnew.get("name", "{{ name }}"))
+            dnew["name"] = re.sub(
+                r"{{\s*name\s*}}", name, dnew.get("name", "{{ name }}"))
             jobid, error = _run_job(ssh, sftp, gjf, jobstring, **dnew)
             if error is None:
                 results["worked"].append((name, jobid))

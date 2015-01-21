@@ -21,6 +21,7 @@ SERVER = {
     "password": "vagrant",
 }
 
+
 def _register(client, data):
     response = client.post(reverse(views.register_user), data)
     assert response.status_code == 200
@@ -38,6 +39,7 @@ def _register(client, data):
 
 
 class RegistrationTestCase(TestCase):
+
     def setUp(self):
         self.client = Client()
         self.users = [{
@@ -92,8 +94,8 @@ class RegistrationTestCase(TestCase):
     def test_register_after_login(self):
         for user in self.users:
             r = self.client.login(
-                                username=user["username"],
-                                password=user["new_password1"])
+                username=user["username"],
+                password=user["new_password1"])
             self.assertTrue(r)
             response = self.client.get(reverse(views.register_user))
             self.assertEqual(response.status_code, 302)
@@ -134,65 +136,65 @@ class SettingsTestCase(TestCase):
     def test_get_public_key(self):
         for user in self.users:
             response = self.client.get(reverse(views.get_public_key,
-                                                args=(user["username"], )))
+                                               args=(user["username"], )))
             self.assertEqual(response.status_code, 200)
             profile = User.objects.get(username=user["username"]).get_profile()
             self.assertEqual(response.content.strip(), profile.public_key)
 
     def test_get_public_key_invalid(self):
         response = self.client.get(reverse(views.get_public_key,
-                                                args=("notauser", )))
+                                           args=("notauser", )))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content.strip(), '')
 
     def test_settings_redirect_page(self):
         for user in self.users:
             r = self.client.login(
-                                username=user["username"],
-                                password=user["new_password1"])
+                username=user["username"],
+                password=user["new_password1"])
             self.assertTrue(r)
             response = self.client.get(reverse(views.user_settings,
-                                                args=(user["username"], )))
+                                               args=(user["username"], )))
             self.assertEqual(response.status_code, 302)
 
     def test_change_settings_page(self):
         for user in self.users:
             r = self.client.login(
-                                username=user["username"],
-                                password=user["new_password1"])
+                username=user["username"],
+                password=user["new_password1"])
             self.assertTrue(r)
             response = self.client.get(reverse(views.account_page,
-                                            args=(user["username"],
-                                                "settings")))
+                                               args=(user["username"],
+                                                     "settings")))
             self.assertEqual(response.status_code, 200)
 
     def test_change_settings_redirect(self):
         for i, user in enumerate(self.users):
             r = self.client.login(
-                                username=user["username"],
-                                password=user["new_password1"])
+                username=user["username"],
+                password=user["new_password1"])
             self.assertTrue(r)
             opposite = self.users[not i]["username"]
             response = self.client.get(reverse(views.account_page,
-                                                args=(opposite, "settings")))
+                                               args=(opposite, "settings")))
             self.assertEqual(response.status_code, 302)
 
     def test_change_email(self):
         for user in self.users:
             r = self.client.login(
-                                username=user["username"],
-                                password=user["new_password1"])
+                username=user["username"],
+                password=user["new_password1"])
             self.assertTrue(r)
 
             response = self.client.get(reverse(views.account_page,
-                                                args=(user["username"],
-                                                    "settings")))
+                                               args=(user["username"],
+                                                     "settings")))
             self.assertEqual(response.status_code, 200)
 
             data = {"email": 'a' + user["email"]}
             response = self.client.post(reverse(views.account_page,
                                                 args=(user["username"],
-                                                    "settings")),
+                                                      "settings")),
                                         data)
             self.assertIn("Settings Successfully Saved", response.content)
 
@@ -204,17 +206,17 @@ class SettingsTestCase(TestCase):
     def test_change_xsede_username(self):
         for user in self.users:
             r = self.client.login(username=user["username"],
-                                password=user["new_password1"])
+                                  password=user["new_password1"])
             self.assertTrue(r)
 
             response = self.client.get(reverse(views.account_page,
-                                                args=(user["username"],
-                                                    "settings")))
+                                               args=(user["username"],
+                                                     "settings")))
             self.assertEqual(response.status_code, 200)
 
             data = {"xsede_username": user["username"], "email": user["email"]}
             response = self.client.post(reverse(views.account_page,
-                                args=(user["username"], "settings")), data)
+                                                args=(user["username"], "settings")), data)
             self.assertIn("Settings Successfully Saved", response.content)
 
             profile = User.objects.get(username=user["username"]).get_profile()
@@ -223,28 +225,28 @@ class SettingsTestCase(TestCase):
     def test_change_password(self):
         for user in self.users:
             r = self.client.login(username=user["username"],
-                                password=user["new_password1"])
+                                  password=user["new_password1"])
             self.assertTrue(r)
 
             response = self.client.get(reverse(views.account_page,
-                                                args=(user["username"],
-                                                    "password")))
+                                               args=(user["username"],
+                                                     "password")))
             self.assertEqual(response.status_code, 200)
             data = {
                 "old_password": user["new_password1"],
                 "new_password1": user["new_password1"] + 'a',
                 "new_password2": user["new_password2"] + 'a',
-                }
+            }
             response = self.client.post(reverse(views.account_page,
                                                 args=(user["username"],
-                                                    "password")),
+                                                      "password")),
                                         data)
             self.assertEqual(response.status_code, 200)
             self.assertIn("Settings Successfully Saved", response.content)
             self.client.logout()
 
             r = self.client.login(username=user["username"],
-                                password=user["new_password1"] + 'a')
+                                  password=user["new_password1"] + 'a')
             self.assertTrue(r)
             temp_user = User.objects.get(username=user["username"])
             temp_user.set_password(user["new_password1"])
@@ -252,22 +254,22 @@ class SettingsTestCase(TestCase):
     def test_change_password_fail(self):
         for user in self.users:
             r = self.client.login(username=user["username"],
-                                password=user["new_password1"])
+                                  password=user["new_password1"])
             self.assertTrue(r)
 
             response = self.client.get(reverse(views.account_page,
-                                                args=(user["username"],
-                                                    "password")))
+                                               args=(user["username"],
+                                                     "password")))
             self.assertEqual(response.status_code, 200)
             data = {
                 "old_password": user["new_password1"],
                 "new_password1": user["new_password1"] + 'a',
                 "new_password2": user["new_password2"],
-                }
+            }
             self.assertNotIn("The two password fields", response.content)
             response = self.client.post(reverse(views.account_page,
                                                 args=(user["username"],
-                                                    "password")),
+                                                      "password")),
                                         data)
             self.assertEqual(response.status_code, 200)
             self.assertIn("The two password fields", response.content)
@@ -276,10 +278,10 @@ class SettingsTestCase(TestCase):
 @skipUnless(server_exists(**SERVER), "Requires external test server.")
 class SSHKeyTestCase(TestCase):
     cluster = {
-            "name": "test-machine",
-            "hostname": "localhost",
-            "port": 2222,
-        }
+        "name": "test-machine",
+        "hostname": "localhost",
+        "port": 2222,
+    }
     credential = {
         "username": "vagrant",
         "use_password": False,
@@ -314,17 +316,17 @@ class SSHKeyTestCase(TestCase):
         profile.save()
 
         cluster = Cluster(
-                        name=self.cluster["name"],
-                        hostname=self.cluster["hostname"],
-                        port=self.cluster["port"])
+            name=self.cluster["name"],
+            hostname=self.cluster["hostname"],
+            port=self.cluster["port"])
         cluster.save()
         self.cluster = cluster
         credential = Credential(
-                                user=user,
-                                cluster=cluster,
-                                username=self.credential["username"],
-                                password='',
-                                use_password=False)
+            user=user,
+            cluster=cluster,
+            username=self.credential["username"],
+            password='',
+            use_password=False)
         credential.save()
         self.credential = credential
 
@@ -341,19 +343,19 @@ class SSHKeyTestCase(TestCase):
         user = self.users[1]
         profile = User.objects.get(username=user["username"]).get_profile()
         r = self.client.login(username=user["username"],
-                            password=user["new_password1"])
+                              password=user["new_password1"])
         self.assertTrue(r)
 
         response = self.client.get(reverse(views.account_page,
-                                    args=(user["username"],
-                                        "settings")))
+                                           args=(user["username"],
+                                                 "settings")))
         self.assertEqual(response.status_code, 200)
 
         initial = profile.public_key
         data = {"new_ssh_keypair": "on", "email": user["email"]}
         response = self.client.post(reverse(views.account_page,
                                             args=(user["username"],
-                                                "settings")),
+                                                  "settings")),
                                     data)
         self.assertIn("Settings Successfully Saved", response.content)
 
@@ -364,19 +366,19 @@ class SSHKeyTestCase(TestCase):
         user = self.users[0]
         profile = User.objects.get(username=user["username"]).get_profile()
         r = self.client.login(username=user["username"],
-                            password=user["new_password1"])
+                              password=user["new_password1"])
         self.assertTrue(r)
 
         response = self.client.get(reverse(views.account_page,
-                                            args=(user["username"],
-                                                "settings")))
+                                           args=(user["username"],
+                                                 "settings")))
         self.assertEqual(response.status_code, 200)
 
         initial = profile.public_key
         data = {"new_ssh_keypair": "on", "email": user["email"]}
         response = self.client.post(reverse(views.account_page,
                                             args=(user["username"],
-                                                "settings")),
+                                                  "settings")),
                                     data)
         self.assertIn("Settings Successfully Saved", response.content)
         profile = User.objects.get(username=user["username"]).get_profile()
@@ -385,6 +387,7 @@ class SSHKeyTestCase(TestCase):
 
 
 class LoginTestCase(TestCase):
+
     def setUp(self):
         self.client = Client()
         self.users = [{
@@ -412,7 +415,7 @@ class LoginTestCase(TestCase):
             data = {
                 "username": user["username"],
                 "password": user["new_password1"],
-                }
+            }
             response = self.client.post("/login/", data)
             self.assertEqual(response.status_code, 302)
 
@@ -424,7 +427,7 @@ class LoginTestCase(TestCase):
             data = {
                 "username": user["username"] + 'a',
                 "password": user["new_password1"],
-                }
+            }
             response = self.client.post("/login/", data)
             self.assertEqual(response.status_code, 200)
             self.assertIn("alert-danger", response.content)
@@ -437,7 +440,7 @@ class LoginTestCase(TestCase):
             data = {
                 "username": user["username"],
                 "password": user["new_password1"] + 'a',
-                }
+            }
             response = self.client.post("/login/", data)
             self.assertEqual(response.status_code, 200)
             self.assertIn("alert-danger", response.content)
@@ -445,18 +448,19 @@ class LoginTestCase(TestCase):
     def test_logout(self):
         for user in self.users:
             r = self.client.login(username=user["username"],
-                                password=user["new_password1"])
+                                  password=user["new_password1"])
             self.assertTrue(r)
 
             data = {
                 "username": user["username"],
                 "password": user["new_password1"],
-                }
+            }
             response = self.client.get("/logout/", data)
             self.assertEqual(response.status_code, 200)
 
 
 class UtilsTestCase(TestCase):
+
     def test_generate_key_pair(self):
         self.assertIsNotNone(utils.generate_key_pair())
         self.assertIsNotNone(utils.generate_key_pair("username"))

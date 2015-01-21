@@ -41,7 +41,7 @@ COLORS = {
     'H': (220, 220, 220),
     'Si': (128, 170, 128),
 }
-COLORS2 = {k: tuple(x/255. for x in v) for k, v in COLORS.items()}
+COLORS2 = {k: tuple(x / 255. for x in v) for k, v in COLORS.items()}
 COLORS2['1'] = (0.0, 0.0, 0.0)
 COLORS2['3'] = (0, .5, 1)
 MASSES = {

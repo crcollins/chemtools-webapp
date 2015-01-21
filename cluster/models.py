@@ -4,7 +4,7 @@ from django import forms
 from django.utils import timezone
 
 from project.utils import get_ssh_connection, get_sftp_connection, StringIO, \
-                        AESCipher
+    AESCipher
 
 
 class Cluster(models.Model):
@@ -17,6 +17,7 @@ class Cluster(models.Model):
 
 
 class ClusterForm(forms.ModelForm):
+
     class Meta:
         model = Cluster
         fields = ("name", "hostname", "port")
@@ -46,7 +47,7 @@ class Credential(models.Model):
 
     def __unicode__(self):
         return "%s@%s:%d" % (self.username, self.cluster.hostname,
-                            self.cluster.port)
+                             self.cluster.port)
 
     def get_long_name(self):
         return "%s-%d" % (unicode(self), self.id)
@@ -54,9 +55,9 @@ class Credential(models.Model):
     def get_ssh_connection(self):
         if self.use_password:
             return get_ssh_connection(self.cluster.hostname,
-                                    self.username,
-                                    password=self.password,
-                                    port=self.cluster.port)
+                                      self.username,
+                                      password=self.password,
+                                      port=self.cluster.port)
         else:
             try:
                 del self.user._profile_cache
@@ -65,16 +66,16 @@ class Credential(models.Model):
             profile = self.user.get_profile()
             private = StringIO(profile.private_key)
             return get_ssh_connection(self.cluster.hostname,
-                                    self.username,
-                                    key=private,
-                                    port=self.cluster.port)
+                                      self.username,
+                                      key=private,
+                                      port=self.cluster.port)
 
     def get_sftp_connection(self):
         if self.use_password:
             return get_sftp_connection(self.cluster.hostname,
-                                    self.username,
-                                    password=self.password,
-                                    port=self.cluster.port)
+                                       self.username,
+                                       password=self.password,
+                                       port=self.cluster.port)
         else:
             try:
                 del self.user._profile_cache
@@ -83,9 +84,9 @@ class Credential(models.Model):
             profile = self.user.get_profile()
             private = StringIO(profile.private_key)
             return get_sftp_connection(self.cluster.hostname,
-                                    self.username,
-                                    key=private,
-                                    port=self.cluster.port)
+                                       self.username,
+                                       key=private,
+                                       port=self.cluster.port)
 
     def connection_works(self):
         try:
@@ -97,14 +98,14 @@ class Credential(models.Model):
 
 class CredentialAdminForm(forms.ModelForm):
     password = forms.CharField(max_length=50, required=False,
-                            widget=forms.PasswordInput)
+                               widget=forms.PasswordInput)
     password2 = forms.CharField(max_length=50, required=False,
-                            widget=forms.PasswordInput)
+                                widget=forms.PasswordInput)
 
     class Meta:
         model = Credential
         fields = ("user", "cluster", "username", "password",
-                "password2", "use_password")
+                  "password2", "use_password")
 
     def clean_use_password(self):
         password = self.cleaned_data.get("password")
@@ -119,10 +120,11 @@ class CredentialAdminForm(forms.ModelForm):
 
 
 class CredentialForm(CredentialAdminForm):
+
     class Meta:
         model = Credential
         fields = ("cluster", "username", "password",
-                "password2", "use_password")
+                  "password2", "use_password")
 
     def __init__(self, user, *args, **kwargs):
         super(CredentialForm, self).__init__(*args, **kwargs)
@@ -196,10 +198,10 @@ class Job(models.Model):
     def get_running_jobs(cls, credential=None, user=None):
         if user is not None:
             return Job.objects.filter(credential__user=user,
-                                    state__in=cls.RUNNING_STATES)
+                                      state__in=cls.RUNNING_STATES)
         elif credential is not None:
             return Job.objects.filter(credential=credential,
-                                    state__in=cls.RUNNING_STATES)
+                                      state__in=cls.RUNNING_STATES)
         else:
             return Job.objects.filter(state__in=cls.RUNNING_STATES)
 
@@ -214,8 +216,8 @@ class Job(models.Model):
     @classmethod
     def _update_states(cls, credential, jobids, state, now):
         update = {
-                "state": state.upper(),
-                "last_update": now,
+            "state": state.upper(),
+            "last_update": now,
         }
         if state in cls.POST_STATES:
             update["ended"] = now
@@ -240,11 +242,11 @@ class Job(models.Model):
         else:
             runtime = '--'
         return (
-                self.jobid,
-                self.credential.username,
-                self.name,
-                self.memory,
-                self.walltime,
-                runtime,
-                self.state,
-            )
+            self.jobid,
+            self.credential.username,
+            self.name,
+            self.memory,
+            self.walltime,
+            runtime,
+            self.state,
+        )

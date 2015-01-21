@@ -23,29 +23,29 @@ from models import ErrorReport
 
 NAMES = ["24a_TON", "24b_TSP_24a_24a", "CON_24a", "A_TON_A_A", "TON_CCC"]
 BAD_NAMES = [
-        ("2a_TON_CC", "no rgroups allowed on aryl0"),
-        ("ASADA", "Bad Substituent Name(s): [u'S']"),
-        ("TON_CC_CC", "'C' can not attach to end"),
+    ("2a_TON_CC", "no rgroups allowed on aryl0"),
+    ("ASADA", "Bad Substituent Name(s): [u'S']"),
+    ("TON_CC_CC", "'C' can not attach to end"),
 ]
 TEST_NAMES = ["A_TON_A_A", "A_TON_A_A_TD"]
 MULTI_NAMES = ["24{a,b}_TON"]
 WARN_NAMES = [
-            "24242424242a_TON",
-            "25252525252a_TON",
-            "26262626262a_TON",
+    "24242424242a_TON",
+    "25252525252a_TON",
+    "26262626262a_TON",
 ]
 OPTIONS = {
-        "job": True,
-        "name": "{{ name }}",
-        "email": "test@test.com",
-        "nodes": 1,
-        "walltime": 48,
-        "allocation": "TG-CHE120081",
-        "template":
+    "job": True,
+    "name": "{{ name }}",
+    "email": "test@test.com",
+    "nodes": 1,
+    "walltime": 48,
+    "allocation": "TG-CHE120081",
+    "template":
             "{{ name }} {{ email }} {{ nodes }} {{ time }} {{ allocation }}",
 }
 DATA_POINT = {
-            "name": "A_TON_A_A",
+    "name": "A_TON_A_A",
             "exact_name": "A_TON_A_A_n1_m1_x1_y1_z1",
             "options": "td B3LYP/6-31g(d) geom=connectivity",
             "homo": -6.460873931,
@@ -109,6 +109,7 @@ CRED_ERROR = "Invalid credential"
 
 
 class MainPageTestCase(TestCase):
+
     def setUp(self):
         self.client = Client()
 
@@ -132,25 +133,25 @@ class MainPageTestCase(TestCase):
     def test_molecule_detail(self):
         for name in NAMES:
             response = self.client.get(reverse(views.molecule_detail,
-                                                args=(name, )))
+                                               args=(name, )))
             self.assertEqual(response.status_code, 200)
 
     def test_molecule_detail_invalid(self):
         for name, reason in BAD_NAMES:
             response = self.client.get(reverse(views.molecule_detail,
-                                                args=(name, )))
+                                               args=(name, )))
             self.assertEqual(response.status_code, 200)
 
     def test_molecule_detail_json(self):
         for name in NAMES:
             response = self.client.get(reverse(views.molecule_detail_json,
-                                                args=(name, )))
+                                               args=(name, )))
             self.assertEqual(response.status_code, 200)
 
     def test_multi_molecule(self):
         string = ','.join(NAMES)
         response = self.client.get(reverse(views.multi_molecule,
-                                            args=(string, )))
+                                           args=(string, )))
         self.assertEqual(response.status_code, 200)
 
         options = OPTIONS.copy()
@@ -172,7 +173,7 @@ class MainPageTestCase(TestCase):
         string = ','.join(NAMES)
         gjf_names = set([name + ".gjf" for name in NAMES])
         response = self.client.get(reverse(views.multi_molecule_zip,
-                                            args=(string, )))
+                                           args=(string, )))
         self.assertEqual(response.status_code, 200)
         with StringIO(response.content) as f:
             with zipfile.ZipFile(f, "r") as zfile:
@@ -297,7 +298,7 @@ class MainPageTestCase(TestCase):
             response = self.client.get(reverse(views.write_gjf, args=(name, )))
             self.assertEqual(response.status_code, 200)
             self.assertEqual(response.get('Content-Disposition'),
-                "attachment; filename=%s.gjf" % name)
+                             "attachment; filename=%s.gjf" % name)
             self.assertTrue(response.content.startswith(string % name))
 
     def test_write_gjf_keywords(self):
@@ -310,30 +311,30 @@ class MainPageTestCase(TestCase):
                 response = self.client.get(url)
                 self.assertEqual(response.status_code, 200)
                 self.assertEqual(response.get('Content-Disposition'),
-                    "attachment; filename=%s.gjf" % name)
+                                 "attachment; filename=%s.gjf" % name)
                 temp_string = string % (name, keywords)
                 self.assertTrue(response.content.startswith(temp_string))
 
     def test_write_mol2(self):
         for name in NAMES:
             response = self.client.get(reverse(views.write_mol2,
-                                            args=(name, )))
+                                               args=(name, )))
             self.assertEqual(response.status_code, 200)
             self.assertEqual(response.get('Content-Disposition'),
-                "attachment; filename=%s.mol2" % name)
+                             "attachment; filename=%s.mol2" % name)
             string = "@<TRIPOS>MOLECULE"
             self.assertTrue(response.content.startswith(string))
 
     def test_write_png(self):
         for name in NAMES:
             response = self.client.get(reverse(views.write_png,
-                                            args=(name, )))
+                                               args=(name, )))
             self.assertEqual(response.status_code, 200)
 
     def test_write_svg(self):
         for name in NAMES:
             response = self.client.get(reverse(views.write_svg,
-                                            args=(name, )))
+                                               args=(name, )))
             self.assertEqual(response.status_code, 200)
 
     def test_write_job(self):
@@ -343,7 +344,7 @@ class MainPageTestCase(TestCase):
         for name in NAMES:
             options["name"] = name
             response = self.client.get(reverse(views.molecule_detail,
-                                            args=(name, )))
+                                               args=(name, )))
             self.assertEqual(response.status_code, 200)
             url = reverse(views.molecule_detail, args=(name, ))
             encoded_options = '?' + urllib.urlencode(options)
@@ -365,7 +366,7 @@ class MainPageTestCase(TestCase):
             options["name"] = name
             options["email"] = USER["email"]
             response = self.client.get(reverse(views.molecule_detail,
-                                                args=(name, )))
+                                               args=(name, )))
             self.assertEqual(response.status_code, 200)
             url = reverse(views.molecule_detail, args=(name, ))
             encoded_options = "?" + urllib.urlencode(options)
@@ -398,7 +399,7 @@ class MainPageTestCase(TestCase):
     def test_molecule_check(self):
         for name in NAMES:
             response = self.client.get(reverse(views.molecule_check,
-                                            args=(name, )))
+                                               args=(name, )))
             self.assertEqual(response.status_code, 200)
 
     def test_molecule_check_html(self):
@@ -410,14 +411,14 @@ class MainPageTestCase(TestCase):
 
     def test_molecule_check_timeout(self):
         response = self.client.get(reverse(views.molecule_check,
-                                        args=(TIMEOUT_NAMES, )))
+                                           args=(TIMEOUT_NAMES, )))
         self.assertEqual(response.status_code, 200)
         value = simplejson.loads(response.content)["error"]
         self.assertEqual(value, "The operation has timed out.")
 
     def test_multi_molecule_zip_timeout(self):
         response = self.client.get(reverse(views.multi_molecule_zip,
-                                        args=(TIMEOUT_NAMES, )))
+                                           args=(TIMEOUT_NAMES, )))
         self.assertEqual(response.status_code, 200)
         self.assertIn("The operation has timed out.", response.content)
 
@@ -428,7 +429,7 @@ class MainPageTestCase(TestCase):
         ]
         for name, error in names:
             response = self.client.get(reverse(views.molecule_check,
-                                            args=(name, )))
+                                               args=(name, )))
             values = simplejson.loads(response.content)["molecules"]
             self.assertEqual(values[0][2], error)
 
@@ -440,12 +441,12 @@ class MainPageTestCase(TestCase):
         for i, name in enumerate(WARN_NAMES):
             data["urgency"] = i
             response = self.client.get(reverse(views.molecule_check,
-                                                args=(name, )))
+                                               args=(name, )))
             values = simplejson.loads(response.content)["molecules"]
             self.assertFalse(values[0][1])
 
             response = self.client.get(reverse(views.report,
-                                                args=(name, )))
+                                               args=(name, )))
             self.assertEqual(response.status_code, 200)
 
             response = self.client.post(reverse(views.report,
@@ -453,10 +454,9 @@ class MainPageTestCase(TestCase):
             self.assertEqual(response.status_code, 302)
 
             response = self.client.get(reverse(views.molecule_check,
-                                                args=(name, )))
+                                               args=(name, )))
             values = simplejson.loads(response.content)["molecules"]
             self.assertTrue(values[0][1])
-
 
     def test_report_molecule_after_login(self):
         data = {
@@ -468,16 +468,16 @@ class MainPageTestCase(TestCase):
             data["email"] = USER["email"]
             data["urgency"] = i
             response = self.client.get(reverse(views.molecule_check,
-                                            args=(name, )))
+                                               args=(name, )))
             values = simplejson.loads(response.content)["molecules"]
             self.assertFalse(values[0][1])
 
             response = self.client.post(reverse(views.report,
-                                            args=(name, )), data)
+                                                args=(name, )), data)
             self.assertEqual(response.status_code, 302)
 
             response = self.client.get(reverse(views.molecule_check,
-                                            args=(name, )))
+                                               args=(name, )))
             values = simplejson.loads(response.content)["molecules"]
             self.assertTrue(values[0][1])
 
@@ -489,12 +489,12 @@ class MainPageTestCase(TestCase):
         for i, name in enumerate(WARN_NAMES):
             data["urgency"] = i
             response = self.client.get(reverse(views.molecule_check,
-                                                args=(name, )))
+                                               args=(name, )))
             values = simplejson.loads(response.content)["molecules"]
             self.assertFalse(values[0][1])
 
             response = self.client.get(reverse(views.report,
-                                                args=(name, )))
+                                               args=(name, )))
             self.assertEqual(response.status_code, 200)
 
             response = self.client.post(reverse(views.report,
@@ -504,6 +504,7 @@ class MainPageTestCase(TestCase):
 
 
 class PostsFailTestCase(TestCase):
+
     def setUp(self):
         self.client = Client()
         norm_user = User.objects.create_user(**USER)
@@ -531,7 +532,7 @@ class PostsFailTestCase(TestCase):
         for name, error in BAD_NAMES:
             options["name"] = name
             response = self.client.get(reverse(views.molecule_detail,
-                                                args=(name, )))
+                                               args=(name, )))
             self.assertEqual(response.status_code, 200)
             url = reverse(views.molecule_detail, args=(name, ))
             response = self.client.post(url, options)
@@ -547,16 +548,16 @@ class PostsFailTestCase(TestCase):
         for name in NAMES:
             options["name"] = name
             response = self.client.get(reverse(views.molecule_detail,
-                                                args=(name, )))
+                                               args=(name, )))
             self.assertEqual(response.status_code, 200)
             url = reverse(views.molecule_detail, args=(name, ))
             response = self.client.post(url, options)
             expected = {
-                        "cluster": "test-machine",
-                        "error": "You must be a staff user to submit a job.",
-                        "failed": [],
-                        "worked": [],
-                        }
+                "cluster": "test-machine",
+                "error": "You must be a staff user to submit a job.",
+                "failed": [],
+                "worked": [],
+            }
             self.assertEqual(simplejson.loads(response.content), expected)
 
     def test_post_single_ajax_fail(self):
@@ -567,7 +568,7 @@ class PostsFailTestCase(TestCase):
             options["name"] = name
             options["email"] = ""
             response = self.client.get(reverse(views.molecule_detail,
-                                                args=(name, )))
+                                               args=(name, )))
             self.assertEqual(response.status_code, 200)
             url = reverse(views.molecule_detail, args=(name, ))
             response = self.client.post(url, options,
@@ -585,7 +586,7 @@ class PostsFailTestCase(TestCase):
             options["template"] = ""
             options["base_template"] = None
             response = self.client.get(reverse(views.molecule_detail,
-                                                args=(name, )))
+                                               args=(name, )))
             self.assertEqual(response.status_code, 200)
             url = reverse(views.molecule_detail, args=(name, ))
             response = self.client.post(url, options,
@@ -604,7 +605,7 @@ class PostsFailTestCase(TestCase):
         options = SUB_OPTIONS2.copy()
         options["name"] = "{{ name }}"
         response = self.client.get(reverse(views.multi_molecule,
-                                        args=(string, )))
+                                           args=(string, )))
         self.assertEqual(response.status_code, 200)
         url = reverse(views.multi_molecule, args=(string, ))
         response = self.client.post(url, options)
@@ -622,16 +623,16 @@ class PostsFailTestCase(TestCase):
         options = SUB_OPTIONS.copy()
         options["name"] = string
         response = self.client.get(reverse(views.multi_molecule,
-                                        args=(string, )))
+                                           args=(string, )))
         self.assertEqual(response.status_code, 200)
         url = reverse(views.multi_molecule, args=(string, ))
         response = self.client.post(url, options)
         expected = {
-                    "cluster": "test-machine",
-                    "error": "You must be a staff user to submit a job.",
-                    "failed": [],
-                    "worked": []
-                    }
+            "cluster": "test-machine",
+            "error": "You must be a staff user to submit a job.",
+            "failed": [],
+            "worked": []
+        }
         self.assertEqual(simplejson.loads(response.content), expected)
 
     def test_post_multi_ajax_fail(self):
@@ -643,7 +644,7 @@ class PostsFailTestCase(TestCase):
         options["name"] = "{{ name }}"
         options["email"] = ''
         response = self.client.get(reverse(views.multi_molecule,
-                                        args=(name, )))
+                                           args=(name, )))
         self.assertEqual(response.status_code, 200)
         url = reverse(views.multi_molecule, args=(name, ))
         response = self.client.post(url, options,
@@ -670,11 +671,11 @@ class PostsFailTestCase(TestCase):
         url = reverse(views.multi_job)
         response = self.client.post(url, options)
         expected = {
-                    "cluster": "test-machine",
-                    "error": "You must be a staff user to submit a job.",
-                    "failed": [],
-                    "worked": []
-                    }
+            "cluster": "test-machine",
+            "error": "You must be a staff user to submit a job.",
+            "failed": [],
+            "worked": []
+        }
         self.assertEqual(simplejson.loads(response.content), expected)
 
     def test_post_multi_job_ajax_fail(self):
@@ -743,6 +744,7 @@ class PostsFailTestCase(TestCase):
 
 @skipUnless(server_exists(**SERVER), "Requires external test server.")
 class PostsTestCase(TestCase):
+
     def setUp(self):
         self.client = Client()
         new_user = User.objects.create_superuser(**SUPER_USER)
@@ -751,9 +753,9 @@ class PostsTestCase(TestCase):
         cluster.save()
         self.cluster = cluster
         credential = Credential(
-                                user=new_user,
-                                cluster=cluster,
-                                **CREDENTIAL)
+            user=new_user,
+            cluster=cluster,
+            **CREDENTIAL)
         credential.save()
         self.credential = credential
 
@@ -764,7 +766,7 @@ class PostsTestCase(TestCase):
         for name in NAMES:
             options["name"] = name
             response = self.client.get(reverse(views.molecule_detail,
-                                                args=(name, )))
+                                               args=(name, )))
             self.assertEqual(response.status_code, 200)
             url = reverse(views.molecule_detail, args=(name, ))
             response = self.client.post(url, options)
@@ -772,7 +774,6 @@ class PostsTestCase(TestCase):
             results = simplejson.loads(response.content)
             self.assertIsNone(results["error"])
             self.assertTrue(len(results["worked"]))
-
 
     def test_post_multi(self):
         r = self.client.login(**SUPER_USER_LOGIN)
@@ -782,7 +783,7 @@ class PostsTestCase(TestCase):
         options = SUB_OPTIONS.copy()
         options["name"] = "{{ name }}"
         response = self.client.get(reverse(views.multi_molecule,
-                                        args=(name, )))
+                                           args=(name, )))
         self.assertEqual(response.status_code, 200)
         url = reverse(views.multi_molecule, args=(name, ))
         response = self.client.post(url, options)
@@ -801,7 +802,7 @@ class PostsTestCase(TestCase):
         options["name"] = "{{ name }}"
         options["html"] = True
         response = self.client.get(reverse(views.multi_molecule,
-                                        args=(name, )))
+                                           args=(name, )))
         self.assertEqual(response.status_code, 200)
         url = reverse(views.multi_molecule, args=(name, ))
         response = self.client.post(url, options)
@@ -921,8 +922,6 @@ class PostsTestCase(TestCase):
             self.assertIn("Go to jobs list", response.content)
 
 
-
-
 class UtilsTestCase(TestCase):
     names = ["24a_TON", "BAD_NAME", "CON_24a", "A_TON_A_A"]
 
@@ -939,22 +938,22 @@ class UtilsTestCase(TestCase):
         string = ','.join(self.names)
         results = utils.get_multi_molecule_warnings(string)
         expected = [
-                    tuple(self.names),
-                    (None, None, True, None),
-                    (None, "Bad Substituent Name(s): ['_N']", None, None),
-                    (True, True, True, False),
-                ]
+            tuple(self.names),
+            (None, None, True, None),
+            (None, "Bad Substituent Name(s): ['_N']", None, None),
+            (True, True, True, False),
+        ]
         self.assertEqual(results, expected)
 
     def test_get_multi_molecule_warnings_new(self):
         string = ','.join(self.names)
         results = utils.get_multi_molecule_warnings(string)
         expected = [
-                    tuple(self.names),
-                    (None, None, True, None),
-                    (None, "Bad Substituent Name(s): ['_N']", None, None),
-                    (True, True, True, False)
-                ]
+            tuple(self.names),
+            (None, None, True, None),
+            (None, "Bad Substituent Name(s): ['_N']", None, None),
+            (True, True, True, False)
+        ]
         self.assertEqual(results, expected)
 
     def test_get_molecule_info(self):
@@ -976,7 +975,7 @@ class UtilsTestCase(TestCase):
                     -5.74066757207639,
                     -2.9489392195479147,
                     2.5846925036411794]
-                },
+            },
             'known_errors': None,
             'error_message': None,
             'datapoint': None,
@@ -993,6 +992,7 @@ class UtilsTestCase(TestCase):
 
 @skipUnless(server_exists(**SERVER), "Requires external test server.")
 class UtilsServerTestCase(TestCase):
+
     def setUp(self):
         self.user = User.objects.create_user(**USER)
         self.user.save()
@@ -1009,9 +1009,11 @@ class UtilsServerTestCase(TestCase):
 
         self.cluster = Cluster(**CLUSTER)
         self.cluster.save()
-        self.credential = Credential(user=self.user, cluster=self.cluster, **CREDENTIAL)
+        self.credential = Credential(
+            user=self.user, cluster=self.cluster, **CREDENTIAL)
         self.credential.save()
-        self.credential2 = Credential(user=super_user, cluster=self.cluster, **CREDENTIAL)
+        self.credential2 = Credential(
+            user=super_user, cluster=self.cluster, **CREDENTIAL)
         self.credential2.save()
 
     def test_run_standard_jobs_staff_error(self):
@@ -1025,19 +1027,22 @@ class UtilsServerTestCase(TestCase):
     def test_run_standard_jobs(self):
         job = 'sleep 10'
         names = "TON,CON"
-        results = utils.run_standard_jobs(self.credential2, names, {}, {'jobstring': job})
+        results = utils.run_standard_jobs(
+            self.credential2, names, {}, {'jobstring': job})
         self.assertEqual(results["error"], None)
         self.assertEqual(results["failed"], [])
 
     def test_run_standard_jobs_name_error(self):
         job = 'sleep 10'
         names = "E-N,C-N"
-        results = utils.run_standard_jobs(self.credential2, names, {}, {'jobstring': job})
+        results = utils.run_standard_jobs(
+            self.credential2, names, {}, {'jobstring': job})
         for name, error in results['failed']:
             self.assertEqual(error, "Bad Substituent Name(s): ['N']")
 
 
 class UploadsTestCase(TestCase):
+
     def setUp(self):
         self.client = Client()
 

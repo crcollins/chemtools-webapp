@@ -41,10 +41,10 @@ SUPER_USER = SUPER_USER_LOGIN.copy()
 SUPER_USER["email"] = "admin@test.com"
 
 CLUSTER = {
-        "name": "test-machine",
-        "hostname": "localhost",
-        "port": 2222,
-    }
+    "name": "test-machine",
+    "hostname": "localhost",
+    "port": 2222,
+}
 CREDENTIAL = {
     "username": "vagrant",
     "password": "vagrant",
@@ -64,6 +64,7 @@ SUBMIT_ERROR = "You must be a staff user to submit a job."
 KILL_ERROR = "You must be a staff user to kill a job."
 CRED_ERROR = "Invalid credential"
 
+
 def run_fake_job(credential):
     gjfstring = "EMPTY"
     jobstring = "sleep 0"
@@ -72,6 +73,7 @@ def run_fake_job(credential):
 
 
 class SSHPageTestCase(TestCase):
+
     def setUp(self):
         user = User.objects.create_user(**USER)
         user.save()
@@ -81,10 +83,12 @@ class SSHPageTestCase(TestCase):
 
         self.cluster = models.Cluster(**CLUSTER)
         self.cluster.save()
-        self.credential = models.Credential(user=user, cluster=self.cluster, **CREDENTIAL)
+        self.credential = models.Credential(
+            user=user, cluster=self.cluster, **CREDENTIAL)
         self.credential.save()
 
-        self.credential2 = models.Credential(user=super_user, cluster=self.cluster, **CREDENTIAL)
+        self.credential2 = models.Credential(
+            user=super_user, cluster=self.cluster, **CREDENTIAL)
         self.credential2.save()
 
         self.client = Client()
@@ -122,7 +126,6 @@ class SSHPageTestCase(TestCase):
         self.assertTrue(r)
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-
 
     @skipUnless(server_exists(**SERVER), "Requires external test server.")
     def test_job_detail_fail(self):
@@ -201,7 +204,7 @@ class SSHPageTestCase(TestCase):
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content,
-                        "You must be a staff user to kill a job.")
+                         "You must be a staff user to kill a job.")
 
     def test_kill_job_redirect(self):
         url = reverse(views.kill_job, args=(CLUSTER['name'], ))
@@ -216,6 +219,7 @@ class SSHPageTestCase(TestCase):
 
 
 class SSHSettingsTestCase(TestCase):
+
     def setUp(self):
         user = User.objects.create_user(**USER)
         user.save()
@@ -229,9 +233,11 @@ class SSHSettingsTestCase(TestCase):
 
         self.cluster = models.Cluster(**CLUSTER)
         self.cluster.save()
-        self.credential = models.Credential(user=user, cluster=self.cluster, **CREDENTIAL)
+        self.credential = models.Credential(
+            user=user, cluster=self.cluster, **CREDENTIAL)
         self.credential.save()
-        self.credential2 = models.Credential(user=user, cluster=self.cluster, **CREDENTIAL2)
+        self.credential2 = models.Credential(
+            user=user, cluster=self.cluster, **CREDENTIAL2)
         self.credential2.save()
         self.client = Client()
 
@@ -246,7 +252,7 @@ class SSHSettingsTestCase(TestCase):
             "name": "test-machine",
             "hostname": "test-machine.com",
             "port": 22,
-            }
+        }
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, 200)
         self.assertIn("Settings Successfully Saved", response.content)
@@ -327,8 +333,8 @@ class SSHSettingsTestCase(TestCase):
     def test_test_credential_fail(self):
         user = User.objects.get(username=USER["username"])
         cred = models.Credential(user=user,
-                                cluster=self.cluster,
-                                **BAD_CREDENTIAL)
+                                 cluster=self.cluster,
+                                 **BAD_CREDENTIAL)
         cred.save()
 
         r = self.client.login(**USER_LOGIN)
@@ -350,8 +356,8 @@ class SSHSettingsTestCase(TestCase):
     def test_test_credential_both(self):
         user = User.objects.get(username=USER["username"])
         cred = models.Credential(user=user,
-                                cluster=self.cluster,
-                                **BAD_CREDENTIAL)
+                                 cluster=self.cluster,
+                                 **BAD_CREDENTIAL)
         cred.save()
 
         r = self.client.login(**USER_LOGIN)
@@ -470,10 +476,11 @@ class SSHSettingsTestCase(TestCase):
 
 
 class UtilsTestCase(TestCase):
+
     @skipUnless(server_exists(**SERVER), "Requires external test server.")
     def test_get_sftp_password(self):
         sftp = get_sftp_connection("localhost", "vagrant",
-                                password="vagrant", port=2222)
+                                   password="vagrant", port=2222)
         with sftp:
             pass
 
@@ -482,7 +489,7 @@ class UtilsTestCase(TestCase):
         test_path = os.path.join(settings.MEDIA_ROOT, "tests")
         with open(os.path.join(test_path, "id_rsa"), 'r') as key:
             sftp = get_sftp_connection("localhost", "vagrant",
-                                    key=key, port=2222)
+                                       key=key, port=2222)
             with sftp:
                 pass
 
@@ -494,7 +501,7 @@ class UtilsTestCase(TestCase):
     @skipUnless(server_exists(**SERVER), "Requires external test server.")
     def test_get_ssh_password(self):
         ssh = get_ssh_connection("localhost", "vagrant",
-                                password="vagrant", port=2222)
+                                 password="vagrant", port=2222)
         with ssh:
             pass
 
@@ -503,7 +510,7 @@ class UtilsTestCase(TestCase):
         test_path = os.path.join(settings.MEDIA_ROOT, "tests")
         with open(os.path.join(test_path, "id_rsa"), 'r') as key:
             ssh = get_ssh_connection("localhost", "vagrant",
-                                    key=key, port=2222)
+                                     key=key, port=2222)
             with ssh:
                 pass
 
@@ -516,10 +523,10 @@ class UtilsTestCase(TestCase):
         utils._get_jobs(None, None, 0, results)
         expected = [
             {
-            'jobs': [],
-            'name': None,
-            'columns': ['Job ID', 'Username', 'Jobname',
-                        "Req'd Memory", "Req'd Time", 'Elap Time', 'S']
+                'jobs': [],
+                'name': None,
+                'columns': ['Job ID', 'Username', 'Jobname',
+                            "Req'd Memory", "Req'd Time", 'Elap Time', 'S']
             }
         ]
         self.assertEqual(results, expected)
@@ -540,6 +547,7 @@ class UtilsTestCase(TestCase):
 
 @skipUnless(server_exists(**SERVER), "Requires external test server.")
 class InterfaceTestCase(TestCase):
+
     def setUp(self):
         self.user = User.objects.create_user(**USER)
         self.user.save()
@@ -556,17 +564,22 @@ class InterfaceTestCase(TestCase):
 
         self.cluster = models.Cluster(**CLUSTER)
         self.cluster.save()
-        self.credential = models.Credential(user=self.user, cluster=self.cluster, **CREDENTIAL)
+        self.credential = models.Credential(
+            user=self.user, cluster=self.cluster, **CREDENTIAL)
         self.credential.save()
-        self.credential2 = models.Credential(user=super_user, cluster=self.cluster, **CREDENTIAL)
+        self.credential2 = models.Credential(
+            user=super_user, cluster=self.cluster, **CREDENTIAL)
         self.credential2.save()
         self.client = Client()
 
     def test_run_job_folder_error(self):
         with self.credential2.get_ssh_connection() as ssh:
-            ssh.exec_command("sudo chown root:root chemtools; sudo chmod 700 chemtools")
-            results = interface.run_job(self.credential2, '', jobstring='sleep 0')
-            ssh.exec_command("sudo chown vagrant:vagrant chemtools; chmod 775 chemtools")
+            ssh.exec_command(
+                "sudo chown root:root chemtools; sudo chmod 700 chemtools")
+            results = interface.run_job(
+                self.credential2, '', jobstring='sleep 0')
+            ssh.exec_command(
+                "sudo chown vagrant:vagrant chemtools; chmod 775 chemtools")
             self.assertIn('mkdir: cannot create directory', results["error"])
 
     def test_run_job_staff_error(self):
@@ -593,14 +606,16 @@ class InterfaceTestCase(TestCase):
         names = ['test', 'test2']
         gjfs = ['', '']
         job = 'sleep 0'
-        results = interface.run_jobs(self.credential2, names, gjfs, jobstring=job)
+        results = interface.run_jobs(
+            self.credential2, names, gjfs, jobstring=job)
         self.assertEqual(results["error"], None)
 
     def test_run_jobs_qsub_error(self):
         names = ['benz; ls files.gjf']
         gjfs = ['']
         job = 'sleep 0'
-        results = interface.run_jobs(self.credential2, names, gjfs, jobstring=job)
+        results = interface.run_jobs(
+            self.credential2, names, gjfs, jobstring=job)
         self.assertIn("qsub -", results["failed"][0][1])
 
     def test_run_job_states(self):
@@ -634,7 +649,8 @@ class InterfaceTestCase(TestCase):
     def test_kill_jobs_run_through_no_job(self):
         results = interface.run_job(self.credential2, '', jobstring='sleep 10')
         jobid = results["jobid"]
-        models.Job.objects.filter(credential=self.credential2, jobid=jobid).delete()
+        models.Job.objects.filter(
+            credential=self.credential2, jobid=jobid).delete()
         results = interface.kill_jobs(self.credential2, [jobid])
         self.assertEqual(results["error"], None)
 
@@ -645,10 +661,10 @@ class InterfaceTestCase(TestCase):
     def test_get_specific_jobs_no_match(self):
         results = interface.get_specific_jobs(self.credential, [])
         expected = {
-                'cluster': CLUSTER["name"],
-                'failed': [],
-                'worked': [],
-                'error': None
+            'cluster': CLUSTER["name"],
+            'failed': [],
+            'worked': [],
+            'error': None
         }
         self.assertEqual(results, expected)
 
@@ -660,14 +676,14 @@ class InterfaceTestCase(TestCase):
                 'jobs': [],
                 'name': CLUSTER['name'],
                 'columns': [
-                            'Job ID',
-                            'Username',
-                            'Jobname',
-                            "Req'd Memory",
-                            "Req'd Time",
-                            'Elap Time',
-                            'S'
-                            ]
+                    'Job ID',
+                    'Username',
+                    'Jobname',
+                    "Req'd Memory",
+                    "Req'd Time",
+                    'Elap Time',
+                    'S'
+                ]
             }
         ]
         self.assertEqual(results, expected)
@@ -722,13 +738,15 @@ class InterfaceTestCase(TestCase):
 
 @skipUnless(server_exists(**SERVER), "Requires external test server.")
 class ManagementTestCase(TestCase):
+
     def setUp(self):
         super_user = User.objects.create_superuser(**SUPER_USER)
         super_user.save()
 
         self.cluster = models.Cluster(**CLUSTER)
         self.cluster.save()
-        self.credential = models.Credential(user=super_user, cluster=self.cluster, **CREDENTIAL)
+        self.credential = models.Credential(
+            user=super_user, cluster=self.cluster, **CREDENTIAL)
         self.credential.save()
         with self.credential.get_ssh_connection() as ssh:
             ssh.exec_command("touch chemtools/walltime.log")
@@ -738,8 +756,8 @@ class ManagementTestCase(TestCase):
 
     def test_update_jobs(self):
         job = models.Job(credential=self.credential,
-            jobid="1",
-            name="not_a_real_job")
+                         jobid="1",
+                         name="not_a_real_job")
         job.save()
         update_jobs.run_all()
         updated = models.Job.objects.get(id=job.id)
@@ -747,8 +765,8 @@ class ManagementTestCase(TestCase):
 
     def test_update_jobs_command(self):
         job = models.Job(credential=self.credential,
-            jobid="1",
-            name="not_a_real_job")
+                         jobid="1",
+                         name="not_a_real_job")
         job.save()
         call_command("update_jobs")
         updated = models.Job.objects.get(id=job.id)
@@ -756,9 +774,9 @@ class ManagementTestCase(TestCase):
 
     def test_update_unknown_walltime(self):
         job = models.Job(credential=self.credential,
-            jobid="1",
-            name="walltime",
-            state=models.Job.UNKNOWN)
+                         jobid="1",
+                         name="walltime",
+                         state=models.Job.UNKNOWN)
         job.save()
         update_unknown.run_all()
         updated = models.Job.objects.get(id=job.id)
@@ -766,9 +784,9 @@ class ManagementTestCase(TestCase):
 
     def test_update_unknown_completed(self):
         job = models.Job(credential=self.credential,
-            jobid="1",
-            name="completed",
-            state=models.Job.UNKNOWN)
+                         jobid="1",
+                         name="completed",
+                         state=models.Job.UNKNOWN)
         job.save()
         update_unknown.run_all()
         updated = models.Job.objects.get(id=job.id)
@@ -776,9 +794,9 @@ class ManagementTestCase(TestCase):
 
     def test_update_unknown_failed(self):
         job = models.Job(credential=self.credential,
-            jobid="1",
-            name="failed",
-            state=models.Job.UNKNOWN)
+                         jobid="1",
+                         name="failed",
+                         state=models.Job.UNKNOWN)
         job.save()
         update_unknown.run_all()
         updated = models.Job.objects.get(id=job.id)
@@ -786,9 +804,9 @@ class ManagementTestCase(TestCase):
 
     def test_update_unknown_missing(self):
         job = models.Job(credential=self.credential,
-            jobid="1",
-            name="missing",
-            state=models.Job.UNKNOWN)
+                         jobid="1",
+                         name="missing",
+                         state=models.Job.UNKNOWN)
         job.save()
         update_unknown.run_all()
         updated = models.Job.objects.get(id=job.id)
@@ -796,18 +814,18 @@ class ManagementTestCase(TestCase):
 
     def test_update_unknown_none(self):
         job = models.Job(credential=self.credential,
-            jobid="1",
-            name="completed",
-            state=models.Job.COMPLETED)
+                         jobid="1",
+                         name="completed",
+                         state=models.Job.COMPLETED)
         job.save()
         update_unknown.run_all()
         update_unknown.run_all()
 
     def test_update_unknown_command(self):
         job = models.Job(credential=self.credential,
-            jobid="1",
-            name="walltime",
-            state=models.Job.UNKNOWN)
+                         jobid="1",
+                         name="walltime",
+                         state=models.Job.UNKNOWN)
         job.save()
         call_command("update_unknown")
         updated = models.Job.objects.get(id=job.id)
@@ -815,23 +833,25 @@ class ManagementTestCase(TestCase):
 
 
 class ModelTestCase(TestCase):
+
     def setUp(self):
         super_user = User.objects.create_superuser(**SUPER_USER)
         super_user.save()
 
         self.cluster = models.Cluster(**CLUSTER)
         self.cluster.save()
-        self.credential = models.Credential(user=super_user, cluster=self.cluster, **CREDENTIAL)
+        self.credential = models.Credential(
+            user=super_user, cluster=self.cluster, **CREDENTIAL)
         self.credential.save()
 
     def test_job_format(self):
         job = models.Job(
-                jobid='1',
-                credential=self.credential,
-                name="test",
-                memory="59GB",
-                walltime="1:00",
-                state=models.Job.QUEUED,
-                )
+            jobid='1',
+            credential=self.credential,
+            name="test",
+            memory="59GB",
+            walltime="1:00",
+            state=models.Job.QUEUED,
+        )
         expected = ('1', 'vagrant', 'test', '59GB', '1:00', '--', 'Q')
         self.assertEqual(job.format(), expected)

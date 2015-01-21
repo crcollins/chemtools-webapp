@@ -2,6 +2,7 @@ from constants import CORE_COMBO, CORE_FREE
 
 
 class Tree(object):
+
     def __init__(self, value, parent=None):
         self.parent = parent
         self.value = value
@@ -58,9 +59,8 @@ class Tree(object):
     def __str__(self, level=0):
         ret = "    " * level + str((self.value.id, self.value.element)) + '\n'
         for child in self.children:
-            ret += child.__str__(level+1)
+            ret += child.__str__(level + 1)
         return ret
-
 
 
 def breadth_first_search(structure):
@@ -76,7 +76,8 @@ def breadth_first_search(structure):
             visited.append(point.value)
             points.extend(point.search())
         else:
-            link = sorted([point.value, point.parent.value], key=lambda x: x.id)
+            link = sorted(
+                [point.value, point.parent.value], key=lambda x: x.id)
             links.append((link, point))
     return links, tree
 
@@ -99,16 +100,16 @@ def graph_distance(structure, start, end):
 
 
 def print_links(links):
-    return [[(f.id, f.element) for f in x] for x,y in links]
+    return [[(f.id, f.element) for f in x] for x, y in links]
 
 
 def get_cycles(links, tree):
     sorted_links = sorted(links, key=lambda y: [x.id for x in y[0]])
     cycles = []
     link_nodes = []
-    for i in xrange(len(sorted_links)/2):
-        first = sorted_links[2*i][1].parent
-        second = sorted_links[2*i+1][1].parent
+    for i in xrange(len(sorted_links) / 2):
+        first = sorted_links[2 * i][1].parent
+        second = sorted_links[2 * i + 1][1].parent
         link_nodes.extend([first, second])
 
         parent = first.get_common_parent(second)
@@ -221,7 +222,7 @@ def sort_fused_cycles(cycles):
                 if len(sets[0]) == len(sets[2]):
                     ordering = [0, 1, 2]
                 else:
-                    ordering  = [2, 0, 1]
+                    ordering = [2, 0, 1]
         temp = [fused_cycle[i] for i in ordering]
         sorted_cycles.append(temp)
     return sorted_cycles
@@ -276,7 +277,7 @@ def identify_core(structure, fused_cycle):
 
 
 def identify_core_side(pairs):
-    lower, upper = [zip(x,y) for x, y in zip(CORE_COMBO, CORE_FREE)]
+    lower, upper = [zip(x, y) for x, y in zip(CORE_COMBO, CORE_FREE)]
 
     results = []
     name_atoms = []
