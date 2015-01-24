@@ -444,6 +444,7 @@ def report(request, molecule):
                                initial={"email": email})
         if form.is_valid():
             form.save()
+            logger.info("'%s' was reported as having an error by %s." % (molecule, email))
             return redirect(molecule_detail, molecule)
     else:
         form = ErrorReportForm(initial={"email": email})
