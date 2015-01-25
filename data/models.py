@@ -1,10 +1,15 @@
-import numpy
 import ast
 import cPickle
+import logging
+
+import numpy
 
 from django.db import models
 from django.template import Template, Context
 from django.utils import timezone
+
+
+logger = logging.getLogger(__name__)
 
 
 class DataPoint(models.Model):
@@ -105,6 +110,7 @@ class Predictor(models.Model):
         try:
             return self.clfs, self.pred_clfs
         except AttributeError:
+            logger.info("Loading a new clf pair")
             clfs, pred_clfs = cPickle.load(self.pickle)
             self.clfs = clfs
             self.pred_clfs = pred_clfs

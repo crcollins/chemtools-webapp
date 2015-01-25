@@ -75,7 +75,7 @@ def kill_job(request, cluster):
             int(key)
             jobids.append(key)
         except ValueError:
-            logger.warn("Invalid key %s" % key)
+            logger.warn("Invalid key '%s' for cluser '%s'" % (key, cluster))
             pass
     credential = Credential.objects.get(
         user=request.user, cluster__name=cluster)
@@ -96,8 +96,10 @@ def credential_settings(request, username):
     if request.method == "POST":
         if "delete" in request.POST:
             form = CredentialForm(request.user, initial=initial)
-            for cred in get_credentials_from_request(request):
+            i = 0
+            for i, cred in enumerate(get_credentials_from_request(request)):
                 cred.delete()
+            logger.info("%s deleted %d credential(s)" % (username, i+1))
             state = "Settings Successfully Saved"
 
         elif "test" in request.POST:
@@ -114,6 +116,7 @@ def credential_settings(request, username):
                 obj = form.save(commit=False)
                 obj.user = request.user
                 obj.save()
+                logger.info("%s updated their credentials" % username)
                 state = "Settings Successfully Saved"
                 form = CredentialForm(request.user, initial=initial)
     else:
