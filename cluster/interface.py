@@ -1,10 +1,14 @@
 import re
+import logging
 
 from django.utils import timezone
 
 from models import Job
 from utils import get_ssh_connection_obj, get_sftp_connection_obj, _run_job, \
     get_jobs, add_fileparser, WANTED_COLS
+
+
+logger = logging.getLogger(__name__)
 
 
 def run_job(credential, gjfstring, jobstring=None, **kwargs):
@@ -22,6 +26,7 @@ def run_job(credential, gjfstring, jobstring=None, **kwargs):
     except:
         results["error"] = "Invalid credential"
         results["cluster"] = None
+        logger.info("Invalid credential %s" % credential)
         return results
 
     with ssh, sftp:
@@ -54,6 +59,7 @@ def run_jobs(credential, names, gjfstrings, jobstring=None, **kwargs):
     except:
         results["error"] = "Invalid credential"
         results["cluster"] = None
+        logger.info("Invalid credential %s" % credential)
         return results
 
     jobs = []
@@ -93,6 +99,7 @@ def kill_jobs(credential, jobids):
     except:
         results["error"] = "Invalid credential"
         results["cluster"] = None
+        logger.info("Invalid credential %s" % credential)
         return results
 
     with ssh:
@@ -150,6 +157,7 @@ def get_specific_jobs(credential, jobids):
     except:
         results["error"] = "Invalid credential"
         results["cluster"] = None
+        logger.info("Invalid credential %s" % credential)
         return results
 
     if not jobids:
@@ -183,6 +191,7 @@ def get_all_log_data(credential):
     except:
         results["error"] = "Invalid credential"
         results["cluster"] = None
+        logger.info("Invalid credential %s" % credential)
         return results
 
     with ssh, sftp:
@@ -214,6 +223,7 @@ def get_log_data(credential, names):
     except:
         results["error"] = "Invalid credential"
         results["cluster"] = None
+        logger.info("Invalid credential %s" % credential)
         return results
 
     with ssh, sftp:
@@ -253,6 +263,7 @@ def get_log_status(credential, names):
     except:
         results["error"] = "Invalid credential"
         results["cluster"] = None
+        logger.info("Invalid credential %s" % credential)
         return results
 
     with ssh, sftp:
