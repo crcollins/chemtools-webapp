@@ -1,9 +1,13 @@
 import threading
+import logging
 
 from project.utils import SSHClient, SFTPClient
 
 from models import Credential, Job
 from data.models import JobTemplate
+
+
+logger = logging.getLogger(__name__)
 
 
 WANTED_COLS = ["Job ID", "Username", "Jobname", "Req'd Memory", "Req'd Time",
@@ -19,6 +23,7 @@ def get_ssh_connection_obj(obj):
     elif isinstance(obj, SSHClient):
         return obj
     else:
+        logger.warn("The object passed to get an SSH connection was not of the correct type")
         raise TypeError
 
 
@@ -31,6 +36,7 @@ def get_sftp_connection_obj(obj):
     elif isinstance(obj, SFTPClient):
         return obj
     else:
+        logger.warn("The object passed to get an SFTP connection was not of the correct type")
         raise TypeError
 
 
@@ -50,6 +56,7 @@ def get_credentials_from_request(request):
                     cluster__port=int(port))
                 creds.append(cred)
             except Exception:
+                logger.info("Could not find the credential: %s@%s:%s" % (username, hostname, port))
                 pass
     return creds
 
@@ -84,6 +91,7 @@ def add_fileparser(ssh, sftp):
         _, stdout, stderr = ssh.exec_command(command)
         err = stderr.read()
         if err:
+            logger.warn("Could not add the fileparser: %s" % err)
             return err
     return None
 
@@ -117,6 +125,7 @@ def _run_job(ssh, sftp, gjfstring, jobstring=None, **kwargs):
 
         jobid = stdout.readlines()[0].split(".")[0]
     except Exception as e:
+        logger.warn("Could not run the job: %s" % e)
         return None, str(e)
     return jobid, None
 
