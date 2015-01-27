@@ -3,6 +3,7 @@ import math
 import copy
 import string
 from itertools import product
+import logging
 
 import numpy
 import cairo
@@ -13,6 +14,9 @@ from utils import get_full_rotation_matrix, get_angles, replace_geom_vars, \
     convert_zmatrix_to_cart, calculate_bonds, \
     get_axis_rotation_matrix
 from project.utils import StringIO
+
+
+logger = logging.getLogger(__name__)
 
 
 def from_xyz(file):
@@ -244,6 +248,7 @@ def from_name(name):
                 if bonda and bondb:
                     this[parentid][0].merge(bonda, bondb, part, freeze=freeze)
                 else:
+                    logging.warn("Odd condition occured, part not connected. '%s'" % name)
                     raise Exception(6, "Part not connected")
 
             # The skip here is dependent on if there are any other aryl groups
