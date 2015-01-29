@@ -679,6 +679,10 @@ class Structure(object):
                     frags.append(a)
         return Structure.concatenate(frags)
 
+    def perturb(self, delta=0.1):
+        for atom in self.atoms:
+            atom.xyz += numpy.matrix(numpy.random.uniform(-delta, delta, size=(3, 1)))
+
     ###########################################################################
     # Properties
     ###########################################################################
