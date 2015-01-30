@@ -1,8 +1,14 @@
+import logging
+
 from models import Credential, Job
 from interface import get_log_status
 
 
+logger = logging.getLogger(__name__)
+
+
 def run_all():
+    logger.debug("Updating all unknown job states")
     for cred in Job.objects.values('credential').distinct():
         cred = Credential.objects.get(id=cred["credential"])
         jobs = Job.objects.filter(credential=cred, state=Job.UNKNOWN)
