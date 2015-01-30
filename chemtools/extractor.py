@@ -1,8 +1,12 @@
 import os
 import itertools
+import logging
 
 from structure import Atom, Bond
 from constants import RGROUPS, ARYL
+
+
+logger = logging.getLogger(__name__)
 
 
 PARTS_OF_NAME = ['C', 'T', 'Z', 'E'], ['2', '3', '4'], ['3', '4']
@@ -56,7 +60,7 @@ def run_all(base="chemtools"):
             f.write('\n')
             for bond in bonds:
                 f.write(' '.join(bond.mol2.split()[1:]) + '\n')
-
+        logger.debug("Converted %s to %s" % (fname, os.path.join(base, "data", name)))
 
 if __name__ == "__main__":
     run_all("")

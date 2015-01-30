@@ -199,6 +199,7 @@ def _concatenate_fragments(core, fragments):
 def from_name(name):
     '''Returns a closed structure based on the input of each of the edge
     names.'''
+    logging.debug("Building '%s' from name" % name)
     coresets, nm, xyz = parse_name(name)
 
     structures = []
