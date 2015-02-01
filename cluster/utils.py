@@ -186,6 +186,7 @@ def _get_jobs(cred, cluster, i, results):
                 jobs.append(temp)
         results[i] = {"name": cluster, "columns": WANTED_COLS, "jobs": jobs}
     except Exception:
+        logger.info("No jobs running for %s", cred)
         results[i] = {"name": cluster, "columns": WANTED_COLS, "jobs": []}
 
 
