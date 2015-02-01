@@ -356,7 +356,7 @@ def reset_gjf(request, upload_form):
             strings.append(parser.format_gjf(td=td))
             names.append(name)
         except Exception as e:
-            logger.warn(str(e))
+            logger.warn("There was an error when trying to reset a gjf: '%s'" % str(e))
             errors.append((f.name, e))
 
     if request.REQUEST.get("gjf_submit"):
