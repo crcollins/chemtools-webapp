@@ -300,7 +300,7 @@ The actual reading of information can also be done now using just the log files.
 
 #### Gjf Reset ####
 
-This takes a log file and returns a gjf file with the extracted geometry. This is intended to be used to extract the optimized geometry from the DFT log files to then use as the TDDFT gjf file. _WARNING: this will not work in some cases where the job stopped part way through writing._
+This takes a log file and returns a gjf file with the extracted geometry. This is intended to be used to extract the optimized geometry from the DFT log files to then use as the TDDFT gjf file. _WARNING: this will not work in some cases where the job stopped part way through writing._ If this does occur, the parser will try to get the geometry from the top of the log file and return the same geometry that was used for the job.
 
 In addition to just being able to write out the gjf with the same parameters that were used to generate the log file, this also allows the creation of TDDFT files. If you are logged in, you can use this same mechanism to then submit the TDDFT calculation on the spot.
 
