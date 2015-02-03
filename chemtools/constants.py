@@ -22,7 +22,7 @@ NEEDSPACE = XGROUPS + ARYL0
 TURNING = set(['5', '7', '9', '10', '11', '12', '13'])
 VALID_SIDE_TOKENS = set(XGROUPS + ARYL + RGROUPS + ['-'])
 
-KEYWORDS = "opt B3LYP/6-31g(d)"
+KEYWORDS = "opt B3LYP/6-31g(d,p)"
 CONNECTIONS = "~*+"
 
 COLORS = {
