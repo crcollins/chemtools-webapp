@@ -33,6 +33,7 @@ class Molecule(object):
         self.mem = kwargs.get('memory', 59)
         self.charge = kwargs.get('charge', 0)
         self.multiplicty = kwargs.get('multiplicity', 1)
+        self.perturb = kwargs.get('perturb', 0.0)
         self.structure = None
 
     def from_gjf(self, f):
@@ -132,6 +133,8 @@ class Benzobisazole(Molecule):
     def __init__(self, name, **kwargs):
         super(Benzobisazole, self).__init__(name, **kwargs)
         self.structure = structure.from_name(name)
+        if self.perturb:
+            self.structure.perturb(delta=self.perturb)
         self._exact_name = None
 
     def get_exact_name(self, spacers=False):

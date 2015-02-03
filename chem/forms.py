@@ -114,6 +114,7 @@ class MoleculeForm(forms.Form):
     nprocshared = forms.IntegerField(initial=16, required=False)
     charge = forms.IntegerField(initial=0, required=False)
     multiplicity = forms.IntegerField(initial=1, required=False)
+    perturb = forms.FloatField(initial=0.0, required=False)
 
     def clean(self):
         super(MoleculeForm, self).clean()
