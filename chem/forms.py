@@ -115,6 +115,8 @@ class MoleculeForm(forms.Form):
     charge = forms.IntegerField(initial=0, required=False)
     multiplicity = forms.IntegerField(initial=1, required=False)
     perturb = forms.FloatField(initial=0.0, required=False)
+    scale = forms.IntegerField(initial=10, required=False)
+    view = forms.BooleanField(initial=False, required=False)
 
     def clean(self):
         super(MoleculeForm, self).clean()
