@@ -5,7 +5,7 @@ from django.http import HttpResponse
 from django.utils import simplejson
 from django.template.loader import render_to_string
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout
+from crispy_forms.layout import Layout, Div
 
 from data.models import JobTemplate
 from cluster.models import Credential
@@ -117,6 +117,27 @@ class MoleculeForm(forms.Form):
     perturb = forms.FloatField(initial=0.0, required=False)
     scale = forms.IntegerField(initial=10, required=False)
     view = forms.BooleanField(initial=False, required=False)
+
+    helper = FormHelper()
+    # helper.form_class = 'form-horizontal'
+    helper.layout = Layout(
+        Div(
+            Div('keywords', css_class='col-xs-12'),
+        css_class='row'),
+        Div(
+            Div('memory', css_class='col-xs-6'),
+            Div('nprocshared', css_class='col-xs-6'),
+        css_class='row'),
+        Div(
+            Div('charge', css_class='col-xs-6'),
+            Div('multiplicity', css_class='col-xs-6'),
+        css_class='row'),
+        Div(
+            Div('perturb', css_class='col-xs-6'),
+            Div('scale', css_class='col-xs-6'),
+        css_class='row'),
+        'view',
+    )
 
     def clean(self):
         super(MoleculeForm, self).clean()
