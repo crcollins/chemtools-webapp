@@ -7,8 +7,8 @@
 <h3>{{ state }}</h3>
 <form action='' method="post">
     {% csrf_token %}
-    {{ reg_form|crispy }}
-    {{ pass_form|crispy }}
+    {% crispy reg_form %}
+    {% crispy pass_form %}
     <div class="row">
         <div class="col-xs-6">
             <button class="btn btn-lg btn-primary btn-block" type="submit">Register</button>

@@ -79,11 +79,11 @@ $(function() {
     <form multiple enctype="multipart/form-data" id="id_form" role="form" action="." method="post">
         {% csrf_token %}
         <div id="id_upload_form">
-            {{ upload_form|crispy }}
+            {% crispy upload_form %}
         </div>
         <div id="details" class="{% if form.errors %}in{% else %}collapse{% endif %}">
             <div id="id_job_form">
-                {{ job_form|crispy }}
+                {% crispy job_form %}
             </div>
         </div>
         <div class="row">

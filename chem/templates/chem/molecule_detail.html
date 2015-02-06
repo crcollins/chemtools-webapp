@@ -96,7 +96,7 @@
         <div id="details" class="{% if form.errors %}in{% else %}collapse{% endif %}">
             <form id="id_job_form" action="." method="get">
                 <div id="id_form_input">
-                    {{ job_form|crispy }}
+                    {% crispy job_form %}
                 </div>
                 <input type="hidden" id="id_molname" name="molname" value="">
                 <div class="row">

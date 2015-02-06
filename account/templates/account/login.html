@@ -11,7 +11,7 @@
 <h3>{{ state }}</h3>
 <form action='' method="post">
     {% csrf_token %}
-    {{ form|crispy }}
+    {% crispy form %}
     <input class="btn btn-lg btn-primary btn-block" type="submit" value="Log In" />
 </form>
 <a href="/reset">Forgot your password?</a>

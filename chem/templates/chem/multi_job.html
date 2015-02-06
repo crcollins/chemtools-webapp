@@ -87,7 +87,7 @@ $(function() {
             </div>
         </div>
         <div id="id_form_input">
-            {{ form|crispy }}
+            {% crispy form %}
         </div>
         <div class="row">
             <div class="col-xs-{% if user.is_authenticated %}4{% else %}6{% endif %}">
