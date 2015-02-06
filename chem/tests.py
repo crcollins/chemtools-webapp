@@ -293,7 +293,7 @@ class MainPageTestCase(TestCase):
 
     def test_write_gjf(self):
         string = "%%nprocshared=16\n%%mem=59GB\n%%chk=%s.chk"
-        string += "\n# opt B3LYP/6-31g(d) geom=connectivity"
+        string += "\n# opt B3LYP/6-31g(d,p) geom=connectivity"
         for name in NAMES:
             response = self.client.get(reverse(views.write_gjf, args=(name, )))
             self.assertEqual(response.status_code, 200)
