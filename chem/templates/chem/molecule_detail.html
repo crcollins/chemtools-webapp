@@ -88,7 +88,7 @@
         <div id="mol_details" class="{% if mol_form.errors %}in{% else %}collapse{% endif %}">
             <form id="id_mol_form">
                 <div id="id_form_input2">
-                    {{ mol_form|crispy }}
+                    {% crispy mol_form %}
                 </div>
             </form>
         </div>
