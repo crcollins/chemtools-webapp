@@ -119,7 +119,6 @@ class MoleculeForm(forms.Form):
     view = forms.BooleanField(initial=False, required=False)
 
     helper = FormHelper()
-    # helper.form_class = 'form-horizontal'
     helper.layout = Layout(
         Div(
             Div('keywords', css_class='col-xs-12'),
@@ -150,9 +149,9 @@ class MoleculeForm(forms.Form):
 class JobForm(forms.Form):
     name = forms.CharField(max_length=400)
     email = forms.EmailField()
+    allocation = forms.CharField(max_length=12)
     nodes = forms.IntegerField()
     walltime = forms.IntegerField()
-    allocation = forms.CharField(max_length=12)
     custom_template = forms.BooleanField(required=False)
     base_template = forms.ModelChoiceField(
         queryset=JobTemplate.objects.all(),
@@ -174,6 +173,27 @@ class JobForm(forms.Form):
         required=False,
         widget=forms.HiddenInput(),
         help_text="Only required if you are submitting a job.")
+
+    helper = FormHelper()
+    helper.layout = Layout(
+        Div(
+            Div('name', css_class='col-xs-12'),
+        css_class='row'),
+        Div(
+            Div('email', css_class='col-xs-6'),
+            Div('allocation', css_class='col-xs-6'),
+        css_class='row'),
+        Div(
+            Div('nodes', css_class='col-xs-6'),
+            Div('walltime', css_class='col-xs-6'),
+        css_class='row'),
+        Div(
+            Div('custom_template', css_class='col-xs-2'),
+            Div('base_template', css_class='col-xs-10'),
+        css_class='row'),
+        'template',
+        'credential',
+    )
 
     def __init__(self,  *args, **kwargs):
         super(JobForm, self).__init__(*args, **kwargs)
