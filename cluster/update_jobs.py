@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 def run_all():
-	logger.debug("Updating all the jobs")
+    logger.debug("Updating all the jobs")
     for user in User.objects.all():
         creds = user.credentials.all()
         get_jobs(creds)
