@@ -500,7 +500,7 @@ class MainPageTestCase(TestCase):
             response = self.client.post(reverse(views.report,
                                                 args=(name, )), data)
             self.assertEqual(response.status_code, 200)
-            self.assertIn("Enter a valid e-mail", response.content)
+            self.assertIn("Enter a valid email address", response.content)
 
 
 class PostsFailTestCase(TestCase):
