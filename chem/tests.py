@@ -1059,8 +1059,8 @@ class UploadsTestCase(TestCase):
             }
             response = self.client.post(reverse(views.upload_data), data)
             self.assertEqual(response.status_code, 200)
-            with StringIO(response.content) as f:
-                reader = csv.reader(f, delimiter=',', quotechar='"')
+            with StringIO(response.content) as f2:
+                reader = csv.reader(f2, delimiter=',', quotechar='"')
                 expected = ["A_TON_A_A.log", "A_TON_A_A",
                             "A_TON_A_A_n1_m1_x1_y1_z1",
                             "opt B3LYP/6-31g(d) geom=connectivity",
