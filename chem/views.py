@@ -225,8 +225,7 @@ def write_gjf(request, molecule):
 
     mol_settings = dict(mol_form.cleaned_data)
     out = gjfwriter.Benzobisazole(molecule, **mol_settings)
-    f = StringIO(out.get_gjf())
-    response = HttpResponse(FileWrapper(f), content_type="text/plain")
+    response = HttpResponse(out.get_gjf(), content_type="text/plain")
     response['Content-Disposition'] = add + 'filename=%s.gjf' % molecule
     return response
 
@@ -238,8 +237,7 @@ def write_mol2(request, molecule):
 
     mol_settings = dict(mol_form.cleaned_data)
     out = gjfwriter.Benzobisazole(molecule, **mol_settings)
-    f = StringIO(out.get_mol2())
-    response = HttpResponse(FileWrapper(f), content_type="text/plain")
+    response = HttpResponse(out.get_mol2(), content_type="text/plain")
     response['Content-Disposition'] = add + 'filename=%s.mol2' % molecule
     return response
 
@@ -309,8 +307,7 @@ def parse_log(request, upload_form):
         logger.info("%d datapoint(s) added to database" % number_added)
         output += "\n\n\n%d datapoint(s) added to database." % number_added
 
-    f = StringIO(output)
-    response = HttpResponse(FileWrapper(f), content_type="text/plain")
+    response = HttpResponse(output, content_type="text/plain")
     return response
 
 
