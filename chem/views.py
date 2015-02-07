@@ -1,6 +1,7 @@
 import os
 import zipfile
 import logging
+import json
 
 from django.shortcuts import render, redirect
 from django.template import Context, RequestContext
@@ -8,7 +9,6 @@ from django.template.loader import render_to_string
 from django.http import HttpResponse
 from django.core.servers.basehttp import FileWrapper
 from django.core.serializers.json import DjangoJSONEncoder
-from django.utils import simplejson
 from crispy_forms.utils import render_crispy_form
 
 from models import ErrorReport
@@ -59,7 +59,7 @@ def multi_job(request):
                 "job_form_html": job_form_html,
                 "mol_form_html": '',
             }
-            return HttpResponse(simplejson.dumps(a),
+            return HttpResponse(json.dumps(a),
                                 mimetype="application/json")
         return render(request, "chem/multi_job.html", c)
 
@@ -74,10 +74,10 @@ def multi_job(request):
         if do_html:
             html = render_to_string("chem/multi_submit.html", a)
             temp = {"success": True, "html": html}
-            return HttpResponse(simplejson.dumps(temp),
+            return HttpResponse(json.dumps(temp),
                                 mimetype="application/json")
         else:
-            return HttpResponse(simplejson.dumps(a),
+            return HttpResponse(json.dumps(a),
                                 mimetype="application/json")
 
     string = request.REQUEST.get('filenames', '').replace('\n', ',')
@@ -106,7 +106,7 @@ def molecule_check(request, string):
         html = render_to_string("chem/multi_table.html", a)
         return HttpResponse(html)
     else:
-        return HttpResponse(simplejson.dumps(a), mimetype="application/json")
+        return HttpResponse(json.dumps(a), mimetype="application/json")
 
 
 def molecule_detail(request, molecule):
@@ -128,7 +128,7 @@ def molecule_detail(request, molecule):
             "job_form_html": job_form_html,
             "mol_form_html": mol_form_html,
         }
-        return HttpResponse(simplejson.dumps(a), mimetype="application/json")
+        return HttpResponse(json.dumps(a), mimetype="application/json")
 
     a = get_molecule_info(molecule)
     a["job_form"] = job_form
@@ -139,7 +139,7 @@ def molecule_detail(request, molecule):
 
 def molecule_detail_json(request, molecule):
     a = get_molecule_info(molecule)
-    return HttpResponse(simplejson.dumps(a, cls=DjangoJSONEncoder),
+    return HttpResponse(json.dumps(a, cls=DjangoJSONEncoder),
                         mimetype="application/json")
 
 
@@ -166,7 +166,7 @@ def multi_molecule(request, string):
             "job_form_html": job_form_html,
             "mol_form_html": mol_form_html,
         }
-        return HttpResponse(simplejson.dumps(a), mimetype="application/json")
+        return HttpResponse(json.dumps(a), mimetype="application/json")
 
     c = Context({
         "pagename": string,
@@ -377,7 +377,7 @@ def reset_gjf(request, upload_form):
                     "job_form_html": job_form_html,
                     "upload_form_html": upload_form_html,
                 }
-                return HttpResponse(simplejson.dumps(a),
+                return HttpResponse(json.dumps(a),
                                     mimetype="application/json")
             c = Context({
                 "job_form": job_form,
@@ -393,10 +393,10 @@ def reset_gjf(request, upload_form):
         if do_html:
             html = render_to_string("chem/multi_submit.html", a)
             temp = {"success": True, "html": html}
-            return HttpResponse(simplejson.dumps(temp),
+            return HttpResponse(json.dumps(temp),
                                 mimetype="application/json")
         else:
-            return HttpResponse(simplejson.dumps(a),
+            return HttpResponse(json.dumps(a),
                                 mimetype="application/json")
 
     buff = StringIO()

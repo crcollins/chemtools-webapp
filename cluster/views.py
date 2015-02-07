@@ -1,10 +1,10 @@
 import logging
+import json
 
 from django.shortcuts import render, redirect
 from django.template import Context
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
-from django.utils import simplejson
 
 from account.utils import add_account_page, PAGES
 from models import CredentialForm, ClusterForm, Cluster, Credential
@@ -39,7 +39,7 @@ def get_job_list(request):
     if request.REQUEST.get("html", ''):
         c = Context(a)
         return render(request, "cluster/job_table.html", c)
-    return HttpResponse(simplejson.dumps(a), mimetype="application/json")
+    return HttpResponse(json.dumps(a), mimetype="application/json")
 
 
 @login_required

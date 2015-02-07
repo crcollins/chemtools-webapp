@@ -1,12 +1,12 @@
 import os
 from unittest import skipUnless
 import time
+import json
 
 from django.conf import settings
 from django.test import Client, TestCase
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
-from django.utils import simplejson
 from django.core.management import call_command
 
 import views
@@ -149,7 +149,7 @@ class SSHPageTestCase(TestCase):
 
         response = self.client.get(reverse(views.get_job_list))
         self.assertEqual(response.status_code, 200)
-        data = simplejson.loads(response.content)
+        data = json.loads(response.content)
         self.assertTrue(data["is_authenticated"])
 
     def test_get_job_list_html(self):

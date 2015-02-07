@@ -1,8 +1,8 @@
 import re
+import json
 
 from django import forms
 from django.http import HttpResponse
-from django.utils import simplejson
 from django.template.loader import render_to_string
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Div
@@ -267,8 +267,8 @@ class JobForm(forms.Form):
             if do_html:
                 html = render_to_string("chem/multi_submit.html", results)
                 temp = {"success": True, "html": html}
-                return HttpResponse(simplejson.dumps(temp),
+                return HttpResponse(json.dumps(temp),
                                     mimetype="application/json")
             else:
-                return HttpResponse(simplejson.dumps(results),
+                return HttpResponse(json.dumps(results),
                                     mimetype="application/json")

@@ -4,10 +4,10 @@ import zipfile
 import itertools
 import urllib
 from unittest import skipUnless
+import json
 
 from django.test import Client, TestCase
 from django.core.urlresolvers import reverse
-from django.utils import simplejson
 from django.contrib.auth.models import User
 from django.conf import settings
 
@@ -413,7 +413,7 @@ class MainPageTestCase(TestCase):
         response = self.client.get(reverse(views.molecule_check,
                                            args=(TIMEOUT_NAMES, )))
         self.assertEqual(response.status_code, 200)
-        value = simplejson.loads(response.content)["error"]
+        value = json.loads(response.content)["error"]
         self.assertEqual(value, "The operation has timed out.")
 
     def test_multi_molecule_zip_timeout(self):
@@ -430,7 +430,7 @@ class MainPageTestCase(TestCase):
         for name, error in names:
             response = self.client.get(reverse(views.molecule_check,
                                                args=(name, )))
-            values = simplejson.loads(response.content)["molecules"]
+            values = json.loads(response.content)["molecules"]
             self.assertEqual(values[0][2], error)
 
     def test_report_molecule(self):
@@ -442,7 +442,7 @@ class MainPageTestCase(TestCase):
             data["urgency"] = i
             response = self.client.get(reverse(views.molecule_check,
                                                args=(name, )))
-            values = simplejson.loads(response.content)["molecules"]
+            values = json.loads(response.content)["molecules"]
             self.assertFalse(values[0][1])
 
             response = self.client.get(reverse(views.report,
@@ -455,7 +455,7 @@ class MainPageTestCase(TestCase):
 
             response = self.client.get(reverse(views.molecule_check,
                                                args=(name, )))
-            values = simplejson.loads(response.content)["molecules"]
+            values = json.loads(response.content)["molecules"]
             self.assertTrue(values[0][1])
 
     def test_report_molecule_after_login(self):
@@ -469,7 +469,7 @@ class MainPageTestCase(TestCase):
             data["urgency"] = i
             response = self.client.get(reverse(views.molecule_check,
                                                args=(name, )))
-            values = simplejson.loads(response.content)["molecules"]
+            values = json.loads(response.content)["molecules"]
             self.assertFalse(values[0][1])
 
             response = self.client.post(reverse(views.report,
@@ -478,7 +478,7 @@ class MainPageTestCase(TestCase):
 
             response = self.client.get(reverse(views.molecule_check,
                                                args=(name, )))
-            values = simplejson.loads(response.content)["molecules"]
+            values = json.loads(response.content)["molecules"]
             self.assertTrue(values[0][1])
 
     def test_report_molecule_invalid(self):
@@ -490,7 +490,7 @@ class MainPageTestCase(TestCase):
             data["urgency"] = i
             response = self.client.get(reverse(views.molecule_check,
                                                args=(name, )))
-            values = simplejson.loads(response.content)["molecules"]
+            values = json.loads(response.content)["molecules"]
             self.assertFalse(values[0][1])
 
             response = self.client.get(reverse(views.report,
@@ -537,7 +537,7 @@ class PostsFailTestCase(TestCase):
             url = reverse(views.molecule_detail, args=(name, ))
             response = self.client.post(url, options)
 
-            results = simplejson.loads(response.content)
+            results = json.loads(response.content)
             self.assertEqual(results["failed"][0][1], error)
             self.assertFalse(len(results['worked']) > 0)
 
@@ -558,7 +558,7 @@ class PostsFailTestCase(TestCase):
                 "failed": [],
                 "worked": [],
             }
-            self.assertEqual(simplejson.loads(response.content), expected)
+            self.assertEqual(json.loads(response.content), expected)
 
     def test_post_single_ajax_fail(self):
         r = self.client.login(**SUPER_USER_LOGIN)
@@ -573,7 +573,7 @@ class PostsFailTestCase(TestCase):
             url = reverse(views.molecule_detail, args=(name, ))
             response = self.client.post(url, options,
                                         HTTP_X_REQUESTED_WITH="XMLHttpRequest")
-            results = simplejson.loads(response.content)
+            results = json.loads(response.content)
             self.assertFalse(results["success"])
             self.assertIn("has-error", results["job_form_html"])
 
@@ -591,7 +591,7 @@ class PostsFailTestCase(TestCase):
             url = reverse(views.molecule_detail, args=(name, ))
             response = self.client.post(url, options,
                                         HTTP_X_REQUESTED_WITH="XMLHttpRequest")
-            results = simplejson.loads(response.content)
+            results = json.loads(response.content)
             self.assertFalse(results["success"])
             message = "A template or base template is required."
             self.assertIn(message, results["job_form_html"])
@@ -610,7 +610,7 @@ class PostsFailTestCase(TestCase):
         url = reverse(views.multi_molecule, args=(string, ))
         response = self.client.post(url, options)
 
-        results = simplejson.loads(response.content)
+        results = json.loads(response.content)
         self.assertIsNone(results["error"])
         self.assertEqual(len(results["worked"]), 0)
         self.assertEqual(len(results["failed"]), len(names))
@@ -633,7 +633,7 @@ class PostsFailTestCase(TestCase):
             "failed": [],
             "worked": []
         }
-        self.assertEqual(simplejson.loads(response.content), expected)
+        self.assertEqual(json.loads(response.content), expected)
 
     def test_post_multi_ajax_fail(self):
         r = self.client.login(**SUPER_USER_LOGIN)
@@ -649,7 +649,7 @@ class PostsFailTestCase(TestCase):
         url = reverse(views.multi_molecule, args=(name, ))
         response = self.client.post(url, options,
                                     HTTP_X_REQUESTED_WITH="XMLHttpRequest")
-        results = simplejson.loads(response.content)
+        results = json.loads(response.content)
         self.assertFalse(results["success"])
         self.assertIn("has-error", results["job_form_html"])
 
@@ -676,7 +676,7 @@ class PostsFailTestCase(TestCase):
             "failed": [],
             "worked": []
         }
-        self.assertEqual(simplejson.loads(response.content), expected)
+        self.assertEqual(json.loads(response.content), expected)
 
     def test_post_multi_job_ajax_fail(self):
         r = self.client.login(**SUPER_USER_LOGIN)
@@ -697,7 +697,7 @@ class PostsFailTestCase(TestCase):
         url = reverse(views.multi_job)
         response = self.client.post(url, options,
                                     HTTP_X_REQUESTED_WITH="XMLHttpRequest")
-        results = simplejson.loads(response.content)
+        results = json.loads(response.content)
         self.assertFalse(results["success"])
         self.assertIn("has-error", results["job_form_html"])
 
@@ -737,7 +737,7 @@ class PostsFailTestCase(TestCase):
             response = self.client.post(reverse(views.upload_data), data,
                                         HTTP_X_REQUESTED_WITH="XMLHttpRequest")
             self.assertEqual(response.status_code, 200)
-            value = simplejson.loads(response.content)
+            value = json.loads(response.content)
             self.assertFalse(value['success'])
             self.assertIn("has-error", value["job_form_html"])
 
@@ -771,7 +771,7 @@ class PostsTestCase(TestCase):
             url = reverse(views.molecule_detail, args=(name, ))
             response = self.client.post(url, options)
 
-            results = simplejson.loads(response.content)
+            results = json.loads(response.content)
             self.assertIsNone(results["error"])
             self.assertTrue(len(results["worked"]))
 
@@ -788,7 +788,7 @@ class PostsTestCase(TestCase):
         url = reverse(views.multi_molecule, args=(name, ))
         response = self.client.post(url, options)
 
-        results = simplejson.loads(response.content)
+        results = json.loads(response.content)
         self.assertIsNone(results["error"])
         self.assertEqual(len(results["worked"]), len(NAMES))
         self.assertEqual(len(results["failed"]), 0)
@@ -807,7 +807,7 @@ class PostsTestCase(TestCase):
         url = reverse(views.multi_molecule, args=(name, ))
         response = self.client.post(url, options)
 
-        results = simplejson.loads(response.content)
+        results = json.loads(response.content)
         self.assertTrue(results["success"])
         self.assertIn("Go to jobs list", response.content)
 
@@ -829,7 +829,7 @@ class PostsTestCase(TestCase):
         url = reverse(views.multi_job)
         response = self.client.post(url, options)
 
-        results = simplejson.loads(response.content)
+        results = json.loads(response.content)
         self.assertIsNone(results["error"])
         self.assertEqual(len(results["worked"]), len(files))
         self.assertEqual(len(results["failed"]), 0)
@@ -853,7 +853,7 @@ class PostsTestCase(TestCase):
         url = reverse(views.multi_job)
         response = self.client.post(url, options)
 
-        results = simplejson.loads(response.content)
+        results = json.loads(response.content)
         self.assertTrue(results["success"])
         self.assertIn("Go to jobs list", response.content)
 
@@ -873,7 +873,7 @@ class PostsTestCase(TestCase):
             data = dict(temp.items() + SUB_OPTIONS.items())
             response = self.client.post(reverse(views.upload_data), data)
             self.assertEqual(response.status_code, 200)
-            results = simplejson.loads(response.content)
+            results = json.loads(response.content)
             self.assertIsNone(results["error"])
             self.assertEqual(len(results["worked"]), 1)
             self.assertEqual(len(results["failed"]), 0)
@@ -895,7 +895,7 @@ class PostsTestCase(TestCase):
             data = dict(temp.items() + SUB_OPTIONS.items())
             response = self.client.post(reverse(views.upload_data), data)
             self.assertEqual(response.status_code, 200)
-            results = simplejson.loads(response.content)
+            results = json.loads(response.content)
             self.assertIsNone(results["error"])
             self.assertEqual(len(results["worked"]), 1)
             self.assertEqual(len(results["failed"]), 0)
@@ -917,7 +917,7 @@ class PostsTestCase(TestCase):
             data = dict(temp.items() + SUB_OPTIONS.items())
             response = self.client.post(reverse(views.upload_data), data)
             self.assertEqual(response.status_code, 200)
-            results = simplejson.loads(response.content)
+            results = json.loads(response.content)
             self.assertTrue(results["success"])
             self.assertIn("Go to jobs list", response.content)
 
