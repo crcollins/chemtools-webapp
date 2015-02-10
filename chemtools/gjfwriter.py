@@ -35,6 +35,7 @@ class Molecule(object):
         self.multiplicty = kwargs.get('multiplicity', 1)
         self.perturb = kwargs.get('perturb', 0.0)
         self.structure = None
+        self.scale = kwargs.get('scale', 10)
 
     def from_gjf(self, f):
         self.structure = structure.from_gjf(f)
