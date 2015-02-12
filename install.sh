@@ -21,7 +21,7 @@ install_chemtools() {
     ln -fs /usr/lib/python2.7/dist-packages/cairo/ lib/python2.7/site-packages/
 
     # Numpy needs to install before the others because sometimes it has install issues
-    pip install numpy==1.6.1
+    pip install numpy==1.9.1
     pip install -r requirements.txt
     python manage.py syncdb --noinput
 }
