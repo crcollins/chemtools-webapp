@@ -72,17 +72,25 @@ class Molecule(object):
         body = self.structure.mol2
         return header + body
 
-    def get_png(self, size=10):
+    def get_png(self, size=None):
+        if size is None:
+            size = self.scale
         return self.structure.draw(size).getvalue()
 
-    def get_png_data_url(self, size=10):
+    def get_png_data_url(self, size=None):
+        if size is None:
+            size = self.scale
         string = "data:image/png;base64,"
         return string + base64.b64encode(self.get_png(size))
 
-    def get_svg(self, size=10):
+    def get_svg(self, size=None):
+        if size is None:
+            size = self.scale
         return self.structure.draw(size, svg=True).getvalue()
 
-    def get_svg_data_url(self, size=10):
+    def get_svg_data_url(self, size=None):
+        if size is None:
+            size = self.scale
         string = "data:image/svg;base64,"
         return string + base64.b64encode(self.get_svg(size))
 

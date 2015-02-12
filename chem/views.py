@@ -245,11 +245,10 @@ def write_mol2(request, molecule):
 def write_png(request, molecule):
     mol_form = MoleculeForm(request.REQUEST)
     mol_form.is_valid()
-    scale = request.REQUEST.get("scale", 10)
     mol_settings = dict(mol_form.cleaned_data)
 
     out = gjfwriter.Benzobisazole(molecule, **mol_settings)
-    response = HttpResponse(out.get_png(int(scale)), content_type="image/png")
+    response = HttpResponse(out.get_png(), content_type="image/png")
     response['Content-Disposition'] = 'filename=%s.png' % molecule
     return response
 
@@ -257,12 +256,11 @@ def write_png(request, molecule):
 def write_svg(request, molecule):
     mol_form = MoleculeForm(request.REQUEST)
     mol_form.is_valid()
-    scale = request.REQUEST.get("scale", 10)
     mol_settings = dict(mol_form.cleaned_data)
 
     out = gjfwriter.Benzobisazole(molecule, **mol_settings)
     response = HttpResponse(
-        out.get_svg(int(scale)), content_type="image/svg+xml")
+        out.get_svg(), content_type="image/svg+xml")
     response['Content-Disposition'] = 'filename=%s.svg' % molecule
     return response
 
