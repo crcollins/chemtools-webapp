@@ -72,27 +72,27 @@ class Molecule(object):
         body = self.structure.mol2
         return header + body
 
-    def get_png(self, size=None):
-        if size is None:
-            size = self.scale
-        return self.structure.draw(size).getvalue()
+    def get_png(self, scale=None):
+        if scale is None:
+            scale = self.scale
+        return self.structure.draw(scale).getvalue()
 
-    def get_png_data_url(self, size=None):
-        if size is None:
-            size = self.scale
+    def get_png_data_url(self, scale=None):
+        if scale is None:
+            scale = self.scale
         string = "data:image/png;base64,"
-        return string + base64.b64encode(self.get_png(size))
+        return string + base64.b64encode(self.get_png(scale))
 
-    def get_svg(self, size=None):
-        if size is None:
-            size = self.scale
-        return self.structure.draw(size, svg=True).getvalue()
+    def get_svg(self, scale=None):
+        if scale is None:
+            scale = self.scale
+        return self.structure.draw(scale, svg=True).getvalue()
 
-    def get_svg_data_url(self, size=None):
-        if size is None:
-            size = self.scale
+    def get_svg_data_url(self, scale=None):
+        if scale is None:
+            scale = self.scale
         string = "data:image/svg;base64,"
-        return string + base64.b64encode(self.get_svg(size))
+        return string + base64.b64encode(self.get_svg(scale))
 
     @cache
     def get_coulomb_matrix(self):

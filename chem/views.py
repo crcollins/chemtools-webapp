@@ -418,7 +418,7 @@ def view_gjf(request, upload_form):
     for f in upload_form.cleaned_data["files"]:
         out = gjfwriter.Molecule(f.name)
         out.from_gjf(f)
-        images.append(out.get_png_data_url(size=scale))
+        images.append(out.get_png_data_url(scale=scale))
 
     c = Context({
         "images": images,
