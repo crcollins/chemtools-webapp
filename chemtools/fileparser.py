@@ -251,14 +251,22 @@ class Options(LineParser):
     def __init__(self, *args, **kwargs):
         super(Options, self).__init__(*args, **kwargs)
         self.value = ''
+        self.start = False
 
     @is_done
     def parse(self, line):
         # " # opt B3LYP/svp geom=connectivity"
         line = line.strip()
         if line.startswith("#"):
-            self.value = line.lstrip("# ")
-            self.done = True
+            self.start = True
+
+        if self.start:
+            if "--------" in line:
+                self.done = True
+                return
+
+            self.value += line.lstrip("# ")
+
 
 
 @Log.add_parser
