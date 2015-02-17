@@ -482,7 +482,7 @@ class PartialGeometry(LineParser):
          # "---------------------------------------------------------------------"
          # Note: This occurs multiple times in an optimization
 
-        if "X           Y           Z" in line:
+        if "Number       Type             X           Y           Z" in line:
             self.start = True
             return
 
