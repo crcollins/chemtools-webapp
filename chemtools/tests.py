@@ -1101,7 +1101,12 @@ class FileParserTestCase(TestCase):
 
     def test_parse_files(self):
         base = os.path.join(settings.MEDIA_ROOT, "tests")
-        files = ["A_TON_A_A.log", "A_TON_A_A_TD.log", "A_CON_A_A_TDDFT.log"]
+        files = [
+            "A_TON_A_A.log",
+            "A_TON_A_A_TD.log",
+            "A_CON_A_A_TDDFT.log",
+            "crazy.log",
+         ]
         paths = [os.path.join(base, x) for x in files]
         logset = fileparser.LogSet()
         logset.parse_files(paths)
@@ -1121,6 +1126,12 @@ class FileParserTestCase(TestCase):
                  "td B3LYP/6-31g(d)", "-6.59495099194",
                  "-1.19594032058", "41", "2.1565",
                  "-567.1958243", "4.7914", "0.15"],
+                ["crazy",
+                 "---",
+                 "td=(nstates=10) pbeh1pbe/6-311g(d,p) scrf=(cpcm,solvent=dichloromethane) geom=connectivity",
+                 "-4.87464730441",
+                 "-2.47732438648", "371", "0.9760",
+                 "-6879.2403675", "1.8620", "34.3166666667"],
             ]
             lines = [x[1:3] + x[4:] for i, x in enumerate(reader) if i]
             self.assertEqual(expected, lines)
