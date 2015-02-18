@@ -88,9 +88,9 @@ def save_names(names):
         with open(name + ".gjf", 'w') as f:
             f.write(struct.get_gjf())
 
+if __name__ == "__main__":
+    ARYL = ['4', '6', '12', '13']
+    RGROUPS = 'adefhil'
+    FLIP = [''] + ['(%d)' % x for x in xrange(10, 360, 10)]
 
-ARYL = ['4', '6', '12', '13']
-RGROUPS = 'adefhil'
-FLIP = [''] + ['(%d)' % x for x in xrange(10, 360, 10)]
-
-save_names(random_names(ARYL, RGROUPS, flip=FLIP))
+    save_names(random_names(ARYL, RGROUPS, flip=FLIP))
