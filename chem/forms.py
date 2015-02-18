@@ -255,7 +255,7 @@ class JobForm(forms.Form):
                 job_settings['name'] = request.REQUEST.get('molname')
             job_string = JobTemplate.render(**job_settings)
             response = HttpResponse(job_string, content_type="text/plain")
-            filename = '%s.job' % request.REQUEST.get("molname")
+            filename = '%s.job' % job_settings['name']
             add = "" if request.REQUEST.get("view") else "attachment; "
             response['Content-Disposition'] = add + 'filename=' + filename
             return response
