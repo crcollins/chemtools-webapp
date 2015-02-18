@@ -80,7 +80,7 @@ def multi_job(request):
             return HttpResponse(json.dumps(a),
                                 mimetype="application/json")
 
-    string = request.REQUEST.get('filenames', '').replace('\n', ',')
+    string = request.REQUEST.get('filenames', '').replace('\r\n', ',').replace('\n', ',')
     ret_zip = get_multi_job(string, form)
     response = HttpResponse(ret_zip, mimetype="application/zip")
     response["Content-Disposition"] = "attachment; filename=output.zip"
