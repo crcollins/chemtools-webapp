@@ -87,6 +87,7 @@ class UploadForm(forms.Form):
     store = forms.BooleanField(required=False,  label="Store Log File")
 
     helper = FormHelper()
+    helper.form_tag = False
     helper.form_class = 'form-horizontal'
     helper.layout = Layout(
         'files',
@@ -119,6 +120,7 @@ class MoleculeForm(forms.Form):
     view = forms.BooleanField(initial=False, required=False)
 
     helper = FormHelper()
+    helper.form_tag = False
     helper.layout = Layout(
         Div(
             Div('keywords', css_class='col-xs-12'),
@@ -175,6 +177,7 @@ class JobForm(forms.Form):
         help_text="Only required if you are submitting a job.")
 
     helper = FormHelper()
+    helper.form_tag = False
     helper.layout = Layout(
         Div(
             Div('name', css_class='col-xs-12'),
