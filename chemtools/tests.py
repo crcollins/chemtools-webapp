@@ -1,4 +1,5 @@
 import os
+import hashlib
 from itertools import product
 import csv
 
@@ -401,6 +402,8 @@ Title Card Required
 B 5 1 F
 """
 
+# hashlib.sha224(string).hexdigest()
+PNG_HASH = "4cbf2c82970819ccbe66025fdbc627171af31571c96e06323a98c945"
 
 class StructureTestCase(TestCase):
     templates = [
@@ -819,6 +822,12 @@ class BenzobisazoleTestCase(TestCase):
         value = obj.get_formula()
         expected = 'C8H4N2O2'
         self.assertEqual(value, expected)
+
+
+    def test_get_png_data_url(self):
+        obj = gjfwriter.Benzobisazole("TON")
+        string = obj.get_png_data_url()
+        self.assertEqual(PNG_HASH, hashlib.sha224(string).hexdigest())
 
 
 class MolNameTestCase(TestCase):
