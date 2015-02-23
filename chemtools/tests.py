@@ -404,6 +404,7 @@ B 5 1 F
 
 # hashlib.sha224(string).hexdigest()
 PNG_HASH = "4cbf2c82970819ccbe66025fdbc627171af31571c96e06323a98c945"
+SVG_HASH = "c095979c874d01bd997ac6435b9e72a74e510060aad2df7ca4d58c1d"
 
 class StructureTestCase(TestCase):
     templates = [
@@ -828,6 +829,11 @@ class BenzobisazoleTestCase(TestCase):
         obj = gjfwriter.Benzobisazole("TON")
         string = obj.get_png_data_url()
         self.assertEqual(PNG_HASH, hashlib.sha224(string).hexdigest())
+
+    def test_get_svg_data_url(self):
+        obj = gjfwriter.Benzobisazole("TON")
+        string = obj.get_svg_data_url()
+        self.assertEqual(SVG_HASH, hashlib.sha224(string).hexdigest())
 
 
 class MolNameTestCase(TestCase):
