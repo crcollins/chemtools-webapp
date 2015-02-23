@@ -824,6 +824,8 @@ class BenzobisazoleTestCase(TestCase):
         expected = 'C8H4N2O2'
         self.assertEqual(value, expected)
 
+    def test_build_perturb(self):
+        obj = gjfwriter.Benzobisazole("TON", perturb=0.1)
 
     def test_get_png_data_url(self):
         obj = gjfwriter.Benzobisazole("TON")
