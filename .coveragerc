@@ -1,0 +1,34 @@
+[run]
+branch = True
+source = .
+[report]
+# Regexes for lines to exclude from consideration
+exclude_lines =
+    # Have to re-enable the standard pragma
+    pragma: no cover
+
+    # Don't complain about missing debug-only code:
+    def __repr__
+    def __str__
+    def __unicode__
+    if self\.debug
+    if settings\.DEBUG
+
+    # Don't complain if tests don't hit defensive assertion code:
+    raise AssertionError
+    raise NotImplementedError
+    self\.fail\(
+
+    # Don't complain if non-runnable code isn't run:
+    if 0:
+    if __name__ == .__main__.:
+    if SSL:
+    except ImportError:
+    except:  # sometimes this times out
+# omit = */tests.py
+omit = project/wsgi.py,chemtools/update_ml.py,env/*
+ignore_errors = True
+show_missing = True
+
+[html]
+directory = .coverage_html
