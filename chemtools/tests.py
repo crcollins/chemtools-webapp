@@ -733,7 +733,7 @@ class BenzobisazoleTestCase(TestCase):
     ]
     valid_polymer_sides = ['2', '4b', '22', '24', '4bc', '44bc', '4b4',
                            '5-', '5-5', '55-', '5-a', '5-ab4-', '4b114b', '3',
-                           '11']
+                           '11', '4(25)', '4(25)4']
     invalid_polymer_sides = ['B', '2B']
     valid_sides = valid_polymer_sides + invalid_polymer_sides
 
