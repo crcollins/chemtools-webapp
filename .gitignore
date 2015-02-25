@@ -2,6 +2,8 @@
 database
 scratch
 project/secret_key.py
-.coverage*
+.coverage
+.coverage_html/*
 vagrant/.vagrant/*
 *.box
+env/*
