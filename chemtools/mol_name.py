@@ -270,6 +270,7 @@ def parse_name(name):
 
     >>> parse_name('4a_TON_4b_4c')
     (
+        True,
         [
             (
                 'TON',
@@ -285,6 +286,7 @@ def parse_name(name):
     )
     >>> parse_name('4a_TON_5-b_CON_4cd')
     (
+        True,
         [
             (
                 'TON',
@@ -314,7 +316,9 @@ def parse_name(name):
 
     output = []
     for idx, (core, parts) in enumerate(partsets):
-        if core is not None:
+        is_benzo = core is not None
+
+        if is_benzo:
             core_idx = parts.index(core)
         else:
             # If there is no core, join all the parts together into 1 chain
@@ -330,11 +334,11 @@ def parse_name(name):
 
     if len(output) > 1 and nm[1] > 1:
         raise Exception(8, "Can not do m expansion and have multiple cores")
-    return output, nm, xyz
+    return is_benzo, output, nm, xyz
 
 
 def get_exact_name(name, spacers=False):
-    output, nm, xyz = parse_name(name)
+    is_benzo, output, nm, xyz = parse_name(name)
     sidefuncs = (
         lambda num: num == 0 and nm[0] == 1,
         lambda num: nm[1] == 1,
