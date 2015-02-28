@@ -7,3 +7,4 @@ project/secret_key.py
 vagrant/.vagrant/*
 *.box
 env/*
+logfile.log*
