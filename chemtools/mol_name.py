@@ -142,7 +142,7 @@ def tokenize(string):
     return tokens
 
 
-def parse_end_name(name):
+def parse_end_name(name, autoflip=False):
     tokens = tokenize(name)
 
     parts = []
@@ -153,7 +153,7 @@ def parse_end_name(name):
     turns = 0
     for i, token in enumerate(tokens):
         # Alternate flipping structures
-        if token in TURNING:
+        if token in TURNING and autoflip:
             flip = bool(turns % 2)
             turns += 1
         else:
