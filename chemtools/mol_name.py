@@ -142,6 +142,7 @@ def tokenize(string):
     return tokens
 
 
+
 def parse_end_name(name, autoflip=False):
     tokens = tokenize(name)
 
@@ -265,7 +266,7 @@ def get_sides(parts, core_idx):
     return (left, middle, right)
 
 
-def parse_name(name):
+def parse_name(name, autoflip=False):
     '''Parses a molecule name and returns the edge part names.
 
     >>> parse_name('4a_TON_4b_4c')
@@ -327,7 +328,7 @@ def parse_name(name):
 
         sides = get_sides(parts, core_idx)
 
-        parsedsides = tuple(parse_end_name(x) if x else None for x in sides)
+        parsedsides = tuple(parse_end_name(x, autoflip) if x else None for x in sides)
 
         check_sides(parsedsides, len(partsets), idx, nm)
         output.append((core, parsedsides))
