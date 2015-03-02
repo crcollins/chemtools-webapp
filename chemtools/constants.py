@@ -6,6 +6,18 @@ import os
 folder, _ = os.path.split(__file__)
 DATAPATH = os.path.join(folder, "data")
 
+# Structure Classes
+BENZO_TWO = 0
+BENZO_ONE = 1
+BENZO_MULTI = 2
+CHAIN = 3
+CLASSES = {
+    BENZO_TWO: "Benzobisazole",
+    BENZO_ONE: "Benzazole",
+    BENZO_MULTI: "Mutli Benzobisazole",
+    CHAIN: "Chain",
+}
+
 CORE_COMBO = (['O', 'S', 'N', 'P', 'C'], ['N', 'P', 'C'])
 CORE_FREE = ([0, 0, 1, 1, 2], [0, 0, 1])
 
