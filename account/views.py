@@ -2,13 +2,13 @@ import logging
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.template import Context
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import PasswordChangeForm, SetPasswordForm
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 
 from project.settings import HOME_URL
-from account.models import UserProfile
+# from account.models import UserProfile
 from account.forms import RegistrationForm, SettingsForm
 
 import utils
@@ -32,7 +32,7 @@ def register_user(request):
             reg_form.cleaned_data.items() + pass_form.cleaned_data.items()
         )
 
-        new_user = User.objects.create_user(d["username"],
+        new_user = get_user_model().objects.create_user(d["username"],
                                             d["email"],
                                             d["new_password1"])
         new_user.is_active = False
@@ -74,7 +74,7 @@ def activate_user(request, activation_key):
 def get_public_key(request, username):
     pubkey = ''
     try:
-        user = User.objects.filter(username=username)
+        user = get_user_model().objects.filter(username=username)
         user_profile, _ = UserProfile.objects.get_or_create(user=user)
         pubkey = user_profile.public_key + "\n"
     except:

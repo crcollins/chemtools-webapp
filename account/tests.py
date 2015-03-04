@@ -4,7 +4,7 @@ from unittest import skipUnless
 from django.test import Client, TestCase
 from django.conf import settings
 from django.core.urlresolvers import reverse
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from Crypto.PublicKey import RSA
 
 import views
@@ -54,7 +54,7 @@ class RegistrationTestCase(TestCase):
             "new_password2": "mypass",
         }]
         for user in self.users:
-            new_user = User.objects.create_user(user["username"],
+            new_user = get_user_model().objects.create_user(user["username"],
                                                 user["email"],
                                                 user["new_password1"])
             new_user.save()
@@ -128,7 +128,7 @@ class SettingsTestCase(TestCase):
     def setUp(self):
         self.client = Client()
         for user in self.users:
-            new_user = User.objects.create_user(user["username"],
+            new_user = get_user_model().objects.create_user(user["username"],
                                                 user["email"],
                                                 user["new_password1"])
             new_user.save()
@@ -138,7 +138,7 @@ class SettingsTestCase(TestCase):
             response = self.client.get(reverse(views.get_public_key,
                                                args=(user["username"], )))
             self.assertEqual(response.status_code, 200)
-            profile = User.objects.get(username=user["username"]).get_profile()
+            profile = get_user_model().objects.get(username=user["username"]).get_profile()
             self.assertEqual(response.content.strip(), profile.public_key)
 
     def test_get_public_key_invalid(self):
@@ -198,7 +198,7 @@ class SettingsTestCase(TestCase):
                                         data)
             self.assertIn("Settings Successfully Saved", response.content)
 
-            u = User.objects.get(username=user["username"])
+            u = get_user_model().objects.get(username=user["username"])
             self.assertEqual(u.email, 'a' + user["email"])
             u.email = user["email"]
             u.save()
@@ -219,7 +219,7 @@ class SettingsTestCase(TestCase):
                                                 args=(user["username"], "settings")), data)
             self.assertIn("Settings Successfully Saved", response.content)
 
-            profile = User.objects.get(username=user["username"]).get_profile()
+            profile = get_user_model().objects.get(username=user["username"]).get_profile()
             self.assertEqual(profile.xsede_username, user["username"])
 
     def test_change_password(self):
@@ -248,7 +248,7 @@ class SettingsTestCase(TestCase):
             r = self.client.login(username=user["username"],
                                   password=user["new_password1"] + 'a')
             self.assertTrue(r)
-            temp_user = User.objects.get(username=user["username"])
+            temp_user = get_user_model().objects.get(username=user["username"])
             temp_user.set_password(user["new_password1"])
 
     def test_change_password_fail(self):
@@ -301,12 +301,12 @@ class SSHKeyTestCase(TestCase):
     def setUp(self):
         self.client = Client()
         for user in self.users:
-            new_user = User.objects.create_user(user["username"],
+            new_user = get_user_model().objects.create_user(user["username"],
                                                 user["email"],
                                                 user["new_password1"])
             new_user.save()
 
-        user = User.objects.all()[0]
+        user = get_user_model().objects.all()[0]
         profile = user.get_profile()
         test_path = os.path.join(settings.MEDIA_ROOT, "tests")
         with open(os.path.join(test_path, "id_rsa.pub"), 'r') as f:
@@ -341,7 +341,7 @@ class SSHKeyTestCase(TestCase):
 
     def test_change_ssh_key(self):
         user = self.users[1]
-        profile = User.objects.get(username=user["username"]).get_profile()
+        profile = get_user_model().objects.get(username=user["username"]).get_profile()
         r = self.client.login(username=user["username"],
                               password=user["new_password1"])
         self.assertTrue(r)
@@ -359,12 +359,12 @@ class SSHKeyTestCase(TestCase):
                                     data)
         self.assertIn("Settings Successfully Saved", response.content)
 
-        profile = User.objects.get(username=user["username"]).get_profile()
+        profile = get_user_model().objects.get(username=user["username"]).get_profile()
         self.assertNotEqual(profile.public_key, initial)
 
     def test_update_ssh_keys(self):
         user = self.users[0]
-        profile = User.objects.get(username=user["username"]).get_profile()
+        profile = get_user_model().objects.get(username=user["username"]).get_profile()
         r = self.client.login(username=user["username"],
                               password=user["new_password1"])
         self.assertTrue(r)
@@ -381,7 +381,7 @@ class SSHKeyTestCase(TestCase):
                                                   "settings")),
                                     data)
         self.assertIn("Settings Successfully Saved", response.content)
-        profile = User.objects.get(username=user["username"]).get_profile()
+        profile = get_user_model().objects.get(username=user["username"]).get_profile()
         self.assertNotEqual(profile.public_key, initial)
         self.credential.get_ssh_connection()
 
@@ -402,7 +402,7 @@ class LoginTestCase(TestCase):
             "new_password2": "mypass",
         }]
         for user in self.users:
-            new_user = User.objects.create_user(user["username"],
+            new_user = get_user_model().objects.create_user(user["username"],
                                                 user["email"],
                                                 user["new_password1"])
             new_user.save()

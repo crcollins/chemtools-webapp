@@ -8,7 +8,7 @@ import json
 
 from django.test import Client, TestCase
 from django.core.urlresolvers import reverse
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.conf import settings
 
 from project.utils import StringIO, server_exists
@@ -113,7 +113,7 @@ class MainPageTestCase(TestCase):
     def setUp(self):
         self.client = Client()
 
-        new_user = User.objects.create_user(**USER)
+        new_user = get_user_model().objects.create_user(**USER)
         new_user.save()
         new_data = DataPoint(**DATA_POINT)
         new_data.save()
@@ -507,9 +507,9 @@ class PostsFailTestCase(TestCase):
 
     def setUp(self):
         self.client = Client()
-        norm_user = User.objects.create_user(**USER)
+        norm_user = get_user_model().objects.create_user(**USER)
         norm_user.save()
-        super_user = User.objects.create_superuser(**SUPER_USER)
+        super_user = get_user_model().objects.create_superuser(**SUPER_USER)
         super_user.save()
         cluster = Cluster(**CLUSTER)
         cluster.save()
@@ -747,7 +747,7 @@ class PostsTestCase(TestCase):
 
     def setUp(self):
         self.client = Client()
-        new_user = User.objects.create_superuser(**SUPER_USER)
+        new_user = get_user_model().objects.create_superuser(**SUPER_USER)
         new_user.save()
         cluster = Cluster(**CLUSTER)
         cluster.save()
@@ -994,9 +994,9 @@ class UtilsTestCase(TestCase):
 class UtilsServerTestCase(TestCase):
 
     def setUp(self):
-        self.user = User.objects.create_user(**USER)
+        self.user = get_user_model().objects.create_user(**USER)
         self.user.save()
-        super_user = User.objects.create_superuser(**SUPER_USER)
+        super_user = get_user_model().objects.create_superuser(**SUPER_USER)
         super_user.save()
 
         profile = self.user.get_profile()

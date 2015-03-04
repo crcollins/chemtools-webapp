@@ -95,7 +95,6 @@ LOGIN_REDIRECT_URL = "/chem/"
 LOGOUT_URL = "/logout/"
 HOME_URL = "/chem/"
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-AUTH_PROFILE_MODULE = 'account.UserProfile'
 
 # Additional locations of static files
 STATICFILES_DIRS = (
@@ -181,7 +180,7 @@ try:
 except ImportError:
     pass
 
-
+AUTH_USER_MODEL = 'account.CustomUser'
 CRISPY_TEMPLATE_PACK = 'bootstrap3'
 
 # A sample logging configuration. The only tangible logging

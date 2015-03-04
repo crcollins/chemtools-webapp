@@ -1,6 +1,6 @@
-from django.contrib.auth.models import User
 from django.db import models
 from django import forms
+from django.conf import settings
 from django.utils import timezone
 
 from project.utils import get_ssh_connection, get_sftp_connection, StringIO, \
@@ -38,7 +38,7 @@ class EncryptedCharField(models.CharField):
 
 
 class Credential(models.Model):
-    user = models.ForeignKey(User, related_name='credentials')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='credentials')
 
     cluster = models.ForeignKey(Cluster)
     username = models.CharField(max_length=255, null=True, blank=True)

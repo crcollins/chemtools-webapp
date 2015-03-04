@@ -6,7 +6,7 @@ import json
 from django.conf import settings
 from django.test import Client, TestCase
 from django.core.urlresolvers import reverse
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.core.management import call_command
 
 import views
@@ -75,10 +75,10 @@ def run_fake_job(credential):
 class SSHPageTestCase(TestCase):
 
     def setUp(self):
-        user = User.objects.create_user(**USER)
+        user = get_user_model().objects.create_user(**USER)
         user.save()
         self.user = user
-        super_user = User.objects.create_superuser(**SUPER_USER)
+        super_user = get_user_model().objects.create_superuser(**SUPER_USER)
         super_user.save()
 
         self.cluster = models.Cluster(**CLUSTER)
@@ -221,7 +221,7 @@ class SSHPageTestCase(TestCase):
 class SSHSettingsTestCase(TestCase):
 
     def setUp(self):
-        user = User.objects.create_user(**USER)
+        user = get_user_model().objects.create_user(**USER)
         user.save()
         profile = user.get_profile()
         test_path = os.path.join(settings.MEDIA_ROOT, "tests")
@@ -331,7 +331,7 @@ class SSHSettingsTestCase(TestCase):
         self.assertIn('class="success"', response.content)
 
     def test_test_credential_fail(self):
-        user = User.objects.get(username=USER["username"])
+        user = get_user_model().objects.get(username=USER["username"])
         cred = models.Credential(user=user,
                                  cluster=self.cluster,
                                  **BAD_CREDENTIAL)
@@ -354,7 +354,7 @@ class SSHSettingsTestCase(TestCase):
 
     @skipUnless(server_exists(**SERVER), "Requires external test server.")
     def test_test_credential_both(self):
-        user = User.objects.get(username=USER["username"])
+        user = get_user_model().objects.get(username=USER["username"])
         cred = models.Credential(user=user,
                                  cluster=self.cluster,
                                  **BAD_CREDENTIAL)
@@ -549,9 +549,9 @@ class UtilsTestCase(TestCase):
 class InterfaceTestCase(TestCase):
 
     def setUp(self):
-        self.user = User.objects.create_user(**USER)
+        self.user = get_user_model().objects.create_user(**USER)
         self.user.save()
-        super_user = User.objects.create_superuser(**SUPER_USER)
+        super_user = get_user_model().objects.create_superuser(**SUPER_USER)
         super_user.save()
 
         profile = self.user.get_profile()
@@ -740,7 +740,7 @@ class InterfaceTestCase(TestCase):
 class ManagementTestCase(TestCase):
 
     def setUp(self):
-        super_user = User.objects.create_superuser(**SUPER_USER)
+        super_user = get_user_model().objects.create_superuser(**SUPER_USER)
         super_user.save()
 
         self.cluster = models.Cluster(**CLUSTER)
@@ -835,7 +835,7 @@ class ManagementTestCase(TestCase):
 class ModelTestCase(TestCase):
 
     def setUp(self):
-        super_user = User.objects.create_superuser(**SUPER_USER)
+        super_user = get_user_model().objects.create_superuser(**SUPER_USER)
         super_user.save()
 
         self.cluster = models.Cluster(**CLUSTER)
