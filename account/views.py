@@ -38,14 +38,12 @@ def register_user(request):
         new_user.is_active = False
 
         activation_key = utils.generate_key(d["username"])
-        profile = new_user.get_profile()
-        profile.activation_key = activation_key
+        new_user.activation_key = activation_key
         keypair = utils.generate_key_pair(d["username"])
-        profile.public_key = keypair["public"]
-        profile.private_key = keypair["private"]
+        new_user.public_key = keypair["public"]
+        new_user.private_key = keypair["private"]
 
         new_user.save()
-        profile.save()
         logger.info("New user '%s' registered." % new_user.username)
         c = Context({
             "key": activation_key,
@@ -61,7 +59,7 @@ def register_user(request):
 
 
 def activate_user(request, activation_key):
-    user = get_object_or_404(UserProfile, activation_key=activation_key).user
+    user = get_object_or_404(get_user_model(), activation_key=activation_key)
     if not user.is_active:
         user.is_active = True
         user.save()
@@ -75,8 +73,7 @@ def get_public_key(request, username):
     pubkey = ''
     try:
         user = get_user_model().objects.filter(username=username)
-        user_profile, _ = UserProfile.objects.get_or_create(user=user)
-        pubkey = user_profile.public_key + "\n"
+        pubkey = user.public_key + "\n"
     except:
         logger.info("'%s' does not have a public key." % username)
         pass
@@ -99,13 +96,13 @@ def user_settings(request, username):
 @utils.add_account_page("settings")
 def main_settings(request, username):
     state = "Change Settings"
-    user_profile = request.user.get_profile()
+    user = request.user
 
     changed = False
     initial = {
         "email": request.user.email,
-        "xsede_username": user_profile.xsede_username,
-        "public_key": user_profile.public_key,
+        "xsede_username": user.xsede_username,
+        "public_key": user.public_key,
     }
     settings_form = SettingsForm(request.POST or None, initial=initial)
     if settings_form.is_valid():
@@ -117,26 +114,25 @@ def main_settings(request, username):
 
         if d.get("new_ssh_keypair"):
             keys = utils.generate_key_pair(username)
-            if user_profile.public_key:
+            if user.public_key:
                 try:
                     utils.update_all_ssh_keys(request.user, keys["public"])
                 except Exception as e:
                     logger.warn("User '%s' tried to update ssh keys and got an error: %s" % (username, str(e)))
                     pass
-            user_profile.public_key = keys["public"]
-            user_profile.private_key = keys["private"]
+            user.public_key = keys["public"]
+            user.private_key = keys["private"]
             logger.info("User '%s' updated ssh keys." % user.username)
             changed = True
 
 
-        if d.get("xsede_username") != user_profile.xsede_username:
-            user_profile.xsede_username = d.get("xsede_username")
-            logger.info("User '%s' updated xsede_username to %s." % (request.user.username, user_profile.xsede_username))
+        if d.get("xsede_username") != user.xsede_username:
+            user.xsede_username = d.get("xsede_username")
+            logger.info("User '%s' updated xsede_username to %s." % (request.user.username, user.xsede_username))
             changed = True
 
     if changed:
-        user_profile.save()
-        request.user.save()
+        user.save()
         state = "Settings Successfully Saved"
 
     c = Context({

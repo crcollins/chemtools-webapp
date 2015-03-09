@@ -222,14 +222,12 @@ class SSHSettingsTestCase(TestCase):
 
     def setUp(self):
         user = get_user_model().objects.create_user(**USER)
-        user.save()
-        profile = user.get_profile()
         test_path = os.path.join(settings.MEDIA_ROOT, "tests")
         with open(os.path.join(test_path, "id_rsa.pub"), 'r') as f:
-            profile.public_key = f.read()
+            user.public_key = f.read()
         with open(os.path.join(test_path, "id_rsa"), 'r') as f:
-            profile.private_key = f.read()
-        profile.save()
+            user.private_key = f.read()
+        user.save()
 
         self.cluster = models.Cluster(**CLUSTER)
         self.cluster.save()
@@ -550,17 +548,16 @@ class InterfaceTestCase(TestCase):
 
     def setUp(self):
         self.user = get_user_model().objects.create_user(**USER)
+        test_path = os.path.join(settings.MEDIA_ROOT, "tests")
+        with open(os.path.join(test_path, "id_rsa.pub"), 'r') as f:
+            user.public_key = f.read()
+        with open(os.path.join(test_path, "id_rsa"), 'r') as f:
+            user.private_key = f.read()
         self.user.save()
+
         super_user = get_user_model().objects.create_superuser(**SUPER_USER)
         super_user.save()
 
-        profile = self.user.get_profile()
-        test_path = os.path.join(settings.MEDIA_ROOT, "tests")
-        with open(os.path.join(test_path, "id_rsa.pub"), 'r') as f:
-            profile.public_key = f.read()
-        with open(os.path.join(test_path, "id_rsa"), 'r') as f:
-            profile.private_key = f.read()
-        profile.save()
 
         self.cluster = models.Cluster(**CLUSTER)
         self.cluster.save()

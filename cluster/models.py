@@ -63,8 +63,7 @@ class Credential(models.Model):
                 del self.user._profile_cache
             except:
                 pass
-            profile = self.user.get_profile()
-            private = StringIO(profile.private_key)
+            private = StringIO(self.user.private_key)
             return get_ssh_connection(self.cluster.hostname,
                                       self.username,
                                       key=private,
@@ -81,8 +80,7 @@ class Credential(models.Model):
                 del self.user._profile_cache
             except:
                 pass
-            profile = self.user.get_profile()
-            private = StringIO(profile.private_key)
+            private = StringIO(self.user.private_key)
             return get_sftp_connection(self.cluster.hostname,
                                        self.username,
                                        key=private,

@@ -90,7 +90,7 @@ def kill_job(request, cluster):
 @add_account_page("credentials")
 def credential_settings(request, username):
     state = "Change Settings"
-    initial = {"username": request.user.get_profile().xsede_username}
+    initial = {"username": request.user.xsede_username}
     working_creds = []
     failing_creds = []
     if request.method == "POST":
