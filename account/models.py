@@ -9,16 +9,14 @@ from django.contrib.auth.models import BaseUserManager
 
 class CustomUserManager(BaseUserManager):
 
-    def _create_user(self, email, password,
-                     is_staff, is_superuser, **extra_fields):
+    def _create_user(self, username, email, password,
+                     is_staff=False, is_superuser=False, **extra_fields):
         """
         Creates and saves a User with the given email and password.
         """
         now = timezone.now()
-        if not email:
-            raise ValueError('The given email must be set')
         email = self.normalize_email(email)
-        user = self.model(email=email,
+        user = self.model(username=username, email=email,
                           is_staff=is_staff, is_active=True,
                           is_superuser=is_superuser, last_login=now,
                           date_joined=now, **extra_fields)
@@ -26,23 +24,18 @@ class CustomUserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-    def create_user(self, email, password=None, **extra_fields):
-        return self._create_user(email, password, False, False,
+    def create_user(self, username, email, password=None, **extra_fields):
+        return self._create_user(username, email, password, False, False,
                                  **extra_fields)
 
-    def create_superuser(self, email, password, **extra_fields):
-        return self._create_user(email, password, True, True,
+    def create_superuser(self, username, email, password, **extra_fields):
+        return self._create_user(username, email, password, True, True,
                                  **extra_fields)
 
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
-    """
-    A fully featured User model with admin-compliant permissions that uses
-    a full-length email field as the username.
-
-    Email and password are required. Other fields are optional.
-    """
     email = models.EmailField('email address', max_length=254, unique=True)
+    username = models.CharField('username', max_length=30, unique=True)
     first_name = models.CharField('first name', max_length=30, blank=True)
     last_name = models.CharField('last name', max_length=30, blank=True)
     is_staff = models.BooleanField('staff status', default=False,
@@ -63,8 +56,8 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     objects = CustomUserManager()
 
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = []
+    USERNAME_FIELD = 'username'
+    REQUIRED_FIELDS = ['email']
 
     class Meta:
         verbose_name = 'user'
