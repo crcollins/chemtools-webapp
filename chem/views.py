@@ -60,7 +60,7 @@ def multi_job(request):
                 "mol_form_html": '',
             }
             return HttpResponse(json.dumps(a),
-                                mimetype="application/json")
+                                content_type="application/json")
         return render(request, "chem/multi_job.html", c)
 
     d = dict(form.cleaned_data)
@@ -75,14 +75,14 @@ def multi_job(request):
             html = render_to_string("chem/multi_submit.html", a)
             temp = {"success": True, "html": html}
             return HttpResponse(json.dumps(temp),
-                                mimetype="application/json")
+                                content_type="application/json")
         else:
             return HttpResponse(json.dumps(a),
-                                mimetype="application/json")
+                                content_type="application/json")
 
     string = request.REQUEST.get('filenames', '').replace('\r\n', ',').replace('\n', ',')
     ret_zip = get_multi_job(string, form)
-    response = HttpResponse(ret_zip, mimetype="application/zip")
+    response = HttpResponse(ret_zip, content_type="application/zip")
     response["Content-Disposition"] = "attachment; filename=output.zip"
     return response
 
@@ -106,7 +106,7 @@ def molecule_check(request, string):
         html = render_to_string("chem/multi_table.html", a)
         return HttpResponse(html)
     else:
-        return HttpResponse(json.dumps(a), mimetype="application/json")
+        return HttpResponse(json.dumps(a), content_type="application/json")
 
 
 def molecule_detail(request, molecule):
@@ -128,7 +128,7 @@ def molecule_detail(request, molecule):
             "job_form_html": job_form_html,
             "mol_form_html": mol_form_html,
         }
-        return HttpResponse(json.dumps(a), mimetype="application/json")
+        return HttpResponse(json.dumps(a), content_type="application/json")
 
     a = get_molecule_info(molecule)
     a["job_form"] = job_form
@@ -140,7 +140,7 @@ def molecule_detail(request, molecule):
 def molecule_detail_json(request, molecule):
     a = get_molecule_info(molecule)
     return HttpResponse(json.dumps(a, cls=DjangoJSONEncoder),
-                        mimetype="application/json")
+                        content_type="application/json")
 
 
 def multi_molecule(request, string):
@@ -166,7 +166,7 @@ def multi_molecule(request, string):
             "job_form_html": job_form_html,
             "mol_form_html": mol_form_html,
         }
-        return HttpResponse(json.dumps(a), mimetype="application/json")
+        return HttpResponse(json.dumps(a), content_type="application/json")
 
     c = Context({
         "pagename": string,
@@ -213,7 +213,7 @@ def multi_molecule_zip(request, string):
         molecules = [x for i, x in enumerate(molecules) if news[i]]
     ret_zip = get_multi_molecule(molecules, options, mol_form, job_form)
 
-    response = HttpResponse(ret_zip, mimetype="application/zip")
+    response = HttpResponse(ret_zip, content_type="application/zip")
     response["Content-Disposition"] = "attachment; filename=molecules.zip"
     return response
 
@@ -334,7 +334,7 @@ def long_chain_limit(request, upload_form):
     ret_zip = buff.getvalue()
     buff.close()
 
-    response = HttpResponse(ret_zip, mimetype="application/zip")
+    response = HttpResponse(ret_zip, content_type="application/zip")
     response["Content-Disposition"] = "attachment; filename=%s.zip" % name
     return response
 
@@ -373,7 +373,7 @@ def reset_gjf(request, upload_form):
                     "upload_form_html": upload_form_html,
                 }
                 return HttpResponse(json.dumps(a),
-                                    mimetype="application/json")
+                                    content_type="application/json")
             c = Context({
                 "job_form": job_form,
                 "upload_form": upload_form,
@@ -389,10 +389,10 @@ def reset_gjf(request, upload_form):
             html = render_to_string("chem/multi_submit.html", a)
             temp = {"success": True, "html": html}
             return HttpResponse(json.dumps(temp),
-                                mimetype="application/json")
+                                content_type="application/json")
         else:
             return HttpResponse(json.dumps(a),
-                                mimetype="application/json")
+                                content_type="application/json")
 
     buff = StringIO()
     zfile = zipfile.ZipFile(buff, 'w', zipfile.ZIP_DEFLATED)
@@ -406,7 +406,7 @@ def reset_gjf(request, upload_form):
     ret_zip = buff.getvalue()
     buff.close()
 
-    response = HttpResponse(ret_zip, mimetype="application/zip")
+    response = HttpResponse(ret_zip, content_type="application/zip")
     response["Content-Disposition"] = "attachment; filename=output.zip"
     return response
 

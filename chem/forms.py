@@ -271,7 +271,7 @@ class JobForm(forms.Form):
                 html = render_to_string("chem/multi_submit.html", results)
                 temp = {"success": True, "html": html}
                 return HttpResponse(json.dumps(temp),
-                                    mimetype="application/json")
+                                    content_type="application/json")
             else:
                 return HttpResponse(json.dumps(results),
-                                    mimetype="application/json")
+                                    content_type="application/json")

@@ -39,7 +39,7 @@ def get_job_list(request):
     if request.REQUEST.get("html", ''):
         c = Context(a)
         return render(request, "cluster/job_table.html", c)
-    return HttpResponse(json.dumps(a), mimetype="application/json")
+    return HttpResponse(json.dumps(a), content_type="application/json")
 
 
 @login_required
