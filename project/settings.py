@@ -48,6 +48,9 @@ DATABASES = {
     }
 }
 
+AUTH_USER_MODEL = 'account.CustomUser'
+
+
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 # although not all choices may be available on all operating systems.
@@ -180,7 +183,6 @@ try:
 except ImportError:
     pass
 
-AUTH_USER_MODEL = 'account.CustomUser'
 CRISPY_TEMPLATE_PACK = 'bootstrap3'
 
 # A sample logging configuration. The only tangible logging
