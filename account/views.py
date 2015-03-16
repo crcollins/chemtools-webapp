@@ -1,14 +1,12 @@
 import logging
 
 from django.shortcuts import render, redirect, get_object_or_404
-from django.template import Context
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import PasswordChangeForm, SetPasswordForm
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 
 from project.settings import HOME_URL
-# from account.models import UserProfile
 from account.forms import RegistrationForm, SettingsForm
 
 import utils
@@ -45,16 +43,16 @@ def register_user(request):
 
         new_user.save()
         logger.info("New user '%s' registered." % new_user.username)
-        c = Context({
+        c = {
             "key": activation_key,
-        })
+        }
         return render(request, "account/post_register.html", c)
 
-    c = Context({
+    c = {
         "state": state,
         "reg_form": reg_form,
         "pass_form": pass_form,
-    })
+    }
     return render(request, "account/register.html", c)
 
 
@@ -135,12 +133,12 @@ def main_settings(request, username):
         user.save()
         state = "Settings Successfully Saved"
 
-    c = Context({
+    c = {
         "pages": utils.PAGES,
         "page": "settings",
         "state": state,
         "form": settings_form,
-    })
+    }
     return render(request, "account/main_settings.html", c)
 
 
@@ -162,10 +160,10 @@ def password_settings(request, username):
         logger.info("User '%s' updated their password." % username)
         state = "Settings Successfully Saved"
 
-    c = Context({
+    c = {
         "pages": utils.PAGES,
         "page": "password",
         "state": state,
         "form": pass_form,
-    })
+    }
     return render(request, "account/password_settings.html", c)

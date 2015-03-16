@@ -1,7 +1,6 @@
 import os
 
 from django.shortcuts import render, redirect
-from django.template import Context
 from django.http import HttpResponse
 from django.core.servers.basehttp import FileWrapper
 
@@ -20,7 +19,7 @@ def frag_index(request):
         ["X/R Groups", zip(RGROUPS, xrnames)],
         ["Aryl Groups", zip(ARYL, arylnames)],
     )
-    c = Context({"usable_parts": data})
+    c = {"usable_parts": data}
     return render(request, "data/frag_index.html", c)
 
 
@@ -34,5 +33,5 @@ def get_frag(request, frag):
 
 
 def template_index(request):
-    c = Context({"templates": JobTemplate.objects.all()})
+    c = {"templates": JobTemplate.objects.all()}
     return render(request, "data/template_index.html", c)

@@ -2,7 +2,6 @@ import logging
 import json
 
 from django.shortcuts import render, redirect
-from django.template import Context
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 
@@ -22,9 +21,9 @@ def job_index(request):
 
 @login_required
 def cluster_job_index(request, cluster):
-    c = Context({
+    c = {
         "cluster": cluster,
-    })
+    }
     return render(request, "cluster/job_index.html", c)
 
 
@@ -37,8 +36,7 @@ def get_job_list(request):
         "clusters": jobs,
     }
     if request.REQUEST.get("html", ''):
-        c = Context(a)
-        return render(request, "cluster/job_table.html", c)
+        return render(request, "cluster/job_table.html", a)
     return HttpResponse(json.dumps(a), content_type="application/json")
 
 
@@ -56,11 +54,11 @@ def job_detail(request, cluster, jobid):
     else:
         job = results["worked"][0][1]
         e = None
-    c = Context({
+    c = {
         "job": job,
         "cluster": cluster,
         "error_message": e,
-    })
+    }
     return render(request, "cluster/job_detail.html", c)
 
 
@@ -122,14 +120,14 @@ def credential_settings(request, username):
     else:
         form = CredentialForm(request.user, initial=initial)
 
-    c = Context({
+    c = {
         "pages": PAGES,
         "page": "credentials",
         "state": state,
         "form": form,
         "failing_creds": failing_creds,
         "working_creds": working_creds,
-    })
+    }
     return render(request, "cluster/credential_settings.html", c)
 
 
@@ -148,11 +146,11 @@ def cluster_settings(request, username):
     else:
         form = ClusterForm()
 
-    c = Context({
+    c = {
         "pages": PAGES,
         "page": "clusters",
         "state": state,
         "form": form,
         "clusters": Cluster.objects.all(),
-    })
+    }
     return render(request, "cluster/cluster_settings.html", c)

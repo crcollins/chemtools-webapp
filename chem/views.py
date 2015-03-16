@@ -4,7 +4,7 @@ import logging
 import json
 
 from django.shortcuts import render, redirect
-from django.template import Context, RequestContext
+from django.template import RequestContext
 from django.template.loader import render_to_string
 from django.http import HttpResponse
 from django.core.servers.basehttp import FileWrapper
@@ -47,9 +47,9 @@ def index(request):
 def multi_job(request):
     form = JobForm.get_form(request, "{{ name }}")
 
-    c = Context({
+    c = {
         "form": form,
-    })
+    }
     if not form.is_valid(request.method):
         if request.is_ajax():
             job_form_html = render_crispy_form(
@@ -133,8 +133,7 @@ def molecule_detail(request, molecule):
     a = get_molecule_info(molecule)
     a["job_form"] = job_form
     a["mol_form"] = MoleculeForm()
-    c = Context(a)
-    return render(request, "chem/molecule_detail.html", c)
+    return render(request, "chem/molecule_detail.html", a)
 
 
 def molecule_detail_json(request, molecule):
@@ -168,12 +167,12 @@ def multi_molecule(request, string):
         }
         return HttpResponse(json.dumps(a), content_type="application/json")
 
-    c = Context({
+    c = {
         "pagename": string,
         "job_form": job_form,
         "mol_form": MoleculeForm(),
         "gjf": "checked",
-    })
+    }
     return render(request, "chem/multi_molecule.html", c)
 
 
@@ -183,9 +182,9 @@ def multi_molecule_zip(request, string):
             string)
     except ValueError as e:
         logger.warn(str(e))
-        c = Context({
+        c = {
             "error": str(e)
-        })
+        }
         return render(request, "chem/multi_molecule.html", c)
 
     mol_form = MoleculeForm(request.REQUEST)
@@ -194,7 +193,7 @@ def multi_molecule_zip(request, string):
         job_form = JobForm.get_form(request, "{{ name }}")
         if not job_form.is_valid():
             f = lambda x: 'checked' if request.REQUEST.get(x) else ''
-            c = Context({
+            c = {
                 "pagename": string,
                 "job_form": job_form,
                 "mol_form": mol_form,
@@ -202,7 +201,7 @@ def multi_molecule_zip(request, string):
                 "mol2": f("mol2"),
                 "image": f("image"),
                 "job": f("job"),
-            })
+            }
             return render(request, "chem/multi_molecule.html", c)
     else:
         job_form = None
@@ -285,10 +284,10 @@ def upload_data(request):
             return switch[request.POST["options"]](request, upload_form)
     else:
         upload_form = UploadForm()
-    c = Context({
+    c = {
         "upload_form": upload_form,
         "job_form": JobForm.get_form(request, "{{ name }}", initial=True),
-    })
+    }
     return render(request, "chem/upload_log.html", c)
 
 
@@ -374,10 +373,10 @@ def reset_gjf(request, upload_form):
                 }
                 return HttpResponse(json.dumps(a),
                                     content_type="application/json")
-            c = Context({
+            c = {
                 "job_form": job_form,
                 "upload_form": upload_form,
-            })
+            }
             return render(request, "chem/upload_log.html", c)
 
         d = dict(job_form.cleaned_data)
@@ -420,9 +419,9 @@ def view_gjf(request, upload_form):
         out.from_gjf(f)
         images.append(out.get_png_data_url(scale=scale))
 
-    c = Context({
+    c = {
         "images": images,
-    })
+    }
     return render(request, "chem/gjf_view.html", c)
 
 ###########################################################
@@ -450,8 +449,8 @@ def report(request, molecule):
     else:
         form = ErrorReportForm(initial={"email": email})
 
-    c = Context({
+    c = {
         "form": form,
         "molecule": molecule
-    })
+    }
     return render(request, "chem/report.html", c)
