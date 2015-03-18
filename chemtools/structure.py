@@ -200,7 +200,7 @@ def from_name(name):
     '''Returns a closed structure based on the input of each of the edge
     names.'''
     logging.debug("Building '%s' from name" % name)
-    is_benzo, coresets, nm, xyz = parse_name(name)
+    structure_type, coresets, nm, xyz = parse_name(name)
 
     structures = []
     for coreset in coresets:

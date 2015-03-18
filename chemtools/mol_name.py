@@ -4,7 +4,8 @@ import collections
 import random
 
 from constants import SCORES, DCORES, CORES, RGROUPS, XGROUPS, ARYL, ARYL0, \
-    ARYL2, NEEDSPACE, TURNING, VALID_SIDE_TOKENS
+    ARYL2, NEEDSPACE, TURNING, VALID_SIDE_TOKENS, BENZO_MULTI, BENZO_ONE, \
+    BENZO_TWO, CHAIN, CLASSES
 
 
 def name_expansion(string, rand=None):
@@ -316,10 +317,9 @@ def parse_name(name, autoflip=False):
     partsets = parse_cores(parts)
 
     output = []
-    for idx, (core, parts) in enumerate(partsets):
-        is_benzo = core is not None
 
-        if is_benzo:
+    for idx, (core, parts) in enumerate(partsets):
+        if core is not None:
             core_idx = parts.index(core)
         else:
             # If there is no core, join all the parts together into 1 chain
@@ -333,13 +333,24 @@ def parse_name(name, autoflip=False):
         check_sides(parsedsides, len(partsets), idx, nm)
         output.append((core, parsedsides))
 
+    if len(output) > 1:
+        structure_type = BENZO_MULTI
+    elif output[0][0] is None:
+        structure_type = CHAIN
+    elif output[0][0][0] in 'TC':
+        structure_type = BENZO_TWO
+    elif output[0][0][0] in 'EZ':
+        structure_type = BENZO_ONE
+    else:
+        raise Exception(12, "Unknown structure type")
+
     if len(output) > 1 and nm[1] > 1:
         raise Exception(8, "Can not do m expansion and have multiple cores")
-    return is_benzo, output, nm, xyz
+    return structure_type, output, nm, xyz
 
 
 def get_exact_name(name, spacers=False):
-    is_benzo, output, nm, xyz = parse_name(name)
+    structure_type, output, nm, xyz = parse_name(name)
     sidefuncs = (
         lambda num: num == 0 and nm[0] == 1,
         lambda num: nm[1] == 1,
