@@ -1,4 +1,4 @@
-Django==1.7.5
+Django==1.6.10
 matplotlib==1.1.1
 misaka==1.0.2
 paramiko==1.12.1
