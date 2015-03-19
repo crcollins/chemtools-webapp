@@ -506,7 +506,10 @@ class PartialGeometry(LineParser):
 
             if self.dashes:
                 temp = line.strip().split()
-                use = [SYMBOLS[temp[1]]] + temp[3:]
+                try:
+                    use = [SYMBOLS[temp[1]]] + temp[3:]
+                except KeyError:
+                    raise NotImplementedError("The atomic number %s is not yet added to chemtools." % (temp[1], ))
                 self.value += ' '.join(use) + '\n'
 
 
