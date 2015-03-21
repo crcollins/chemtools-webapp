@@ -231,7 +231,7 @@ LOGGING = {
             'propagate': True,
         },
         '': {
-            'handlers': ['logfile','console'],
+            'handlers': ['logfile'],#'console'],
             'level': 'WARNING',
             'propagate': True,
         },
