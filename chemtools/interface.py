@@ -94,7 +94,7 @@ def get_property_limits(name):
                 else:
                     temp_name = name + "_%s%d" % (direction, j)
 
-                exact_name = mol_name.get_exact_name(temp_name, spacers=True)
+                exact_name, _ = mol_name.get_exact_name(temp_name, spacers=True)
                 temp = ml.get_decay_feature_vector(exact_name)
                 groups.append(ml.get_properties_from_decay_with_predictions(
                     temp

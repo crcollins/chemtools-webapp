@@ -334,13 +334,13 @@ def parse_name(name, autoflip=False):
         output.append((core, parsedsides))
 
     if len(output) > 1:
-        structure_type = BENZO_MULTI
+        structure_type = CLASSES[BENZO_MULTI]
     elif output[0][0] is None:
-        structure_type = CHAIN
+        structure_type = CLASSES[CHAIN]
     elif output[0][0][0] in 'TC':
-        structure_type = BENZO_TWO
+        structure_type = CLASSES[BENZO_TWO]
     elif output[0][0][0] in 'EZ':
-        structure_type = BENZO_ONE
+        structure_type = CLASSES[BENZO_ONE]
     else:
         raise Exception(12, "Unknown structure type")
 
@@ -398,4 +398,4 @@ def get_exact_name(name, spacers=False):
             coreset = '_'.join([core, parts[1], parts[2]])
 
         sets.append(coreset)
-    return '_'.join(sets) + '_n%d_m%d' % nm + '_x%d_y%d_z%d' % xyz
+    return '_'.join(sets) + '_n%d_m%d' % nm + '_x%d_y%d_z%d' % xyz, structure_type

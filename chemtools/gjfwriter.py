@@ -145,10 +145,12 @@ class Benzobisazole(Molecule):
         if self.perturb:
             self.structure.perturb(delta=self.perturb)
         self._exact_name = None
+        self._structure_type = None
 
     def get_exact_name(self, spacers=False):
         if self._exact_name is None:
-            self._exact_name = get_exact_name(self.name, spacers=True)
+            self._exact_name, self._structure_type = get_exact_name(self.name,
+                                                                spacers=True)
         if spacers:
             return self._exact_name
         else:

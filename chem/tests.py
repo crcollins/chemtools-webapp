@@ -980,7 +980,8 @@ class UtilsTestCase(TestCase):
             'error_message': None,
             'datapoint': None,
             'new': True,
-            'exact_name_spacers': '2**4aaA**_TON_A**_A**_n1_m1_x1_y1_z1'
+            'exact_name_spacers': '2**4aaA**_TON_A**_A**_n1_m1_x1_y1_z1',
+            'structure_type': 'Benzobisazole',
         }
         self.assertEqual(results, expected)
 

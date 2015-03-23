@@ -24,17 +24,18 @@ logger = logging.getLogger(__name__)
 
 def get_molecule_warnings(name):
     try:
-        exact_spacers = get_exact_name(name, spacers=True)
+        exact_spacers, structure_type = get_exact_name(name, spacers=True)
         error = None
     except Exception as e:
         exact_spacers = ''
+        structure_type = 'Unknown'
         error = str(e)
         logger.warn("%s -- %s" % (name, error))
     warn = ErrorReport.objects.filter(molecule=name)
     warning = True if warn else None
     exact_name = exact_spacers.replace('*', '')
     new = not DataPoint.objects.filter(exact_name=exact_name).exists()
-    return exact_spacers, warning, error, new
+    return exact_spacers, structure_type, warning, error, new
 
 
 def get_multi_molecule_warnings(string):
@@ -46,7 +47,7 @@ def get_multi_molecule_warnings(string):
         if time.time() - start > 1:
             logger.warn("%s -- The operation timed out" % (string))
             raise ValueError("The operation has timed out.")
-        exact_spacer, warning, error, new = get_molecule_warnings(name)
+        exact_spacer, _, warning, error, new = get_molecule_warnings(name)
         if exact_spacer not in new_molecules:
             new_molecules[exact_spacer] = [name, warning, error, new]
 
@@ -54,7 +55,7 @@ def get_multi_molecule_warnings(string):
 
 
 def get_molecule_info(molecule):
-    exactspacer, warning, error, new = get_molecule_warnings(molecule)
+    exactspacer, structure_type, warning, error, new = get_molecule_warnings(molecule)
     exactname = exactspacer.replace('*', '')
 
     features = ['', '', '']
@@ -96,6 +97,7 @@ def get_molecule_info(molecule):
         "known_errors": warning,
         "error_message": error,
         "limits": limits,
+        "structure_type": structure_type,
     }
 
 

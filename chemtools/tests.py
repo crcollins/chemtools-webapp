@@ -587,7 +587,7 @@ class StructureTestCase(TestCase):
     #         [2, 3, 4],
     #     ]
     #     for group, num in product(*sets):
-    #         exact_name = mol_name.get_exact_name(group * num)
+    #         exact_name, _ = mol_name.get_exact_name(group * num)
     #         expected = group + "_n%d_m1_x1_y1_z1" % num
     #         self.assertEqual(exact_name, expected)
 
@@ -1041,25 +1041,25 @@ class MolNameTestCase(TestCase):
 
     def test_get_exact_name(self):
         for name, expected in self.pairs:
-            a = mol_name.get_exact_name(name)
+            a, _ = mol_name.get_exact_name(name)
             expected = expected + "_n1_m1_x1_y1_z1"
             self.assertEqual(a, expected.replace('*', ''))
 
     def test_get_exact_name_polymer(self):
         for name, expected in self.polymer_pairs:
-            a = mol_name.get_exact_name(name)
+            a, _ = mol_name.get_exact_name(name)
             expected = expected + "_x1_y1_z1"
             self.assertEqual(a, expected.replace('*', ''))
 
     def test_get_exact_name_spacers(self):
         for name, expected in self.pairs:
-            a = mol_name.get_exact_name(name, spacers=True)
+            a, _ = mol_name.get_exact_name(name, spacers=True)
             expected = expected + "_n1_m1_x1_y1_z1"
             self.assertEqual(a, expected)
 
     def test_get_exact_name_polymer_spacers(self):
         for name, expected in self.polymer_pairs:
-            a = mol_name.get_exact_name(name, spacers=True)
+            a, _ = mol_name.get_exact_name(name, spacers=True)
             expected = expected + "_x1_y1_z1"
             self.assertEqual(a, expected)
 

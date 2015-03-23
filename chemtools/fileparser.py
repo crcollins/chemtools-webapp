@@ -208,7 +208,7 @@ class ExactName(LineParser):
         super(ExactName, self).__init__(*args, **kwargs)
         try:
             from mol_name import get_exact_name
-            spacer = get_exact_name(self.log.name, spacers=True)
+            spacer, _ = get_exact_name(self.log.name, spacers=True)
             self.value = spacer.replace('*', '')
         except:
             self.value = None
@@ -229,7 +229,7 @@ class Features(LineParser):
             from ml import get_decay_distance_correction_feature_vector, \
                 get_naive_feature_vector, get_decay_feature_vector
 
-            spacer = get_exact_name(self.log.name, spacers=True)
+            spacer, _ = get_exact_name(self.log.name, spacers=True)
             #exactname = spacer.replace('*', '')
             self.value = '"' + str([
                 get_naive_feature_vector(spacer),
