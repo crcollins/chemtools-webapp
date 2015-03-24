@@ -9,96 +9,53 @@ from models import ErrorReport
 
 from chemtools import gjfwriter
 from chemtools import fileparser
-from chemtools.ml import get_properties_from_decay_with_predictions, \
-    get_naive_feature_vector, \
-    get_decay_feature_vector, \
-    get_decay_distance_correction_feature_vector
 from chemtools.mol_name import name_expansion, get_exact_name
 from chemtools.interface import get_property_limits
 from data.models import DataPoint
 from cluster.interface import run_jobs
 from project.utils import StringIO
 
+
 logger = logging.getLogger(__name__)
 
 
-def get_molecule_warnings(name):
-    try:
-        exact_spacers, structure_type = get_exact_name(name, spacers=True)
-        error = None
-    except Exception as e:
-        exact_spacers = ''
-        structure_type = 'Unknown'
-        error = str(e)
-        logger.warn("%s -- %s" % (name, error))
-    warn = ErrorReport.objects.filter(molecule=name)
-    warning = True if warn else None
-    exact_name = exact_spacers.replace('*', '')
-    new = not DataPoint.objects.filter(exact_name=exact_name).exists()
-    return exact_spacers, structure_type, warning, error, new
+def get_molecule_status(name):
+    mol = gjfwriter.Benzobisazole(name)
+    name_error = mol.get_name_error()
+    error_report = ErrorReport.objects.filter(molecule=name).exists()
+    new = not DataPoint.objects.filter(exact_name=mol.get_exact_name()).exists()
+    return mol, name_error, error_report, new
 
 
-def get_multi_molecule_warnings(string):
-    molecules = name_expansion(string)
-    new_molecules = collections.OrderedDict()
+def get_molecule_info_status(name):
+    mol, _, error_report, new = get_molecule_status(name)
+    info = mol.get_info()
+
+    temp = DataPoint.objects.filter(exact_name=mol.get_exact_name(),
+                                    band_gap__isnull=False).values()
+    if temp:
+        datapoint = temp[0]
+
+    info["datapoint"] = datapoint
+    info["new"] = new
+    info["known_errors"] = error_report
+    return info
+
+
+def get_multi_molecule_info(string):
+    unique_molecules = collections.OrderedDict()
 
     start = time.time()
-    for name in molecules:
+    for name in name_expansion(string):
         if time.time() - start > 1:
             logger.warn("%s -- The operation timed out" % (string))
             raise ValueError("The operation has timed out.")
-        exact_spacer, _, warning, error, new = get_molecule_warnings(name)
-        if exact_spacer not in new_molecules:
-            new_molecules[exact_spacer] = [name, warning, error, new]
+        mol, name_error, error_report, new = get_molecule_status(name)
+        if mol.get_exact_name(spacers=True) not in unique_molecules:
+            unique_molecules[exact_spacer] = [mol, error_report,
+                                            name_error, new]
 
-    return zip(*new_molecules.values())
-
-
-def get_molecule_info(molecule):
-    exactspacer, structure_type, warning, error, new = get_molecule_warnings(molecule)
-    exactname = exactspacer.replace('*', '')
-
-    features = ['', '', '']
-    homo, lumo, gap = None, None, None
-    datapoint = None
-
-    if not error:
-        try:
-            features = [
-                get_naive_feature_vector(exactspacer),
-                get_decay_feature_vector(exactspacer),
-                get_decay_distance_correction_feature_vector(exactspacer),
-            ]
-            homo, lumo, gap = get_properties_from_decay_with_predictions(
-                features[1]
-            )
-        except ValueError as e:
-            # multi core and other non-ML structures
-            logger.warn("%s -- %s" % (molecule, e))
-            pass
-
-        temp = DataPoint.objects.filter(exact_name=exactname,
-                                        band_gap__isnull=False).values()
-        if temp:
-            datapoint = temp[0]
-
-    limits = get_property_limits(molecule)
-
-    return {
-        "molecule": molecule,
-        "exact_name": exactname,
-        "exact_name_spacers": exactspacer,
-        "features": features,
-        "datapoint": datapoint,
-        "homo": homo,
-        "lumo": lumo,
-        "band_gap": gap,
-        "new": new,
-        "known_errors": warning,
-        "error_message": error,
-        "limits": limits,
-        "structure_type": structure_type,
-    }
+    return zip(*unique_molecules.values())
 
 
 def run_standard_jobs(credential, string, mol_settings, job_settings):
