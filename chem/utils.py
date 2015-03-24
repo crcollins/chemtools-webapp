@@ -42,7 +42,7 @@ def get_molecule_info_status(name):
     return info
 
 
-def get_multi_molecule_info(string):
+def get_multi_molecule_status(string):
     unique_molecules = collections.OrderedDict()
 
     start = time.time()
