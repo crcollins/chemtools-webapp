@@ -75,35 +75,3 @@ def get_multi_job(string, form):
     ret_zip = buff.getvalue()
     buff.close()
     return ret_zip
-
-
-def get_property_limits(name):
-    results = {
-        "n": [None, None, None],
-        "m": [None, None, None]
-    }
-    for direction in results:
-        try:
-            groups = []
-            xvals = range(1, 5)
-            for j in xvals:
-                if direction in name:
-                    exp = "%s\d+" % direction
-                    replace = "%s%d" % (direction, j)
-                    temp_name = re.sub(exp, replace, name)
-                else:
-                    temp_name = name + "_%s%d" % (direction, j)
-
-                exact_name, _ = mol_name.get_exact_name(temp_name, spacers=True)
-                temp = ml.get_decay_feature_vector(exact_name)
-                groups.append(ml.get_properties_from_decay_with_predictions(
-                    temp
-                ))
-            lim_results = dataparser.predict_values(xvals, *zip(*groups))
-            properties = ["homo", "lumo", "gap"]
-            results[direction] = [lim_results[x][0] for x in properties]
-        except Exception:
-            logger.info("Improper property limits: %s - %s" %
-                        (name, direction))
-            pass
-    return results

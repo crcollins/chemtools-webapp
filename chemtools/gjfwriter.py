@@ -171,3 +171,33 @@ class Benzobisazole(Molecule):
         exact_name = self.get_exact_name(spacers=True)
         return get_decay_distance_correction_feature_vector(exact_name,
                                                             **kwargs)
+    @cache
+    def get_property_limits(self):
+        results = {
+            "n": [None, None, None],
+            "m": [None, None, None]
+        }
+        for direction in results:
+            try:
+                groups = []
+                xvals = range(1, 5)
+                for j in xvals:
+                    if direction in self.name:
+                        expr = "%s\d+" % direction
+                        replace = "%s%d" % (direction, j)
+                        temp_name = re.sub(expr, replace, self.name)
+                    else:
+                        temp_name = self.name + "_%s%d" % (direction, j)
+
+                    struct = Benzobisazole(temp_name)
+                    groups.append(struct.get_property_predictions())
+
+                lim_results = dataparser.predict_values(xvals, *zip(*groups))
+                properties = ["homo", "lumo", "gap"]
+                results[direction] = [lim_results[x][0] for x in properties]
+            except Exception:
+                logger.info("Improper property limits: %s - %s" %
+                            (self.name, direction))
+                pass
+        return results
+
