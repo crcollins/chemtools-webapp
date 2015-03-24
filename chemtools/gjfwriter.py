@@ -1,6 +1,8 @@
 import functools
 import collections
 import base64
+import logging
+import re
 
 import numpy
 from numpy.linalg import norm
@@ -9,7 +11,12 @@ import structure
 from constants import KEYWORDS, NUMBERS
 from mol_name import get_exact_name
 from ml import get_decay_distance_correction_feature_vector, \
-    get_naive_feature_vector, get_decay_feature_vector
+    get_naive_feature_vector, get_decay_feature_vector, \
+    get_properties_from_decay_with_predictions
+import dataparser
+
+
+logger = logging.getLogger(__name__)
 
 
 def cache(f):
