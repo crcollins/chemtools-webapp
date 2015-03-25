@@ -64,6 +64,7 @@ def run_standard_jobs(credential, string, mol_settings, job_settings):
         "failed": [],
         "error": None,
     }
+    # This is to catch invalid users early on
     try:
         results["cluster"] = credential.cluster.name
         if not credential.user.is_staff:
@@ -79,8 +80,11 @@ def run_standard_jobs(credential, string, mol_settings, job_settings):
     for mol in name_expansion(string):
         try:
             out = gjfwriter.Benzobisazole(mol, **mol_settings)
+            # This instantiation needs to be done here because of the errors
+            # in a structure are calculated lazily.
+            gjf = out.get_gjf()
             names.append(mol)
-            gjfs.append(out.get_gjf())
+            gjfs.append(gjf)
         except Exception as e:
             logger.warn("Failed gjf write -- %s -- %s" % (mol, e))
             results["failed"].append((mol, str(e)))
