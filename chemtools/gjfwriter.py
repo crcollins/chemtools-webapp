@@ -158,6 +158,7 @@ class Benzobisazole(Molecule):
         super(Benzobisazole, self).__init__(name, **kwargs)
         self._exact_name = None
         self._structure_type = None
+        self._name_error = None
 
     @property
     @cache
@@ -169,12 +170,27 @@ class Benzobisazole(Molecule):
 
     def get_exact_name(self, spacers=False):
         if self._exact_name is None:
-            self._exact_name, self._structure_type = get_exact_name(self.name,
+            try:
+                self._exact_name, self._structure_type = get_exact_name(
+                                                                self.name,
                                                                 spacers=True)
+            except Exception as e:
+                self._name_error = str(e)
+                self._exact_name = ''
+                self._structure_type = 'Unknown'
+
         if spacers:
             return self._exact_name
         else:
             return self._exact_name.replace('*', '')
+
+    def get_structure_type(self):
+        self.get_exact_name()
+        return self._structure_type
+
+    def get_name_error(self):
+        self.get_exact_name()
+        return self._name_error
 
     @cache
     def get_naive_feature_vector(self, **kwargs):
