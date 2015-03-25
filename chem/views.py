@@ -13,7 +13,7 @@ from crispy_forms.utils import render_crispy_form
 
 from models import ErrorReport
 from forms import ErrorReportForm, JobForm, UploadForm, MoleculeForm
-from utils import get_multi_molecule_warnings, get_molecule_info
+from utils import get_multi_molecule_status, get_molecule_info_status
 
 from chemtools import gjfwriter
 from chemtools import fileparser, dataparser
@@ -92,7 +92,7 @@ def molecule_check(request, string):
         "error": None,
     }
     try:
-        molecules, warnings, errors, news = get_multi_molecule_warnings(
+        molecules, warnings, errors, news = get_multi_molecule_status(
             string)
         # This is used to fix the issue with ( and ) not being allowed for
         # the id of an HTML tag.
@@ -130,14 +130,14 @@ def molecule_detail(request, molecule):
         }
         return HttpResponse(json.dumps(a), content_type="application/json")
 
-    a = get_molecule_info(molecule)
+    a = get_molecule_info_status(molecule)
     a["job_form"] = job_form
     a["mol_form"] = MoleculeForm()
     return render(request, "chem/molecule_detail.html", a)
 
 
 def molecule_detail_json(request, molecule):
-    a = get_molecule_info(molecule)
+    a = get_molecule_info_status(molecule)
     return HttpResponse(json.dumps(a, cls=DjangoJSONEncoder),
                         content_type="application/json")
 
@@ -178,8 +178,7 @@ def multi_molecule(request, string):
 
 def multi_molecule_zip(request, string):
     try:
-        molecules, warnings, errors, news = get_multi_molecule_warnings(
-            string)
+        molecules, warnings, errors, news = get_multi_molecule_status(string)
     except ValueError as e:
         logger.warn(str(e))
         c = {

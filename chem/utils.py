@@ -10,7 +10,6 @@ from models import ErrorReport
 from chemtools import gjfwriter
 from chemtools import fileparser
 from chemtools.mol_name import name_expansion, get_exact_name
-from chemtools.interface import get_property_limits
 from data.models import DataPoint
 from cluster.interface import run_jobs
 from project.utils import StringIO
@@ -22,7 +21,7 @@ logger = logging.getLogger(__name__)
 def get_molecule_status(name):
     mol = gjfwriter.Benzobisazole(name)
     name_error = mol.get_name_error()
-    error_report = ErrorReport.objects.filter(molecule=name).exists()
+    error_report = ErrorReport.objects.filter(molecule=name).exists() or None
     new = not DataPoint.objects.filter(exact_name=mol.get_exact_name()).exists()
     return mol, name_error, error_report, new
 
@@ -35,10 +34,12 @@ def get_molecule_info_status(name):
                                     band_gap__isnull=False).values()
     if temp:
         datapoint = temp[0]
+    else:
+        datapoint = None
 
     info["datapoint"] = datapoint
     info["new"] = new
-    info["known_errors"] = error_report
+    info["error_report"] = error_report
     return info
 
 
@@ -52,7 +53,7 @@ def get_multi_molecule_status(string):
             raise ValueError("The operation has timed out.")
         mol, name_error, error_report, new = get_molecule_status(name)
         if mol.get_exact_name(spacers=True) not in unique_molecules:
-            unique_molecules[exact_spacer] = [mol, error_report,
+            unique_molecules[mol.get_exact_name(spacers=True)] = [mol.name, error_report,
                                             name_error, new]
 
     return zip(*unique_molecules.values())

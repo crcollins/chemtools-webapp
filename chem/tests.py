@@ -934,9 +934,9 @@ class UtilsTestCase(TestCase):
                                 message="This is a message")
         new_error.save()
 
-    def test_get_multi_molecule_warnings(self):
+    def test_get_multi_molecule_status(self):
         string = ','.join(self.names)
-        results = utils.get_multi_molecule_warnings(string)
+        results = utils.get_multi_molecule_status(string)
         expected = [
             tuple(self.names),
             (None, None, True, None),
@@ -945,9 +945,9 @@ class UtilsTestCase(TestCase):
         ]
         self.assertEqual(results, expected)
 
-    def test_get_multi_molecule_warnings_new(self):
+    def test_get_multi_molecule_status_new(self):
         string = ','.join(self.names)
-        results = utils.get_multi_molecule_warnings(string)
+        results = utils.get_multi_molecule_status(string)
         expected = [
             tuple(self.names),
             (None, None, True, None),
@@ -958,15 +958,17 @@ class UtilsTestCase(TestCase):
 
     def test_get_molecule_info(self):
         name = "24a_TON"
-        results = utils.get_molecule_info(name)
+        results = utils.get_molecule_info_status(name)
         del results["features"]
         expected = {
             'molecule': '24a_TON',
-            'lumo': -2.1298787902985779,
-            'homo': -5.6866366091077571,
+            'property_predictions': (
+                -5.6866366091077571,
+                -2.1298787902985779,
+                3.4415766653971942,
+                ),
             'exact_name': '24aaA_TON_A_A_n1_m1_x1_y1_z1',
-            'band_gap': 3.4415766653971942,
-            'limits': {
+            'property_limits': {
                 'm': [
                     -5.5380175794413322,
                     -2.3145802963818163,
@@ -976,8 +978,8 @@ class UtilsTestCase(TestCase):
                     -2.9489392195479147,
                     2.5846925036411794]
             },
-            'known_errors': None,
-            'error_message': None,
+            'error_report': None,
+            'name_error': None,
             'datapoint': None,
             'new': True,
             'exact_name_spacers': '2**4aaA**_TON_A**_A**_n1_m1_x1_y1_z1',

@@ -234,14 +234,16 @@ class Benzobisazole(Molecule):
                         temp_name = re.sub(expr, replace, self.name)
                     else:
                         temp_name = self.name + "_%s%d" % (direction, j)
-
                     struct = Benzobisazole(temp_name)
-                    groups.append(struct.get_property_predictions())
+                    values = struct.get_property_predictions()
+                    if values == (None, None, None):
+                        raise ValueError
+                    groups.append(values)
 
                 lim_results = dataparser.predict_values(xvals, *zip(*groups))
                 properties = ["homo", "lumo", "gap"]
                 results[direction] = [lim_results[x][0] for x in properties]
-            except Exception:
+            except ValueError:
                 logger.info("Improper property limits: %s - %s" %
                             (self.name, direction))
                 pass
