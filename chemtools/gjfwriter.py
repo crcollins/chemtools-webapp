@@ -143,12 +143,12 @@ class Molecule(object):
             end.append(data[i, i])
         return vector + end
 
-    def _get_element_counts(self):
+    def get_element_counts(self):
         elems = [x.element for x in self.structure.atoms]
         return collections.Counter(elems)
 
     def get_formula(self):
-        values = self._get_element_counts()
+        values = self.get_element_counts()
         return ''.join(key + str(values[key]) for key in sorted(values.keys()))
 
 
