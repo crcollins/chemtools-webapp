@@ -5,7 +5,7 @@ import random
 
 from constants import SCORES, DCORES, CORES, RGROUPS, XGROUPS, ARYL, ARYL0, \
     ARYL2, NEEDSPACE, TURNING, VALID_SIDE_TOKENS, BENZO_MULTI, BENZO_ONE, \
-    BENZO_TWO, CHAIN, CLASSES
+    BENZO_TWO, CHAIN, UNKNOWN
 
 
 def name_expansion(string, rand=None):
@@ -334,14 +334,16 @@ def parse_name(name, autoflip=False):
         output.append((core, parsedsides))
 
     if len(output) > 1:
-        structure_type = CLASSES[BENZO_MULTI]
+        structure_type = BENZO_MULTI
     elif output[0][0] is None:
-        structure_type = CLASSES[CHAIN]
+        structure_type = CHAIN
     elif output[0][0][0] in 'TC':
-        structure_type = CLASSES[BENZO_TWO]
+        structure_type = BENZO_TWO
     elif output[0][0][0] in 'EZ':
-        structure_type = CLASSES[BENZO_ONE]
+        structure_type = BENZO_ONE
     else:
+        # This will not return, but it is added for completeness
+        structure_type = UNKNOWN
         raise Exception(12, "Unknown structure type")
 
     if len(output) > 1 and nm[1] > 1:
