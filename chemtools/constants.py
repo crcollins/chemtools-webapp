@@ -7,11 +7,13 @@ folder, _ = os.path.split(__file__)
 DATAPATH = os.path.join(folder, "data")
 
 # Structure Classes
+UNKNOWN = -1
 BENZO_TWO = 0
 BENZO_ONE = 1
 BENZO_MULTI = 2
 CHAIN = 3
 CLASSES = {
+    UNKNOWN: "Unknown",
     BENZO_TWO: "Benzobisazole",
     BENZO_ONE: "Benzazole",
     BENZO_MULTI: "Mutli Benzobisazole",
