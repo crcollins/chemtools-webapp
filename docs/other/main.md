@@ -416,7 +416,7 @@ The whole thing is very hackish and is just intended to allow a preview of the m
 
 
 #### Molecule JSON Data ####
-If you want a simple machine readable collection of the properties of a given name you can use the molecule JSON interface. Many of the values that are returned by this are dependent on the name of the molecule and if the calculated values of the molecule are already in the database. `lumo`, `homo`, and `band_gap` will only be available for names that fit the subset of the naming scheme that the machine learning was done (single core). The `limits` values will be available if the name fits the subset of the naming scheme and if that respective direction can be polymerized (ie, no X-Groups capping expansion in that direction). `datapoint` will only be seen in structures that already have calculated values stored in the database.
+If you want a simple machine readable collection of the properties of a given name you can use the molecule JSON interface. Many of the values that are returned by this are dependent on the name of the molecule and if the calculated values of the molecule are already in the database. `property_predictions` will only be available for names that fit the subset of the naming scheme that the machine learning was done (single core). The `property_limits` values will be available if the name fits the subset of the naming scheme and if that respective direction can be polymerized (ie, no X-Groups capping expansion in that direction). `datapoint` will only be seen in structures that already have calculated values stored in the database.
 
 [/chem/4a_TON.json](/chem/4a_TON.json)
 
@@ -426,17 +426,17 @@ If you want a simple machine readable collection of the properties of a given na
             [ <DECAY FEATURE VECTOR> ],
         ],
         "molecule": "4a_TON",
-        "lumo": -1.6922736317511982,
-        "homo": -6.0272586106408301,
-        "exact_name":"4aaA_TON_A_A_n1_m1_x1_y1_z1",
-        "keywords": "opt B3LYP/6-31g(d)",
-        "band_gap": 3.9585367995371712,
-        "limits": {
-            "m": [-5.7452556884445283, -2.29758310520688, 2.8838972872018624],
-            "n": [-5.8333558187221861, -2.9287786769624411, 2.457959486049158]
+        "property_predictions": [-5.8055209124754841, -1.9840131601722049, 3.649533471581226],
+        "exact_name": "4aaA_TON_A_A_n1_m1_x1_y1_z1",
+        "exact_name_spacers": "4aaA**_TON_A**_A**_n1_m1_x1_y1_z1",
+        "property_limits": {
+            "m": [-5.6012581484079291, -2.2255173089165798, 3.0106583051116274],
+            "n": [-5.8039781252330664, -2.8912498957468986, 2.7177841447390274]
         },
-        "known_errors": null,
-        "error_message": null,
+        "structure_type": "Benzobisazole",
+        "name_error": null,
+        "error_report": null,
+        "new": false,
         "datapoint": {
             "band_gap": 4.0578,
             "name": "4_TON_A_A",
