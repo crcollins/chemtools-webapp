@@ -207,6 +207,16 @@ class Benzobisazole(Molecule):
         exact_name = self.get_exact_name(spacers=True)
         return get_decay_distance_correction_feature_vector(exact_name,
                                                             **kwargs)
+
+    @cache
+    def get_property_predictions(self):
+        try:
+            feature = self.get_decay_feature_vector()
+            results = get_properties_from_decay_with_predictions(feature)
+        except ValueError:
+            results = (None, None, None)
+        return results
+
     @cache
     def get_property_limits(self):
         results = {
