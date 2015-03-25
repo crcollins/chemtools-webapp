@@ -247,3 +247,16 @@ class Benzobisazole(Molecule):
                 pass
         return results
 
+    def get_info(self):
+        features = []
+        return {
+            "molecule": self.name,
+            "exact_name": self.get_exact_name(),
+            "exact_name_spacers": self.get_exact_name(spacers=True),
+            "features": features,
+            "property_predictions": self.get_property_predictions(),
+            "property_limits": self.get_property_limits(),
+            "name_error": self.get_name_error(),
+            "structure_type": self.get_structure_type(),
+        }
+
