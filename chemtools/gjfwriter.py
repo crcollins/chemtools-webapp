@@ -41,8 +41,16 @@ class Molecule(object):
         self.charge = kwargs.get('charge', 0)
         self.multiplicty = kwargs.get('multiplicity', 1)
         self.perturb = kwargs.get('perturb', 0.0)
-        self.structure = None
         self.scale = kwargs.get('scale', 10)
+        self._structure = None
+
+    @property
+    @cache
+    def structure(self):
+        return self._structure
+    @structure.setter
+    def structure(self, value):
+        self._structure = value
 
     def from_gjf(self, f):
         self.structure = structure.from_gjf(f)
@@ -148,11 +156,16 @@ class Benzobisazole(Molecule):
 
     def __init__(self, name, **kwargs):
         super(Benzobisazole, self).__init__(name, **kwargs)
-        self.structure = structure.from_name(name)
-        if self.perturb:
-            self.structure.perturb(delta=self.perturb)
         self._exact_name = None
         self._structure_type = None
+
+    @property
+    @cache
+    def structure(self):
+        struct = structure.from_name(self.name)
+        if self.perturb:
+            struct.perturb(delta=self.perturb)
+        return struct
 
     def get_exact_name(self, spacers=False):
         if self._exact_name is None:
