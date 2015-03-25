@@ -7,7 +7,7 @@
 {% block content %}
     <h1>{{ molecule }}</h1>
     <a href="report">Report Me</a><br><br>
-    {% if known_errors %}
+    {% if error_report %}
         <div class="alert alert-warning">This molecule is reported to have errors.</div>
     {% endif %}
     {% if error_message %}
