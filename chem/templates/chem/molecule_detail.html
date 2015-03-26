@@ -10,8 +10,8 @@
     {% if error_report %}
         <div class="alert alert-warning">This molecule is reported to have errors.</div>
     {% endif %}
-    {% if error_message %}
-        <div class="alert alert-danger">{{ error_message }}</div>
+    {% if name_error %}
+        <div class="alert alert-danger">{{ name_error }}</div>
     {% else %}
     <div class="col-lg text-center">
         <img src="{% url 'mol_png' molecule %}" alt="{{ molecule }}"></img>
