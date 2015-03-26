@@ -9,7 +9,7 @@ from numpy.linalg import norm
 
 import structure
 from constants import KEYWORDS, NUMBERS
-from mol_name import get_exact_name
+from mol_name import get_exact_name, autoflip_name
 from ml import get_decay_distance_correction_feature_vector, \
     get_naive_feature_vector, get_decay_feature_vector, \
     get_properties_from_decay_with_predictions
@@ -156,6 +156,8 @@ class Benzobisazole(Molecule):
 
     def __init__(self, name, **kwargs):
         super(Benzobisazole, self).__init__(name, **kwargs)
+        if kwargs.get("autoflip"):
+            self.name = autoflip_name(name)
         self._exact_name = None
         self._structure_type = None
         self._name_error = None

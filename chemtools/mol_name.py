@@ -144,7 +144,7 @@ def tokenize(string):
 
 
 
-def parse_end_name(name, autoflip=False):
+def parse_end_name(name):
     tokens = tokenize(name)
 
     parts = []
@@ -154,12 +154,7 @@ def parse_end_name(name, autoflip=False):
     state = "start"
     turns = 0
     for i, token in enumerate(tokens):
-        # Alternate flipping structures
-        if token in TURNING and autoflip:
-            flip = bool(turns % 2)
-            turns += 1
-        else:
-            flip = False
+        flip = False
 
         if token.startswith('(') or token == "-":
             previous = parts[lastconnect]
@@ -267,7 +262,7 @@ def get_sides(parts, core_idx):
     return (left, middle, right)
 
 
-def parse_name(name, autoflip=False):
+def parse_name(name):
     '''Parses a molecule name and returns the edge part names.
 
     >>> parse_name('4a_TON_4b_4c')
@@ -328,7 +323,7 @@ def parse_name(name, autoflip=False):
 
         sides = get_sides(parts, core_idx)
 
-        parsedsides = tuple(parse_end_name(x, autoflip) if x else None for x in sides)
+        parsedsides = tuple(parse_end_name(x) if x else None for x in sides)
 
         check_sides(parsedsides, len(partsets), idx, nm)
         output.append((core, parsedsides))
@@ -401,3 +396,44 @@ def get_exact_name(name, spacers=False):
 
         sets.append(coreset)
     return '_'.join(sets) + '_n%d_m%d' % nm + '_x%d_y%d_z%d' % xyz, structure_type
+
+
+def autoflip_end_name(name):
+    new_tokens = []
+    turns = 0
+    for token in tokenize(name):
+        # Alternate flipping structures
+        if token in TURNING:
+            flip = bool(turns % 2)
+            turns += 1
+        else:
+            flip = False
+        new_tokens.append(token)
+        if flip:
+            new_tokens.append('-')
+    return ''.join(new_tokens)
+
+
+def autoflip_name(name):
+    parts = name.split("_")
+
+    parts, nm, xyz = parse_options(parts)
+    partsets = parse_cores(parts)
+
+    output = []
+    for idx, (core, parts) in enumerate(partsets):
+        if core is not None:
+            core_idx = parts.index(core)
+        else:
+            # If there is no core, join all the parts together into 1 chain
+            parts = ['_'.join(parts)]
+            core_idx = None
+
+        sides = get_sides(parts, core_idx)
+
+        newsides = tuple(autoflip_end_name(x) if x else None for x in sides)
+
+        temp = [x for x in newsides[:1] + (core, ) + newsides[1:] if x is not None]
+        output.append('_'.join(temp))
+
+    return '_'.join(output)
