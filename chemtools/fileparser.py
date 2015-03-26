@@ -208,9 +208,9 @@ class ExactName(LineParser):
         super(ExactName, self).__init__(*args, **kwargs)
         try:
             from mol_name import get_exact_name
-            spacer, _ = get_exact_name(self.log.name, spacers=True)
+            spacer = get_exact_name(self.log.name, spacers=True)
             self.value = spacer.replace('*', '')
-        except:
+        except Exception as e:
             self.value = None
         self.done = False
 

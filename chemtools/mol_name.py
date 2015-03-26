@@ -267,7 +267,6 @@ def parse_name(name):
 
     >>> parse_name('4a_TON_4b_4c')
     (
-        True,
         [
             (
                 'TON',
@@ -283,7 +282,6 @@ def parse_name(name):
     )
     >>> parse_name('4a_TON_5-b_CON_4cd')
     (
-        True,
         [
             (
                 'TON',
@@ -328,6 +326,19 @@ def parse_name(name):
         check_sides(parsedsides, len(partsets), idx, nm)
         output.append((core, parsedsides))
 
+    if len(output) > 1 and nm[1] > 1:
+        raise Exception(8, "Can not do m expansion and have multiple cores")
+    return output, nm, xyz
+
+
+def get_structure_type(name):
+    try:
+        output, nm, xyz = parse_name(name)
+    except Exception as e:
+        # This will not return, but it is added for completeness
+        return UNKNOWN
+        # raise Exception(12, "Unknown structure type")
+
     if len(output) > 1:
         structure_type = BENZO_MULTI
     elif output[0][0] is None:
@@ -336,18 +347,11 @@ def parse_name(name):
         structure_type = BENZO_TWO
     elif output[0][0][0] in 'EZ':
         structure_type = BENZO_ONE
-    else:
-        # This will not return, but it is added for completeness
-        structure_type = UNKNOWN
-        raise Exception(12, "Unknown structure type")
-
-    if len(output) > 1 and nm[1] > 1:
-        raise Exception(8, "Can not do m expansion and have multiple cores")
-    return structure_type, output, nm, xyz
+    return structure_type
 
 
 def get_exact_name(name, spacers=False):
-    structure_type, output, nm, xyz = parse_name(name)
+    output, nm, xyz = parse_name(name)
     sidefuncs = (
         lambda num: num == 0 and nm[0] == 1,
         lambda num: nm[1] == 1,
@@ -395,7 +399,7 @@ def get_exact_name(name, spacers=False):
             coreset = '_'.join([core, parts[1], parts[2]])
 
         sets.append(coreset)
-    return '_'.join(sets) + '_n%d_m%d' % nm + '_x%d_y%d_z%d' % xyz, structure_type
+    return '_'.join(sets) + '_n%d_m%d' % nm + '_x%d_y%d_z%d' % xyz
 
 
 def autoflip_end_name(name):
