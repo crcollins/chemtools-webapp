@@ -64,9 +64,9 @@ EOF
 }
 
 remove() {
-    sudo rm -rf $CHEMTOOLS_DIR /etc/nginx/sites-available/chemtools \
-                /etc/nginx/sites-enabled/chemtools /etc/supervisor/conf.d/chemtools.conf \
-                /etc/cron.d/chemtools
+    sudo rm /etc/nginx/sites-available/chemtools \
+            /etc/nginx/sites-enabled/chemtools /etc/supervisor/conf.d/chemtools.conf \
+            /etc/cron.d/chemtools
     sudo supervisorctl shutdown chemtools
     sudo service nginx restart
 }
