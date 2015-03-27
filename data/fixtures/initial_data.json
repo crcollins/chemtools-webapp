@@ -4,7 +4,8 @@
         "model": "data.jobtemplate",
         "fields": {
             "name": "Blacklight",
-            "template": "job_templates\/bjob.txt"
+            "template": "job_templates\/bjob.txt",
+            "creator": null
         }
     },
     {
@@ -12,7 +13,8 @@
         "model": "data.jobtemplate",
         "fields": {
             "name": "Carver",
-            "template": "job_templates\/cjob.txt"
+            "template": "job_templates\/cjob.txt",
+            "creator": null
         }
     },
     {
@@ -20,7 +22,8 @@
         "model": "data.jobtemplate",
         "fields": {
             "name": "Gordon",
-            "template": "job_templates\/gjob.txt"
+            "template": "job_templates\/gjob.txt",
+            "creator": null
         }
     },
     {
@@ -28,7 +31,8 @@
         "model": "data.jobtemplate",
         "fields": {
             "name": "Hooper",
-            "template": "job_templates\/hjob.txt"
+            "template": "job_templates\/hjob.txt",
+            "creator": null
         }
     },
     {
@@ -36,7 +40,8 @@
         "model": "data.jobtemplate",
         "fields": {
             "name": "Marcy",
-            "template": "job_templates\/mjob.txt"
+            "template": "job_templates\/mjob.txt",
+            "creator": null
         }
     },
     {
@@ -44,7 +49,8 @@
         "model": "data.jobtemplate",
         "fields": {
             "name": "Trestles",
-            "template": "job_templates\/tjob.txt"
+            "template": "job_templates\/tjob.txt",
+            "creator": null
         }
     },
     {
@@ -52,7 +58,8 @@
         "model": "data.jobtemplate",
         "fields": {
             "name": "Localhost",
-            "template": "job_templates\/ljob.txt"
+            "template": "job_templates\/ljob.txt",
+            "creator": null
         }
     },
     {

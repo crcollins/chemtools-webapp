@@ -7,6 +7,8 @@ import numpy
 from django.db import models
 from django.template import Template, Context
 from django.utils import timezone
+from django.conf import settings
+from django.db.models import Q
 
 
 logger = logging.getLogger(__name__)
@@ -119,6 +121,7 @@ class Predictor(models.Model):
 
 class JobTemplate(models.Model):
     name = models.CharField(max_length=60)
+    creator = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='templates', null=True)
     template = models.FileField(upload_to="job_templates")
 
     def read(self):
@@ -128,6 +131,16 @@ class JobTemplate(models.Model):
 
     def __unicode__(self):
         return self.name
+
+    def get_long_name(self):
+        return "%s:%s-%d" % (self.creator, self.name, self.id)
+
+    @classmethod
+    def get_templates(self, user=None):
+        if user is not None:
+            return JobTemplate.objects.filter(Q(creator=user) | Q(creator__isnull=True))
+        else:
+            return JobTemplate.objects.filter(creator__isnull=True)
 
     @classmethod
     def render(cls, **kwargs):
