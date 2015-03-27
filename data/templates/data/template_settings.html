@@ -1,0 +1,69 @@
+{% extends "account/settings.html" %}
+{% load crispy_forms_tags %}
+
+{% block script %}
+<script>
+{% autoescape on %}
+
+$(function() {
+    $("a.show").click(function() {
+
+        $("#id_name").val($(this).attr('name'))
+        $.get($(this).attr('data-href'), function (data) {
+            $("textarea#id_template").val(data);
+        });
+    });
+});
+{% endautoescape %}
+</script>
+{% endblock %}
+
+
+
+{% block settingsbody %}
+<form action="." method="post">
+    {% csrf_token %}
+
+    <div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Creator</th>
+                <th>Name</th>
+                <th>Show</th>
+                <th>Delete</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for template in templates %}
+            <tr>
+                <td>{{ template.creator }}</td>
+                <td>{{ template.name }}</td>
+                <td><a data-href="{{ template.template.url }}" name="{{ template.name }}" class="show" href="#show">Show</a></td>
+                <td>
+                {% if template.creator == user %}
+                    <div class="checkbox"><input class="delete" id="{{ template.get_long_name }}-delete" type="checkbox"></div>
+                {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </div>
+
+    {% crispy form %}
+
+    <div class="row">
+        <div class="col-xs-4">
+            <button class="btn btn-lg btn-success btn-block" name="save" type="submit">Save Template</button>
+        </div>
+        <div class="col-xs-4">
+            <button class="btn btn-lg btn-danger btn-block" name="delete" type="submit">Delete Template</button>
+        </div>
+        <div class="col-xs-4">
+            <button class="btn btn-lg btn-block" type="reset">Reset</button>
+        </div>
+    </div>
+</form>
+{% endblock %}
+
