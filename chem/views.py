@@ -93,8 +93,9 @@ def molecule_check(request, string):
         "error": None,
     }
     try:
+        autoflip = request.REQUEST.get("autoflip")
         molecules, warnings, errors, news = get_multi_molecule_status(
-            string)
+            string, autoflip=autoflip)
         # This is used to fix the issue with ( and ) not being allowed for
         # the id of an HTML tag.
         name_ids = [x.replace('(', 'z').replace(')', 'z') for x in molecules]
@@ -175,13 +176,16 @@ def multi_molecule(request, string):
         "job_form": job_form,
         "mol_form": MoleculeForm(),
         "gjf": "checked",
+        "autoflip": request.REQUEST.get("autoflip"),
     }
     return render(request, "chem/multi_molecule.html", c)
 
 
 def multi_molecule_zip(request, string):
     try:
-        molecules, warnings, errors, news = get_multi_molecule_status(string)
+        autoflip = request.REQUEST.get("autoflip")
+        molecules, warnings, errors, news = get_multi_molecule_status(
+            string, autoflip=autoflip)
     except ValueError as e:
         logger.warn(str(e))
         c = {

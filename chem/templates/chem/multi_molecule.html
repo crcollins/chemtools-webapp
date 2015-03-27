@@ -21,6 +21,7 @@ $(function() {
         if ($("#id_new").is(':checked')) {
             data += '&new=on';
         }
+        {% if autoflip %}data += '&autoflip=true';{% endif %}
         data += '&' + $('#id_mol_form').serialize();
 
         var val = $(this).attr('href');
@@ -41,7 +42,7 @@ $(function() {
         }
     );
 
-    $.get('{% url "mol_check" pagename %}', {"html": true}, function(data) {
+    $.get('{% url "mol_check" pagename %}', {"html": true, {% if autoflip %}"autoflip": true{% endif %}}, function(data) {
         var table = $("table.table");
         html = table.html();
         html += data;

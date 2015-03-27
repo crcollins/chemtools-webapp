@@ -20,8 +20,8 @@ from project.utils import StringIO
 logger = logging.getLogger(__name__)
 
 
-def get_molecule_status(name):
-    mol = gjfwriter.Benzobisazole(name)
+def get_molecule_status(name, autoflip=False):
+    mol = gjfwriter.Benzobisazole(name, autoflip=autoflip)
     name_error = mol.get_name_error()
     error_report = ErrorReport.objects.filter(molecule=name).exists() or None
     new = not DataPoint.objects.filter(exact_name=mol.get_exact_name()).exists()
@@ -45,7 +45,7 @@ def get_molecule_info_status(name):
     return info
 
 
-def get_multi_molecule_status(string):
+def get_multi_molecule_status(string, autoflip=False):
     unique_molecules = collections.OrderedDict()
 
     start = time.time()
@@ -53,7 +53,7 @@ def get_multi_molecule_status(string):
         if time.time() - start > 1:
             logger.warn("%s -- The operation timed out" % (string))
             raise ValueError("The operation has timed out.")
-        mol, name_error, error_report, new = get_molecule_status(name)
+        mol, name_error, error_report, new = get_molecule_status(name, autoflip=autoflip)
         if mol.get_exact_name(spacers=True) not in unique_molecules:
             unique_molecules[mol.get_exact_name(spacers=True)] = [mol.name, error_report,
                                             name_error, new]
