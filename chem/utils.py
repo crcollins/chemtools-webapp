@@ -5,6 +5,8 @@ import re
 import collections
 import logging
 
+from django.shortcuts import redirect
+
 from models import ErrorReport
 
 from chemtools import gjfwriter
@@ -168,3 +170,17 @@ def convert_logs(logsets):
         f.seek(0)
         converted.append(f)
     return converted
+
+
+def autoflip_check(f):
+    def wrapper(request, molecule, *args, **kwargs):
+        if request.REQUEST.get("autoflip"):
+            mol = gjfwriter.Benzobisazole(molecule, autoflip=True)
+            # print f.__name__
+            return redirect(wrapper, mol.name)
+        return f(request, molecule, *args, **kwargs)
+
+    wrapper.__name__ = f.__name__
+    wrapper.__dict__ = f.__dict__
+    wrapper.__doc__ = f.__doc__
+    return wrapper

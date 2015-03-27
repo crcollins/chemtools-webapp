@@ -13,7 +13,8 @@ from crispy_forms.utils import render_crispy_form
 
 from models import ErrorReport
 from forms import ErrorReportForm, JobForm, UploadForm, MoleculeForm
-from utils import get_multi_molecule_status, get_molecule_info_status
+from utils import get_multi_molecule_status, get_molecule_info_status, \
+                autoflip_check
 
 from chemtools import gjfwriter
 from chemtools import fileparser, dataparser
@@ -109,6 +110,7 @@ def molecule_check(request, string):
         return HttpResponse(json.dumps(a), content_type="application/json")
 
 
+@autoflip_check
 def molecule_detail(request, molecule):
     job_form = JobForm.get_form(request, molecule)
     mol_form = MoleculeForm(request.REQUEST)
@@ -136,6 +138,7 @@ def molecule_detail(request, molecule):
     return render(request, "chem/molecule_detail.html", a)
 
 
+@autoflip_check
 def molecule_detail_json(request, molecule):
     a = get_molecule_info_status(molecule)
     return HttpResponse(json.dumps(a, cls=DjangoJSONEncoder),
@@ -216,6 +219,7 @@ def multi_molecule_zip(request, string):
     return response
 
 
+@autoflip_check
 def write_gjf(request, molecule):
     mol_form = MoleculeForm(request.REQUEST)
     mol_form.is_valid()
@@ -228,6 +232,7 @@ def write_gjf(request, molecule):
     return response
 
 
+@autoflip_check
 def write_mol2(request, molecule):
     mol_form = MoleculeForm(request.REQUEST)
     mol_form.is_valid()
@@ -240,6 +245,7 @@ def write_mol2(request, molecule):
     return response
 
 
+@autoflip_check
 def write_png(request, molecule):
     mol_form = MoleculeForm(request.REQUEST)
     mol_form.is_valid()
@@ -251,6 +257,7 @@ def write_png(request, molecule):
     return response
 
 
+@autoflip_check
 def write_svg(request, molecule):
     mol_form = MoleculeForm(request.REQUEST)
     mol_form.is_valid()
@@ -430,6 +437,7 @@ def view_gjf(request, upload_form):
 ###########################################################
 
 
+@autoflip_check
 def report(request, molecule):
     if request.user.is_authenticated():
         email = request.user.email
