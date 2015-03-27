@@ -6,7 +6,8 @@ import json
 from django.shortcuts import render, redirect
 from django.template import RequestContext
 from django.template.loader import render_to_string
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
+from django.core.urlresolvers import reverse
 from django.core.servers.basehttp import FileWrapper
 from django.core.serializers.json import DjangoJSONEncoder
 from crispy_forms.utils import render_crispy_form
@@ -35,7 +36,9 @@ def index(request):
         func = molecule_detail
         if set(",{}$") & set(molecule):
             func = multi_molecule
-        return redirect(func, molecule)
+        autoflip = "?autoflip=true" if request.REQUEST.get("autoflip") else ""
+        url = reverse(func, args=(molecule, )) + autoflip
+        return HttpResponseRedirect(url)
     return render(request, "chem/index.html")
 
 
