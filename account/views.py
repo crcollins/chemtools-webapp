@@ -94,13 +94,12 @@ def user_settings(request, username):
 @utils.add_account_page("settings")
 def main_settings(request, username):
     state = "Change Settings"
-    user = request.user
 
     changed = False
     initial = {
         "email": request.user.email,
-        "xsede_username": user.xsede_username,
-        "public_key": user.public_key,
+        "xsede_username": request.user.xsede_username,
+        "public_key": request.user.public_key,
     }
     settings_form = SettingsForm(request.POST or None, initial=initial)
     if settings_form.is_valid():
@@ -112,25 +111,31 @@ def main_settings(request, username):
 
         if d.get("new_ssh_keypair"):
             keys = utils.generate_key_pair(username)
-            if user.public_key:
+            if request.user.public_key:
                 try:
                     utils.update_all_ssh_keys(request.user, keys["public"])
                 except Exception as e:
                     logger.warn("User '%s' tried to update ssh keys and got an error: %s" % (username, str(e)))
                     pass
-            user.public_key = keys["public"]
-            user.private_key = keys["private"]
-            logger.info("User '%s' updated ssh keys." % user.username)
+            request.user.public_key = keys["public"]
+            request.user.private_key = keys["private"]
+            logger.info("User '%s' updated ssh keys." % request.user.username)
             changed = True
 
 
-        if d.get("xsede_username") != user.xsede_username:
-            user.xsede_username = d.get("xsede_username")
-            logger.info("User '%s' updated xsede_username to %s." % (request.user.username, user.xsede_username))
+        if d.get("xsede_username") != request.user.xsede_username:
+            request.user.xsede_username = d.get("xsede_username")
+            logger.info("User '%s' updated xsede_username to %s." % (request.user.username, request.user.xsede_username))
             changed = True
 
     if changed:
-        user.save()
+        request.user.save()
+        initial = {
+            "email": request.user.email,
+            "xsede_username": request.user.xsede_username,
+            "public_key": request.user.public_key,
+        }
+        settings_form = SettingsForm(initial=initial)
         state = "Settings Successfully Saved"
 
     c = {
