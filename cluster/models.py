@@ -13,7 +13,10 @@ class Cluster(models.Model):
     port = models.IntegerField(default=22)
 
     def __unicode__(self):
-        return "%s (%s:%d)" % (self.name, self.hostname, self.port)
+        return "%s (%s)" % (self.name, self.full_hostname())
+
+    def full_hostname(self):
+        return "%s:%d" % (self.hostname, self.port)
 
 
 class ClusterForm(forms.ModelForm):
