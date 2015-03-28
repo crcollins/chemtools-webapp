@@ -447,7 +447,7 @@ If you want a simple machine readable collection of the properties of a given na
             "homo": -5.99983802696,
             "exact_name": "4aaA_TON_A_A_n1_m1_x1_y1_z1",
             "dipole": 1.3283,
-            "options": "td B3LYP/6-31g(d)"},
+            "options": "td B3LYP/6-31g(d)",
             "exact_name_spacers": "4aaA**_TON_A**_A**_n1_m1_x1_y1_z1"
         }
     }
