@@ -10,6 +10,7 @@
         <thead>
             <tr>
                 <th>Creator</th>
+                <th>Name</th>
                 <th>Hostname</th>
                 <th>Delete</th>
             </tr>
@@ -18,6 +19,7 @@
             {% for cluster in clusters %}
             <tr>
                 <td>{{ cluster.creator }}</td>
+                <td>{{ cluster.name }}</td>
                 <td>{{ cluster.full_hostname }}</td>
                 <td>
                 {% if cluster.creator == user %}
