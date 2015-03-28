@@ -140,7 +140,7 @@ class JobTemplate(models.Model):
         return "%s:%d" % (str(self), self.id)
 
     @classmethod
-    def get_templates(self, user=None):
+    def get_templates(cls, user=None):
         if user is not None:
             return JobTemplate.objects.filter(Q(creator=user) | Q(creator__isnull=True))
         else:
