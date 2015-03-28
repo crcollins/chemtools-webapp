@@ -59,9 +59,9 @@
         <tbody>
             <tr>
                 <th>Predicted</th>
-                <td>{{ homo|floatformat:2 }} (± 0.09)</td>
-                <td>{{ lumo|floatformat:2 }} (± 0.08)</td>
-                <td>{{ band_gap|floatformat:2 }} (± 0.10)</td>
+                <td>{{ property_predictions.0|floatformat:2 }} (± 0.09)</td>
+                <td>{{ property_predictions.1|floatformat:2 }} (± 0.08)</td>
+                <td>{{ property_predictions.2|floatformat:2 }} (± 0.10)</td>
             </tr>
             {% if datapoint %}
             <tr>
@@ -75,7 +75,7 @@
                 <td class="text-center" colspan="3">{{ datapoint.options }}</td>
             </tr>
             {% endif %}
-            {% for direction, values in limits.items %}
+            {% for direction, values in property_limits.items %}
             <tr>
                 <th>Predicted {{ direction }} Limit</th>
                 {% for value in values %}
