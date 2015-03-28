@@ -248,7 +248,10 @@ class Benzobisazole(Molecule):
         return results
 
     def get_info(self):
-        features = []
+        features = [
+            self.get_naive_feature_vector(),
+            self.get_decay_feature_vector(),
+        ]
         return {
             "molecule": self.name,
             "exact_name": self.get_exact_name(),
