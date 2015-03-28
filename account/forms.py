@@ -66,12 +66,3 @@ class CustomUserChangeForm(UserChangeForm):
 
     class Meta:
         model = CustomUser
-
-# class UserProfileForm(forms.ModelForm):
-#     private_key = forms.CharField(widget=forms.Textarea)
-#     public_key = forms.CharField(widget=forms.Textarea)
-
-#     class Meta:
-#         model = UserProfile
-#         fields = ("xsede_username", "public_key", "activation_key",
-#                   "password_reset_key", "reset_expires")
