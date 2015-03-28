@@ -5,7 +5,8 @@
         "fields": {
             "name": "Blacklight",
             "hostname": "blacklight.psc.teragrid.org",
-            "port": 22
+            "port": 22,
+            "creator": null
         }
     },
     {
@@ -14,7 +15,8 @@
         "fields": {
             "name": "Gordon",
             "hostname": "gordon.sdsc.edu",
-            "port": 22
+            "port": 22,
+            "creator": null
         }
     },
     {
@@ -23,7 +25,8 @@
         "fields": {
             "name": "Trestles",
             "hostname": "trestles.sdsc.edu",
-            "port": 22
+            "port": 22,
+            "creator": null
         }
     },
     {
@@ -32,7 +35,8 @@
         "fields": {
             "name": "Marcy",
             "hostname": "marcy.bucknell.edu",
-            "port": 22
+            "port": 22,
+            "creator": null
         }
     }
 ]

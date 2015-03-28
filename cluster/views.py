@@ -8,7 +8,7 @@ from django.contrib.auth.decorators import login_required
 from account.utils import add_account_page, PAGES
 from models import CredentialForm, ClusterForm, Cluster, Credential
 import interface
-from utils import get_credentials_from_request
+from utils import get_credentials_from_request, get_clusters_from_request
 
 
 logger = logging.getLogger(__name__)
@@ -135,22 +135,36 @@ def credential_settings(request, username):
 @add_account_page("clusters")
 def cluster_settings(request, username):
     state = "Change Settings"
+
     if request.method == "POST":
-        form = ClusterForm(request.POST)
-        if form.is_valid():
-            obj = form.save(commit=False)
-            obj.user = request.user
-            obj.save()
+        if "delete" in request.POST:
+            i = 0
+            for i, cluster in enumerate(get_clusters_from_request(request)):
+                cluster.delete()
+            logger.info("%s deleted %d clusters(s)" % (username, i+1))
             state = "Settings Successfully Saved"
-            form = ClusterForm()
+            form = ClusterForm(request.user)
+
+        elif "save" in request.POST:
+            form = ClusterForm(request.user, request.POST)
+            if form.is_valid():
+                obj = form.save(commit=False)
+                obj.creator = request.user
+                obj.save()
+                state = "Settings Successfully Saved"
+                form = ClusterForm(request.user)
+
     else:
-        form = ClusterForm()
+        form = ClusterForm(request.user)
 
     c = {
         "pages": PAGES,
         "page": "clusters",
         "state": state,
         "form": form,
-        "clusters": Cluster.objects.all(),
+        "clusters": Cluster.get_clusters(request.user),
     }
     return render(request, "cluster/cluster_settings.html", c)
+
+
+

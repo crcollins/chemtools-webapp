@@ -2,6 +2,7 @@ from django.db import models
 from django import forms
 from django.conf import settings
 from django.utils import timezone
+from django.db.models import Q
 
 from project.utils import get_ssh_connection, get_sftp_connection, StringIO, \
     AESCipher
@@ -9,6 +10,7 @@ from project.utils import get_ssh_connection, get_sftp_connection, StringIO, \
 
 class Cluster(models.Model):
     name = models.CharField(max_length=50)
+    creator = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='clusters', null=True)
     hostname = models.CharField(max_length=255)
     port = models.IntegerField(default=22)
 
@@ -18,12 +20,31 @@ class Cluster(models.Model):
     def full_hostname(self):
         return "%s:%d" % (self.hostname, self.port)
 
+    def get_long_name(self):
+        return "%s:%s:%d" % (self.creator.username, self.full_hostname(), self.id)
+
+    @classmethod
+    def get_clusters(cls, user):
+        if user is not None:
+            return Cluster.objects.filter(Q(creator=user) | Q(creator__isnull=True))
+        else:
+            return Cluster.objects.filter(creator__isnull=True)
+
 
 class ClusterForm(forms.ModelForm):
 
     class Meta:
         model = Cluster
         fields = ("name", "hostname", "port")
+
+    def __init__(self, user, *args, **kwargs):
+        super(ClusterForm, self).__init__(*args, **kwargs)
+        self.user = user
+
+    def clean(self):
+        if Cluster.objects.filter(creator=self.user, **self.cleaned_data):
+            forms.ValidationError("That cluster already exists")
+        return self.cleaned_data
 
 
 class EncryptedCharField(models.CharField):

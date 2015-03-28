@@ -61,6 +61,25 @@ def get_credentials_from_request(request):
     return creds
 
 
+def get_clusters_from_request(request):
+    clusters = []
+    userclusters = request.user.clusters.all()
+    for key in request.POST:
+        if ':' in key and request.POST[key] == "on":
+            try:
+                creator, hostname, port, id_ =  key.split(':')
+                cluster = userclusters.get(
+                    id=id_,
+                    creator__username=creator,
+                    hostname=hostname,
+                    port=port)
+                clusters.append(cluster)
+            except Exception as e:
+                logger.info("Could not find the cluster: %s:%s:%s:%s" % (creator, hostname, port, id_))
+                pass
+    return clusters
+
+
 def _make_folders(ssh):
     folder = 'chemtools/done/'
     _, _, stderr = ssh.exec_command("mkdir -p %s" % folder)
