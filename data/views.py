@@ -54,7 +54,6 @@ def template_settings(request, username):
         if "delete" in request.POST:
             i = 0
             for i, template in enumerate(get_templates_from_request(request)):
-                print template
                 template.delete()
             logger.info("%s deleted %d template(s)" % (username, i+1))
             state = "Settings Successfully Saved"
