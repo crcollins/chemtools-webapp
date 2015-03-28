@@ -1,4 +1,5 @@
 import os
+import logging
 
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
@@ -9,6 +10,10 @@ from chemtools.extractor import CORES, RGROUPS, ARYL
 from data.models import JobTemplate
 from data.forms import JobTemplateForm
 from account.utils import add_account_page, PAGES
+from utils import get_templates_from_request
+
+
+logger = logging.getLogger(__name__)
 
 
 def frag_index(request):
@@ -43,10 +48,42 @@ def template_index(request):
 @login_required
 @add_account_page("templates")
 def template_settings(request, username):
+    state = "Change Settings"
+
+    if request.method == "POST":
+        if "delete" in request.POST:
+            i = 0
+            for i, template in enumerate(get_templates_from_request(request)):
+                print template
+                template.delete()
+            logger.info("%s deleted %d template(s)" % (username, i+1))
+            state = "Settings Successfully Saved"
+            form = JobTemplateForm(request.user)
+
+        elif "save" in request.POST:
+            form = JobTemplateForm(request.user, request.POST)
+            if form.is_valid():
+                try:
+                    name = form.cleaned_data.get("name")
+                    obj = JobTemplate.objects.get(creator=request.user, name=name)
+                    with open(a.template.path, "w") as f:
+                        f.write(form.cleaned_data.get("template"))
+
+                except JobTemplate.DoesNotExist:
+                    obj = form.save(commit=False)
+                    obj.creator = request.user
+                    obj.save()
+                state = "Settings Successfully Saved"
+                form = JobTemplateForm(request.user)
+
+    else:
+        form = JobTemplateForm(request.user)
+
     c = {
         "pages": PAGES,
         "page": "templates",
+        "state": state,
+        "form": form,
         "templates": JobTemplate.get_templates(request.user),
-        "form": JobTemplateForm(),
     }
     return render(request, "data/template_settings.html", c)

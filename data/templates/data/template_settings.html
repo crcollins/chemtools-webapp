@@ -42,7 +42,7 @@ $(function() {
                 <td><a data-href="{{ template.template.url }}" name="{{ template.name }}" class="show" href="#show">Show</a></td>
                 <td>
                 {% if template.creator == user %}
-                    <div class="checkbox"><input class="delete" id="{{ template.get_long_name }}-delete" type="checkbox"></div>
+                    <div class="checkbox"><input class="delete" name="{{ template.get_long_name }}" type="checkbox"></div>
                 {% endif %}
                 </td>
             </tr>

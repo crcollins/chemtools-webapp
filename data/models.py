@@ -9,6 +9,8 @@ from django.template import Template, Context
 from django.utils import timezone
 from django.conf import settings
 from django.db.models import Q
+from django.db.models.signals import post_delete
+from django.dispatch.dispatcher import receiver
 
 
 logger = logging.getLogger(__name__)
@@ -130,10 +132,12 @@ class JobTemplate(models.Model):
         return data
 
     def __unicode__(self):
+        if self.creator is not None:
+            return "%s:%s" % (self.creator.username, self.name)
         return self.name
 
     def get_long_name(self):
-        return "%s:%s-%d" % (self.creator, self.name, self.id)
+        return "%s:%d" % (str(self), self.id)
 
     @classmethod
     def get_templates(self, user=None):
@@ -162,3 +166,10 @@ class JobTemplate(models.Model):
             "allocation": kwargs.get("allocation", ''),
         })
         return template.render(c)
+
+
+@receiver(post_delete, sender=JobTemplate)
+def delete_jobtemplate(sender, instance, **kwargs):
+    if instance.template:
+        # Pass false so FileField doesn't save the model.
+        instance.template.delete(False)

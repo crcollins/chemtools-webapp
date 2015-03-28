@@ -1,9 +1,13 @@
 from django import forms
+from django.core.files import File
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Div
 
+from models import JobTemplate
+from project.utils import StringIO
 
-class JobTemplateForm(forms.Form):
+
+class JobTemplateForm(forms.ModelForm):
     name = forms.CharField(max_length=400)
     template = forms.CharField(
         widget=forms.Textarea(
@@ -22,3 +26,15 @@ class JobTemplateForm(forms.Form):
         css_class='row'),
         'template',
     )
+    def __init__(self, user, *args, **kwargs):
+        super(JobTemplateForm, self).__init__(*args, **kwargs)
+        self.user = user
+
+    class Meta:
+        model = JobTemplate
+        fields = ("name", "template")
+
+    def clean_template(self):
+        template = self.cleaned_data.get("template")
+        name = self.cleaned_data.get("name")
+        return File(StringIO(template, name=name))
