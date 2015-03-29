@@ -75,7 +75,7 @@ $(document).ready(function() {
 
         var controlForm = $(this).parents('form:first');
         var currentEntry = $(this).parents('.entry:first');
-        var controlGroup = $(this).parents('.control-group')
+        var controlGroup = $(this).parents('.control-group');
         var newEntry = $(currentEntry.clone()).appendTo(controlGroup);
 
         newEntry.find('input').val('');
