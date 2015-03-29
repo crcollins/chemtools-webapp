@@ -229,7 +229,7 @@ class SSHSettingsTestCase(TestCase):
             user.private_key = f.read()
         user.save()
 
-        self.cluster = models.Cluster(**CLUSTER)
+        self.cluster = models.Cluster(creator=user, **CLUSTER)
         self.cluster.save()
         self.credential = models.Credential(
             user=user, cluster=self.cluster, **CREDENTIAL)
