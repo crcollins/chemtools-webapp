@@ -3,6 +3,7 @@ import re
 
 from django.core.management.base import BaseCommand
 from django.template import loader, Context
+from django.test import Client
 import misaka
 
 from docs.utils import postprocess_toc
@@ -43,7 +44,22 @@ class Command(BaseCommand):
 
             with open(os.path.join("docs/static/docs", page), "w") as f:
                 rendered = t.render(c)
-                f.write(rendered)
+                new_rendered = self.get_and_replace_images(rendered)
+                f.write(new_rendered)
+
+    def get_and_replace_images(self, text):
+        image_urls = set(re.findall('<img src="(.*?)"', text))
+        c = Client()
+
+        for image_url in image_urls:
+            name = os.path.split(image_url)[1]
+            request = c.get(image_url)
+            with open(os.path.join("docs/static/docs/img", name), "w") as f:
+                f.write(request.content)
+
+            new_url = os.path.join("img", name)
+            text = text.replace(image_url, new_url)
+        return text
 
 
 def mkdir_p(path):
