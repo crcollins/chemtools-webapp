@@ -137,6 +137,7 @@ def cluster_settings(request, username):
     state = "Change Settings"
 
     if request.method == "POST":
+        form = ClusterForm(request.user, request.POST)
         if "delete" in request.POST:
             i = 0
             for i, cluster in enumerate(get_clusters_from_request(request)):
@@ -146,7 +147,6 @@ def cluster_settings(request, username):
             form = ClusterForm(request.user)
 
         elif "save" in request.POST:
-            form = ClusterForm(request.user, request.POST)
             if form.is_valid():
                 obj = form.save(commit=False)
                 obj.creator = request.user
