@@ -5,7 +5,7 @@ from django import forms
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Div
+from crispy_forms.layout import Layout, Div, HTML
 
 from data.models import JobTemplate
 from cluster.models import Credential
@@ -109,8 +109,7 @@ class UploadForm(forms.Form):
 
 
 class MoleculeForm(forms.Form):
-    keywords = forms.CharField(
-        max_length="200", initial=KEYWORDS, required=False)
+    keywords = forms.CharField(initial=KEYWORDS, required=False)
     memory = forms.IntegerField(initial=59, required=False)
     nprocshared = forms.IntegerField(initial=16, required=False)
     charge = forms.IntegerField(initial=0, required=False)
@@ -123,8 +122,23 @@ class MoleculeForm(forms.Form):
     helper.form_tag = False
     helper.layout = Layout(
         Div(
-            Div('keywords', css_class='col-xs-12'),
-        css_class='row'),
+            HTML("""
+            <div class="col-xs-12" >
+                <div id="div_id_keywords" class="form-group control-group">
+                    <label for="id_keywords" class="control-label ">Keywords</label>
+                        <div class="entry input-group">
+                            <input type="text" size=54 class="form-control" id="id_keywords" name="keywords[]" value="%s">
+                            <span class="input-group-btn">
+                                <button class="btn btn-add btn-primary" type="button">
+                                    <span class="glyphicon glyphicon-plus"></span>
+                                </button>
+                            </span>
+                        </div>
+                </div>
+            </div>
+                """ % KEYWORDS),
+            css_class="row",
+        ),
         Div(
             Div('memory', css_class='col-xs-6'),
             Div('nprocshared', css_class='col-xs-6'),
@@ -147,6 +161,11 @@ class MoleculeForm(forms.Form):
                 self.cleaned_data[field] = self.fields[field].initial
         return self.cleaned_data
 
+    def clean_keywords(self):
+        try:
+            return [x for x in self.data.getlist("keywords[]") if x]
+        except AttributeError:
+            print self.data, type(self.data)
 
 class JobForm(forms.Form):
     name = forms.CharField(max_length=400)

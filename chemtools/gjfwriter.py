@@ -35,7 +35,7 @@ class Molecule(object):
 
     def __init__(self, name, **kwargs):
         self.name = name
-        self.keywords = kwargs.get('keywords', KEYWORDS)
+        self.keywords = kwargs.get('keywords', [KEYWORDS])
         self.nprocshared = kwargs.get('nprocshared', 16)
         self.mem = kwargs.get('memory', 59)
         self.charge = kwargs.get('charge', 0)
@@ -63,23 +63,30 @@ class Molecule(object):
         if self.nprocshared is not None:
             starter.append("%%nprocshared=%d" % self.nprocshared)
 
-        if self.structure.frozen:
-            geom = "geom=(modredundant,connectivity)"
-        else:
-            geom = "geom=connectivity"
-
         starter.extend([
             "%%mem=%dGB" % self.mem,
             "%%chk=%s.chk" % self.name,
-            "# %s %s" % (self.keywords, geom),
+            "# {keywords} {geom}",
             "",
             self.name,
             "",
             "%d %d" % (self.charge, self.multiplicty),
             ""
         ])
-        string = "\n".join(starter)
-        string += self.structure.gjf
+        header_template = "\n".join(starter)
+
+        string = ''
+        for i, keywords in enumerate(self.keywords):
+            if not i:
+                if self.structure.frozen:
+                    geom = "geom=(modredundant,connectivity)"
+                else:
+                    geom = "geom=connectivity"
+                string += header_template.format(keywords=keywords, geom=geom)
+                string += self.structure.gjf
+            else:
+                string += "\n\n--Link1--\n"
+                string += header_template.format(keywords=keywords, geom="geom=check guess=read")
         return string
 
     def get_mol2(self):
