@@ -192,19 +192,28 @@ class Benzobisazole(Molecule):
 
     @cache
     def get_naive_feature_vector(self, **kwargs):
-        exact_name = self.get_exact_name(spacers=True)
-        return get_naive_feature_vector(exact_name, **kwargs)
+        try:
+            exact_name = self.get_exact_name(spacers=True)
+            return get_naive_feature_vector(exact_name, **kwargs)
+        except ValueError:
+            return None
 
     @cache
     def get_decay_feature_vector(self, **kwargs):
-        exact_name = self.get_exact_name(spacers=True)
-        return get_decay_feature_vector(exact_name, **kwargs)
+        try:
+            exact_name = self.get_exact_name(spacers=True)
+            return get_decay_feature_vector(exact_name, **kwargs)
+        except ValueError:
+            return None
 
     @cache
     def get_decay_distance_correction_feature_vector(self, **kwargs):
-        exact_name = self.get_exact_name(spacers=True)
-        return get_decay_distance_correction_feature_vector(exact_name,
+        try:
+            exact_name = self.get_exact_name(spacers=True)
+            return get_decay_distance_correction_feature_vector(exact_name,
                                                             **kwargs)
+        except ValueError:
+            return None
 
     @cache
     def get_property_predictions(self):
