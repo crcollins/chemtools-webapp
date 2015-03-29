@@ -17,6 +17,8 @@ class Command(BaseCommand):
         paths = [os.path.join("docs/other", x) for x in names]
         paths += ["README.md"]
 
+        mkdir_p("docs/static/docs/img")
+
         for path in paths:
             text = "".join(open(path, "r").readlines())
 
@@ -43,3 +45,12 @@ class Command(BaseCommand):
                 rendered = t.render(c)
                 f.write(rendered)
 
+
+def mkdir_p(path):
+    try:
+        os.makedirs(path)
+    except OSError as exc:
+        import errno
+        if exc.errno == errno.EEXIST and os.path.isdir(path):
+            pass
+        else: raise
