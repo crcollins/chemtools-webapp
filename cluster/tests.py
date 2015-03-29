@@ -250,6 +250,7 @@ class SSHSettingsTestCase(TestCase):
             "name": "test-machine",
             "hostname": "test-machine.com",
             "port": 22,
+            "save": True,
         }
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, 200)
