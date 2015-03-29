@@ -256,6 +256,23 @@ class SSHSettingsTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn("Settings Successfully Saved", response.content)
 
+    def test_delete_cluster(self):
+        r = self.client.login(**USER_LOGIN)
+        self.assertTrue(r)
+
+        url = reverse(account_page, args=(USER["username"], "clusters"))
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        name = models.Cluster.objects.filter(port=2222)[0].get_long_name()
+        data = {
+            "delete": "on",
+            name : "on",
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Settings Successfully Saved", response.content)
+
     @skipUnless(server_exists(**SERVER), "Requires external test server.")
     def test_add_credential_password(self):
         r = self.client.login(**USER_LOGIN)
