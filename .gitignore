@@ -8,3 +8,5 @@ vagrant/.vagrant/*
 *.box
 env/*
 logfile.log*
+*.sublime-*
+docs/static/*
