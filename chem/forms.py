@@ -165,7 +165,8 @@ class MoleculeForm(forms.Form):
         try:
             return [x for x in self.data.getlist("keywords[]") if x]
         except AttributeError:
-            print self.data, type(self.data)
+            # self.data is a dict because it does not have a request dict
+            return
 
 class JobForm(forms.Form):
     name = forms.CharField(max_length=400)
