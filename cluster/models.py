@@ -21,7 +21,10 @@ class Cluster(models.Model):
         return "%s:%d" % (self.hostname, self.port)
 
     def get_long_name(self):
-        return "%s:%s:%d" % (self.creator.username, self.full_hostname(), self.id)
+        if self.creator:
+            return "%s:%s:%d" % (self.creator.username, self.full_hostname(), self.id)
+        else:
+            return "%s:%d" % (self.full_hostname(), self.id)
 
     @classmethod
     def get_clusters(cls, user):
