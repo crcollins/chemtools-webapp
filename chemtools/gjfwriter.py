@@ -35,7 +35,9 @@ class Molecule(object):
 
     def __init__(self, name, **kwargs):
         self.name = name
-        self.keywords = kwargs.get('keywords', [KEYWORDS])
+        self.keywords = kwargs.get('keywords', KEYWORDS)
+        if type(self.keywords) == str:
+            self.keywords = [self.keywords]
         self.nprocshared = kwargs.get('nprocshared', 16)
         self.mem = kwargs.get('memory', 59)
         self.charge = kwargs.get('charge', 0)
