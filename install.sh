@@ -24,6 +24,9 @@ install_chemtools() {
     pip install numpy==1.9.1
     pip install -r requirements.txt
     python manage.py syncdb --noinput
+    python manage.py make_docs
+    python manage.py load_data base_data.csv
+    python manage.py collectstatic
 }
 
 setup_nginx() {
