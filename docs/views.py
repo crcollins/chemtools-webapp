@@ -1,49 +1,27 @@
-from django.shortcuts import render
-import misaka
+import os
 
-import utils
+from django.shortcuts import render
+from django.conf import settings
+from django.http import Http404
 
 
 def index(request):
-    a = "".join(open("docs/other/main.md", "r").readlines())
-
-    tree = misaka.html(a, render_flags=misaka.HTML_TOC_TREE)
-    body = misaka.html(a, render_flags=misaka.HTML_TOC)
+    path = os.path.join(settings.STATIC_ROOT, "docs", "main.html")
     c = {
-        # "header": misaka.html(a),
-        "toc": utils.postprocess_toc(tree, "#"),
-        "docs": utils.postprocess_toc(body, 'id="'),
+        "content": open(path, "r").read(),
     }
-    return render(request, "docs/index.html", c)
+    return render(request, "docs/final.html", c)
 
 
-def common_errors(request):
-    a = "".join(open("docs/other/common_errors.md", "r").readlines())
+def docs_pages(request, page):
+    base = os.path.join(settings.STATIC_ROOT, "docs")
+    pages = [x.replace(".html", "") for x in os.listdir(base)]
+
+    if page not in pages:
+        raise Http404
+
+    path = os.path.join(settings.STATIC_ROOT, "docs", "%s.html" % page)
     c = {
-        "docs": misaka.html(a),
+        "content": open(path, "r").read(),
     }
-    return render(request, "docs/content.html", c)
-
-
-def one_liners(request):
-    a = "".join(open("docs/other/one_liners.md", "r").readlines())
-    c = {
-        "docs": misaka.html(a),
-    }
-    return render(request, "docs/content.html", c)
-
-
-def technical(request):
-    a = "".join(open("README.md", "r").readlines())
-    c = {
-        "docs": misaka.html(a),
-    }
-    return render(request, "docs/content.html", c)
-
-
-def resources(request):
-    a = "".join(open("docs/other/resources.md", "r").readlines())
-    c = {
-        "docs": misaka.html(a),
-    }
-    return render(request, "docs/content.html", c)
+    return render(request, "docs/final.html", c)
