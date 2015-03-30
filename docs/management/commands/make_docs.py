@@ -57,7 +57,7 @@ class Command(BaseCommand):
             with open(os.path.join("docs/static/docs/img", name), "w") as f:
                 f.write(request.content)
 
-            new_url = os.path.join("img", name)
+            new_url = os.path.join("/static/docs/img", name)
             text = text.replace(image_url, new_url)
         return text
 
