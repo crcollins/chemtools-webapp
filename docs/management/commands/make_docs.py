@@ -5,6 +5,7 @@ from django.core.management.base import BaseCommand
 from django.template import loader, Context
 from django.test import Client
 import misaka
+from django.conf import settings
 
 from docs.utils import postprocess_toc
 
@@ -26,6 +27,7 @@ class Command(BaseCommand):
             if path.endswith("_plain.md"):
                 c = Context({
                     "docs": misaka.html(text),
+                    "STATIC_URL": settings.STATIC_URL,
                 })
                 t = loader.get_template("docs/content.html")
                 page = os.path.split(path)[1].replace("_plain.md", ".html")
@@ -36,6 +38,7 @@ class Command(BaseCommand):
                 c = Context({
                     "toc": postprocess_toc(tree, "#"),
                     "docs": postprocess_toc(body, 'id="'),
+                    "STATIC_URL": settings.STATIC_URL,
                 })
                 t = loader.get_template("docs/index.html")
                 page = os.path.split(path)[1].replace(".md", ".html")
