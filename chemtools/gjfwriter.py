@@ -77,6 +77,8 @@ class Molecule(object):
         ])
         header_template = "\n".join(starter)
 
+        geometry = self.structure.gjf
+
         string = ''
         for i, keywords in enumerate(self.keywords):
             if not i:
@@ -85,7 +87,7 @@ class Molecule(object):
                 else:
                     geom = "geom=connectivity"
                 string += header_template.format(keywords=keywords, geom=geom)
-                string += self.structure.gjf
+                string += geometry
             else:
                 string += "\n\n--Link1--\n"
                 string += header_template.format(keywords=keywords, geom="geom=check guess=read")
