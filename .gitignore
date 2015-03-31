@@ -10,3 +10,4 @@ env/*
 logfile.log*
 *.sublime-*
 docs/static/*
+static/*
