@@ -767,6 +767,21 @@ class BenzobisazoleTestCase(TestCase):
             obj = gjfwriter.Benzobisazole(name)
             obj.get_gjf()
 
+    def test_multistep_gjf(self):
+        sets = [
+            self.templates,
+            self.valid_sides,
+        ]
+        for template, group in product(*sets):
+            name = template.format(group)
+            keywords = ["opt b3lyp/6-31g(d,p)", "td b3lyp/6-31g(d,p)"]
+            obj = gjfwriter.Benzobisazole(name, keywords=keywords)
+            text = obj.get_gjf()
+            for i, key in enumerate(keywords):
+                self.assertIn(key, text)
+                if i:
+                    self.assertIn("--Link1--", text)
+
     def test_mol2(self):
         sets = [
             self.templates,
@@ -1233,6 +1248,25 @@ class FileParserTestCase(TestCase):
                 pass
             actual = [x.lower() for x in line[1:]]
             expected = [x.lower() for x in expected]
+            self.assertEqual(expected, actual)
+
+    def test_parse_multistep_log(self):
+        name = "A.log"
+        path = os.path.join(settings.MEDIA_ROOT, "tests", name)
+        log = fileparser.Log(path)
+
+        with StringIO(log.format_data()) as f:
+            reader = csv.reader(f, delimiter=',', quotechar='"')
+            expected = [
+                        ["opt b3lyp/6-31g(d,p) geom=connectivity",
+                         "-11.7422563626", "2.74508440364", "1", "0.0000",
+                         "-1.1785393", "---", "0.0"],
+                        ["td b3lyp/6-31g(d,p) geom=check guess=read",
+                         "-11.7422563626", "2.74508440364", "1", "0.0000",
+                         "-1.1785393", "14.5967", "0.0"]
+                     ]
+
+            actual = [[y.lower() for y in x[4:]] for x in reader]
             self.assertEqual(expected, actual)
 
     def test_Output_newline(self):

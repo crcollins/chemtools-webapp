@@ -65,46 +65,71 @@ class Log(object):
                 name = name[:-6]
             self.name = name
 
-            self.parsers = dict()
-            for k, v in Log.PARSERS.items():
-                self.parsers[k] = v(self)
-
+            self.parsers = [self.setup_parsers()]
             # This initialization is just in case the file is empty
             # If the file is empty, then line will not be defined causing a
             # UnboundLocalError when it does the check for normal termination.
             line = ''
+            completed = False
+            started = False
+            current_parsers = self.parsers[0]
+
             for i, line in enumerate(f):
-                for k, parser in self.parsers.items():
+                if "******************************************" in line:
+                    started = True
+
+                if not started:
+                    continue
+
+                if "Normal termination of Gaussian" in line:
+                    completed = True
+
+                if "Initial command" in line:
+                    # Multistep Gaussian log
+                    if not completed:
+                        current_parsers["Geometry"].value = None
+                    completed = False
+                    self.parsers.append(self.setup_parsers())
+                    current_parsers = self.parsers[-1]
+
+                for k, parser in current_parsers.items():
                     parser.parse(line.replace('\r', ''))
 
-        if "Normal termination of Gaussian" not in line:
-            self.parsers["Geometry"].value = None
+            if not completed:
+                current_parsers["Geometry"].value = None
 
         # major memory saver by deleting all the line parser objects
-        for parser in self.parsers:
-            self.parsers[parser] = (self.parsers[parser].value,
-                                    self.parsers[parser].done)
+        self.parsers = [self.cleanup_parsers(parsers) for parsers in self.parsers]
+
+    def setup_parsers(self):
+        return {k: v(self) for k, v in Log.PARSERS.items()}
+
+    def cleanup_parsers(self, parsers):
+        # major memory saver by deleting all the line parser objects
+        return {k: (v.value, v.done) for k, v in parsers.items()}
 
     @classmethod
     def add_parser(cls, parser):
         cls.PARSERS[parser.__name__] = parser
         return parser
 
-    def __getitem__(self, name):
-        return self.parsers[name][0]
-
     def format_gjf(self, td=False):
-        if td:
-            header = self["Header"].replace(".chk", "_TD.chk")
-            options = self["Options"].lower().replace("opt", "td")
-        else:
-            header = self["Header"]
-            options = self["Options"]
+        if len(self.parsers) > 1:
+            logger.warn("Multistep Gaussian Log file!")
 
-        if self["Geometry"] is None:
-            geometry = self["PartialGeometry"]
+        parsers = self.parsers[-1]
+
+        if td:
+            header = parsers["Header"][0].replace(".chk", "_TD.chk")
+            options = parsers["Options"][0].lower().replace("opt", "td")
         else:
-            geometry = self["Geometry"]
+            header = parsers["Header"][0]
+            options = parsers["Options"][0]
+
+        if parsers["Geometry"][0] is None:
+            geometry = parsers["PartialGeometry"][0]
+        else:
+            geometry = parsers["Geometry"][0]
 
         if not geometry or not header or not options:
             logger.info("The log file was invalid")
@@ -115,22 +140,25 @@ class Log(object):
             '',
             self.name,
             '',
-            self["ChargeMultiplicity"],
+            parsers["ChargeMultiplicity"][0],
             geometry,
             '',
         ])
         return s
 
     def format_data(self):
-        values = []
-        for key in self.order:
-            value, done = self.parsers[key]
-            # csv fixes
-            if value and "," in value:
-                value = '"' + value.replace('"', '""') + '"'
-            values.append(value if (done or value) else "---")
+        outer_values = []
+        for parsers in self.parsers:
+            values = []
+            for key in self.order:
+                value, done = parsers[key]
+                # csv fixes
+                if value and "," in value:
+                    value = '"' + value.replace('"', '""') + '"'
+                values.append(value if (done or value) else "---")
 
-        return ','.join([self.fname, self.name] + values)
+            outer_values.append(','.join([self.fname, self.name] + values))
+        return '\n'.join(outer_values)
 
     @classmethod
     def format_header(cls):
