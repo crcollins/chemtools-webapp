@@ -185,7 +185,7 @@ class MainPageTestCase(TestCase):
         header += "%%chk=%s.chk\n# %s geom=connectivity"
 
         for keywords in KEYWORDS_SET:
-            params = "?keywords=%s" % keywords
+            params = "?keywords[]=%s" % keywords
             url = reverse(views.multi_molecule_zip, args=(string, )) + params
             response = self.client.get(url)
             self.assertEqual(response.status_code, 200)
@@ -306,7 +306,7 @@ class MainPageTestCase(TestCase):
         string += "%%chk=%s.chk\n# %s geom=connectivity"
         for name in NAMES:
             for keywords in KEYWORDS_SET:
-                params = "?keywords=%s" % keywords
+                params = "?keywords[]=%s" % keywords
                 url = reverse(views.write_gjf, args=(name, )) + params
                 response = self.client.get(url)
                 self.assertEqual(response.status_code, 200)
