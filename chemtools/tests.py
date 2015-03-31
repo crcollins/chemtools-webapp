@@ -1235,6 +1235,25 @@ class FileParserTestCase(TestCase):
             expected = [x.lower() for x in expected]
             self.assertEqual(expected, actual)
 
+    def test_parse_multistep_log(self):
+        name = "A.log"
+        path = os.path.join(settings.MEDIA_ROOT, "tests", name)
+        log = fileparser.Log(path)
+
+        with StringIO(log.format_data()) as f:
+            reader = csv.reader(f, delimiter=',', quotechar='"')
+            expected = [
+                        ["opt b3lyp/6-31g(d,p) geom=connectivity",
+                         "-11.7422563626", "2.74508440364", "1", "0.0000",
+                         "-1.1785393", "---", "0.0"],
+                        ["td b3lyp/6-31g(d,p) geom=check guess=read",
+                         "-11.7422563626", "2.74508440364", "1", "0.0000",
+                         "-1.1785393", "14.5967", "0.0"]
+                     ]
+
+            actual = [[y.lower() for y in x[4:]] for x in reader]
+            self.assertEqual(expected, actual)
+
     def test_Output_newline(self):
         out = fileparser.Output()
         string = "Some message"
