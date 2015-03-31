@@ -15,10 +15,10 @@ dependencies() {
 
 install_chemtools() {
     cd $CHEMTOOLS_DIR
-    virtualenv .
-    . bin/activate
+    virtualenv env
+    . env/bin/activate
     # This is needed because pycairo is not available in pip
-    ln -fs /usr/lib/python2.7/dist-packages/cairo/ lib/python2.7/site-packages/
+    ln -fs /usr/lib/python2.7/dist-packages/cairo/ env/lib/python2.7/site-packages/
 
     # Numpy needs to install before the others because sometimes it has install issues
     pip install numpy==1.9.1
@@ -34,7 +34,7 @@ setup_nginx() {
     sudo apt-get install -y supervisor nginx
 
     cd $CHEMTOOLS_DIR
-    . bin/activate
+    . env/bin/activate
     pip install gunicorn
 
     # This is to setup the periodic update of the ML models
