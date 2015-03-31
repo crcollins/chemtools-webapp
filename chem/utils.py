@@ -176,7 +176,6 @@ def autoflip_check(f):
     def wrapper(request, molecule, *args, **kwargs):
         if request.REQUEST.get("autoflip"):
             mol = gjfwriter.Benzobisazole(molecule, autoflip=True)
-            # print f.__name__
             return redirect(wrapper, mol.name)
         return f(request, molecule, *args, **kwargs)
 
