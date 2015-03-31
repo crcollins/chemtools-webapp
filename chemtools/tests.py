@@ -767,6 +767,21 @@ class BenzobisazoleTestCase(TestCase):
             obj = gjfwriter.Benzobisazole(name)
             obj.get_gjf()
 
+    def test_multistep_gjf(self):
+        sets = [
+            self.templates,
+            self.valid_sides,
+        ]
+        for template, group in product(*sets):
+            name = template.format(group)
+            keywords = ["opt b3lyp/6-31g(d,p)", "td b3lyp/6-31g(d,p)"]
+            obj = gjfwriter.Benzobisazole(name, keywords=keywords)
+            text = obj.get_gjf()
+            for i, key in enumerate(keywords):
+                self.assertIn(key, text)
+                if i:
+                    self.assertIn("--Link1--", text)
+
     def test_mol2(self):
         sets = [
             self.templates,
