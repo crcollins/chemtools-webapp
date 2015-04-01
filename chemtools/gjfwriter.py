@@ -232,7 +232,7 @@ class Benzobisazole(Molecule):
             feature = self.get_decay_feature_vector()
             results = get_properties_from_decay_with_predictions(feature)
         except ValueError:
-            results = (None, None, None)
+            results = {}
         return results
 
     @cache
@@ -241,6 +241,7 @@ class Benzobisazole(Molecule):
             "n": [None, None, None],
             "m": [None, None, None]
         }
+        properties = ["homo", "lumo", "gap"]
         for direction in results:
             try:
                 groups = []
@@ -254,14 +255,11 @@ class Benzobisazole(Molecule):
                         temp_name = self.name + "_%s%d" % (direction, j)
                     struct = Benzobisazole(temp_name)
                     values = struct.get_property_predictions()
-                    if values == (None, None, None):
-                        raise ValueError
-                    groups.append(values)
+                    groups.append([values[x][0] for x in properties])
 
                 lim_results = dataparser.predict_values(xvals, *zip(*groups))
-                properties = ["homo", "lumo", "gap"]
                 results[direction] = [lim_results[x][0] for x in properties]
-            except ValueError:
+            except KeyError:
                 logger.info("Improper property limits: %s - %s" %
                             (self.name, direction))
                 pass

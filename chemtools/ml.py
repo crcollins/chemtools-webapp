@@ -161,4 +161,8 @@ def get_properties_from_decay_with_predictions(feature):
     gap = PRED_GAP_CLF.predict(feature_gap)
     homo = PRED_HOMO_CLF.predict(feature_homo)
     lumo = PRED_LUMO_CLF.predict(feature_lumo)
-    return homo[0], lumo[0], gap[0]
+
+    homo_val = (homo[0], 0.09)
+    lumo_val = (lumo[0], 0.08)
+    gap_val = (gap[0], 0.10)
+    return {"homo": homo_val, "lumo": lumo_val, "gap": gap_val}
