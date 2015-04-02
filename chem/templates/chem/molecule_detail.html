@@ -37,9 +37,9 @@
     <a class="btn collapse-data-btn collapsed" data-toggle="collapse" href="#features">Feature Vectors</a>
     <div class="table-responsive">
     <table id="features" class="table collapse">
-        {% for feature in features %}
+        {% for name, feature in features.items %}
         <tr>
-            <th>{{ forloop.counter }}</th>
+            <th>{{ name }}</th>
             <td>{{ feature }}</td>
         </tr>
         {% endfor %}
@@ -59,9 +59,9 @@
         <tbody>
             <tr>
                 <th>Predicted</th>
-                <td>{{ property_predictions.0|floatformat:2 }} (± 0.09)</td>
-                <td>{{ property_predictions.1|floatformat:2 }} (± 0.08)</td>
-                <td>{{ property_predictions.2|floatformat:2 }} (± 0.10)</td>
+                <td>{{ property_predictions.homo.0|floatformat:2 }} (± {{ property_predictions.homo.1 }})</td>
+                <td>{{ property_predictions.lumo.0|floatformat:2 }} (± {{ property_predictions.lumo.1 }})</td>
+                <td>{{ property_predictions.gap.0|floatformat:2 }} (± {{ property_predictions.gap.1 }})</td>
             </tr>
             {% if datapoint %}
             <tr>
