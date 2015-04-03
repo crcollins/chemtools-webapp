@@ -241,7 +241,7 @@ class Benzobisazole(Molecule):
             "n": [None, None, None],
             "m": [None, None, None]
         }
-        properties = ["homo", "lumo", "gap"]
+        use = ["homo", "lumo", "gap"]
         for direction in results:
             try:
                 groups = []
@@ -254,11 +254,19 @@ class Benzobisazole(Molecule):
                     else:
                         temp_name = self.name + "_%s%d" % (direction, j)
                     struct = Benzobisazole(temp_name)
-                    values = struct.get_property_predictions()
-                    groups.append([values[x][0] for x in properties])
+                    properties = struct.get_property_predictions()
+                    groups.append([x.value for x in properties if x.short in use])
 
                 lim_results = dataparser.predict_values(xvals, *zip(*groups))
-                results[direction] = [lim_results[x][0] for x in properties]
+
+                results[direction] = []
+                for prop in properties:
+                    try:
+                        x = lim_results[prop.short][0]
+                    except KeyError:
+                        x = None
+                    results[direction].append(x)
+
             except KeyError:
                 logger.info("Improper property limits: %s - %s" %
                             (self.name, direction))
