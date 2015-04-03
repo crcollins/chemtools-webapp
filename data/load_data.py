@@ -26,7 +26,7 @@ def main(csvfile):
             continue
         try:
             try:
-                exact_name, _ = get_exact_name(row[1])
+                exact_name = get_exact_name(row[1])
                 try:
                     decay_feature = get_decay_feature_vector(exact_name)
                     feature_vector = True
