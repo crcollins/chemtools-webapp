@@ -65,14 +65,10 @@
             </tr>
             {% if datapoint %}
             <tr>
-                <th>Calculated</th>
+                <th><abbr title="{{ datapoint.options }}">Calculated</abbr></th>
                 <td>{{ datapoint.homo|floatformat:2 }}</td>
                 <td>{{ datapoint.lumo|floatformat:2 }}</td>
                 <td>{{ datapoint.band_gap|floatformat:2 }}</td>
-            </tr>
-            <tr>
-                <th>Calculation Options</th>
-                <td class="text-center" colspan="3">{{ datapoint.options }}</td>
             </tr>
             {% endif %}
             {% for direction, values in property_limits.items %}
