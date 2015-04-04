@@ -32,14 +32,8 @@ def get_molecule_info_status(name):
     mol, _, error_report, new = get_molecule_status(name)
     info = mol.get_info()
 
-    temp = DataPoint.objects.filter(exact_name=mol.get_exact_name(),
-                                    band_gap__isnull=False).values()
-    if temp:
-        datapoint = temp[0]
-    else:
-        datapoint = None
-
-    info["datapoint"] = datapoint
+    datapoints = DataPoint.objects.filter(exact_name=mol.get_exact_name()).values()
+    info["datapoints"] = datapoints
     info["new"] = new
     info["error_report"] = error_report
     return info
