@@ -267,7 +267,7 @@ class Benzobisazole(Molecule):
                         x = None
                     results[direction].append(x)
 
-            except KeyError:
+            except (KeyError, TypeError):
                 logger.info("Improper property limits: %s - %s" %
                             (self.name, direction))
                 pass
