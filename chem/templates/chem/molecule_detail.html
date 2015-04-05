@@ -63,14 +63,14 @@
                 <td>{{ value|floatformat:2 }}  (± {{ error|floatformat:2 }}) </td>
                 {% endfor %}
             </tr>
-            {% if datapoint %}
+            {% for datapoint in datapoints %}
             <tr>
                 <th><abbr title="{{ datapoint.options }}">Calculated</abbr></th>
                 <td>{{ datapoint.homo|floatformat:2 }}</td>
                 <td>{{ datapoint.lumo|floatformat:2 }}</td>
                 <td>{{ datapoint.band_gap|floatformat:2 }}</td>
             </tr>
-            {% endif %}
+            {% endfor %}
             {% for direction, values in property_limits.items %}
             <tr>
                 <th>Predicted {{ direction }} Limit</th>
