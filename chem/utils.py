@@ -33,6 +33,11 @@ def get_molecule_info_status(name):
     info = mol.get_info()
 
     datapoints = DataPoint.objects.filter(exact_name=mol.get_exact_name()).values()
+    try:
+        datapoints = list(datapoints)
+    except IndexError:
+        datapoints = []
+
     info["datapoints"] = datapoints
     info["new"] = new
     info["error_report"] = error_report
