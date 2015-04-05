@@ -232,7 +232,7 @@ class Benzobisazole(Molecule):
             feature = self.get_decay_feature_vector()
             results = get_properties_from_decay_with_predictions(feature)
         except ValueError:
-            results = (None, None, None)
+            results = {}
         return results
 
     @cache
@@ -241,6 +241,7 @@ class Benzobisazole(Molecule):
             "n": [None, None, None],
             "m": [None, None, None]
         }
+        use = ["homo", "lumo", "gap"]
         for direction in results:
             try:
                 groups = []
@@ -253,25 +254,30 @@ class Benzobisazole(Molecule):
                     else:
                         temp_name = self.name + "_%s%d" % (direction, j)
                     struct = Benzobisazole(temp_name)
-                    values = struct.get_property_predictions()
-                    if values == (None, None, None):
-                        raise ValueError
-                    groups.append(values)
+                    properties = struct.get_property_predictions()
+                    groups.append([x.value for x in properties if x.short in use])
 
                 lim_results = dataparser.predict_values(xvals, *zip(*groups))
-                properties = ["homo", "lumo", "gap"]
-                results[direction] = [lim_results[x][0] for x in properties]
-            except ValueError:
+
+                results[direction] = []
+                for prop in properties:
+                    try:
+                        x = lim_results[prop.short][0]
+                    except KeyError:
+                        x = None
+                    results[direction].append(x)
+
+            except (KeyError, TypeError):
                 logger.info("Improper property limits: %s - %s" %
                             (self.name, direction))
                 pass
         return results
 
     def get_info(self):
-        features = [
-            self.get_naive_feature_vector(),
-            self.get_decay_feature_vector(),
-        ]
+        features = {
+            "Naive": self.get_naive_feature_vector(),
+            "Decay": self.get_decay_feature_vector(),
+        }
         return {
             "molecule": self.name,
             "exact_name": self.get_exact_name(),

@@ -1,3 +1,5 @@
+from collections import namedtuple
+
 from numpy.linalg import norm
 import numpy
 
@@ -161,4 +163,12 @@ def get_properties_from_decay_with_predictions(feature):
     gap = PRED_GAP_CLF.predict(feature_gap)
     homo = PRED_HOMO_CLF.predict(feature_homo)
     lumo = PRED_LUMO_CLF.predict(feature_lumo)
-    return homo[0], lumo[0], gap[0]
+
+    Property = namedtuple("Property", ("title", "short", "units", "value", "error"))
+
+    return [
+        Property("HOMO", "homo", "eV", homo[0], 0.09),
+        Property("LUMO", "lumo", "eV", lumo[0], 0.08),
+        Property("Band Gap", "gap", "eV", gap[0], 0.10),
+    ]
+

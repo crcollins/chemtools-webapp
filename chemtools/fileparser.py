@@ -101,6 +101,10 @@ class Log(object):
         # major memory saver by deleting all the line parser objects
         self.parsers = [self.cleanup_parsers(parsers) for parsers in self.parsers]
 
+    def __getitem__(self, x):
+        '''Return the value of the last parser'''
+        return self.parsers[-1][x][0]
+
     def setup_parsers(self):
         return {k: v(self) for k, v in Log.PARSERS.items()}
 
@@ -117,19 +121,17 @@ class Log(object):
         if len(self.parsers) > 1:
             logger.warn("Multistep Gaussian Log file!")
 
-        parsers = self.parsers[-1]
-
         if td:
-            header = parsers["Header"][0].replace(".chk", "_TD.chk")
-            options = parsers["Options"][0].lower().replace("opt", "td")
+            header = self["Header"].replace(".chk", "_TD.chk")
+            options = self["Options"].lower().replace("opt", "td")
         else:
-            header = parsers["Header"][0]
-            options = parsers["Options"][0]
+            header = self["Header"]
+            options = self["Options"]
 
-        if parsers["Geometry"][0] is None:
-            geometry = parsers["PartialGeometry"][0]
+        if self["Geometry"] is None:
+            geometry = self["PartialGeometry"]
         else:
-            geometry = parsers["Geometry"][0]
+            geometry = self["Geometry"]
 
         if not geometry or not header or not options:
             logger.info("The log file was invalid")
@@ -140,7 +142,7 @@ class Log(object):
             '',
             self.name,
             '',
-            parsers["ChargeMultiplicity"][0],
+            self["ChargeMultiplicity"],
             geometry,
             '',
         ])

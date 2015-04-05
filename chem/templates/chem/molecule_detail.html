@@ -37,9 +37,9 @@
     <a class="btn collapse-data-btn collapsed" data-toggle="collapse" href="#features">Feature Vectors</a>
     <div class="table-responsive">
     <table id="features" class="table collapse">
-        {% for feature in features %}
+        {% for name, feature in features.items %}
         <tr>
-            <th>{{ forloop.counter }}</th>
+            <th>{{ name }}</th>
             <td>{{ feature }}</td>
         </tr>
         {% endfor %}
@@ -51,30 +51,26 @@
         <thead>
             <tr>
                 <th></th>
-                <th>HOMO (eV)</th>
-                <th>LUMO (eV)</th>
-                <th>Band Gap (eV)</th>
+                {% for title, short, units, value, error in property_predictions %}
+                <th>{{ title }} ({{ units }})</th>
+                {% endfor %}
             </tr>
         </thead>
         <tbody>
             <tr>
                 <th>Predicted</th>
-                <td>{{ property_predictions.0|floatformat:2 }} (± 0.09)</td>
-                <td>{{ property_predictions.1|floatformat:2 }} (± 0.08)</td>
-                <td>{{ property_predictions.2|floatformat:2 }} (± 0.10)</td>
+                {% for title, short, units, value, error in property_predictions %}
+                <td>{{ value|floatformat:2 }}  (± {{ error|floatformat:2 }}) </td>
+                {% endfor %}
             </tr>
-            {% if datapoint %}
+            {% for datapoint in datapoints %}
             <tr>
-                <th>Calculated</th>
+                <th><abbr title="{{ datapoint.options }}">Calculated</abbr></th>
                 <td>{{ datapoint.homo|floatformat:2 }}</td>
                 <td>{{ datapoint.lumo|floatformat:2 }}</td>
                 <td>{{ datapoint.band_gap|floatformat:2 }}</td>
             </tr>
-            <tr>
-                <th>Calculation Options</th>
-                <td class="text-center" colspan="3">{{ datapoint.options }}</td>
-            </tr>
-            {% endif %}
+            {% endfor %}
             {% for direction, values in property_limits.items %}
             <tr>
                 <th>Predicted {{ direction }} Limit</th>

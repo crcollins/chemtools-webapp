@@ -960,13 +960,14 @@ class UtilsTestCase(TestCase):
         name = "24a_TON"
         results = utils.get_molecule_info_status(name)
         del results["features"]
+        del results["property_predictions"]
         expected = {
             'molecule': '24a_TON',
-            'property_predictions': (
-                -5.6866366091077571,
-                -2.1298787902985779,
-                3.4415766653971942,
-                ),
+            # 'property_predictions': (
+            #     ("HOMO", "homo", "eV", -5.6866366091077571),
+            #     ("LUMO", "lumo", "eV", -2.1298787902985779),
+            #     ("Band Gap", "gap", "eV", 3.4415766653971942),
+            # ),
             'exact_name': '24aaA_TON_A_A_n1_m1_x1_y1_z1',
             'property_limits': {
                 'm': [
@@ -980,7 +981,7 @@ class UtilsTestCase(TestCase):
             },
             'error_report': None,
             'name_error': None,
-            'datapoint': None,
+            'datapoints': [],
             'new': True,
             'exact_name_spacers': '2**4aaA**_TON_A**_A**_n1_m1_x1_y1_z1',
             'structure_type': 'Benzobisazole',
