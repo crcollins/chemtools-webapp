@@ -6,7 +6,7 @@ from django.http import HttpResponse
 from django.core.servers.basehttp import FileWrapper
 from django.contrib.auth.decorators import login_required
 
-from chemtools.extractor import CORES, RGROUPS, ARYL
+from chemtools.constants import NUMCORES, RGROUPS, ARYL
 from data.models import JobTemplate
 from data.forms import JobTemplateForm
 from account.utils import add_account_page, PAGES
@@ -23,7 +23,7 @@ def frag_index(request):
                  "acetyl", "phenyl", "thiophene", "pyridine", "carbazole",
                  "furan", "pyrrole"]
     data = (
-        ["Cores", CORES],
+        ["Cores", NUMCORES],
         ["X/R Groups", zip(RGROUPS, xrnames)],
         ["Aryl Groups", zip(ARYL, arylnames)],
     )

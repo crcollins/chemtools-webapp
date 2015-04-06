@@ -11,7 +11,6 @@ import numpy
 import gjfwriter
 import utils
 import constants
-import extractor
 import mol_name
 import ml
 import structure
@@ -1099,9 +1098,6 @@ class MolNameTestCase(TestCase):
 
 
 class ExtractorTestCase(TestCase):
-
-    def test_run_all(self):
-        extractor.run_all()
 
     def test_extractor_command(self):
         call_command("extract")

@@ -13,6 +13,9 @@ BENZO_ONE = "Benzazole"
 BENZO_MULTI = "Mutli Benzobisazole"
 CHAIN = "Chain"
 
+PARTS_OF_NAME = ['C', 'T', 'Z', 'E'], ['2', '3', '4'], ['3', '4']
+NUMCORES = [''.join(x) for x in product(*PARTS_OF_NAME)]
+
 CORE_COMBO = (['O', 'S', 'N', 'P', 'C'], ['N', 'P', 'C'])
 CORE_FREE = ([0, 0, 1, 1, 2], [0, 0, 1])
 
