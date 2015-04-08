@@ -13,7 +13,6 @@ import views
 import models
 import utils
 import interface
-import update_unknown
 from account.views import account_page
 from project.utils import get_sftp_connection, get_ssh_connection, AESCipher
 from project.utils import SSHClient, SFTPClient, server_exists
@@ -792,7 +791,7 @@ class ManagementTestCase(TestCase):
                          name="walltime",
                          state=models.Job.UNKNOWN)
         job.save()
-        update_unknown.run_all()
+        call_command("update_unknown")
         updated = models.Job.objects.get(id=job.id)
         self.assertEqual(updated.state, models.Job.WALLTIME)
 
@@ -802,7 +801,7 @@ class ManagementTestCase(TestCase):
                          name="completed",
                          state=models.Job.UNKNOWN)
         job.save()
-        update_unknown.run_all()
+        call_command("update_unknown")
         updated = models.Job.objects.get(id=job.id)
         self.assertEqual(updated.state, models.Job.COMPLETED)
 
@@ -812,7 +811,7 @@ class ManagementTestCase(TestCase):
                          name="failed",
                          state=models.Job.UNKNOWN)
         job.save()
-        update_unknown.run_all()
+        call_command("update_unknown")
         updated = models.Job.objects.get(id=job.id)
         self.assertEqual(updated.state, models.Job.FAILED)
 
@@ -822,7 +821,7 @@ class ManagementTestCase(TestCase):
                          name="missing",
                          state=models.Job.UNKNOWN)
         job.save()
-        update_unknown.run_all()
+        call_command("update_unknown")
         updated = models.Job.objects.get(id=job.id)
         self.assertEqual(updated.state, models.Job.MISSING)
 
@@ -832,8 +831,8 @@ class ManagementTestCase(TestCase):
                          name="completed",
                          state=models.Job.COMPLETED)
         job.save()
-        update_unknown.run_all()
-        update_unknown.run_all()
+        call_command("update_unknown")
+        call_command("update_unknown")
 
     def test_update_unknown_command(self):
         job = models.Job(credential=self.credential,
