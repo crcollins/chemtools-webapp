@@ -13,7 +13,6 @@ import views
 import models
 import utils
 import interface
-import update_jobs
 import update_unknown
 from account.views import account_page
 from project.utils import get_sftp_connection, get_ssh_connection, AESCipher
@@ -639,11 +638,11 @@ class InterfaceTestCase(TestCase):
         self.assertEqual(results["error"], None)
         job = models.Job.objects.get(jobid=jobid)
         self.assertEqual(job.state, models.Job.QUEUED)
-        update_jobs.run_all()
+        call_command("update_jobs")
         job = models.Job.objects.get(jobid=jobid)
         self.assertEqual(job.state, models.Job.RUNNING)
         time.sleep(10)
-        update_jobs.run_all()
+        call_command("update_jobs")
         job = models.Job.objects.get(jobid=jobid)
         self.assertEqual(job.state, models.Job.COMPLETED)
 
@@ -774,7 +773,7 @@ class ManagementTestCase(TestCase):
                          jobid="1",
                          name="not_a_real_job")
         job.save()
-        update_jobs.run_all()
+        call_command("update_jobs")
         updated = models.Job.objects.get(id=job.id)
         self.assertEqual(updated.state, models.Job.UNKNOWN)
 
