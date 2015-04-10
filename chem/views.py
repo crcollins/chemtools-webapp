@@ -233,7 +233,7 @@ def write_gjf(request, molecule):
     add = "" if request.REQUEST.get("view") else "attachment; "
 
     mol_settings = dict(mol_form.cleaned_data)
-    out = gjfwriter.Benzobisazole(molecule, **mol_settings)
+    out = gjfwriter.NamedMolecule(molecule, **mol_settings)
     response = HttpResponse(out.get_gjf(), content_type="text/plain")
     response['Content-Disposition'] = add + 'filename=%s.gjf' % molecule
     return response
@@ -246,7 +246,7 @@ def write_mol2(request, molecule):
     add = "" if request.REQUEST.get("view") else "attachment; "
 
     mol_settings = dict(mol_form.cleaned_data)
-    out = gjfwriter.Benzobisazole(molecule, **mol_settings)
+    out = gjfwriter.NamedMolecule(molecule, **mol_settings)
     response = HttpResponse(out.get_mol2(), content_type="text/plain")
     response['Content-Disposition'] = add + 'filename=%s.mol2' % molecule
     return response
@@ -258,7 +258,7 @@ def write_png(request, molecule):
     mol_form.is_valid()
     mol_settings = dict(mol_form.cleaned_data)
 
-    out = gjfwriter.Benzobisazole(molecule, **mol_settings)
+    out = gjfwriter.NamedMolecule(molecule, **mol_settings)
     response = HttpResponse(out.get_png(), content_type="image/png")
     response['Content-Disposition'] = 'filename=%s.png' % molecule
     return response
@@ -270,7 +270,7 @@ def write_svg(request, molecule):
     mol_form.is_valid()
     mol_settings = dict(mol_form.cleaned_data)
 
-    out = gjfwriter.Benzobisazole(molecule, **mol_settings)
+    out = gjfwriter.NamedMolecule(molecule, **mol_settings)
     response = HttpResponse(
         out.get_svg(), content_type="image/svg+xml")
     response['Content-Disposition'] = 'filename=%s.svg' % molecule

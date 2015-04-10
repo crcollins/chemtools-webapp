@@ -163,10 +163,10 @@ class Molecule(object):
         return ''.join(key + str(values[key]) for key in sorted(values.keys()))
 
 
-class Benzobisazole(Molecule):
+class NamedMolecule(Molecule):
 
     def __init__(self, name, **kwargs):
-        super(Benzobisazole, self).__init__(name, **kwargs)
+        super(NamedMolecule, self).__init__(name, **kwargs)
         if kwargs.get("autoflip"):
             self.name = autoflip_name(name)
         self._exact_name = None
@@ -253,7 +253,7 @@ class Benzobisazole(Molecule):
                         temp_name = re.sub(expr, replace, self.name)
                     else:
                         temp_name = self.name + "_%s%d" % (direction, j)
-                    struct = Benzobisazole(temp_name)
+                    struct = NamedMolecule(temp_name)
                     properties = struct.get_property_predictions()
                     groups.append([x.value for x in properties if x.short in use])
 

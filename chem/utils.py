@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 
 
 def get_molecule_status(name, autoflip=False):
-    mol = gjfwriter.Benzobisazole(name, autoflip=autoflip)
+    mol = gjfwriter.NamedMolecule(name, autoflip=autoflip)
     name_error = mol.get_name_error()
     error_report = ErrorReport.objects.filter(molecule=name).exists() or None
     new = not DataPoint.objects.filter(exact_name=mol.get_exact_name()).exists()
@@ -81,7 +81,7 @@ def run_standard_jobs(credential, string, mol_settings, job_settings):
     gjfs = []
     for mol in name_expansion(string):
         try:
-            out = gjfwriter.Benzobisazole(mol, **mol_settings)
+            out = gjfwriter.NamedMolecule(mol, **mol_settings)
             # This instantiation needs to be done here because of the errors
             # in a structure are calculated lazily.
             gjf = out.get_gjf()
@@ -174,7 +174,7 @@ def convert_logs(logsets):
 def autoflip_check(f):
     def wrapper(request, molecule, *args, **kwargs):
         if request.REQUEST.get("autoflip"):
-            mol = gjfwriter.Benzobisazole(molecule, autoflip=True)
+            mol = gjfwriter.NamedMolecule(molecule, autoflip=True)
             return redirect(wrapper, mol.name)
         return f(request, molecule, *args, **kwargs)
 

@@ -79,7 +79,7 @@ def random_names(aryl, rgroups, flip=None, n=250, max_layers=4):
 
 def save_names(names):
     for name in names:
-        struct = gjfwriter.Benzobisazole(
+        struct = gjfwriter.NamedMolecule(
             name,
             keywords="opt B3LYP/6-31g(d,p)",
             nprocshared=12,

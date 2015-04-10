@@ -28,7 +28,7 @@ def get_multi_molecule(molecules, options, mol_form, job_form):
             mol_name = name
 
         try:
-            out = gjfwriter.Benzobisazole(name, **mol_settings)
+            out = gjfwriter.NamedMolecule(name, **mol_settings)
             others = False
 
             if "image" in options:
