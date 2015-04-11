@@ -29,7 +29,7 @@ def get_extra_features(n, m, x, y, z):
     return [int(group[1:]) for group in [n, m, x, y, z]]
 
 
-def get_end_features(left, center, right, limit=4):
+def get_end_binary(left, center, right, limit=4):
     first = ARYL + XGROUPS
     second = ['*'] + RGROUPS
     length = len(first) + 2 * len(second)
@@ -53,7 +53,7 @@ def get_end_features(left, center, right, limit=4):
     return endfeatures
 
 
-def get_end_features2(left, center, right, power=1, H=1, lacunarity=1):
+def get_end_decay(left, center, right, power=1, H=1, lacunarity=1):
     first = ARYL + XGROUPS
     second = ['*'] + RGROUPS
     both = first + 2 * second
@@ -75,7 +75,7 @@ def get_end_features2(left, center, right, power=1, H=1, lacunarity=1):
     return endfeatures
 
 
-def get_end_features3(left, center, right, power=1, H=1, lacunarity=1):
+def get_end_decay_corrected(left, center, right, power=1, H=1, lacunarity=1):
     lengths = []
     for name in ARYL:
         struct = from_data(name)
@@ -118,7 +118,7 @@ def get_end_features3(left, center, right, power=1, H=1, lacunarity=1):
 
 def get_naive_feature_vector(exactname, limit=4):
     left, core, center, right, n, m, x, y, z = exactname.split('_')
-    endfeatures = get_end_features(left, center, right, limit=limit)
+    endfeatures = get_end_binary(left, center, right, limit=limit)
     corefeatures = get_core_features(core)
     extrafeatures = get_extra_features(n, m, x, y, z)
     return corefeatures + endfeatures + extrafeatures + [1]
@@ -126,7 +126,7 @@ def get_naive_feature_vector(exactname, limit=4):
 
 def get_decay_feature_vector(exactname, power=1, H=1, lacunarity=1):
     left, core, center, right, n, m, x, y, z = exactname.split('_')
-    endfeatures = get_end_features2(
+    endfeatures = get_end_decay(
         left, center, right, power=power, H=H, lacunarity=lacunarity)
     corefeatures = get_core_features(core)
     extrafeatures = get_extra_features(n, m, x, y, z)
@@ -135,7 +135,7 @@ def get_decay_feature_vector(exactname, power=1, H=1, lacunarity=1):
 
 def get_decay_distance_correction_feature_vector(exactname, power=1, H=1, lacunarity=1):
     left, core, center, right, n, m, x, y, z = exactname.split('_')
-    endfeatures = get_end_features3(
+    endfeatures = get_end_decay_corrected(
         left, center, right, power=power, H=H, lacunarity=lacunarity)
     corefeatures = get_core_features(core)
     extrafeatures = get_extra_features(n, m, x, y, z)
