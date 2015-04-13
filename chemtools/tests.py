@@ -17,6 +17,7 @@ import structure
 import fileparser
 import graph
 import interface
+import random_gen
 from project.utils import StringIO
 
 # TON
@@ -1380,3 +1381,11 @@ class GraphTestCase(TestCase):
         # big
         self.assertEqual(graph.run_name("TON_7_CCC_94_EON"), set(
             ["TON", '7', "CCC", '9', '4', "E/ZON"]))
+
+
+class RandomGenTestCase(TestCase):
+    def test_random_names(self):
+        names = [x for x in random_gen.random_names("2", "*",  flip=[''], n=1, max_layers=1)]
+        self.assertEqual(names, ["2**"])
+        names = [x for x in random_gen.random_names("4", "a", flip=[''], n=1, max_layers=1)]
+        self.assertEqual(names, ["4aa"])
