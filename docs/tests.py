@@ -2,6 +2,7 @@ import os
 
 from django.test import Client, TestCase
 from django.core.urlresolvers import reverse
+from django.core.management import call_command
 
 import views
 
@@ -23,3 +24,6 @@ class DocsTestCase(TestCase):
         for page in pages:
             response = self.client.get(reverse(views.docs_pages, args=(page, )))
             self.assertEqual(response.status_code, 200)
+
+    def test_make_docs(self):
+        call_command("make_docs")
