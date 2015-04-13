@@ -869,6 +869,15 @@ class NamedMoleculeTestCase(TestCase):
         results = obj.get_property_limits()
         self.assertEqual(expected, results)
 
+    def test_autoflip_name(self):
+        names = (
+            ("5555", "55-55-"),
+            ("4444", "4444"),
+            ("4545", "4545-"),
+        )
+        for initial, expected in names:
+            obj = gjfwriter.NamedMolecule(initial, autoflip=True)
+            self.assertEqual(obj.name, expected)
 
 
 class MolNameTestCase(TestCase):
