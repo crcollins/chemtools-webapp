@@ -1389,6 +1389,9 @@ class RandomGenTestCase(TestCase):
         self.assertEqual(names, ["2**"])
         names = [x for x in random_gen.random_names("4", "a", flip=[''], n=1, max_layers=1)]
         self.assertEqual(names, ["4aa"])
+        names = [x for x in random_gen.random_names("4", "a", n=1, max_layers=1)]
+        self.assertEqual(names, ["4aa"])
+
     def test_random_names_sets(self):
         aryl = ['4', '5']
         rgroups = ['a', 'b']
