@@ -880,6 +880,23 @@ class NamedMoleculeTestCase(TestCase):
             obj = gjfwriter.NamedMolecule(initial, autoflip=True)
             self.assertEqual(obj.name, expected)
 
+    def test_perturb_struct(self):
+        name = "4444"
+        obj1 = gjfwriter.NamedMolecule(name)
+        obj2 = gjfwriter.NamedMolecule(name, perturb=1.0)
+        obj3 = gjfwriter.NamedMolecule(name, perturb=0.0)
+
+        diff12 = []
+        diff13 = []
+        for atom1, atom2, atom3 in zip(obj1.structure.atoms,
+                                    obj2.structure.atoms,
+                                    obj3.structure.atoms):
+            diff12.append(numpy.linalg.norm(atom1.xyz - atom2.xyz))
+            diff13.append(numpy.linalg.norm(atom1.xyz - atom3.xyz))
+
+        eps = 1e-3
+        self.assertTrue(sum(diff12) > eps)
+        self.assertTrue(sum(diff13) < eps)
 
 class MolNameTestCase(TestCase):
     pairs = [
