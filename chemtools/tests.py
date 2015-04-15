@@ -1403,3 +1403,12 @@ class RandomGenTestCase(TestCase):
         names = set(names)
         self.assertTrue(names & expected)
         self.assertFalse(names.difference(expected))
+
+    def test_all_layers_same(self):
+        layer = ["4aa"]
+        layers = set([x for x in random_gen.all_layers_same(layer, max_layers=3)])
+        expected = set([
+            '4aa', '4aa4aa', '4aa4aa-', '4aa4aa4aa',
+            '4aa4aa-4aa', '4aa4aa4aa-', '4aa4aa-4aa-',
+        ])
+        self.assertEqual(layers, expected)
