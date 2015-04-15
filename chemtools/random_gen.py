@@ -57,12 +57,13 @@ def random_names(aryl, rgroups, flip=None, n=250, max_layers=4):
 
     totals = [size0 * size1 ** i for i in xrange(max_layers)]
     cumsum = [totals[0]]
+
     for x in totals[1:]:
         cumsum.append(cumsum[-1] + x)
 
     distributions = []
     for x in cumsum:
-        distributions.append([y / float(x) for y in totals if y <= x])
+        distributions.append([y / float(x) for y in totals[:-1] if y <= x])
 
     for i in xrange(n):
         number_of_layers = get_number_of_layers(
