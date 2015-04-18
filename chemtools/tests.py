@@ -499,6 +499,11 @@ class StructureTestCase(TestCase):
         self.assertEqual(
             [x.strip() for x in s.gjf.split()], [x.strip() for x in STRUCTURE_GJF.split()])
 
+    def test_from_log(self):
+        path = os.path.join(settings.MEDIA_ROOT, "tests", "A_TON_A_A.log")
+        s = structure.from_log(open(path, 'r'))
+        self.assertIn("C -0.022105 -0.036359 -0.000155", s.gjf)
+
     def test_from_gjf_no_bonds(self):
         string = "%chk=chk.chk\n# hf\n\nTitle\n\n0 1" + METHANE_REPLACED
         f = StringIO(string)

@@ -14,6 +14,7 @@ from utils import get_full_rotation_matrix, get_angles, replace_geom_vars, \
     convert_zmatrix_to_cart, calculate_bonds, \
     get_axis_rotation_matrix
 from project.utils import StringIO
+import fileparser
 
 
 logger = logging.getLogger(__name__)
@@ -149,6 +150,11 @@ def from_gjf(file):
         bonds_string = calculate_bonds(geom)
     f = StringIO(geom + "\n\n" + bonds_string)
     return from_xyz(f)
+
+
+def from_log(file):
+    out = fileparser.Log(file)
+    return from_gjf(StringIO(out.format_gjf()))
 
 
 def _load_fragments(coreset):
