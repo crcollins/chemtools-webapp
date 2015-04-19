@@ -65,8 +65,9 @@ def template_settings(request, username):
                 try:
                     name = form.cleaned_data.get("name")
                     obj = JobTemplate.objects.get(creator=request.user, name=name)
-                    with open(a.template.path, "w") as f:
-                        f.write(form.cleaned_data.get("template"))
+                    obj.template.delete(False)
+                    obj.template = form.cleaned_data.get("template")
+                    obj.save()
 
                 except JobTemplate.DoesNotExist:
                     obj = form.save(commit=False)
