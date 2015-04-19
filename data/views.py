@@ -74,6 +74,8 @@ def template_settings(request, username):
                     obj.save()
                 state = "Settings Successfully Saved"
                 form = JobTemplateForm(request.user)
+        else:
+            form = JobTemplateForm(request.user)
 
     else:
         form = JobTemplateForm(request.user)
