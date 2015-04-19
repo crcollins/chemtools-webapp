@@ -6,11 +6,15 @@ from django.conf import settings
 from django.test import Client, TestCase
 from django.core.urlresolvers import reverse
 from django.core.management import call_command
+from django.contrib.auth import get_user_model
+from django.core.files import File
 
 import views
 import models
 import load_data
+from account.views import account_page
 from chemtools.constants import RGROUPS, ARYL
+from project.utils import StringIO
 
 
 OPTIONS = {
@@ -22,7 +26,12 @@ OPTIONS = {
     "template":
             "{{ name }} {{ email }} {{ nodes }} {{ time }} {{ allocation }}",
 }
-
+USER_LOGIN = {
+    "username": "testerman",
+    "password": "S0m3thing",
+}
+USER = USER_LOGIN.copy()
+USER["email"] = "test@test.com"
 
 class FragmentTestCase(TestCase):
 
@@ -53,10 +62,89 @@ class TemplateTestCase(TestCase):
 
     def setUp(self):
         self.client = Client()
+        user = get_user_model().objects.create_user(**USER)
+        user.save()
+        self.user = user
+
+        self.template = models.JobTemplate(
+                                        name="test-template-delete",
+                                        creator=self.user,
+                                        )
+        self.template.template = File(StringIO("template", name="test-template-delete"))
+        self.template.save()
 
     def test_index(self):
         response = self.client.get(reverse(views.template_index))
         self.assertEqual(response.status_code, 200)
+
+    def test_add_template(self):
+        r = self.client.login(**USER_LOGIN)
+        self.assertTrue(r)
+
+        url = reverse(account_page, args=(USER["username"], "templates"))
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        data = {
+            "name": "test-template",
+            "creator": self.user,
+            "template": "asda",
+            "save": True,
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Settings Successfully Saved", response.content)
+
+    def test_save_template(self):
+        r = self.client.login(**USER_LOGIN)
+        self.assertTrue(r)
+
+        url = reverse(account_page, args=(USER["username"], "templates"))
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        data = {
+            "name": "test-template",
+            "creator": self.user,
+            "template": "asda",
+            "save": True,
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Settings Successfully Saved", response.content)
+
+        data = {
+            "name": "test-template",
+            "creator": self.user,
+            "template": "new stuff",
+            "save": True,
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Settings Successfully Saved", response.content)
+        obj = models.JobTemplate.objects.get(name="test-template")
+        self.assertEqual(obj.template.read(), "new stuff")
+
+    def test_delete_template(self):
+        r = self.client.login(**USER_LOGIN)
+        self.assertTrue(r)
+
+        url = reverse(account_page, args=(USER["username"], "templates"))
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        name = models.JobTemplate.objects.filter(name="test-template-delete")[0].get_long_name()
+        data = {
+            "delete": "on",
+            name : "on",
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Settings Successfully Saved", response.content)
+        try:
+            models.JobTemplate.objects.get(name="test-template-delete")
+            self.assertTrue(False)
+        except models.JobTemplate.DoesNotExist:
+            pass
 
 
 class ModelTestCase(TestCase):
