@@ -1,6 +1,10 @@
 {% extends "chem/base.html" %}
 
 {% block content %}
+{% for error in errors %}
+    <p>{{ error }}</p>
+{% endfor %}
+
 {% for image in images %}
 <div class="col-lg text-center">
     <img src="{{ image }}" />

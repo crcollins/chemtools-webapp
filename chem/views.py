@@ -427,6 +427,7 @@ def view_gjf(request, upload_form):
     scale = request.REQUEST.get("scale", 10)
 
     images = []
+    errors = []
     for f in upload_form.cleaned_data["files"]:
         out = gjfwriter.Molecule(f.name)
         try:
@@ -435,10 +436,12 @@ def view_gjf(request, upload_form):
             try:
                 out.from_log(f)
             except Exception:
+                errors.append("%s is an invalid file" % f.name)
                 continue
         images.append(out.get_png_data_url(scale=scale))
 
     c = {
+        "errors": errors,
         "images": images,
     }
     return render(request, "chem/gjf_view.html", c)
