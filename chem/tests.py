@@ -1191,6 +1191,27 @@ class UploadsTestCase(TestCase):
             response = self.client.post(reverse(views.upload_data), data)
             self.assertEqual(response.status_code, 200)
 
+    def test_view_gjf_log(self):
+        name = os.path.join(settings.MEDIA_ROOT, "tests", "A_TON_A_A.log")
+        with open(name, 'r') as log:
+            data = {
+                "files": log,
+                "options": "gjfview",
+            }
+            response = self.client.post(reverse(views.upload_data), data)
+            self.assertEqual(response.status_code, 200)
+
+    def test_view_gjf_error(self):
+        name = os.path.join(settings.MEDIA_ROOT, "tests", "id_rsa")
+        with open(name, 'r') as log:
+            data = {
+                "files": log,
+                "options": "gjfview",
+            }
+            response = self.client.post(reverse(views.upload_data), data)
+            self.assertEqual(response.status_code, 200)
+            self.assertIn("id_rsa is an invalid file", response.content)
+
     # def test_data_parse_log(self):
     #     test_path = os.path.join(settings.MEDIA_ROOT, "tests")
     #     with open(os.path.join(test_path, "A_TON_A_A.log"), 'r') as f:
