@@ -288,7 +288,7 @@ def upload_data(request):
         "logparse": parse_log,
         "longchain": long_chain_limit,
         "gjfreset": reset_gjf,
-        "gjfview": view_gjf,
+        "structureview": view_structure,
     }
 
     if request.method == "POST":
@@ -423,7 +423,7 @@ def reset_gjf(request, upload_form):
     return response
 
 
-def view_gjf(request, upload_form):
+def view_structure(request, upload_form):
     scale = request.REQUEST.get("scale", 10)
 
     images = []
@@ -444,7 +444,7 @@ def view_gjf(request, upload_form):
         "errors": errors,
         "images": images,
     }
-    return render(request, "chem/gjf_view.html", c)
+    return render(request, "chem/structure_view.html", c)
 
 ###########################################################
 ###########################################################

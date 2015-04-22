@@ -1181,32 +1181,32 @@ class UploadsTestCase(TestCase):
                         with zfile2.open(folder + "output.txt") as f2:
                             self.assertIn("Errors (0)", f2.read())
 
-    def test_view_gjf(self):
+    def test_view_structure(self):
         name = os.path.join(settings.MEDIA_ROOT, "tests", "A_TON_A_A.gjf")
         with open(name, 'r') as log:
             data = {
                 "files": log,
-                "options": "gjfview",
+                "options": "structureview",
             }
             response = self.client.post(reverse(views.upload_data), data)
             self.assertEqual(response.status_code, 200)
 
-    def test_view_gjf_log(self):
+    def test_view_structure_log(self):
         name = os.path.join(settings.MEDIA_ROOT, "tests", "A_TON_A_A.log")
         with open(name, 'r') as log:
             data = {
                 "files": log,
-                "options": "gjfview",
+                "options": "structureview",
             }
             response = self.client.post(reverse(views.upload_data), data)
             self.assertEqual(response.status_code, 200)
 
-    def test_view_gjf_error(self):
+    def test_view_structure_error(self):
         name = os.path.join(settings.MEDIA_ROOT, "tests", "id_rsa")
         with open(name, 'r') as log:
             data = {
                 "files": log,
-                "options": "gjfview",
+                "options": "structureview",
             }
             response = self.client.post(reverse(views.upload_data), data)
             self.assertEqual(response.status_code, 200)
