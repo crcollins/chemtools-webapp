@@ -25,5 +25,9 @@ class DocsTestCase(TestCase):
             response = self.client.get(reverse(views.docs_pages, args=(page, )))
             self.assertEqual(response.status_code, 200)
 
+    def test_doc_pages_404(self):
+        response = self.client.get(reverse(views.docs_pages, args=("notarealpage", )))
+        self.assertEqual(response.status_code, 404)
+
     def test_make_docs(self):
         call_command("make_docs")
