@@ -94,6 +94,22 @@ class TemplateTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn("Settings Successfully Saved", response.content)
 
+    def test_null_template(self):
+        r = self.client.login(**USER_LOGIN)
+        self.assertTrue(r)
+
+        url = reverse(account_page, args=(USER["username"], "templates"))
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        data = {
+            "name": "test-template",
+            "creator": self.user,
+            "template": "asda",
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 200)
+        self.assertNotIn("Settings Successfully Saved", response.content)
+
     def test_save_template(self):
         r = self.client.login(**USER_LOGIN)
         self.assertTrue(r)
