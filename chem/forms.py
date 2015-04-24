@@ -77,7 +77,7 @@ class UploadForm(forms.Form):
     CHOICES = (
         ("logparse", "Log Parse"),
         ("longchain", "Long Chain Limit"),
-        ("gjfview", "Gjf View"),
+        ("structureview", "Structure View"),
         ("gjfreset", "Gjf Reset"),
     )
     files = MultiFileField()
