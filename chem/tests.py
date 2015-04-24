@@ -1048,6 +1048,8 @@ class UploadsTestCase(TestCase):
 
     def setUp(self):
         self.client = Client()
+        super_user = get_user_model().objects.create_superuser(**SUPER_USER)
+        super_user.save()
 
     def test_index(self):
         response = self.client.get(reverse(views.upload_data))
@@ -1077,6 +1079,21 @@ class UploadsTestCase(TestCase):
                 lines = [x for x in reader]
                 results = lines[1][:3] + lines[1][4:]
                 self.assertEqual(results, expected)
+
+    def test_log_store(self):
+        r = self.client.login(**SUPER_USER_LOGIN)
+        self.assertTrue(r)
+
+        test_path = os.path.join(settings.MEDIA_ROOT, "tests")
+        with open(os.path.join(test_path, "A_TON_A_A.log"), 'r') as f:
+            data = {
+                "files": f,
+                "options": "logparse",
+                "store": True,
+            }
+            response = self.client.post(reverse(views.upload_data), data)
+            self.assertEqual(response.status_code, 200)
+            self.assertIn("1 datapoint(s) added to database", response.content)
 
     def test_gjf_reset(self):
         base = os.path.join(settings.MEDIA_ROOT, "tests", "A_TON_A_A")
