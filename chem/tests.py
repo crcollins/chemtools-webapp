@@ -136,6 +136,13 @@ class MainPageTestCase(TestCase):
                                                args=(name, )))
             self.assertEqual(response.status_code, 200)
 
+    def test_molecule_detail_autoflip(self):
+        name = "5555"
+        s = "?autoflip=true"
+        url = reverse(views.molecule_detail, args=(name, )) + s
+        response = self.client.get(url, follow=True)
+        self.assertEqual(response.context["molecule"], "55-55-")
+
     def test_molecule_detail_invalid(self):
         for name, reason in BAD_NAMES:
             response = self.client.get(reverse(views.molecule_detail,
