@@ -73,6 +73,9 @@ class TemplateTestCase(TestCase):
         self.template.template = File(StringIO("template", name="test-template-delete"))
         self.template.save()
 
+    def tearDown(self):
+        models.JobTemplate.objects.filter(creator=self.user).delete()
+
     def test_index(self):
         response = self.client.get(reverse(views.template_index))
         self.assertEqual(response.status_code, 200)
