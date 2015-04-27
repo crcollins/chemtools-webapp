@@ -165,6 +165,21 @@ class TemplateTestCase(TestCase):
         except models.JobTemplate.DoesNotExist:
             pass
 
+    def test_delete_template_fail(self):
+        r = self.client.login(**USER_LOGIN)
+        self.assertTrue(r)
+
+        url = reverse(account_page, args=(USER["username"], "templates"))
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        data = {
+            "delete": "on",
+            "made:up:name" : "on",
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Settings Successfully Saved", response.content)
 
 class ModelTestCase(TestCase):
 
