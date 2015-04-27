@@ -11,7 +11,7 @@ import structure
 from constants import KEYWORDS, NUMBERS
 from mol_name import get_exact_name, autoflip_name, get_structure_type
 from ml import get_decay_distance_correction_feature_vector, \
-    get_naive_feature_vector, get_decay_feature_vector, \
+    get_binary_feature_vector, get_decay_feature_vector, \
     get_properties_from_decay_with_predictions
 import dataparser
 
@@ -202,10 +202,10 @@ class NamedMolecule(Molecule):
         return self._name_error
 
     @cache
-    def get_naive_feature_vector(self, **kwargs):
+    def get_binary_feature_vector(self, **kwargs):
         try:
             exact_name = self.get_exact_name(spacers=True)
-            return get_naive_feature_vector(exact_name, **kwargs)
+            return get_binary_feature_vector(exact_name, **kwargs)
         except ValueError:
             return None
 
@@ -275,7 +275,7 @@ class NamedMolecule(Molecule):
 
     def get_info(self):
         features = {
-            "Naive": self.get_naive_feature_vector(),
+            "Naive": self.get_binary_feature_vector(),
             "Decay": self.get_decay_feature_vector(),
         }
         return {

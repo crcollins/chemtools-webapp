@@ -817,9 +817,9 @@ class NamedMoleculeTestCase(TestCase):
         value = obj.get_exact_name(spacers=True)
         self.assertEqual(value, "A**_TON_A**_A**_n1_m1_x1_y1_z1")
 
-    def test_get_naive_feature_vector(self):
+    def test_get_binary_feature_vector(self):
         obj = gjfwriter.NamedMolecule("TON")
-        value = obj.get_naive_feature_vector()
+        value = obj.get_binary_feature_vector()
         self.assertEqual(value, NAIVE_FEATURE_VECTOR)
 
     def test_get_decay_feature_vector(self):
@@ -1160,9 +1160,9 @@ class MLTestCase(TestCase):
             vector = ml.get_extra_features(*use)
             self.assertEqual(vector, list(numbers))
 
-    def test_get_naive_feature_vector(self):
+    def test_get_binary_feature_vector(self):
         name = "A**_TON_A**_A**_n1_m1_x1_y1_z1"
-        self.assertEqual(ml.get_naive_feature_vector(name),
+        self.assertEqual(ml.get_binary_feature_vector(name),
                          NAIVE_FEATURE_VECTOR)
 
     def test_get_decay_feature_vector(self):

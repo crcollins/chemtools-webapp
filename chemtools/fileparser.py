@@ -257,12 +257,12 @@ class Features(LineParser):
         try:
             from mol_name import get_exact_name
             from ml import get_decay_distance_correction_feature_vector, \
-                get_naive_feature_vector, get_decay_feature_vector
+                get_binary_feature_vector, get_decay_feature_vector
 
             spacer, _ = get_exact_name(self.log.name, spacers=True)
             #exactname = spacer.replace('*', '')
             self.value = '"' + str([
-                get_naive_feature_vector(spacer),
+                get_binary_feature_vector(spacer),
                 get_decay_feature_vector(spacer),
                 get_decay_distance_correction_feature_vector(spacer),
             ]) + '"'

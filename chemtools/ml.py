@@ -116,7 +116,7 @@ def get_end_decay_corrected(left, center, right, power=1, H=1, lacunarity=1):
     return endfeatures
 
 
-def get_naive_feature_vector(exactname, limit=4):
+def get_binary_feature_vector(exactname, limit=4):
     left, core, center, right, n, m, x, y, z = exactname.split('_')
     endfeatures = get_end_binary(left, center, right, limit=limit)
     corefeatures = get_core_features(core)
