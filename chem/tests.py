@@ -21,7 +21,7 @@ import utils
 from models import ErrorReport
 
 
-NAMES = ["24a_TON", "24b_TSP_24a_24a", "CON_24a", "A_TON_A_A", "TON_CCC"]
+NAMES = ["24a_TON", "24b_TSP_24a_24a", "CON_24a", "A_TON_A_A", "TON_CCC", "EON"]
 BAD_NAMES = [
     ("2a_TON_CC", "no rgroups allowed on aryl0"),
     ("ASADA", "Bad Substituent Name(s): [u'S']"),
