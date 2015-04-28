@@ -880,6 +880,7 @@ class NamedMoleculeTestCase(TestCase):
             ("5555", "55-55-"),
             ("4444", "4444"),
             ("4545", "4545-"),
+            ("TON_5555", "TON_55-55-"),
         )
         for initial, expected in names:
             obj = gjfwriter.NamedMolecule(initial, autoflip=True)
