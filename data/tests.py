@@ -8,6 +8,7 @@ from django.core.urlresolvers import reverse
 from django.core.management import call_command
 from django.contrib.auth import get_user_model
 from django.core.files import File
+from django.core.management.base import CommandError
 
 import views
 import models
@@ -281,3 +282,11 @@ class LoadDataTestCase(TestCase):
     def test_load_data_command(self):
         path = os.path.join(settings.MEDIA_ROOT, "tests", "data.csv")
         call_command('load_data', path)
+
+    def test_load_data_no_file(self):
+        with self.assertRaises(CommandError):
+            call_command('load_data')
+
+    def test_load_data_invalid_file(self):
+        with self.assertRaises(CommandError):
+            call_command('load_data', "not/a/real/path.csv")
