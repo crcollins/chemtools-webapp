@@ -53,8 +53,11 @@ def get_multi_molecule_status(string, autoflip=False):
             logger.warn("%s -- The operation timed out" % (string))
             raise ValueError("The operation has timed out.")
         mol, name_error, error_report, new = get_molecule_status(name, autoflip=autoflip)
-        if mol.get_exact_name(spacers=True) not in unique_molecules:
-            unique_molecules[mol.get_exact_name(spacers=True)] = [mol.name, error_report,
+        exact_spacer = mol.get_exact_name(spacers=True)
+        if not exact_spacer:
+            exact_spacer = name
+        if exact_spacer not in unique_molecules:
+            unique_molecules[exact_spacer] = [mol.name, error_report,
                                             name_error, new]
 
     return zip(*unique_molecules.values())
