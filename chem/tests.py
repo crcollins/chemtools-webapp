@@ -186,6 +186,22 @@ class MainPageTestCase(TestCase):
             with zipfile.ZipFile(f, "r") as zfile:
                 self.assertEqual(set(zfile.namelist()), gjf_names)
 
+    def test_multi_molecule_zip_invalid(self):
+        names, errors = zip(*BAD_NAMES)
+        string = ','.join(names)
+        filenames = set(["errors.txt"])
+        response = self.client.get(reverse(views.multi_molecule_zip,
+                                           args=(string, )))
+        self.assertEqual(response.status_code, 200)
+        with StringIO(response.content) as f:
+            with zipfile.ZipFile(f, "r") as zfile:
+                self.assertEqual(set(zfile.namelist()), filenames)
+                for name in zfile.namelist():
+                    with zfile.open(name) as f1:
+                        text = f1.read()
+                    for error in errors:
+                        self.assertIn(error, text)
+
     def test_multi_molecule_zip_keywords(self):
         string = ','.join(NAMES)
         header = "%%nprocshared=16\n%%mem=59GB\n"
