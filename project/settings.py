@@ -21,6 +21,13 @@ except ImportError:
     from secret_key import SECRET_KEY, AES_KEY
 
 DEBUG = True
+
+if DEBUG:
+    ALLOWED_HOSTS = ['*']
+else:
+    ALLOWED_HOSTS = ['gauss.crcollins.com']
+
+
 TEMPLATE_DEBUG = DEBUG
 SSL = os.environ.get('HTTPS')
 
