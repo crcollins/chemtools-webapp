@@ -26,7 +26,7 @@ install_chemtools() {
     python manage.py syncdb --noinput
     python manage.py make_docs
     python manage.py load_data base_data.csv
-    python manage.py collectstatic
+    python manage.py collectstatic --noinput
 }
 
 setup_nginx() {
