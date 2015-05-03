@@ -7,7 +7,7 @@ notifications:
 
 # Install packages
 install:
-  - bash install.sh dev
+  - travis_wait bash install.sh dev
 
 # Run test
 script:
