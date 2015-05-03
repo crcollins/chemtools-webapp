@@ -7,3 +7,4 @@ scipy==0.15.1
 django-crispy-forms==1.4.0
 scikit-learn==0.14.1
 django-sslserver==0.12
+coverage==3.7.1
