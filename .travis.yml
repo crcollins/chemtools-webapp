@@ -7,7 +7,16 @@ notifications:
 
 # Install packages
 install:
-  - travis_wait bash install.sh dev
+  - sudo apt-get install -y -qq python-dev gfortran liblapack-dev\
+                            libatlas-dev build-essential libfreetype6-dev\
+                            libpng-dev python-cairo
+  - ln -fs /usr/lib/python2.7/dist-packages/cairo/ env/lib/python2.7/site-packages/
+  - pip install numpy==1.9.1
+  - pip install -r requirements.txt
+  - python manage.py syncdb --noinput
+  - python manage.py make_docs
+  - python manage.py load_data base_data.csv
+  - python manage.py collectstatic
 
 # Run test
 script:
