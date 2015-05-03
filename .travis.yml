@@ -7,9 +7,10 @@ notifications:
 
 # Install packages
 install:
-  - sudo apt-get install -y -qq python-dev gfortran liblapack-dev libatlas-dev build-essential libfreetype6-dev libpng-dev python-cairo
+  - sudo apt-get install -y -qq python-dev gfortran liblapack-dev libatlas-dev build-essential libfreetype6-dev libpng-dev python-cairo python-scipy
   - ln -fs /usr/lib/python2.7/dist-packages/cairo/ ~/virtualenv/python2.7/lib/python2.7/site-packages/
   - pip install numpy==1.9.1
+  - travis_wait pip install scipy==0.15.1
   - travis_wait pip install -r requirements.txt
 
 before_script:
