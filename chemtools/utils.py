@@ -13,7 +13,7 @@ def get_axis_rotation_matrix(axis, theta):
     ux = axis[0, 0] / r
     uy = axis[1, 0] / r
     uz = axis[2, 0] / r
-    rot = numpy. matrix([
+    rot = numpy.matrix([
         [ct + ux ** 2 * nct, ux * uy * nct - uz * st, ux * uz * nct + uy * st],
         [uy * ux * nct + uz * st, ct + uy ** 2 * nct, uy * uz * nct - ux * st],
         [uz * ux * nct - uy * st, uz * uy * nct + ux * st, ct + uz ** 2 * nct],
