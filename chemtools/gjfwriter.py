@@ -120,6 +120,9 @@ class Molecule(object):
         string = "data:image/svg;base64,"
         return string + base64.b64encode(self.get_svg(scale))
 
+    def get_json(self):
+        return self.structure.json
+
     @cache
     def get_coulomb_matrix(self):
         coords = []

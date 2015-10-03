@@ -316,6 +316,16 @@ class Atom(object):
                                                    *self.xyz_tuple)
 
     @property
+    def json(self):
+        x, y, z = self.xyz_tuple
+        return {
+                "element": self.element,
+                "x": x,
+                "y": y,
+                "z": z,
+        }
+
+    @property
     def gjf_atoms(self):
         return self.element + " %f %f %f" % self.xyz_tuple
 
@@ -390,6 +400,14 @@ class Bond(object):
                                 self.atoms[0].id,
                                 self.atoms[1].id,
                                 self.type)
+
+    @property
+    def json(self):
+        return {
+                "first": self.atoms[0].id - 1,
+                "second": self.atoms[1].id - 1,
+                "type": self.type
+            }
 
     def __repr__(self):
         return self.mol2
@@ -525,6 +543,14 @@ class Structure(object):
                     string += ' '.join(['D'] + [str(x)
                                                 for x in [left] + ids + [right]] + ['F']) + '\n'
         return string
+
+    @property
+    def json(self):
+        return {
+            "atoms": [atom.json for atom in self.atoms],
+            "bonds": [bond.json for bond in self.bonds],
+            "center": self.get_center().T.tolist()[0],
+        }
 
     ###########################################################################
     # Matrix
