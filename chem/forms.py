@@ -94,6 +94,7 @@ class UploadForm(forms.Form):
         'options',
         'td_reset',
         'gjf_submit',
+        'store',
     )
 
     def clean(self):
