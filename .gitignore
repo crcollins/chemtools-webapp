@@ -11,3 +11,4 @@ logfile.log*
 *.sublime-*
 docs/static/*
 static/*
+temp/*
