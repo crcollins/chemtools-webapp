@@ -15,7 +15,7 @@ from crispy_forms.utils import render_crispy_form
 from models import ErrorReport
 from forms import ErrorReportForm, JobForm, UploadForm, MoleculeForm
 from utils import get_multi_molecule_status, get_molecule_info_status, \
-                autoflip_check
+                autoflip_check, get_molecule_status
 
 from chemtools import gjfwriter
 from chemtools import fileparser, dataparser
@@ -144,7 +144,11 @@ def molecule_detail(request, molecule):
 
 @autoflip_check
 def molecule_detail_json(request, molecule):
-    a = get_molecule_info_status(molecule)
+    if request.REQUEST.get("geometry"):
+        mol, _, _, _ = get_molecule_status(molecule)
+        a = mol.get_json()
+    else:
+        a = get_molecule_info_status(molecule)
     return HttpResponse(json.dumps(a, cls=DjangoJSONEncoder),
                         content_type="application/json")
 
