@@ -114,6 +114,85 @@ If you want a simple machine readable collection of the properties of a given na
         }
     }
 
+
+In addition to the standard information about the molecules, one can also get the geometry in a JSON format as seen below.
+
+[/chem/2.json](/chem/2.json)
+
+    {
+      "bonds": [
+        {
+          "second": 1,
+          "type": "1",
+          "first": 0
+        },
+        {
+          "second": 2,
+          "type": "2",
+          "first": 0
+        },
+        {
+          "second": 5,
+          "type": "1",
+          "first": 0
+        },
+        {
+          "second": 3,
+          "type": "1",
+          "first": 2
+        },
+        {
+          "second": 4,
+          "type": "1",
+          "first": 2
+        }
+      ],
+      "center": [
+        -0.33813333333333,
+        0.58133333333333,
+        0.00015
+      ],
+      "atoms": [
+        {
+          "y": 0,
+          "x": 0,
+          "z": 0,
+          "element": "C"
+        },
+        {
+          "y": 0,
+          "x": 1.0867,
+          "z": 0,
+          "element": "H"
+        },
+        {
+          "y": 1.1717,
+          "x": -0.6771,
+          "z": 0,
+          "element": "C"
+        },
+        {
+          "y": 1.1457,
+          "x": -1.7636,
+          "z": 0.0015,
+          "element": "H"
+        },
+        {
+          "y": 2.3642,
+          "x": -0.1596,
+          "z": -0.0006,
+          "element": "H"
+        },
+        {
+          "y": -1.1936,
+          "x": -0.5152,
+          "z": 0,
+          "element": "H"
+        }
+      ]
+    }
+
+
 #### Jobs ####
 
 Jobs have a few required parameters: `name`, `email`, `cluster`, `nodes`, and `walltime`. `name` and `email` are just as they seem. The former being the name of the job/file (this can be used to setup time dependent files). The latter just being the email to send the job updates to. `cluster` corresponds to the single letter at the start of the cluster's name.
