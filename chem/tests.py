@@ -13,6 +13,7 @@ from django.conf import settings
 
 from project.utils import StringIO, server_exists
 from data.models import DataPoint
+from account.models import CustomUser
 from cluster.models import Cluster, Credential
 from chemtools.constants import KEYWORDS
 import views
