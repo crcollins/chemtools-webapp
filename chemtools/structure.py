@@ -283,7 +283,7 @@ def from_name(name):
     vertical_ends = final_ends[:2]
     structure = structure.polymerize(vertical_ends, nm[1])
 
-    if any(xyz):
+    if any(x > 1 for x in xyz):
         structure = structure.stack(*xyz)
 
     structure.close_ends()
