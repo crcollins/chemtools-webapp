@@ -435,6 +435,17 @@ class StructureTestCase(TestCase):
         atom = structure.Atom(0, 0, 0, "C")
         self.assertEqual(str(atom), "C 0.000000 0.000000 0.000000")
 
+    def test_atom_json_property(self):
+        ele, x, y, z = ('C', 0.0, 0.0, 0.0)
+        atom = structure.Atom(x, y, z, ele)
+        data = {
+                "element": ele,
+                "x": x,
+                "y": y,
+                "z": z,
+            }
+        self.assertEqual(atom.json, data)
+
     def test_get_mass(self):
         struct = structure.from_name("TON")
         result = struct.get_mass()
@@ -903,6 +914,7 @@ class NamedMoleculeTestCase(TestCase):
         eps = 1e-3
         self.assertTrue(sum(diff12) > eps)
         self.assertTrue(sum(diff13) < eps)
+
 
 class MolNameTestCase(TestCase):
     pairs = [
