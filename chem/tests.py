@@ -156,6 +156,12 @@ class MainPageTestCase(TestCase):
                                                args=(name, )))
             self.assertEqual(response.status_code, 200)
 
+    def test_molecule_detail_geometry_json(self):
+        url = reverse(views.molecule_detail_json, args=('2', ))
+        encoded_options = "?" + urllib.urlencode({"geometry": True})
+        response = self.client.get(url + encoded_options)
+        self.assertEqual(response.status_code, 200)
+
     def test_multi_molecule(self):
         string = ','.join(NAMES)
         response = self.client.get(reverse(views.multi_molecule,
