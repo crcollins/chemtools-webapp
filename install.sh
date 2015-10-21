@@ -81,7 +81,7 @@ if [ "$1" == "remove" ];
 else
     dependencies
     install_chemtools
-    if [ "$1" != "dev"];
+    if [ "$1" != "dev" ];
         then
         setup_nginx
     fi
