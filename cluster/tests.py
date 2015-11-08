@@ -566,9 +566,9 @@ class InterfaceTestCase(TestCase):
         self.user = get_user_model().objects.create_user(**USER)
         test_path = os.path.join(settings.MEDIA_ROOT, "tests")
         with open(os.path.join(test_path, "id_rsa.pub"), 'r') as f:
-            user.public_key = f.read()
+            self.user.public_key = f.read()
         with open(os.path.join(test_path, "id_rsa"), 'r') as f:
-            user.private_key = f.read()
+            self.user.private_key = f.read()
         self.user.save()
 
         super_user = get_user_model().objects.create_superuser(**SUPER_USER)
