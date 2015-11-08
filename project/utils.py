@@ -83,7 +83,6 @@ def get_sftp_connection(hostname, username, key=None, password=None, port=22):
 def get_ssh_connection(hostname, username, key=None, password=None, port=22):
     if key is None and password is None:
         raise Exception("no key or password")
-
     client = SSHClient()
     client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     if key:
@@ -105,7 +104,7 @@ def get_ssh_connection(hostname, username, key=None, password=None, port=22):
 
 def server_exists(*args, **kwargs):
     try:
-        get_ssh_connection(*args, **kwargs)
+        get_ssh_connection(*args, timeout=1, **kwargs)
     except Exception as e:
         return False
     return True
