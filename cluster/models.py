@@ -86,11 +86,8 @@ class Credential(models.Model):
                                       password=self.password,
                                       port=self.cluster.port)
         else:
-            try:
-                del self.user._profile_cache
-            except:
-                pass
-            private = StringIO(self.user.private_key)
+            user = type(self.user).objects.get(id=self.user.id)
+            private = StringIO(user.private_key)
             return get_ssh_connection(self.cluster.hostname,
                                       self.username,
                                       key=private,
