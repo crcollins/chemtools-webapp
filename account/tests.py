@@ -329,6 +329,14 @@ class SSHKeyTestCase(TestCase):
             use_password=False)
         credential.save()
         self.credential = credential
+        credential2 = Credential(
+            user=user,
+            cluster=cluster,
+            username=self.credential.username,
+            password="vagrant",
+            use_password=True)
+        credential2.save()
+        self.credential2 = credential2
 
         s = "cp ~/.ssh/authorized_keys ~/.ssh/authorized_keys.chemtools.bak"
         with self.credential.get_ssh_connection() as ssh:
@@ -336,7 +344,7 @@ class SSHKeyTestCase(TestCase):
 
     def tearDown(self):
         s = "cp ~/.ssh/authorized_keys.chemtools.bak ~/.ssh/authorized_keys"
-        with self.credential.get_ssh_connection() as ssh:
+        with self.credential2.get_ssh_connection() as ssh:
             ssh.exec_command(s)
 
     def test_change_ssh_key(self):
