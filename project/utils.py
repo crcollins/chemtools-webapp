@@ -80,7 +80,7 @@ def get_sftp_connection(hostname, username, key=None, password=None, port=22):
     return SFTPClient.from_transport(transport)
 
 
-def get_ssh_connection(hostname, username, key=None, password=None, port=22):
+def get_ssh_connection(hostname, username, key=None, password=None, port=22, timeout=None):
     if key is None and password is None:
         raise Exception("no key or password")
     client = SSHClient()
@@ -92,7 +92,7 @@ def get_ssh_connection(hostname, username, key=None, password=None, port=22):
     else:
         client.connect(hostname, username=username, password=password,
                        port=port, allow_agent=False, look_for_keys=False,
-                       compress=True)
+                       compress=True, timeout=timeout)
     bases = [". ~/.bash_profile; ", "source .login; ", ". ~/.bashrc; "]
     for base in bases:
         _, _, err = client.exec_command(base)
