@@ -40,7 +40,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     config.vm.box = "chemtools-precise32"
   else
     config.vm.box = "precise32"
-  endq
+  end
   config.vm.synced_folder "../", "/tmp/chemtools-webapp"
 
 
