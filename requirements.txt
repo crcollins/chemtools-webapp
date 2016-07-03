@@ -2,7 +2,7 @@ Django==1.6.10
 matplotlib==1.1.1
 misaka==1.0.2
 paramiko==1.12.1
-pycrypto==2.6
+pycrypto==2.6.1
 scipy==0.15.1
 django-crispy-forms==1.4.0
 scikit-learn==0.14.1
