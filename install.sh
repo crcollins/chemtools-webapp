@@ -39,7 +39,7 @@ setup_nginx() {
 
     # This is to setup the periodic update of the ML models
     sudo tee /etc/cron.d/chemtools <<EOF
-PATH=$CHEMTOOLS_DIR/bin
+PATH=$CHEMTOOLS_DIR/env/bin
 0 3 * * * $INSTALL_USER cd $CHEMTOOLS_DIR && python -u $CHEMTOOLS_DIR/manage.py update_ml >> $CHEMTOOLS_DIR/ml_update.log
 EOF
     # Select the usage of the HTTPS configuration
