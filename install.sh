@@ -25,7 +25,11 @@ install_chemtools() {
     pip install -r requirements.txt
     python manage.py syncdb --noinput
     python manage.py make_docs
-    python manage.py load_data base_data.csv
+    if [ ! -f .loaded_data ];
+    then
+        python manage.py load_data base_data.csv
+        touch .loaded_data
+    fi
     python manage.py collectstatic --noinput
 }
 
