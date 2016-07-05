@@ -16,5 +16,5 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
 	    logger.debug("Updating all the jobs")
 	    for user in get_user_model().objects.all():
-	        creds = get_user_model().credentials.all()
+	        creds = user.credentials.all()
 	        get_jobs(creds)
