@@ -185,6 +185,7 @@ class LogSet(Output):
         self.write(x.format_data())
 
     def parse_files(self, files):
+        if not files: return
         pool = multiprocessing.Pool(processes=multiprocessing.cpu_count())
         self.logs = pool.map(Log, files)
         pool.close()
