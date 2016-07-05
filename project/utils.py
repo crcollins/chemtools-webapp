@@ -102,6 +102,20 @@ def get_ssh_connection(hostname, username, key=None, password=None, port=22, tim
     return client
 
 
+def memoize(func):
+    cache = {}
+    def wrapped(*args, **kwargs):
+        all_args = args + tuple(kwargs.items())
+        if all_args in cache:
+            return cache[all_args]
+        else:
+            value = func(*args, **kwargs)
+            cache[all_args] = value
+            return value
+    return wrapped
+
+
+@memoize
 def server_exists(*args, **kwargs):
     try:
         get_ssh_connection(*args, timeout=1, **kwargs)
