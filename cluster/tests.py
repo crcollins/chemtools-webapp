@@ -725,7 +725,8 @@ class InterfaceTestCase(TestCase):
 
     def test_get_log_data_error(self):
         results = interface.get_log_data(self.credential2, [""])
-        self.assertIn("IndexError", results["error"])
+        self.assertEqual(results["error"], None)
+        self.assertEqual(results["results"].strip(), '')
 
     def test_get_log_data_argparse(self):
         with self.credential2.get_sftp_connection() as sftp:
