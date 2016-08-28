@@ -175,15 +175,7 @@ class Log(object):
             f = open(f, 'r')
         with f:
             self.fname = fname if fname else f.name
-
-            name, _ = os.path.splitext(self.fname)
-            name = os.path.basename(name)
-            if name.lower().endswith("_td"):
-                # rstrip does not work because some names end with a "d"
-                name = name[:-3]
-            elif name.lower().endswith("_tddft"):
-                name = name[:-6]
-            self.name = name
+            self.name = self.cleanup_name()
 
             self.parsers = [self.setup_parsers()]
             # This initialization is just in case the file is empty
@@ -220,6 +212,16 @@ class Log(object):
 
         # major memory saver by deleting all the line parser objects
         self.parsers = [self.cleanup_parsers(parsers) for parsers in self.parsers]
+
+    def cleanup_name(self):
+        name, _ = os.path.splitext(self.fname)
+        name = os.path.basename(name)
+        if name.lower().endswith("_td"):
+            # rstrip does not work because some names end with a "d"
+            name = name[:-3]
+        elif name.lower().endswith("_tddft"):
+            name = name[:-6]
+        return name
 
     def __getitem__(self, x):
         '''Return the value of the last parser'''
