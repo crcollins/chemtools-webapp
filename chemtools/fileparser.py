@@ -241,7 +241,7 @@ class Log(object):
 
     def format_gjf(self, td=False):
         if len(self.parsers) > 1:
-            logger.warn("Multistep Gaussian Log file!")
+            logger.warn("%s is a multistep Gaussian log file!" % self.fname)
 
         if td:
             header = self["Header"].replace(".chk", "_TD.chk")
