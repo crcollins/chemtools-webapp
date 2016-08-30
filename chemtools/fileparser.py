@@ -706,6 +706,28 @@ class DipoleVector(LineParser):
             self.done = True
 
 
+@Log.add_parser
+class ExcitationDipoleVector(LineParser):
+
+    def __init__(self, *args, **kwargs):
+        super(ExcitationDipoleVector, self).__init__(*args, **kwargs)
+        self.start = False
+        self.value = '[]'
+
+    @is_done
+    def parse(self, line):
+         # " Ground to excited state transition electric dipole moments (Au):"
+         # "       state          X           Y           Z        Dip. S.      Osc."
+         # "         1         1.0081     -0.2949      0.0000      1.1032      0.1299"
+        line = line.strip()
+        if "transition electric dipole" in line:
+            self.start = True
+
+        if self.start and line.startswith("1"):
+            self.value = str([float(x) for x in line.split()[1:4]])
+            self.done = True
+
+
 ##############################################################################
 # StandAlone
 ##############################################################################
