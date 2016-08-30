@@ -690,6 +690,22 @@ class Dipole(LineParser):
             self.value = line.split()[-1]
 
 
+@Log.add_parser
+class DipoleVector(LineParser):
+
+    def __init__(self, *args, **kwargs):
+        super(DipoleVector, self).__init__(*args, **kwargs)
+        self.value = '[]'
+
+    @is_done
+    def parse(self, line):
+        # "    X=              0.0000    Y=              0.0000    Z=              0.0001  Tot=              0.0001"
+        line = line.strip()
+        if line.startswith("X="):
+            self.value = str([float(x) for x in line.split()[1:-1:2]])
+            self.done = True
+
+
 ##############################################################################
 # StandAlone
 ##############################################################################
