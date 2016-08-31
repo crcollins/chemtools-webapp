@@ -728,6 +728,20 @@ class ExcitationDipoleVector(LineParser):
             self.done = True
 
 
+@Log.add_parser
+class OscillatorStrength(LineParser):
+
+    def __init__(self, *args, **kwargs):
+        super(OscillatorStrength, self).__init__(*args, **kwargs)
+
+    @is_done
+    def parse(self, line):
+        # " Excited State   1:      Singlet-A      2.9126 eV  425.67 nm  f=0.7964  <S**2>=0.000"
+        if "Excited State   1:" in line:
+            self.value = line.split()[8][2:]
+            self.done = True
+
+
 ##############################################################################
 # StandAlone
 ##############################################################################
