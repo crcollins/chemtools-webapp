@@ -169,6 +169,8 @@ class Log(object):
     PARSERS = dict()
     order = ["ExactName", "Features", "Options", "HOMO", "LUMO",
              "HomoOrbital", "Dipole", "Energy", "BandGap", "Time"]
+             "HomoOrbital", "Dipole", "Energy", "BandGap", "Time", "SumMullikenCharges"]
+             #"DipoleVector", "ExcitationDipoleVector", "OscillatorStrength",
 
     def __init__(self, f, fname=None):
         if not hasattr(f, "read"):  # filename
@@ -741,6 +743,18 @@ class OscillatorStrength(LineParser):
             self.value = line.split()[8][2:]
             self.done = True
 
+
+@Log.add_parser
+class SpatialExtent(LineParser):
+
+    def __init__(self, *args, **kwargs):
+        super(SpatialExtent, self).__init__(*args, **kwargs)
+
+    @is_done
+    def parse(self, line):
+        # " Electronic spatial extent (au):  <R**2>=           1800.4171"
+        if "Electronic spatial extent" in line:
+            self.value = line.split()[-1]
 
 ##############################################################################
 # StandAlone
