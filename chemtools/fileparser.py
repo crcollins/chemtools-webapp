@@ -756,6 +756,47 @@ class SpatialExtent(LineParser):
         if "Electronic spatial extent" in line:
             self.value = line.split()[-1]
 
+
+@Log.add_parser
+class ForceVectors(LineParser):
+
+    def __init__(self, *args, **kwargs):
+        super(ForceVectors, self).__init__(*args, **kwargs)
+        self.start = False
+        self.dashes = False
+
+    @is_done
+    def parse(self, line):
+        # " Center     Atomic                   Forces (Hartrees/Bohr)"
+        # " Number     Number              X              Y              Z"
+        # " -------------------------------------------------------------------"
+        # "      1        6          -0.000023872    0.000126277    0.000001090"
+        # ...
+        # " ---------------------------------------------------------------------"
+        # Note: This occurs multiple times in an optimization
+        if "Forces (Hartrees/Bohr)" in line:
+            self.start = True
+            return
+
+        if self.start:
+            if "--------------" in line:
+                # dashed lines toggle the selection area
+                self.dashes = not self.dashes
+                if self.dashes:
+                    self.value = ''
+                else:
+                    self.start = False
+                return
+
+            if self.dashes:
+                temp = line.strip().split()
+                try:
+                    use = [SYMBOLS[temp[1]]] + temp[2:]
+                except KeyError:
+                    raise NotImplementedError("The atomic number %s is not yet added to chemtools." % (temp[1], ))
+                self.value += ' '.join(use) + '\n'
+
+
 ##############################################################################
 # StandAlone
 ##############################################################################
