@@ -797,6 +797,38 @@ class ForceVectors(LineParser):
                 self.value += ' '.join(use) + '\n'
 
 
+@Log.add_parser
+class MullikenCharges(LineParser):
+
+    def __init__(self, *args, **kwargs):
+        super(MullikenCharges, self).__init__(*args, **kwargs)
+        self.start = False
+
+    @is_done
+    def parse(self, line):
+        # Sometimes "atomic" is not there?
+        # " Mulliken atomic charges:"
+        # "          1"
+        # " 1  C    0.324629"
+        # ...
+        # " Sum of Mulliken atomic charges =   0.00000"
+        line = line.strip()
+        if "Mulliken" in line and "charges" in line and "sum" not in line.lower():
+            self.start = True
+            self.value = ''
+            return
+
+        if "Sum" in line and "Mulliken" in line:
+            self.start = False
+            return
+
+        if self.start:
+            temp = line.strip().split()
+            if len(temp) == 1:
+                return
+            self.value += ' '.join(temp[1:]) + '\n'
+
+
 ##############################################################################
 # StandAlone
 ##############################################################################
