@@ -829,6 +829,53 @@ class MullikenCharges(LineParser):
             self.value += ' '.join(temp[1:]) + '\n'
 
 
+@Log.add_parser
+class SumMullikenCharges(LineParser):
+
+    def __init__(self, *args, **kwargs):
+        super(SumMullikenCharges, self).__init__(*args, **kwargs)
+        self.start = False
+
+    @is_done
+    def parse(self, line):
+        # Sometimes "atomic" is not there?
+        # " Mulliken atomic charges:"
+        # "          1"
+        # " 1  C    0.324629"
+        # ...
+        # " Sum of Mulliken atomic charges =   0.00000"
+        line = line.strip()
+        if "summed into heavy atoms" in line:
+            self.start = True
+            self.value = ''
+            return
+
+        if "Electronic spatial extent" in line or "Mulliken charges=" in line:
+            self.start = False
+            return
+
+        if self.start:
+            temp = line.strip().split()
+            if len(temp) == 1:
+                return
+            self.value += ' '.join(temp[:]) + '\n'
+
+
+@Log.add_parser
+class StepNumber(LineParser):
+
+    def __init__(self, *args, **kwargs):
+        super(StepNumber, self).__init__(*args, **kwargs)
+        self.value = "Final"
+
+    @is_done
+    def parse(self, line):
+        # " Step number   1 out of a maximum of   96"
+        if "Step number" in line:
+            self.value = line.split()[2]
+
+
+
 ##############################################################################
 # StandAlone
 ##############################################################################
