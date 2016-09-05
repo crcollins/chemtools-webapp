@@ -473,11 +473,15 @@ class Energy(LineParser):
     @is_done
     def parse(self, line):
         # " 36\\Version=EM64L-G09RevC.01\State=1-A\HF=-1127.8085512\RMSD=3.531e-09"
+        # or
+        # " SCF Done:  E(RB3LYP) =  -567.104150100     A.U. after   14 cycles"
+        if "SCF Done" in line:
+            self.value = line.strip().split()[4]
+            return
+
         modline = self.prevline + line.strip()
-        if self.delimiter in modline:
-            if ":\\" in modline:
-                self.delimiter = '|'
-                self.start = False
+        if "|" in modline:
+            self.delimiter = '|'
 
         if "{0}HF=".format(self.delimiter) in modline:
             idx = modline.index("HF=") + 3
@@ -579,12 +583,10 @@ class Geometry(LineParser):
         # " 6,-0.8632316482,20.4346296726\\Version=EM64L-G09RevC.01\State=1-A\HF=-"
         line = line[1:]
         modline = self.prevline + line.strip('\n')
-        if self.delimiter in modline:
-            if ":\\" in modline:
-                self.delimiter = '|'
-                self.start = False
-            else:
-                self.start = True
+
+        if "|" in modline:
+            self.delimiter = '|'
+            self.start = True
 
         if self.start:
             if '{0}{0}@'.format(self.delimiter) in modline:
@@ -916,6 +918,7 @@ if __name__ == "__main__":
 
         for p in processes:
             p.join()
+
 
     class StandAlone(object):
 
