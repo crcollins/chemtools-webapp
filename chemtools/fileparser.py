@@ -649,10 +649,7 @@ class PartialGeometry(LineParser):
 
             if self.dashes:
                 temp = line.strip().split()
-                try:
-                    use = [SYMBOLS[temp[1]]] + temp[3:]
-                except KeyError:
-                    raise NotImplementedError("The atomic number %s is not yet added to chemtools." % (temp[1], ))
+                use = [SYMBOLS[temp[1]]] + temp[3:]
                 self.value += ' '.join(use) + '\n'
 
 
@@ -792,10 +789,7 @@ class ForceVectors(LineParser):
 
             if self.dashes:
                 temp = line.strip().split()
-                try:
-                    use = [SYMBOLS[temp[1]]] + temp[2:]
-                except KeyError:
-                    raise NotImplementedError("The atomic number %s is not yet added to chemtools." % (temp[1], ))
+                use = [SYMBOLS[temp[1]]] + temp[2:]
                 self.value += ' '.join(use) + '\n'
 
 
