@@ -841,18 +841,18 @@ class SumMullikenCharges(LineParser):
     @is_done
     def parse(self, line):
         # Sometimes "atomic" is not there?
-        # " Mulliken atomic charges:"
-        # "          1"
-        # " 1  C    0.324629"
+        # " Mulliken charges with hydrogens summed into heavy atoms:"
+        # "              1"
+        # "     1  C    0.324629"
         # ...
-        # " Sum of Mulliken atomic charges =   0.00000"
+        # " Sum of Mulliken charges with hydrogens summed into heavy atoms =   0.00000"
         line = line.strip()
-        if "summed into heavy atoms" in line:
+        if "summed into heavy atoms:" in line:
             self.start = True
             self.value = ''
             return
 
-        if "Electronic spatial extent" in line or "Mulliken charges=" in line:
+        if "summed into heavy atoms =" in line:
             self.start = False
             return
 
