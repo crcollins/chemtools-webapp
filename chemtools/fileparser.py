@@ -167,7 +167,7 @@ class Output(object):
 
 class Log(object):
     PARSERS = dict()
-    order = ["ExactName", "Features", "Options", "HOMO", "LUMO",
+    ORDER = ["ExactName", "Features", "Options", "HOMO", "LUMO",
              "HomoOrbital", "Dipole", "Energy", "BandGap", "Time"]
              "HomoOrbital", "Dipole", "Energy", "BandGap", "Time", "SumMullikenCharges"]
              #"DipoleVector", "ExcitationDipoleVector", "OscillatorStrength",
@@ -276,7 +276,7 @@ class Log(object):
         outer_values = []
         for parsers in self.parsers:
             values = []
-            for key in self.order:
+            for key in self.ORDER:
                 value, done = parsers[key]
                 # csv fixes
                 if value and "," in value:
@@ -289,7 +289,7 @@ class Log(object):
     @classmethod
     def format_header(cls):
         nonparsed = ["Filename", "Name"]
-        return ','.join(nonparsed + cls.order)
+        return ','.join(nonparsed + cls.ORDER)
 
 
 class LogSet(Output):
