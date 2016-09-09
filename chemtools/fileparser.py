@@ -236,6 +236,16 @@ class Log(object):
         # major memory saver by deleting all the line parser objects
         return {k: (v.value, v.done) for k, v in parsers.items()}
 
+    def get_geometry(self, parsers=None):
+        if parsers is None:
+            parsers = self.parsers[-1]
+
+        if parsers["Geometry"][0] is None:
+            geometry = parsers["PartialGeometry"][0]
+        else:
+            geometry = parsers["Geometry"][0]
+        return geometry
+
     @classmethod
     def add_parser(cls, parser):
         cls.PARSERS[parser.__name__] = parser
@@ -252,11 +262,7 @@ class Log(object):
             header = self["Header"]
             options = self["Options"]
 
-        if self["Geometry"] is None:
-            geometry = self["PartialGeometry"]
-        else:
-            geometry = self["Geometry"]
-
+        geometry = self.get_geometry()
         if not geometry or not header or not options:
             logger.info("The log file was invalid")
             raise Exception("The log file was invalid")
