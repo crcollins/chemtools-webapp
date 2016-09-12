@@ -278,6 +278,9 @@ class Log(object):
         ])
         return s
 
+    def format_out(self):
+        return self.get_geometry()
+
     def format_data(self):
         outer_values = []
         for parsers in self.parsers:
