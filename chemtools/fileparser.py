@@ -188,7 +188,9 @@ class Log(object):
             started = False
             current_parsers = self.parsers[0]
 
-            for i, line in enumerate(f):
+            for line in f:
+                line = line.replace('\r', '')
+
                 if "******************************************" in line:
                     started = True
 
@@ -207,7 +209,7 @@ class Log(object):
                     current_parsers = self.parsers[-1]
 
                 for k, parser in current_parsers.items():
-                    parser.parse(line.replace('\r', ''))
+                    parser.parse(line)
 
             if not completed:
                 current_parsers["Geometry"].value = None
