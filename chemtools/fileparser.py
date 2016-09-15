@@ -187,6 +187,7 @@ class Log(object):
             completed = False
             started = False
             current_parsers = self.parsers[0]
+            first = True
 
             for line in f:
                 line = line.replace('\r', '')
@@ -200,7 +201,11 @@ class Log(object):
                 if "Normal termination of Gaussian" in line:
                     completed = True
 
-                if "Initial command" in line:
+                if "Initial command" in line or "Input orientation:" in line:
+                    if first:
+                        first = False
+                        continue
+
                     # Multistep Gaussian log
                     if not completed:
                         current_parsers["Geometry"].value = None
@@ -632,6 +637,8 @@ class Geometry(LineParser):
 
         if "|" in modline:
             self.delimiter = '|'
+
+        if self.delimiter in modline:
             self.start = True
 
         if self.start:
