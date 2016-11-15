@@ -638,7 +638,8 @@ class Geometry(LineParser):
         if "|" in modline:
             self.delimiter = '|'
 
-        if self.delimiter in modline:
+        # Check for % is to make sure this is not a windows file path
+        if self.delimiter in modline and "%" not in modline:
             self.start = True
 
         if self.start:
@@ -658,9 +659,11 @@ class Geometry(LineParser):
 
                 lines = [x.strip() for x in value.split('\n')]
 
+                # Make sure that the fifth line is the charge and multiplicity
                 assert len(lines[4].split()) == 2
-                lines = lines[5:-1]
 
+                # Now only store the geometry
+                lines = lines[5:-1]
                 self.value = '\n'.join(lines) + '\n'
                 self.done = True
             if not self.done:
