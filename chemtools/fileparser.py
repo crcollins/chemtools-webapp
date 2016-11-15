@@ -292,39 +292,24 @@ class Log(object):
         return self.get_geometry()
 
     def format_outx(self):
-        s = []
+        strings = []
         for parsers in self.parsers:
             geometry = self.get_geometry(parsers)
             forces = parsers["ForceVectors"][0]
-            mulli = parsers["MullikenCharges"][0]
-            sum_mulli = parsers["SumMullikenCharges"][0]
 
-            if mulli is None or sum_mulli is None or forces is None:
+            if forces is None:
                 continue
 
             geom = geometry.strip().split('\n')
-            n = len(geom)
-            new_sum_mulli = []
-            for line in sum_mulli.strip().split('\n'):
-                num, ele, val = line.split()
-                num = int(num) - 1
-
-                while len(new_sum_mulli) < num:
-                    new_sum_mulli.append('0.0')
-                new_sum_mulli.append(val)
-
-            new_sum_mulli.extend(['0.000000'] * (len(geom) - len(new_sum_mulli)))
 
             new_forces = forces.split()
-
             fx = new_forces[1::4]
             fy = new_forces[2::4]
             fz = new_forces[3::4]
 
-            mulli = mulli.split()[1::2]
-            string = '\n'.join([' '.join(x) for x in zip(geom, fx, fy, fz, mulli, new_sum_mulli)])
-            s.append(string)
-        return s
+            string = '\n'.join([' '.join(x) for x in zip(geom, fx, fy, fz)])
+            strings.append(string)
+        return strings
 
     def format_data(self):
         outer_values = []
