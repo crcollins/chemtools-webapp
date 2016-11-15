@@ -261,7 +261,7 @@ class Log(object):
         cls.PARSERS[parser.__name__] = parser
         return parser
 
-    def format_gjf(self, td=False):
+    def format_gjf(self, td=False, *args, **kwargs):
         if len(self.parsers) > 1:
             logger.warn("%s is a multistep Gaussian log file!" % self.fname)
 
@@ -288,10 +288,10 @@ class Log(object):
         ])
         return s
 
-    def format_out(self):
+    def format_out(self, *args, **kwargs):
         return self.get_geometry()
 
-    def format_outx(self):
+    def format_outx(self, *args, **kwargs):
         strings = []
         for parsers in self.parsers:
             geometry = self.get_geometry(parsers)
