@@ -651,6 +651,11 @@ class Geometry(LineParser):
 
                 # Now only store the geometry
                 lines = lines[5:-1]
+                # This is to remove random 0s from appearing in the geometries?
+                split_lines = [x.split() for x in lines]
+                if any([len(x) > 4 for x in split_lines]):
+                    lines = [' '.join([x[0]] + x[2:]) for x in split_lines]
+
                 self.value = '\n'.join(lines) + '\n'
                 self.done = True
             if not self.done:
