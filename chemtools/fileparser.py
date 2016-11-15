@@ -945,6 +945,8 @@ if __name__ == "__main__":
             if args.logs:
                 self.files = [x for x in self.files if x.endswith(".log")]
             self.output_gjf = args.gjf | args.td
+            self.output_out = args.out
+            self.output_outx = args.outx
             self.td = args.td
 
         def check_input_files(self, filelist):
@@ -984,29 +986,47 @@ if __name__ == "__main__":
                 files += [x for x in paths if os.path.isfile(x)]
             return files
 
+        def do_writer(self, log, ending):
+            if self.td:
+                ending = "_TD" + ending
+            try:
+                # used to bubble up errors before creating the file
+                method = getattr(log, "format_" + ending.lstrip("."))
+                result = method(self.td)
+                if type(result) != list:
+                    result = [result]
+
+                for i, string in enumerate(result):
+                    tail = ending
+                    if len(result) > 1:
+                        tail = ('_step%03d' % i) + ending
+
+                    with open(log.name + tail, 'w') as outputfile:
+                        outputfile.write(string)
+
+            except Exception as e:
+                logger.info(
+                    "Problem parsing file: %s - %s" (log.name, str(e)))
+
         def write_file(self):
             logs = LogSet()
             logs.parse_files(self.files)
 
-            if self.output_gjf:
+            names = [".out", ".gjf", ".outx"]
+            mask = [self.output_out, self.output_gjf, self.output_outx]
+
+            endings = [x for x, y in zip(names, mask) if y]
+            for ending in endings:
                 for log in logs.logs:
-                    ending = ".gjf"
-                    if self.td:
-                        ending = "_TD" + ending
-                    try:
-                        # used to bubble up errors before creating the file
-                        string = log.format_gjf(self.td)
-                        with open(log.name + ending, 'w') as outputfile:
-                            outputfile.write(string)
-                    except Exception as e:
-                        logger.info(
-                            "Problem parsing file: %s - %s" (log.name, str(e)))
+                    self.do_writer(log, ending)
+            if len(endings):
+                return
+
+            if self.outputfilename:
+                with open(self.outputfilename, 'w') as outputfile:
+                    outputfile.write(logs.format_output(errors=self.error))
             else:
-                if self.outputfilename:
-                    with open(self.outputfilename, 'w') as outputfile:
-                        outputfile.write(logs.format_output(errors=self.error))
-                else:
-                    print logs.format_output(errors=self.error)
+                print logs.format_output(errors=self.error)
 
     parser = argparse.ArgumentParser(
         description="This program extracts data from Gaussian log files.")
@@ -1034,6 +1054,11 @@ if __name__ == "__main__":
                         help='Toggles writing TD gjf file from log.')
     parser.add_argument('-L', action="store_true", dest="logs", default=False,
                         help='Toggles only parsing .log files.')
+    parser.add_argument('-O', action="store_true", dest="out", default=False,
+                        help='Toggles writing .out files from logs.')
+    parser.add_argument('-X', action="store_true", dest="outx", default=False,
+                        help='Toggles writing .outx files from logs.')
+
 
     if len(sys.argv) > 1:
         args = sys.argv[1:]
