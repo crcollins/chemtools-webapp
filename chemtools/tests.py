@@ -1310,6 +1310,36 @@ class FileParserTestCase(TestCase):
             actual = [[y.lower() for y in x[4:]] for x in reader]
             self.assertEqual(expected, actual)
 
+    def test_parse_log_format_gjf(self):
+        name = "A.log"
+        path = os.path.join(settings.MEDIA_ROOT, "tests", name)
+        log = fileparser.Log(path)
+
+        actual = log.format_gjf()
+        expected = "%nprocshared=1\n%mem=12GB\n%chk=A.chk\n"
+        expected += "# td B3LYP/6-31g(d,p) geom=check guess=read\n\nA\n\n"
+        expected += "0 1\nH 0.3784566169 0. 0.\nH 1.1215433831 0. 0.\n\n"
+        self.assertEqual(expected, actual)
+
+    def test_parse_log_format_out(self):
+        name = "A.log"
+        path = os.path.join(settings.MEDIA_ROOT, "tests", name)
+        log = fileparser.Log(path)
+
+        actual = log.format_out()
+        expected = "H 0.3784566169 0. 0.\nH 1.1215433831 0. 0.\n"
+        self.assertEqual(expected, actual)
+
+    def test_parse_log_format_outx(self):
+        name = "A.log"
+        path = os.path.join(settings.MEDIA_ROOT, "tests", name)
+        log = fileparser.Log(path)
+
+        actual = log.format_outx()
+        string = 'H 0.3784566169 0. 0. 0.000210772 0.000000000 0.000000000\n'
+        string += 'H 1.1215433831 0. 0. -0.000210772 0.000000000 0.000000000'
+        self.assertEqual([string], actual)
+
     def test_Output_newline(self):
         out = fileparser.Output()
         string = "Some message"
