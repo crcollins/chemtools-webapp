@@ -188,9 +188,12 @@ class Log(object):
             started = False
             current_parsers = self.parsers[0]
             first = True
+            self.windows_file = False
 
             for line in f:
-                line = line.replace('\r', '')
+                if '\r' in line:
+                    line = line.replace('\r', '')
+                    self.windows_file = True
 
                 if "******************************************" in line:
                     started = True
@@ -400,6 +403,13 @@ class LineParser(object):
     def parse(self, line):
         raise NotImplementedError
 
+    @property
+    def delimiter(self):
+        if self.log.windows_file:
+            return "|"
+        else:
+            return "\\"
+
     def __str__(self):
         return str(self.value)
 
@@ -519,7 +529,6 @@ class Energy(LineParser):
         super(Energy, self).__init__(*args, **kwargs)
         self.start = False
         self.prevline = ''
-        self.delimiter = '\\'
 
     @is_done
     def parse(self, line):
@@ -531,8 +540,6 @@ class Energy(LineParser):
             return
 
         modline = self.prevline + line.strip()
-        if "|" in modline:
-            self.delimiter = '|'
 
         if "{0}HF=".format(self.delimiter) in modline:
             idx = modline.index("HF=") + 3
@@ -623,7 +630,6 @@ class Geometry(LineParser):
         self.start = False
         self.newfile = True
         self.prevline = ''
-        self.delimiter = '\\'
 
     @is_done
     def parse(self, line):
@@ -635,11 +641,7 @@ class Geometry(LineParser):
         line = line[1:]
         modline = self.prevline + line.strip('\n')
 
-        if "|" in modline:
-            self.delimiter = '|'
-
-        # Check for % is to make sure this is not a windows file path
-        if self.delimiter in modline and "%" not in modline:
+        if self.delimiter in modline:
             self.start = True
 
         if self.start:
