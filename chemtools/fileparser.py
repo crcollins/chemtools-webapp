@@ -180,6 +180,7 @@ class Log(object):
             self.name = self.cleanup_name()
 
             self.parsers = [self.setup_parsers()]
+            self.parser_labels = ["Start"]
             # This initialization is just in case the file is empty
             # If the file is empty, then line will not be defined causing a
             # UnboundLocalError when it does the check for normal termination.
@@ -187,7 +188,6 @@ class Log(object):
             completed = False
             started = False
             current_parsers = self.parsers[0]
-            first = True
             self.windows_file = False
 
             for line in f:
@@ -205,11 +205,11 @@ class Log(object):
                     completed = True
 
                 if "Initial command" in line or "Input orientation:" in line:
-                    if first:
-                        first = False
-                        continue
+                    if "Initial command" in line:
+                        self.parser_labels.append("MultiStep")
+                    if "Input orientation:" in line:
+                        self.parser_labels.append("Step")
 
-                    # Multistep Gaussian log
                     if not completed:
                         current_parsers["Geometry"].value = None
                     completed = False
