@@ -256,6 +256,16 @@ class Log(object):
             geometry = parsers["Geometry"][0]
         return geometry
 
+    def get_all_options(self):
+        options = []
+        for parsers in self.parsers:
+            val = parsers["Options"][0]
+            if not val:
+                options.append(options[-1])
+            else:
+                options.append(val)
+        return options
+
     @classmethod
     def add_parser(cls, parser):
         cls.PARSERS[parser.__name__] = parser
@@ -316,13 +326,18 @@ class Log(object):
 
     def format_data(self):
         outer_values = []
-        for label, parsers in zip(self.parser_labels, self.parsers):
+        all_options = self.get_all_options()
+        for label, options, parsers in zip(self.parser_labels, all_options, self.parsers):
             if label in ("Start", "MultiStep"):
                 continue
 
             values = []
             for key in self.ORDER:
                 value, done = parsers[key]
+                if key == "Options":
+                    value = options
+                    done = True
+
                 # csv fixes
                 if value and "," in value:
                     value = '"' + value.replace('"', '""') + '"'
