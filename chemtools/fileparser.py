@@ -936,39 +936,6 @@ if __name__ == "__main__":
     import argparse
     import sys
 
-    def worker(work_queue, done_queue):
-        for f in iter(work_queue.get, 'STOP'):
-            done_queue.put(Log(f).format_data())
-        done_queue.put('STOP')
-        return True
-
-    def parse_files_inline(files):
-        workers = multiprocessing.cpu_count()
-        work_queue = multiprocessing.Queue()
-        done_queue = multiprocessing.Queue()
-        processes = []
-
-        for f in files:
-            work_queue.put(f)
-
-        for w in xrange(workers):
-            p = multiprocessing.Process(
-                target=worker, args=(work_queue, done_queue))
-            p.start()
-            processes.append(p)
-            work_queue.put('STOP')
-
-        count = 0
-        while count < workers:
-            item = done_queue.get()
-            if item == "STOP":
-                count += 1
-            else:
-                print item
-
-        for p in processes:
-            p.join()
-
 
     class StandAlone(object):
 
