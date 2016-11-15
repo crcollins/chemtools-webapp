@@ -293,7 +293,10 @@ class Log(object):
 
     def format_outx(self, *args, **kwargs):
         strings = []
-        for parsers in self.parsers:
+        for label, parsers in zip(self.labels, self.parsers):
+            if label in ("Start", "MultiStep"):
+                continue
+
             geometry = self.get_geometry(parsers)
             forces = parsers["ForceVectors"][0]
 
@@ -313,7 +316,10 @@ class Log(object):
 
     def format_data(self):
         outer_values = []
-        for parsers in self.parsers:
+        for label, parsers in zip(self.parser_labels, self.parsers):
+            if label in ("Start", "MultiStep"):
+                continue
+
             values = []
             for key in self.ORDER:
                 value, done = parsers[key]
@@ -322,7 +328,7 @@ class Log(object):
                     value = '"' + value.replace('"', '""') + '"'
                 values.append(value if (done or value) else "---")
 
-            outer_values.append(','.join([self.fname, self.name] + values))
+            outer_values.append(','.join([self.fname, self.name, label] + values))
         return '\n'.join(outer_values)
 
     @classmethod
@@ -651,6 +657,7 @@ class Geometry(LineParser):
 
                 # Now only store the geometry
                 lines = lines[5:-1]
+
                 # This is to remove random 0s from appearing in the geometries?
                 split_lines = [x.split() for x in lines]
                 if any([len(x) > 4 for x in split_lines]):
