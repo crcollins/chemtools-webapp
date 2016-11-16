@@ -348,7 +348,7 @@ class Log(object):
 
     @classmethod
     def format_header(cls):
-        nonparsed = ["Filename", "Name"]
+        nonparsed = ["Filename", "Name", "Type"]
         return ','.join(nonparsed + cls.ORDER)
 
 
