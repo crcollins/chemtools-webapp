@@ -322,7 +322,8 @@ class Log(object):
 
     def format_outx(self, *args, **kwargs):
         strings = []
-        for label, parsers in zip(self.labels, self.parsers):
+        for label, parsers in zip(self.parser_labels, self.parsers):
+            # We skip the intial values because nothing is calculated
             if label in ("Start", "MultiStep"):
                 continue
 
