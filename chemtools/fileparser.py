@@ -204,10 +204,10 @@ class Log(object):
                 if "Normal termination of Gaussian" in line:
                     completed = True
 
-                if "Initial command" in line or "Input orientation:" in line:
+                if "Initial command" in line or " orientation:" in line:
                     if "Initial command" in line:
                         self.parser_labels.append("MultiStep")
-                    if "Input orientation:" in line:
+                    if " orientation:" in line:
                         self.parser_labels.append("Step")
 
                     if not completed:
