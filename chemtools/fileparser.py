@@ -266,6 +266,15 @@ class Log(object):
                 options.append(val)
         return options
 
+    def get_labels(self):
+        new_labels = []
+        for label in self.parser_labels:
+            if len(new_labels) and label in ("Start", "MultiStep"):
+                new_labels[-1] = 'Final'
+            new_labels.append(label)
+        new_labels[-1] = 'Final'
+        return new_labels
+
     @classmethod
     def add_parser(cls, parser):
         cls.PARSERS[parser.__name__] = parser
@@ -327,7 +336,8 @@ class Log(object):
     def format_data(self):
         outer_values = []
         all_options = self.get_all_options()
-        for label, options, parsers in zip(self.parser_labels, all_options, self.parsers):
+        new_labels = self.get_labels()
+        for label, options, parsers in zip(new_labels, all_options, self.parsers):
             if label in ("Start", "MultiStep"):
                 continue
 
