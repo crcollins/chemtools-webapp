@@ -344,6 +344,7 @@ class Log(object):
         all_options = self.get_all_options()
         new_labels = self.get_labels()
         for label, options, parsers in zip(new_labels, all_options, self.parsers):
+            # We skip the intial values because nothing is calculated
             if label in ("Start", "MultiStep"):
                 continue
 
@@ -504,7 +505,6 @@ class Options(LineParser):
                 return
 
             self.value += line.lstrip("# ")
-
 
 
 @Log.add_parser
