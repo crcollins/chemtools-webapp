@@ -339,13 +339,15 @@ class Log(object):
             strings.append(string)
         return strings
 
-    def format_data(self):
+    def format_data(self, split_iter=False):
         outer_values = []
         all_options = self.get_all_options()
         new_labels = self.get_labels()
         for label, options, parsers in zip(new_labels, all_options, self.parsers):
             # We skip the intial values because nothing is calculated
             if label in ("Start", "MultiStep"):
+                continue
+            if not split_iter and label != "Final":
                 continue
 
             values = []
@@ -371,10 +373,11 @@ class Log(object):
 
 class LogSet(Output):
 
-    def __init__(self):
+    def __init__(self, split_iter=False):
         super(LogSet, self).__init__()
         self.logs = []
         self.header = ''
+        self.split_iter = split_iter
 
     @catch
     def parse_file(self, f):
@@ -383,7 +386,7 @@ class LogSet(Output):
         new = x.format_header()
         if len(new) > len(self.header):
             self.header = new
-        self.write(x.format_data())
+        self.write(x.format_data(self.split_iter))
 
     def parse_files(self, files):
         if not files: return
@@ -394,7 +397,7 @@ class LogSet(Output):
 
         self.header = self.logs[0].format_header()
         for log in self.logs:
-            self.write(log.format_data())
+            self.write(log.format_data(self.split_iter))
 
     def format_output(self, errors=True):
         s = self.header + "\n"
@@ -986,6 +989,7 @@ if __name__ == "__main__":
             self.output_out = args.out
             self.output_outx = args.outx
             self.td = args.td
+            self.split_iter = args.split_iter
 
         def check_input_files(self, filelist):
             files = []
@@ -1047,7 +1051,7 @@ if __name__ == "__main__":
                     "Problem parsing file: %s - %s" (log.name, str(e)))
 
         def write_file(self):
-            logs = LogSet()
+            logs = LogSet(self.split_iter)
             logs.parse_files(self.files)
 
             names = [".out", ".gjf", ".outx"]
@@ -1092,6 +1096,8 @@ if __name__ == "__main__":
                         help='Toggles writing TD gjf file from log.')
     parser.add_argument('-L', action="store_true", dest="logs", default=False,
                         help='Toggles only parsing .log files.')
+    parser.add_argument('-I', action="store_true", dest="split_iter", default=False,
+                        help='Toggles splitting log files per iteration in optimization.')
     parser.add_argument('-O', action="store_true", dest="out", default=False,
                         help='Toggles writing .out files from logs.')
     parser.add_argument('-X', action="store_true", dest="outx", default=False,
