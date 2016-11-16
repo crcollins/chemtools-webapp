@@ -261,7 +261,13 @@ class Log(object):
         for parsers in self.parsers:
             val = parsers["Options"][0]
             if not val:
-                options.append(options[-1])
+                try:
+                    options.append(options[-1])
+                except IndexError:
+                    # We set this to '---' instead of '' because we are
+                    # setting the done value to True later. If this is not
+                    # done this way, the value will be ignored
+                    options.append('---')
             else:
                 options.append(val)
         return options
