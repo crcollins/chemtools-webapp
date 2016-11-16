@@ -236,8 +236,12 @@ class Log(object):
         return name
 
     def __getitem__(self, x):
-        '''Return the value of the last parser'''
-        return self.parsers[-1][x][0]
+        '''Return the value of the last parser with a value'''
+        for parser in self.parsers[::-1]:
+            value = parser[x][0]
+            if value:
+                break
+        return value
 
     def setup_parsers(self):
         return {k: v(self) for k, v in Log.PARSERS.items()}
