@@ -66,6 +66,16 @@ EOF
     sudo nginx -s reload
 
     sudo supervisorctl reread
+    # This is a fix required for ubuntu 16.04+
+    # http://unix.stackexchange.com/questions/281774/ubuntu-server-16-04-cannot-get-supervisor-to-start-automatically
+    if [ $? -ne 0 ];
+        then
+        # Make sure Supervisor comes up after a reboot.
+        sudo systemctl enable supervisor
+        # Bring Supervisor up right now.
+        sudo systemctl start supervisor
+        sudo supervisorctl reread
+    fi
     sudo supervisorctl update
     sudo service nginx restart
 }
