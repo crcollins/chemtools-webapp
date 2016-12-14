@@ -15,6 +15,7 @@ if [ $1 ];
     echo "Running dev install"
     cp -r /tmp/chemtools-webapp .
     cd chemtools-webapp
+    rm -rf env/
 else
     sudo apt-get install -y git
     if [ ! -d chemtools-webapp ];
