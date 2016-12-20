@@ -631,6 +631,7 @@ class HOMO(LineParser):
         elif "virt. eigenvalues" in line and self.prevline:
             self.value = str(float(self.prevline.split()[-1]) * HARTREETOEV)
             self.prevline = ''
+            self.done = True
 
 
 @Log.add_parser
@@ -649,6 +650,7 @@ class LUMO(LineParser):
         elif "virt. eigenvalues" in line and self.prevline:
             self.value = str(float(line.split()[4]) * HARTREETOEV)
             self.prevline = ''
+            self.done = True
 
 
 @Log.add_parser
@@ -783,6 +785,7 @@ class Dipole(LineParser):
         line = line.strip()
         if line.startswith("X="):
             self.value = line.split()[-1]
+            self.done = True
 
 
 @Log.add_parser
@@ -848,6 +851,7 @@ class SpatialExtent(LineParser):
         # " Electronic spatial extent (au):  <R**2>=           1800.4171"
         if "Electronic spatial extent" in line:
             self.value = line.split()[-1]
+            self.done = True
 
 
 @Log.add_parser
@@ -879,6 +883,7 @@ class ForceVectors(LineParser):
                     self.value = ''
                 else:
                     self.start = False
+                    self.done = True
                 return
 
             if self.dashes:
@@ -910,6 +915,7 @@ class MullikenCharges(LineParser):
 
         if "Sum" in line and "Mulliken" in line:
             self.start = False
+            self.done = True
             return
 
         if self.start:
@@ -942,6 +948,7 @@ class SumMullikenCharges(LineParser):
 
         if "summed into heavy atoms =" in line:
             self.start = False
+            self.done = True
             return
 
         if self.start:
@@ -963,6 +970,7 @@ class StepNumber(LineParser):
         # " Step number   1 out of a maximum of   96"
         if "Step number" in line:
             self.value = line.split()[2]
+            self.done = True
 
 
 
