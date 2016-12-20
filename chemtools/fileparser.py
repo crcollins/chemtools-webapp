@@ -206,7 +206,7 @@ class Log(object):
 
                 if "Initial command" in line or " orientation:" in line:
                     if "Initial command" in line:
-                        self.parser_labels.append("MultiStep")
+                        self.parser_labels.append("Start")
                     if " orientation:" in line:
                         self.parser_labels.append("Step")
 
@@ -279,7 +279,7 @@ class Log(object):
     def get_labels(self):
         new_labels = []
         for label in self.parser_labels:
-            if len(new_labels) and label in ("Start", "MultiStep"):
+            if len(new_labels) and label == "Start":
                 new_labels[-1] = 'Final'
             new_labels.append(label)
         new_labels[-1] = 'Final'
@@ -324,7 +324,7 @@ class Log(object):
         strings = []
         for label, parsers in zip(self.parser_labels, self.parsers):
             # We skip the intial values because nothing is calculated
-            if label in ("Start", "MultiStep"):
+            if label == "Start":
                 continue
 
             geometry = self.get_geometry(parsers)
@@ -350,7 +350,7 @@ class Log(object):
         new_labels = self.get_labels()
         for label, options, parsers in zip(new_labels, all_options, self.parsers):
             # We skip the intial values because nothing is calculated
-            if label in ("Start", "MultiStep"):
+            if label == "Start":
                 continue
             if not split_iter and label != "Final":
                 continue
