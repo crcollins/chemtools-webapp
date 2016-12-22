@@ -208,6 +208,11 @@ class Log(object):
                     if "Initial command" in line:
                         self.parser_labels.append("Start")
                     if " orientation:" in line:
+                        # This check ensures that it does not create a new
+                        # parser set just because it has both Input and Standard
+                        # orientation geometries printed.
+                        if self.previous_parsers_empty():
+                            continue
                         self.parser_labels.append("Step")
 
                     if not completed:
@@ -224,6 +229,10 @@ class Log(object):
 
         # major memory saver by deleting all the line parser objects
         self.parsers = [self.cleanup_parsers(parsers) for parsers in self.parsers]
+
+    def previous_parsers_empty(self):
+        prev = self.parsers[-1]
+        return prev["Energy"].done == False or prev["StepNumber"].done == False
 
     def cleanup_name(self):
         name, _ = os.path.splitext(self.fname)
@@ -323,10 +332,6 @@ class Log(object):
     def format_outx(self, *args, **kwargs):
         strings = []
         for label, parsers in zip(self.parser_labels, self.parsers):
-            # We skip the intial values because nothing is calculated
-            if label == "Start":
-                continue
-
             geometry = self.get_geometry(parsers)
             forces = parsers["ForceVectors"][0]
 
