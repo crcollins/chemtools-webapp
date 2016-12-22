@@ -244,11 +244,21 @@ class Log(object):
             name = name[:-6]
         return name
 
-    def __getitem__(self, x):
+    def __getitem__(self, key):
         '''Return the value of the last parser with a value'''
-        for parser in self.parsers[::-1]:
-            value = parser[x][0]
-            if value:
+        return self.get_most_recent(key)
+
+    def get_most_recent(self, key, parser_idx=None):
+        if parser_idx is None:
+            parser_idx = len(self.parsers)
+            search_all = True
+
+        search_all = False
+        for label, parser in zip(self.parser_labels, self.parsers)[parser_idx::-1]:
+            value, done = parser[key]
+            if done:
+                break
+            if not search_all and label == "Start":
                 break
         return value
 
