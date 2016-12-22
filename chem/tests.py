@@ -1116,6 +1116,28 @@ class UploadsTestCase(TestCase):
                 results = lines[1][:4] + lines[1][5:]
                 self.assertEqual(results, expected)
 
+    def test_log_parse_steps(self):
+        test_path = os.path.join(settings.MEDIA_ROOT, "tests")
+        with open(os.path.join(test_path, "A.log"), 'r') as f:
+            data = {
+                "files": f,
+                "options": "logparse",
+                "split_iter": True,
+            }
+            response = self.client.post(reverse(views.upload_data), data)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(len(response.content.split('\n')), 11)
+
+        with open(os.path.join(test_path, "A.log"), 'r') as f:
+            data = {
+                "files": f,
+                "options": "logparse",
+                "split_iter": False,
+            }
+            response = self.client.post(reverse(views.upload_data), data)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(len(response.content.split('\n')), 6)
+
     def test_log_store(self):
         r = self.client.login(**SUPER_USER_LOGIN)
         self.assertTrue(r)
