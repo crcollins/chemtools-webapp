@@ -51,15 +51,16 @@ def main(csvfile):
                 feature_vector = None
                 exact_name = None
 
+            # TODO Fix this
             data = {
                 "name": row[1],
-                "options": row[4],
-                "homo": row[5],
-                "lumo": row[6],
-                "homo_orbital": row[7],
-                "dipole": row[8],
-                "energy": row[9],
-                "band_gap": row[10] if row[10] != '---' else None,
+                "options": row[5],
+                "homo": row[6],
+                "lumo": row[7],
+                "homo_orbital": row[8],
+                "dipole": row[9],
+                "energy": row[10],
+                "band_gap": row[11] if row[11] != '---' else None,
                 "exact_name": exact_name,
                 "created": now,
             }

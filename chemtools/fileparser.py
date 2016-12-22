@@ -168,9 +168,9 @@ class Output(object):
 class Log(object):
     PARSERS = dict()
     ORDER = ["ExactName", "Features", "Options", "HOMO", "LUMO",
-             "HomoOrbital", "Dipole", "Energy", "BandGap", "Time"]
-             "HomoOrbital", "Dipole", "Energy", "BandGap", "Time", "SumMullikenCharges"]
-             #"DipoleVector", "ExcitationDipoleVector", "OscillatorStrength",
+             "HomoOrbital", "Dipole", "Energy", "BandGap", "Time",
+             "DipoleVector", "ExcitationDipoleVector", "OscillatorStrength",
+             "SpatialExtent", "StepNumber"]
 
     def __init__(self, f, fname=None):
         if not hasattr(f, "read"):  # filename
