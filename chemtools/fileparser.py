@@ -567,6 +567,7 @@ class Energy(LineParser):
         # " SCF Done:  E(RB3LYP) =  -567.104150100     A.U. after   14 cycles"
         if "SCF Done" in line:
             self.value = line.strip().split()[4]
+            self.done = True
             return
 
         modline = self.prevline + line.strip()
