@@ -768,6 +768,56 @@ class PartialGeometry(LineParser):
                 use = [SYMBOLS[temp[1]]] + temp[3:]
                 self.value += ' '.join(use) + '\n'
 
+            # TODO THIS NEEDS self.done
+
+
+@Log.add_parser
+class InputGeometry(LineParser):
+
+    def __init__(self, *args, **kwargs):
+        super(InputGeometry, self).__init__(*args, **kwargs)
+        self.start = False
+        self.prev_worked = False
+        self.value = ''
+
+    @is_done
+    def parse(self, line):
+         # "Charge =  0 Multiplicity = 1"
+         # "C                     0.1763    1.846     0."
+         # ...
+         # "H                    -10.30138  -0.88433  -0.39716"
+         # ""
+
+        line = line.strip()
+        if "Charge =" in line and "Multiplicity =" in line:
+            self.start = True
+            return
+
+        if self.start:
+            if not line:
+                self.done = True
+                return
+
+            delimiter = ' '
+            if "," in line:
+                delimiter = ','
+
+            temp = line.split(delimiter)
+            # Ensure that this is the right kind of line
+            if len(temp[0]) > 4 or temp[0] not in SYMBOLS.values():
+                if self.prev_worked:
+                    self.done = True
+                    self.start = False
+                return
+
+            if delimiter == ',':
+                # Skip the zero value
+                # Lines with a comma look like this
+                # "H,0,1.1215433831,0.,0."
+                temp = [temp[0]] + temp[2:]
+            self.prev_worked = True
+            self.value += ' '.join([x for x in temp if x]) + '\n'
+
 
 @Log.add_parser
 class Header(LineParser):
