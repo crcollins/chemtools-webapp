@@ -363,16 +363,20 @@ class Log(object):
         outer_values = []
         all_options = self.get_all_options()
         new_labels = self.get_labels()
-        for label, options, parsers in zip(new_labels, all_options, self.parsers):
-            # We skip the intial values because nothing is calculated
-            if label == "Start":
-                continue
+
+        groups = zip(new_labels, all_options, self.parsers)
+        for i, (label, options, parsers) in enumerate(groups):
             if not split_iter and label != "Final":
                 continue
 
             values = []
             for key in self.ORDER:
-                value, done = parsers[key]
+                if split_iter:
+                    value, done = parsers[key]
+                else:
+                    value = self.get_most_recent(key, i)
+                    done = value is not None
+
                 if key == "Options":
                     value = options
                     done = True
