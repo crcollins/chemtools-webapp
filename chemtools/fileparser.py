@@ -555,7 +555,7 @@ class HomoOrbital(LineParser):
 
     def __init__(self, *args, **kwargs):
         super(HomoOrbital, self).__init__(*args, **kwargs)
-        self.value = 0
+        self.value = None
 
     @is_done
     def parse(self, line):
@@ -564,8 +564,10 @@ class HomoOrbital(LineParser):
         # ...
         # " Alpha virt. eigenvalues --   -0.00138   0.03643   0.07104   0.08148   0.08460"
         if "Alpha  occ. eigenvalues" in line:
+            if self.value is None:
+                self.value = 0
             self.value += len(line.split()[4:])
-        elif self.value:
+        elif self.value is not None:
             self.value = str(self.value)
             self.done = True
 

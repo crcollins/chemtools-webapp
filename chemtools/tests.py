@@ -1250,6 +1250,20 @@ class FileParserTestCase(TestCase):
             lines = [x[1:4] + x[5:] for x in reader]
             self.assertEqual(expected, lines)
 
+    def test_parse_invalid_log(self):
+        path = os.path.join(settings.MEDIA_ROOT, "tests", "invalid.log")
+        log = fileparser.Log(path)
+
+        with StringIO(log.format_data()) as f:
+            reader = csv.reader(f, delimiter=',', quotechar='"')
+            expected = [
+                ["invalid", "Final", "---", "---", "---", "---",
+                 "---", "---", "---", "---", "---", "[]", "[]",
+                 "---", "---", "---"],
+            ]
+            lines = [x[1:4] + x[5:] for x in reader]
+            self.assertEqual(expected, lines)
+
     def test_parse_nonbenzo(self):
         path = os.path.join(settings.MEDIA_ROOT, "tests", "1_04_0.log")
         log = fileparser.Log(path)
