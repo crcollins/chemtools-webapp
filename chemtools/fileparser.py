@@ -204,16 +204,15 @@ class Log(object):
                 if "Normal termination of Gaussian" in line:
                     completed = True
 
-                if "Initial command" in line or " orientation:" in line:
-                    if "Initial command" in line:
-                        self.parser_labels.append("Start")
-                    if " orientation:" in line:
-                        # This check ensures that it does not create a new
-                        # parser set just because it has both Input and Standard
-                        # orientation geometries printed.
-                        if self.previous_parsers_empty():
-                            continue
-                        self.parser_labels.append("Step")
+                init_command = "Initial command" in line
+                orientation = " orientation:" in line
+                # This check ensures that it does not create a new
+                # parser set just because it has both Input and Standard
+                # orientation geometries printed.
+                empty = self.previous_parsers_empty()
+                if init_command or (orientation and not empty):
+                    label = "Start" if init_command else "Step"
+                    self.parser_labels.append(label)
 
                     if not completed:
                         current_parsers["Geometry"].value = None
