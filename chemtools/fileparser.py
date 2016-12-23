@@ -1143,8 +1143,6 @@ if __name__ == "__main__":
             for ending in endings:
                 for log in logs.logs:
                     self.do_writer(log, ending)
-            if len(endings):
-                return
 
             if self.outputfilename:
                 with open(self.outputfilename, 'w') as outputfile:
