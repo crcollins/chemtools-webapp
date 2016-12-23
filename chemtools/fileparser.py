@@ -1032,7 +1032,7 @@ class StepNumber(LineParser):
 
     def __init__(self, *args, **kwargs):
         super(StepNumber, self).__init__(*args, **kwargs)
-        self.value = "Final"
+        self.value = None
 
     @is_done
     def parse(self, line):
