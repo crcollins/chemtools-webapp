@@ -125,6 +125,9 @@ SYMBOLS = {
     '117': 'Uus',
     '118': 'Uuo',
 }
+START = 'Start'
+STEP = 'Step'
+FINAL = 'Final'
 
 
 def catch(fn):
@@ -180,7 +183,7 @@ class Log(object):
             self.name = self.cleanup_name()
 
             self.parsers = [self.setup_parsers()]
-            self.parser_labels = ["Start"]
+            self.parser_labels = [START]
             # This initialization is just in case the file is empty
             # If the file is empty, then line will not be defined causing a
             # UnboundLocalError when it does the check for normal termination.
@@ -211,7 +214,7 @@ class Log(object):
                 # orientation geometries printed.
                 empty = self.previous_parsers_empty()
                 if init_command or (orientation and not empty):
-                    label = "Start" if init_command else "Step"
+                    label = START if init_command else STEP
                     self.parser_labels.append(label)
 
                     if not completed:
@@ -257,7 +260,7 @@ class Log(object):
             value, done = parser[key]
             if done:
                 break
-            if not search_all and label == "Start":
+            if not search_all and label == START:
                 break
         return value
 
@@ -297,10 +300,10 @@ class Log(object):
     def get_labels(self):
         new_labels = []
         for label in self.parser_labels:
-            if len(new_labels) and label == "Start":
-                new_labels[-1] = 'Final'
+            if len(new_labels) and label == START:
+                new_labels[-1] = FINAL
             new_labels.append(label)
-        new_labels[-1] = 'Final'
+        new_labels[-1] = FINAL
         return new_labels
 
     @classmethod
@@ -365,7 +368,7 @@ class Log(object):
 
         groups = zip(new_labels, all_options, self.parsers)
         for i, (label, options, parsers) in enumerate(groups):
-            if not split_iter and label != "Final":
+            if not split_iter and label != FINAL:
                 continue
 
             values = []
