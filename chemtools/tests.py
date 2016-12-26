@@ -1141,6 +1141,17 @@ class MolNameTestCase(TestCase):
             expected = expected + "_x1_y1_z1"
             self.assertEqual(a, expected)
 
+    def test_get_structure_type(self):
+        tests = [
+            ("TON", constants.BENZO_TWO),
+            ("EON", constants.BENZO_ONE),
+            ("444", constants.CHAIN),
+            ("TON_TON", constants.BENZO_MULTI),
+        ]
+        for name, expected in tests:
+            res = mol_name.get_structure_type(name)
+            self.assertEqual(res, expected)
+
 
 class ExtractorTestCase(TestCase):
 
