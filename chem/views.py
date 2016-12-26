@@ -309,7 +309,8 @@ def upload_data(request):
 
 
 def parse_log(request, upload_form):
-    parser = fileparser.LogSet()
+    split_iter = upload_form.cleaned_data['split_iter']
+    parser = fileparser.LogSet(split_iter=split_iter)
     for f in upload_form.cleaned_data["files"]:
         parser.parse_file(f)
 

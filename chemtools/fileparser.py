@@ -125,6 +125,9 @@ SYMBOLS = {
     '117': 'Uus',
     '118': 'Uuo',
 }
+START = 'Start'
+STEP = 'Step'
+FINAL = 'Final'
 
 
 def catch(fn):
@@ -167,25 +170,20 @@ class Output(object):
 
 class Log(object):
     PARSERS = dict()
-    order = ["ExactName", "Features", "Options", "HOMO", "LUMO",
-             "HomoOrbital", "Dipole", "Energy", "BandGap", "Time"]
+    ORDER = ["ExactName", "Features", "Options", "HOMO", "LUMO",
+             "HomoOrbital", "Dipole", "Energy", "BandGap", "Time",
+             "DipoleVector", "ExcitationDipoleVector", "OscillatorStrength",
+             "SpatialExtent", "StepNumber"]
 
     def __init__(self, f, fname=None):
         if not hasattr(f, "read"):  # filename
             f = open(f, 'r')
         with f:
             self.fname = fname if fname else f.name
-
-            name, _ = os.path.splitext(self.fname)
-            name = os.path.basename(name)
-            if name.lower().endswith("_td"):
-                # rstrip does not work because some names end with a "d"
-                name = name[:-3]
-            elif name.lower().endswith("_tddft"):
-                name = name[:-6]
-            self.name = name
+            self.name = self.cleanup_name()
 
             self.parsers = [self.setup_parsers()]
+            self.parser_labels = [START]
             # This initialization is just in case the file is empty
             # If the file is empty, then line will not be defined causing a
             # UnboundLocalError when it does the check for normal termination.
@@ -193,8 +191,13 @@ class Log(object):
             completed = False
             started = False
             current_parsers = self.parsers[0]
+            self.windows_file = False
 
-            for i, line in enumerate(f):
+            for line in f:
+                if '\r' in line:
+                    line = line.replace('\r', '')
+                    self.windows_file = True
+
                 if "******************************************" in line:
                     started = True
 
@@ -204,8 +207,16 @@ class Log(object):
                 if "Normal termination of Gaussian" in line:
                     completed = True
 
-                if "Initial command" in line:
-                    # Multistep Gaussian log
+                init_command = "Initial command" in line
+                orientation = " orientation:" in line
+                # This check ensures that it does not create a new
+                # parser set just because it has both Input and Standard
+                # orientation geometries printed.
+                empty = self.previous_parsers_empty()
+                if init_command or (orientation and not empty):
+                    label = START if init_command else STEP
+                    self.parser_labels.append(label)
+
                     if not completed:
                         current_parsers["Geometry"].value = None
                     completed = False
@@ -213,7 +224,7 @@ class Log(object):
                     current_parsers = self.parsers[-1]
 
                 for k, parser in current_parsers.items():
-                    parser.parse(line.replace('\r', ''))
+                    parser.parse(line)
 
             if not completed:
                 current_parsers["Geometry"].value = None
@@ -221,9 +232,37 @@ class Log(object):
         # major memory saver by deleting all the line parser objects
         self.parsers = [self.cleanup_parsers(parsers) for parsers in self.parsers]
 
-    def __getitem__(self, x):
-        '''Return the value of the last parser'''
-        return self.parsers[-1][x][0]
+    def previous_parsers_empty(self):
+        prev = self.parsers[-1]
+        return prev["Energy"].done == False or prev["StepNumber"].done == False
+
+    def cleanup_name(self):
+        name, _ = os.path.splitext(self.fname)
+        name = os.path.basename(name)
+        if name.lower().endswith("_td"):
+            # rstrip does not work because some names end with a "d"
+            name = name[:-3]
+        elif name.lower().endswith("_tddft"):
+            name = name[:-6]
+        return name
+
+    def __getitem__(self, key):
+        '''Return the value of the last parser with a value'''
+        return self.get_most_recent(key)
+
+    def get_most_recent(self, key, parser_idx=None):
+        if parser_idx is None:
+            parser_idx = len(self.parsers)
+            search_all = True
+
+        search_all = False
+        for label, parser in zip(self.parser_labels, self.parsers)[parser_idx::-1]:
+            value, done = parser[key]
+            if done:
+                break
+            if not search_all and label == START:
+                break
+        return value
 
     def setup_parsers(self):
         return {k: v(self) for k, v in Log.PARSERS.items()}
@@ -232,14 +271,49 @@ class Log(object):
         # major memory saver by deleting all the line parser objects
         return {k: (v.value, v.done) for k, v in parsers.items()}
 
+    def get_geometry(self, parsers=None):
+        if parsers is None:
+            parsers = self.parsers[-1]
+
+        if parsers["Geometry"][0] is None:
+            geometry = parsers["PartialGeometry"][0]
+        else:
+            geometry = parsers["Geometry"][0]
+        return geometry
+
+    def get_all_options(self):
+        options = []
+        for parsers in self.parsers:
+            val = parsers["Options"][0]
+            if not val:
+                try:
+                    options.append(options[-1])
+                except IndexError:
+                    # We set this to '---' instead of '' because we are
+                    # setting the done value to True later. If this is not
+                    # done this way, the value will be ignored
+                    options.append('---')
+            else:
+                options.append(val)
+        return options
+
+    def get_labels(self):
+        new_labels = []
+        for label in self.parser_labels:
+            if len(new_labels) and label == START:
+                new_labels[-1] = FINAL
+            new_labels.append(label)
+        new_labels[-1] = FINAL
+        return new_labels
+
     @classmethod
     def add_parser(cls, parser):
         cls.PARSERS[parser.__name__] = parser
         return parser
 
-    def format_gjf(self, td=False):
+    def format_gjf(self, td=False, *args, **kwargs):
         if len(self.parsers) > 1:
-            logger.warn("Multistep Gaussian Log file!")
+            logger.warn("%s is a multistep Gaussian log file!" % self.fname)
 
         if td:
             header = self["Header"].replace(".chk", "_TD.chk")
@@ -248,11 +322,7 @@ class Log(object):
             header = self["Header"]
             options = self["Options"]
 
-        if self["Geometry"] is None:
-            geometry = self["PartialGeometry"]
-        else:
-            geometry = self["Geometry"]
-
+        geometry = self.get_geometry()
         if not geometry or not header or not options:
             logger.info("The log file was invalid")
             raise Exception("The log file was invalid")
@@ -268,32 +338,72 @@ class Log(object):
         ])
         return s
 
-    def format_data(self):
+    def format_out(self, *args, **kwargs):
+        return self.get_geometry()
+
+    def format_outx(self, *args, **kwargs):
+        strings = []
+        for label, parsers in zip(self.parser_labels, self.parsers):
+            geometry = self.get_geometry(parsers)
+            forces = parsers["ForceVectors"][0]
+
+            if forces is None:
+                continue
+
+            geom = geometry.strip().split('\n')
+
+            new_forces = forces.split()
+            fx = new_forces[1::4]
+            fy = new_forces[2::4]
+            fz = new_forces[3::4]
+
+            string = '\n'.join([' '.join(x) for x in zip(geom, fx, fy, fz)])
+            strings.append(string)
+        return strings
+
+    def format_data(self, split_iter=False):
         outer_values = []
-        for parsers in self.parsers:
+        all_options = self.get_all_options()
+        new_labels = self.get_labels()
+
+        groups = zip(new_labels, all_options, self.parsers)
+        for i, (label, options, parsers) in enumerate(groups):
+            if not split_iter and label != FINAL:
+                continue
+
             values = []
-            for key in self.order:
-                value, done = parsers[key]
+            for key in self.ORDER:
+                if split_iter:
+                    value, done = parsers[key]
+                else:
+                    value = self.get_most_recent(key, i)
+                    done = value is not None
+
+                if key == "Options":
+                    value = options
+                    done = True
+
                 # csv fixes
                 if value and "," in value:
                     value = '"' + value.replace('"', '""') + '"'
                 values.append(value if (done or value) else "---")
 
-            outer_values.append(','.join([self.fname, self.name] + values))
+            outer_values.append(','.join([self.fname, self.name, label] + values))
         return '\n'.join(outer_values)
 
     @classmethod
     def format_header(cls):
-        nonparsed = ["Filename", "Name"]
-        return ','.join(nonparsed + cls.order)
+        nonparsed = ["Filename", "Name", "Type"]
+        return ','.join(nonparsed + cls.ORDER)
 
 
 class LogSet(Output):
 
-    def __init__(self):
+    def __init__(self, split_iter=False):
         super(LogSet, self).__init__()
         self.logs = []
         self.header = ''
+        self.split_iter = split_iter
 
     @catch
     def parse_file(self, f):
@@ -302,7 +412,7 @@ class LogSet(Output):
         new = x.format_header()
         if len(new) > len(self.header):
             self.header = new
-        self.write(x.format_data())
+        self.write(x.format_data(self.split_iter))
 
     def parse_files(self, files):
         if not files: return
@@ -313,7 +423,7 @@ class LogSet(Output):
 
         self.header = self.logs[0].format_header()
         for log in self.logs:
-            self.write(log.format_data())
+            self.write(log.format_data(self.split_iter))
 
     def format_output(self, errors=True):
         s = self.header + "\n"
@@ -344,6 +454,13 @@ class LineParser(object):
 
     def parse(self, line):
         raise NotImplementedError
+
+    @property
+    def delimiter(self):
+        if self.log.windows_file:
+            return "|"
+        else:
+            return "\\"
 
     def __str__(self):
         return str(self.value)
@@ -419,7 +536,6 @@ class Options(LineParser):
             self.value += line.lstrip("# ")
 
 
-
 @Log.add_parser
 class ChargeMultiplicity(LineParser):
 
@@ -442,7 +558,7 @@ class HomoOrbital(LineParser):
 
     def __init__(self, *args, **kwargs):
         super(HomoOrbital, self).__init__(*args, **kwargs)
-        self.value = 0
+        self.value = None
 
     @is_done
     def parse(self, line):
@@ -451,8 +567,10 @@ class HomoOrbital(LineParser):
         # ...
         # " Alpha virt. eigenvalues --   -0.00138   0.03643   0.07104   0.08148   0.08460"
         if "Alpha  occ. eigenvalues" in line:
+            if self.value is None:
+                self.value = 0
             self.value += len(line.split()[4:])
-        elif self.value:
+        elif self.value is not None:
             self.value = str(self.value)
             self.done = True
 
@@ -464,16 +582,18 @@ class Energy(LineParser):
         super(Energy, self).__init__(*args, **kwargs)
         self.start = False
         self.prevline = ''
-        self.delimiter = '\\'
 
     @is_done
     def parse(self, line):
         # " 36\\Version=EM64L-G09RevC.01\State=1-A\HF=-1127.8085512\RMSD=3.531e-09"
+        # or
+        # " SCF Done:  E(RB3LYP) =  -567.104150100     A.U. after   14 cycles"
+        if "SCF Done" in line:
+            self.value = line.strip().split()[4]
+            self.done = True
+            return
+
         modline = self.prevline + line.strip()
-        if self.delimiter in modline:
-            if ":\\" in modline:
-                self.delimiter = '|'
-                self.start = False
 
         if "{0}HF=".format(self.delimiter) in modline:
             idx = modline.index("HF=") + 3
@@ -535,6 +655,7 @@ class HOMO(LineParser):
         elif "virt. eigenvalues" in line and self.prevline:
             self.value = str(float(self.prevline.split()[-1]) * HARTREETOEV)
             self.prevline = ''
+            self.done = True
 
 
 @Log.add_parser
@@ -553,6 +674,7 @@ class LUMO(LineParser):
         elif "virt. eigenvalues" in line and self.prevline:
             self.value = str(float(line.split()[4]) * HARTREETOEV)
             self.prevline = ''
+            self.done = True
 
 
 @Log.add_parser
@@ -564,7 +686,6 @@ class Geometry(LineParser):
         self.start = False
         self.newfile = True
         self.prevline = ''
-        self.delimiter = '\\'
 
     @is_done
     def parse(self, line):
@@ -575,12 +696,9 @@ class Geometry(LineParser):
         # " 6,-0.8632316482,20.4346296726\\Version=EM64L-G09RevC.01\State=1-A\HF=-"
         line = line[1:]
         modline = self.prevline + line.strip('\n')
+
         if self.delimiter in modline:
-            if ":\\" in modline:
-                self.delimiter = '|'
-                self.start = False
-            else:
-                self.start = True
+            self.start = True
 
         if self.start:
             if '{0}{0}@'.format(self.delimiter) in modline:
@@ -599,8 +717,16 @@ class Geometry(LineParser):
 
                 lines = [x.strip() for x in value.split('\n')]
 
+                # Make sure that the fifth line is the charge and multiplicity
                 assert len(lines[4].split()) == 2
+
+                # Now only store the geometry
                 lines = lines[5:-1]
+
+                # This is to remove random 0s from appearing in the geometries?
+                split_lines = [x.split() for x in lines]
+                if any([len(x) > 4 for x in split_lines]):
+                    lines = [' '.join([x[0]] + x[2:]) for x in split_lines]
 
                 self.value = '\n'.join(lines) + '\n'
                 self.done = True
@@ -643,11 +769,58 @@ class PartialGeometry(LineParser):
 
             if self.dashes:
                 temp = line.strip().split()
-                try:
-                    use = [SYMBOLS[temp[1]]] + temp[3:]
-                except KeyError:
-                    raise NotImplementedError("The atomic number %s is not yet added to chemtools." % (temp[1], ))
+                use = [SYMBOLS[temp[1]]] + temp[3:]
                 self.value += ' '.join(use) + '\n'
+
+            # TODO THIS NEEDS self.done
+
+
+@Log.add_parser
+class InputGeometry(LineParser):
+
+    def __init__(self, *args, **kwargs):
+        super(InputGeometry, self).__init__(*args, **kwargs)
+        self.start = False
+        self.prev_worked = False
+        self.value = ''
+
+    @is_done
+    def parse(self, line):
+         # "Charge =  0 Multiplicity = 1"
+         # "C                     0.1763    1.846     0."
+         # ...
+         # "H                    -10.30138  -0.88433  -0.39716"
+         # ""
+
+        line = line.strip()
+        if "Charge =" in line and "Multiplicity =" in line:
+            self.start = True
+            return
+
+        if self.start:
+            if not line:
+                self.done = True
+                return
+
+            delimiter = ' '
+            if "," in line:
+                delimiter = ','
+
+            temp = line.split(delimiter)
+            # Ensure that this is the right kind of line
+            if len(temp[0]) > 4 or temp[0] not in SYMBOLS.values():
+                if self.prev_worked:
+                    self.done = True
+                    self.start = False
+                return
+
+            if delimiter == ',':
+                # Skip the zero value
+                # Lines with a comma look like this
+                # "H,0,1.1215433831,0.,0."
+                temp = [temp[0]] + temp[2:]
+            self.prev_worked = True
+            self.value += ' '.join([x for x in temp if x]) + '\n'
 
 
 @Log.add_parser
@@ -682,9 +855,197 @@ class Dipole(LineParser):
 
     @is_done
     def parse(self, line):
+        # "    X=              0.0000    Y=              0.0000    Z=              0.0001  Tot=              0.0001"
         line = line.strip()
         if line.startswith("X="):
             self.value = line.split()[-1]
+            self.done = True
+
+
+@Log.add_parser
+class DipoleVector(LineParser):
+
+    def __init__(self, *args, **kwargs):
+        super(DipoleVector, self).__init__(*args, **kwargs)
+        self.value = '[]'
+
+    @is_done
+    def parse(self, line):
+        # "    X=              0.0000    Y=              0.0000    Z=              0.0001  Tot=              0.0001"
+        line = line.strip()
+        if line.startswith("X="):
+            self.value = str([float(x) for x in line.split()[1:-1:2]])
+            self.done = True
+
+
+@Log.add_parser
+class ExcitationDipoleVector(LineParser):
+
+    def __init__(self, *args, **kwargs):
+        super(ExcitationDipoleVector, self).__init__(*args, **kwargs)
+        self.start = False
+        self.value = '[]'
+
+    @is_done
+    def parse(self, line):
+         # " Ground to excited state transition electric dipole moments (Au):"
+         # "       state          X           Y           Z        Dip. S.      Osc."
+         # "         1         1.0081     -0.2949      0.0000      1.1032      0.1299"
+        line = line.strip()
+        if "transition electric dipole" in line:
+            self.start = True
+
+        if self.start and line.startswith("1"):
+            self.value = str([float(x) for x in line.split()[1:4]])
+            self.done = True
+
+
+@Log.add_parser
+class OscillatorStrength(LineParser):
+
+    def __init__(self, *args, **kwargs):
+        super(OscillatorStrength, self).__init__(*args, **kwargs)
+
+    @is_done
+    def parse(self, line):
+        # " Excited State   1:      Singlet-A      2.9126 eV  425.67 nm  f=0.7964  <S**2>=0.000"
+        if "Excited State   1:" in line:
+            self.value = line.split()[8][2:]
+            self.done = True
+
+
+@Log.add_parser
+class SpatialExtent(LineParser):
+
+    def __init__(self, *args, **kwargs):
+        super(SpatialExtent, self).__init__(*args, **kwargs)
+
+    @is_done
+    def parse(self, line):
+        # " Electronic spatial extent (au):  <R**2>=           1800.4171"
+        if "Electronic spatial extent" in line:
+            self.value = line.split()[-1]
+            self.done = True
+
+
+@Log.add_parser
+class ForceVectors(LineParser):
+
+    def __init__(self, *args, **kwargs):
+        super(ForceVectors, self).__init__(*args, **kwargs)
+        self.start = False
+        self.dashes = False
+
+    @is_done
+    def parse(self, line):
+        # " Center     Atomic                   Forces (Hartrees/Bohr)"
+        # " Number     Number              X              Y              Z"
+        # " -------------------------------------------------------------------"
+        # "      1        6          -0.000023872    0.000126277    0.000001090"
+        # ...
+        # " ---------------------------------------------------------------------"
+        # Note: This occurs multiple times in an optimization
+        if "Forces (Hartrees/Bohr)" in line:
+            self.start = True
+            return
+
+        if self.start:
+            if "--------------" in line:
+                # dashed lines toggle the selection area
+                self.dashes = not self.dashes
+                if self.dashes:
+                    self.value = ''
+                else:
+                    self.start = False
+                    self.done = True
+                return
+
+            if self.dashes:
+                temp = line.strip().split()
+                use = [SYMBOLS[temp[1]]] + temp[2:]
+                self.value += ' '.join(use) + '\n'
+
+
+@Log.add_parser
+class MullikenCharges(LineParser):
+
+    def __init__(self, *args, **kwargs):
+        super(MullikenCharges, self).__init__(*args, **kwargs)
+        self.start = False
+
+    @is_done
+    def parse(self, line):
+        # Sometimes "atomic" is not there?
+        # " Mulliken atomic charges:"
+        # "          1"
+        # " 1  C    0.324629"
+        # ...
+        # " Sum of Mulliken atomic charges =   0.00000"
+        line = line.strip()
+        if "Mulliken" in line and "charges" in line and "sum" not in line.lower():
+            self.start = True
+            self.value = ''
+            return
+
+        if "Sum" in line and "Mulliken" in line:
+            self.start = False
+            self.done = True
+            return
+
+        if self.start:
+            temp = line.strip().split()
+            if len(temp) == 1:
+                return
+            self.value += ' '.join(temp[1:]) + '\n'
+
+
+@Log.add_parser
+class SumMullikenCharges(LineParser):
+
+    def __init__(self, *args, **kwargs):
+        super(SumMullikenCharges, self).__init__(*args, **kwargs)
+        self.start = False
+
+    @is_done
+    def parse(self, line):
+        # Sometimes "atomic" is not there?
+        # " Mulliken charges with hydrogens summed into heavy atoms:"
+        # "              1"
+        # "     1  C    0.324629"
+        # ...
+        # " Sum of Mulliken charges with hydrogens summed into heavy atoms =   0.00000"
+        line = line.strip()
+        if "summed into heavy atoms:" in line:
+            self.start = True
+            self.value = ''
+            return
+
+        if "summed into heavy atoms =" in line:
+            self.start = False
+            self.done = True
+            return
+
+        if self.start:
+            temp = line.strip().split()
+            if len(temp) == 1:
+                return
+            self.value += ' '.join(temp[:]) + '\n'
+
+
+@Log.add_parser
+class StepNumber(LineParser):
+
+    def __init__(self, *args, **kwargs):
+        super(StepNumber, self).__init__(*args, **kwargs)
+        self.value = None
+
+    @is_done
+    def parse(self, line):
+        # " Step number   1 out of a maximum of   96"
+        if "Step number" in line:
+            self.value = line.split()[2]
+            self.done = True
+
 
 
 ##############################################################################
@@ -695,38 +1056,6 @@ if __name__ == "__main__":
     import argparse
     import sys
 
-    def worker(work_queue, done_queue):
-        for f in iter(work_queue.get, 'STOP'):
-            done_queue.put(Log(f).format_data())
-        done_queue.put('STOP')
-        return True
-
-    def parse_files_inline(files):
-        workers = multiprocessing.cpu_count()
-        work_queue = multiprocessing.Queue()
-        done_queue = multiprocessing.Queue()
-        processes = []
-
-        for f in files:
-            work_queue.put(f)
-
-        for w in xrange(workers):
-            p = multiprocessing.Process(
-                target=worker, args=(work_queue, done_queue))
-            p.start()
-            processes.append(p)
-            work_queue.put('STOP')
-
-        count = 0
-        while count < workers:
-            item = done_queue.get()
-            if item == "STOP":
-                count += 1
-            else:
-                print item
-
-        for p in processes:
-            p.join()
 
     class StandAlone(object):
 
@@ -744,7 +1073,10 @@ if __name__ == "__main__":
             if args.logs:
                 self.files = [x for x in self.files if x.endswith(".log")]
             self.output_gjf = args.gjf | args.td
+            self.output_out = args.out
+            self.output_outx = args.outx
             self.td = args.td
+            self.split_iter = args.split_iter
 
         def check_input_files(self, filelist):
             files = []
@@ -783,29 +1115,45 @@ if __name__ == "__main__":
                 files += [x for x in paths if os.path.isfile(x)]
             return files
 
+        def do_writer(self, log, ending):
+            if self.td:
+                ending = "_TD" + ending
+            try:
+                # used to bubble up errors before creating the file
+                method = getattr(log, "format_" + ending.lstrip("."))
+                result = method(self.td)
+                if type(result) != list:
+                    result = [result]
+
+                for i, string in enumerate(result):
+                    tail = ending
+                    if len(result) > 1:
+                        tail = ('_step%03d' % i) + ending
+
+                    with open(log.name + tail, 'w') as outputfile:
+                        outputfile.write(string)
+
+            except Exception as e:
+                logger.info(
+                    "Problem parsing file: %s - %s" (log.name, str(e)))
+
         def write_file(self):
-            logs = LogSet()
+            logs = LogSet(self.split_iter)
             logs.parse_files(self.files)
 
-            if self.output_gjf:
+            names = [".out", ".gjf", ".outx"]
+            mask = [self.output_out, self.output_gjf, self.output_outx]
+
+            endings = [x for x, y in zip(names, mask) if y]
+            for ending in endings:
                 for log in logs.logs:
-                    ending = ".gjf"
-                    if self.td:
-                        ending = "_TD" + ending
-                    try:
-                        # used to bubble up errors before creating the file
-                        string = log.format_gjf(self.td)
-                        with open(log.name + ending, 'w') as outputfile:
-                            outputfile.write(string)
-                    except Exception as e:
-                        logger.info(
-                            "Problem parsing file: %s - %s" (log.name, str(e)))
+                    self.do_writer(log, ending)
+
+            if self.outputfilename:
+                with open(self.outputfilename, 'w') as outputfile:
+                    outputfile.write(logs.format_output(errors=self.error))
             else:
-                if self.outputfilename:
-                    with open(self.outputfilename, 'w') as outputfile:
-                        outputfile.write(logs.format_output(errors=self.error))
-                else:
-                    print logs.format_output(errors=self.error)
+                print logs.format_output(errors=self.error)
 
     parser = argparse.ArgumentParser(
         description="This program extracts data from Gaussian log files.")
@@ -833,6 +1181,13 @@ if __name__ == "__main__":
                         help='Toggles writing TD gjf file from log.')
     parser.add_argument('-L', action="store_true", dest="logs", default=False,
                         help='Toggles only parsing .log files.')
+    parser.add_argument('-I', action="store_true", dest="split_iter", default=False,
+                        help='Toggles splitting log files per iteration in optimization.')
+    parser.add_argument('-O', action="store_true", dest="out", default=False,
+                        help='Toggles writing .out files from logs.')
+    parser.add_argument('-X', action="store_true", dest="outx", default=False,
+                        help='Toggles writing .outx files from logs.')
+
 
     if len(sys.argv) > 1:
         args = sys.argv[1:]

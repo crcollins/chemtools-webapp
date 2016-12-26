@@ -1141,6 +1141,17 @@ class MolNameTestCase(TestCase):
             expected = expected + "_x1_y1_z1"
             self.assertEqual(a, expected)
 
+    def test_get_structure_type(self):
+        tests = [
+            ("TON", constants.BENZO_TWO),
+            ("EON", constants.BENZO_ONE),
+            ("444", constants.CHAIN),
+            ("TON_TON", constants.BENZO_MULTI),
+        ]
+        for name, expected in tests:
+            res = mol_name.get_structure_type(name)
+            self.assertEqual(res, expected)
+
 
 class ExtractorTestCase(TestCase):
 
@@ -1206,26 +1217,32 @@ class FileParserTestCase(TestCase):
         with StringIO(logset.format_output(errors=False)) as f:
             reader = csv.reader(f, delimiter=',', quotechar='"')
             expected = [
-                ["A_TON_A_A", "A_TON_A_A_n1_m1_x1_y1_z1",
+                ["A_TON_A_A", "Final", "A_TON_A_A_n1_m1_x1_y1_z1",
                  "opt B3LYP/6-31g(d) geom=connectivity",
                  "-6.46079886952", "-1.31975211714", "41",
-                 "0.0001", "-567.1965205", "---", "0.35"],
-                ["A_TON_A_A", "A_TON_A_A_n1_m1_x1_y1_z1",
+                 "0.0001", "-567.1965205", "---", "0.35",
+                 "[0.0, 0.0, 0.0001]", "[]", "---", "1800.4170", "7"],
+                ["A_TON_A_A", "Final", "A_TON_A_A_n1_m1_x1_y1_z1",
                  "td B3LYP/6-31g(d)", "-6.46079886952",
                  "-1.31975211714", "41", "0.0001",
-                 "-567.1965205", "4.8068", "0.15"],
-                ["A_CON_A_A", "A_CON_A_A_n1_m1_x1_y1_z1",
+                 "-567.196520530", "4.8068", "0.15",
+                 "[0.0, 0.0, 0.0001]", "[1.0081, -0.2949, 0.0]", "0.1299",
+                 "1800.4171", "---"],
+                ["A_CON_A_A", "Final", "A_CON_A_A_n1_m1_x1_y1_z1",
                  "td B3LYP/6-31g(d)", "-6.59495099194",
                  "-1.19594032058", "41", "2.1565",
-                 "-567.1958243", "4.7914", "0.15"],
-                ["crazy",
-                 "---",
+                 "-567.195824267", "4.7914", "0.15",
+                 "[0.0, -2.1565, 0.0001]", "[0.9867, 0.0, 0.0]", "0.1143",
+                 "1800.8262", "---"],
+                ["crazy", "Final", "---",
                  "td=(nstates=10) pbeh1pbe/6-311g(d,p) scrf=(cpcm,solvent=dichloromethane) geom=connectivity",
                  "-4.87464730441",
                  "-2.47732438648", "371", "0.9760",
-                 "-6879.2403675", "1.8620", "34.3166666667"],
+                 "-6879.24036746", "1.8620", "34.3166666667",
+                 "[0.0009, -0.976, -0.0035]", "[-4.3094, -0.0002, -0.0268]", 
+                 "0.8472", "199573.1185", "---"],
             ]
-            lines = [x[1:3] + x[4:] for i, x in enumerate(reader) if i]
+            lines = [x[1:4] + x[5:] for i, x in enumerate(reader) if i]
             self.assertEqual(expected, lines)
 
     def test_parse_log_open(self):
@@ -1235,12 +1252,27 @@ class FileParserTestCase(TestCase):
         with StringIO(log.format_data()) as f:
             reader = csv.reader(f, delimiter=',', quotechar='"')
             expected = [
-                ["A_TON_A_A", "A_TON_A_A_n1_m1_x1_y1_z1",
+                ["A_TON_A_A", "Final", "A_TON_A_A_n1_m1_x1_y1_z1",
                  "opt B3LYP/6-31g(d) geom=connectivity",
                  "-6.46079886952", "-1.31975211714", "41",
-                 "0.0001", "-567.1965205", "---", "0.35"],
+                 "0.0001", "-567.1965205", "---", "0.35",
+                 "[0.0, 0.0, 0.0001]", "[]", "---", "1800.4170", "7"],
             ]
-            lines = [x[1:3] + x[4:] for x in reader]
+            lines = [x[1:4] + x[5:] for x in reader]
+            self.assertEqual(expected, lines)
+
+    def test_parse_invalid_log(self):
+        path = os.path.join(settings.MEDIA_ROOT, "tests", "invalid.log")
+        log = fileparser.Log(path)
+
+        with StringIO(log.format_data()) as f:
+            reader = csv.reader(f, delimiter=',', quotechar='"')
+            expected = [
+                ["invalid", "Final", "---", "---", "---", "---",
+                 "---", "---", "---", "---", "---", "[]", "[]",
+                 "---", "---", "---"],
+            ]
+            lines = [x[1:4] + x[5:] for x in reader]
             self.assertEqual(expected, lines)
 
     def test_parse_nonbenzo(self):
@@ -1249,10 +1281,11 @@ class FileParserTestCase(TestCase):
 
         with StringIO(log.format_data()) as f:
             reader = csv.reader(f, delimiter=',', quotechar='"')
-            expected = ['1_04_0', '---', '[]',
+            expected = ['1_04_0', 'Final', '---', '[]',
                         'opt b3lyp/6-31g(d) geom=connectivity', '-4.28307181933',
-                        '-1.27539756145', '257', '0.0666', '-4507.6791248', '---',
-                        '1.43333333333']
+                        '-1.27539756145', '257', '0.0666', '-4507.6791248',
+                        '---', '1.43333333333', '[0.0, 0.0, -0.0666]', '[]',
+                        '---', '75848.1170', '1']
             for line in reader:
                 pass
             self.assertEqual(expected, line[1:])
@@ -1264,10 +1297,11 @@ class FileParserTestCase(TestCase):
 
         with StringIO(log.format_data()) as f:
             reader = csv.reader(f, delimiter=',', quotechar='"')
-            expected = ['methane_windows', '---', '[]',
+            expected = ['methane_windows', 'Final', '---', '[]',
                         'OPT B3LYP/3-21G GEOM=CONNECTIVITY', '-10.5803302719',
                         '3.96823610808', '5', '0.0000', '-40.3016014', '---',
-                        '0.0']
+                        '0.0', '[0.0, 0.0, 0.0]', '[]', '---', '35.4879',
+                        '2']
             for line in reader:
                 pass
             actual = [x.lower() for x in line[1:]]
@@ -1281,10 +1315,11 @@ class FileParserTestCase(TestCase):
 
         with StringIO(log.format_data()) as f:
             reader = csv.reader(f, delimiter=',', quotechar='"')
-            expected = ['methane_td_windows', '---', '[]',
+            expected = ['methane_td_windows', 'Final', '---', '[]',
                         'TD RB3LYP/3-21G GEOM=CONNECTIVITY', '-10.5803302719',
-                        '3.96823610808', '5', '0.0000', '-40.3016014', '13.3534',
-                        '0.0']
+                        '3.96823610808', '5', '0.0000', '-40.3016014127', '13.3534',
+                        '0.0', '[0.0, 0.0, 0.0]', '[]', '0.1393', '35.4879',
+                        '---']
             for line in reader:
                 pass
             actual = [x.lower() for x in line[1:]]
@@ -1301,14 +1336,45 @@ class FileParserTestCase(TestCase):
             expected = [
                         ["opt b3lyp/6-31g(d,p) geom=connectivity",
                          "-11.7422563626", "2.74508440364", "1", "0.0000",
-                         "-1.1785393", "---", "0.0"],
+                         "-1.1785393", "---", "0.0", "[0.0, 0.0, 0.0]", "[]",
+                         "---", "5.1246", "5"],
                         ["td b3lyp/6-31g(d,p) geom=check guess=read",
                          "-11.7422563626", "2.74508440364", "1", "0.0000",
-                         "-1.1785393", "14.5967", "0.0"]
+                         "-1.17853927765", "14.5967", "0.0", "[0.0, 0.0, 0.0]", 
+                         "[0.0, 0.0, -1.2973]", "0.6019", "5.1246", "---"]
                      ]
 
-            actual = [[y.lower() for y in x[4:]] for x in reader]
+            actual = [[y.lower() for y in x[5:]] for x in reader]
             self.assertEqual(expected, actual)
+
+    def test_parse_log_format_gjf(self):
+        name = "A.log"
+        path = os.path.join(settings.MEDIA_ROOT, "tests", name)
+        log = fileparser.Log(path)
+
+        actual = log.format_gjf()
+        expected = "%nprocshared=1\n%mem=12GB\n%chk=A.chk\n"
+        expected += "# td B3LYP/6-31g(d,p) geom=check guess=read\n\nA\n\n"
+        expected += "0 1\nH 0.3784566169 0. 0.\nH 1.1215433831 0. 0.\n\n"
+        self.assertEqual(expected, actual)
+
+    def test_parse_log_format_out(self):
+        name = "A.log"
+        path = os.path.join(settings.MEDIA_ROOT, "tests", name)
+        log = fileparser.Log(path)
+
+        actual = log.format_out()
+        expected = "H 0.3784566169 0. 0.\nH 1.1215433831 0. 0.\n"
+        self.assertEqual(expected, actual)
+
+    def test_parse_log_format_outx(self):
+        name = "A.log"
+        path = os.path.join(settings.MEDIA_ROOT, "tests", name)
+        log = fileparser.Log(path)
+
+        actual = log.format_outx()
+        # TODO Needs a better test
+        self.assertEqual(5, len(actual))
 
     def test_Output_newline(self):
         out = fileparser.Output()

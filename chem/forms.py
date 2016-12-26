@@ -85,6 +85,7 @@ class UploadForm(forms.Form):
     td_reset = forms.BooleanField(required=False, label="TD Reset")
     gjf_submit = forms.BooleanField(required=False,  label="GJF Submit")
     store = forms.BooleanField(required=False,  label="Store Log File")
+    split_iter = forms.BooleanField(required=False,  label="Split Log Iterations")
 
     helper = FormHelper()
     helper.form_tag = False
@@ -95,6 +96,7 @@ class UploadForm(forms.Form):
         'td_reset',
         'gjf_submit',
         'store',
+        'split_iter',
     )
 
     def clean(self):

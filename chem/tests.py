@@ -1097,6 +1097,7 @@ class UploadsTestCase(TestCase):
             with StringIO(response.content) as f2:
                 reader = csv.reader(f2, delimiter=',', quotechar='"')
                 expected = ["A_TON_A_A.log", "A_TON_A_A",
+                            "Final",
                             "A_TON_A_A_n1_m1_x1_y1_z1",
                             "opt B3LYP/6-31g(d) geom=connectivity",
                             "-6.46079886952",
@@ -1105,10 +1106,37 @@ class UploadsTestCase(TestCase):
                             "0.0001",
                             "-567.1965205",
                             "---",
-                            "0.35"]
+                            "0.35",
+                            "[0.0, 0.0, 0.0001]",
+                            "[]",
+                            "---",
+                            "1800.4170",
+                            "7"]
                 lines = [x for x in reader]
-                results = lines[1][:3] + lines[1][4:]
+                results = lines[1][:4] + lines[1][5:]
                 self.assertEqual(results, expected)
+
+    def test_log_parse_steps(self):
+        test_path = os.path.join(settings.MEDIA_ROOT, "tests")
+        with open(os.path.join(test_path, "A.log"), 'r') as f:
+            data = {
+                "files": f,
+                "options": "logparse",
+                "split_iter": True,
+            }
+            response = self.client.post(reverse(views.upload_data), data)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(len(response.content.split('\n')), 11)
+
+        with open(os.path.join(test_path, "A.log"), 'r') as f:
+            data = {
+                "files": f,
+                "options": "logparse",
+                "split_iter": False,
+            }
+            response = self.client.post(reverse(views.upload_data), data)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(len(response.content.split('\n')), 6)
 
     def test_log_store(self):
         r = self.client.login(**SUPER_USER_LOGIN)
