@@ -230,7 +230,8 @@ class Log(object):
                 current_parsers["Geometry"].value = None
 
         # major memory saver by deleting all the line parser objects
-        self.parsers = [self.cleanup_parsers(parsers) for parsers in self.parsers]
+        self.parsers = [self.cleanup_parsers(
+            parsers) for parsers in self.parsers]
 
     def previous_parsers_empty(self):
         prev = self.parsers[-1]
@@ -256,7 +257,8 @@ class Log(object):
             search_all = True
 
         search_all = False
-        for label, parser in zip(self.parser_labels, self.parsers)[parser_idx::-1]:
+        for label, parser in zip(self.parser_labels, self.parsers)[
+                parser_idx::-1]:
             value, done = parser[key]
             if done:
                 break
@@ -388,7 +390,8 @@ class Log(object):
                     value = '"' + value.replace('"', '""') + '"'
                 values.append(value if (done or value) else "---")
 
-            outer_values.append(','.join([self.fname, self.name, label] + values))
+            outer_values.append(
+                ','.join([self.fname, self.name, label] + values))
         return '\n'.join(outer_values)
 
     @classmethod
@@ -415,7 +418,8 @@ class LogSet(Output):
         self.write(x.format_data(self.split_iter))
 
     def parse_files(self, files):
-        if not files: return
+        if not files:
+            return
         pool = multiprocessing.Pool(processes=multiprocessing.cpu_count())
         self.logs = pool.map(Log, files)
         pool.close()
@@ -1047,7 +1051,6 @@ class StepNumber(LineParser):
             self.done = True
 
 
-
 ##############################################################################
 # StandAlone
 ##############################################################################
@@ -1055,7 +1058,6 @@ class StepNumber(LineParser):
 if __name__ == "__main__":
     import argparse
     import sys
-
 
     class StandAlone(object):
 
@@ -1122,7 +1124,7 @@ if __name__ == "__main__":
                 # used to bubble up errors before creating the file
                 method = getattr(log, "format_" + ending.lstrip("."))
                 result = method(self.td)
-                if type(result) != list:
+                if not isinstance(result, list):
                     result = [result]
 
                 for i, string in enumerate(result):
@@ -1187,7 +1189,6 @@ if __name__ == "__main__":
                         help='Toggles writing .out files from logs.')
     parser.add_argument('-X', action="store_true", dest="outx", default=False,
                         help='Toggles writing .outx files from logs.')
-
 
     if len(sys.argv) > 1:
         args = sys.argv[1:]
