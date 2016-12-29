@@ -53,6 +53,18 @@ class SSHClient(paramiko.SSHClient):
         command = self.base + command
         return super(SSHClient, self).exec_command(command, *args, **kwargs)
 
+    def connect(self, *args, **kwargs):
+        super(SSHClient, self).connect(*args, **kwargs)
+        self.determine_base()
+
+    def determine_base(self):
+        bases = [". ~/.bash_profile; ", "source .login; ", ". ~/.bashrc; "]
+        for base in bases:
+            _, _, err = self.exec_command(base)
+            if not err.readlines():
+                self.base = base
+                break
+
 
 class SFTPClient(paramiko.SFTPClient):
 
@@ -94,12 +106,6 @@ def get_ssh_connection(hostname, username, key=None, password=None, port=22, tim
         client.connect(hostname, username=username, password=password,
                        port=port, allow_agent=False, look_for_keys=False,
                        compress=True, timeout=timeout)
-    bases = [". ~/.bash_profile; ", "source .login; ", ". ~/.bashrc; "]
-    for base in bases:
-        _, _, err = client.exec_command(base)
-        if not err.readlines():
-            client.base = base
-            break
     return client
 
 
