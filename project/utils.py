@@ -88,7 +88,8 @@ def get_ssh_connection(hostname, username, key=None, password=None, port=22, tim
     if key:
         pkey = paramiko.RSAKey.from_private_key(key)
         client.connect(hostname, username=username, pkey=pkey, port=port,
-                       allow_agent=False, look_for_keys=False, compress=True)
+                       allow_agent=False, look_for_keys=False, compress=True,
+                       timeout=timeout)
     else:
         client.connect(hostname, username=username, password=password,
                        port=port, allow_agent=False, look_for_keys=False,
