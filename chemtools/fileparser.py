@@ -128,6 +128,7 @@ SYMBOLS = {
 START = 'Start'
 STEP = 'Step'
 FINAL = 'Final'
+NULL = '---'
 
 
 def catch(fn):
@@ -291,10 +292,10 @@ class Log(object):
                 try:
                     options.append(options[-1])
                 except IndexError:
-                    # We set this to '---' instead of '' because we are
+                    # We set this to NULL instead of '' because we are
                     # setting the done value to True later. If this is not
                     # done this way, the value will be ignored
-                    options.append('---')
+                    options.append(NULL)
             else:
                 options.append(val)
         return options
@@ -388,7 +389,7 @@ class Log(object):
                 # csv fixes
                 if value and "," in value:
                     value = '"' + value.replace('"', '""') + '"'
-                values.append(value if (done or value) else "---")
+                values.append(value if (done or value) else NULL)
 
             outer_values.append(
                 ','.join([self.fname, self.name, label] + values))
