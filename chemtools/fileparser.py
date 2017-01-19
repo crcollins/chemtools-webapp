@@ -456,6 +456,7 @@ class LineParser(object):
         self.done = False
         self.value = None
         self.newfile = False
+        self.units = None
 
     def parse(self, line):
         raise NotImplementedError
@@ -587,6 +588,7 @@ class Energy(LineParser):
         super(Energy, self).__init__(*args, **kwargs)
         self.start = False
         self.prevline = ''
+        self.units = 'Hartrees'
 
     @is_done
     def parse(self, line):
@@ -619,6 +621,7 @@ class Time(LineParser):
 
     def __init__(self, *args, **kwargs):
         super(Time, self).__init__(*args, **kwargs)
+        self.units = 'Hours'
 
     @is_done
     def parse(self, line):
@@ -635,6 +638,7 @@ class BandGap(LineParser):
 
     def __init__(self, *args, **kwargs):
         super(BandGap, self).__init__(*args, **kwargs)
+        self.units = 'eV'
 
     @is_done
     def parse(self, line):
@@ -650,6 +654,7 @@ class HOMO(LineParser):
     def __init__(self, *args, **kwargs):
         super(HOMO, self).__init__(*args, **kwargs)
         self.prevline = ''
+        self.units = 'eV'
 
     @is_done
     def parse(self, line):
@@ -669,6 +674,7 @@ class LUMO(LineParser):
     def __init__(self, *args, **kwargs):
         super(LUMO, self).__init__(*args, **kwargs)
         self.prevline = ''
+        self.units = 'eV'
 
     @is_done
     def parse(self, line):
@@ -691,6 +697,7 @@ class Geometry(LineParser):
         self.start = False
         self.newfile = True
         self.prevline = ''
+        self.units = 'Angstrom'
 
     @is_done
     def parse(self, line):
@@ -748,6 +755,7 @@ class PartialGeometry(LineParser):
         self.value = ''
         self.start = False
         self.dashes = False
+        self.units = 'Angstrom'
 
     @is_done
     def parse(self, line):
@@ -788,6 +796,7 @@ class InputGeometry(LineParser):
         self.start = False
         self.prev_worked = False
         self.value = ''
+        self.units = 'Angstrom'
 
     @is_done
     def parse(self, line):
@@ -857,6 +866,7 @@ class Dipole(LineParser):
 
     def __init__(self, *args, **kwargs):
         super(Dipole, self).__init__(*args, **kwargs)
+        self.units = 'Debye'
 
     @is_done
     def parse(self, line):
@@ -873,6 +883,7 @@ class DipoleVector(LineParser):
     def __init__(self, *args, **kwargs):
         super(DipoleVector, self).__init__(*args, **kwargs)
         self.value = '[]'
+        self.units = 'Debye'
 
     @is_done
     def parse(self, line):
@@ -890,6 +901,7 @@ class ExcitationDipoleVector(LineParser):
         super(ExcitationDipoleVector, self).__init__(*args, **kwargs)
         self.start = False
         self.value = '[]'
+        self.units = 'Au'
 
     @is_done
     def parse(self, line):
@@ -924,6 +936,7 @@ class SpatialExtent(LineParser):
 
     def __init__(self, *args, **kwargs):
         super(SpatialExtent, self).__init__(*args, **kwargs)
+        self.units = 'Au'
 
     @is_done
     def parse(self, line):
@@ -940,6 +953,7 @@ class ForceVectors(LineParser):
         super(ForceVectors, self).__init__(*args, **kwargs)
         self.start = False
         self.dashes = False
+        self.units = 'Hartrees/Bohr'
 
     @is_done
     def parse(self, line):
@@ -977,6 +991,7 @@ class MullikenCharges(LineParser):
     def __init__(self, *args, **kwargs):
         super(MullikenCharges, self).__init__(*args, **kwargs)
         self.start = False
+        self.units = 'Au'
 
     @is_done
     def parse(self, line):
@@ -1010,6 +1025,7 @@ class SumMullikenCharges(LineParser):
     def __init__(self, *args, **kwargs):
         super(SumMullikenCharges, self).__init__(*args, **kwargs)
         self.start = False
+        self.units = 'Au'
 
     @is_done
     def parse(self, line):
