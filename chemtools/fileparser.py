@@ -2,6 +2,12 @@ import os
 import multiprocessing
 import logging
 
+try:
+    import numpy
+except ImportError:
+    # If there is no numpy, we will just ignore it. This means that it will
+    # not be able to convert standard orientation calculations.
+    pass
 
 logger = logging.getLogger(__name__)
 HARTREE_TO_EV = 27.211383858491185
@@ -144,6 +150,60 @@ def catch(fn):
     return wrapper
 
 
+def procrustes(X, Y):
+    '''
+    A port of MATLAB's `procrustes` function to Numpy.
+
+    Procrustes analysis determines a linear transformation (translation, and
+    orthogonal rotation) of the points in Y to best conform them to the points
+    in matrix X, using the sum of squared errors as the goodness of fit
+    criterion.
+
+    Adapted from here
+    http://stackoverflow.com/questions/18925181/
+    The changes made remove the scaling and reflections because they do not
+    make sense in this context. Comparing different dimensional matrices has
+    also been removed as the values will always be Cartesian coordinates.
+
+    Parameters
+    ----------
+    X, Y
+        Matrices of target and input coordinates. They must both be the same
+        size.
+
+    Returns
+    -------
+        T : array
+            The transformation matrix
+        c : array
+            The translation vector
+    '''
+    muX = X.mean(0)
+    muY = Y.mean(0)
+
+    X0 = X - muX
+    Y0 = Y - muY
+
+    # centred Frobenius norm
+    normX = numpy.linalg.norm(X0)
+    normY = numpy.linalg.norm(Y0)
+
+    # scale to equal (unit) norm
+    X0 /= normX
+    Y0 /= normY
+
+    # optimum rotation matrix of Y
+    A = numpy.dot(X0.T, Y0)
+    U, s, Vt = numpy.linalg.svd(A, full_matrices=False)
+    V = Vt.T
+
+    # transformation matrix
+    T = numpy.dot(V, U.T)
+    # translation vector
+    c = muX - numpy.dot(muY, T)
+    return T, c
+
+
 class Output(object):
 
     def __init__(self):
@@ -235,6 +295,11 @@ class Log(object):
         self.parsers = [self.cleanup_parsers(
             parsers) for parsers in self.parsers]
 
+        # Determine transformation
+        self.Rot = None
+        self.trans = None
+        self.get_transformation()
+
     def previous_parsers_empty(self):
         prev = self.parsers[-1]
         return prev["Energy"].done == False or prev["StepNumber"].done == False
@@ -281,9 +346,39 @@ class Log(object):
 
         if parsers["Geometry"][0] is None:
             geometry = parsers["PartialGeometry"][0]
+            if self.Rot is not None:
+                geometry = self.transform_geometry(geometry)
         else:
             geometry = parsers["Geometry"][0]
         return geometry
+
+    def get_geometry_array(self, geometry):
+        A = geometry.strip().split('\n')
+        elements = []
+        coords = []
+        for line in A:
+            values = line.split()
+            elements.append(values[0])
+            coords.append([float(x) for x in values[1:]])
+        return elements, numpy.array(coords)
+
+    def get_transformation(self):
+        try:
+            _, input_geom = self.get_geometry_array(self.parsers[0]['InputGeometry'][0])
+            _, partial_geom = self.get_geometry_array(self.parsers[0]['PartialGeometry'][0])
+            # This tolerance was selected based on the max precision of
+            # Gaussian inputs.
+            if not numpy.allclose(input_geom, partial_geom, atol=1e-5):
+                self.Rot, self.trans = procrustes(input_geom, partial_geom)
+        except NameError: # numpy is not installed
+            print "WARNING: Numpy is not installed, so outx geometries might not be correct."
+            pass
+
+    def transform_geometry(self, geometry):
+        elements, geom = self.get_geometry_array(geometry)
+        transformed = geom.dot(self.Rot) + self.trans
+        lines = ['%s %f %f %f' % (ele, x, y, z) for ele, (x, y, z) in zip(elements, transformed)]
+        return '\n'.join(lines)
 
     def get_all_options(self):
         options = []
