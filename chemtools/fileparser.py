@@ -5,6 +5,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 HARTREE_TO_EV = 27.211383858491185
+BOHR_TO_ANGSTROM = 0.529177249
 SYMBOLS = {
     '1': 'H',
     '2': 'He',
@@ -953,7 +954,7 @@ class ForceVectors(LineParser):
         super(ForceVectors, self).__init__(*args, **kwargs)
         self.start = False
         self.dashes = False
-        self.units = 'Hartrees/Bohr'
+        self.units = 'eV/Angstrom'
 
     @is_done
     def parse(self, line):
@@ -981,7 +982,9 @@ class ForceVectors(LineParser):
 
             if self.dashes:
                 temp = line.strip().split()
-                use = [SYMBOLS[temp[1]]] + temp[2:]
+                factor = HARTREE_TO_EV / BOHR_TO_ANGSTROM
+                values = [float(x) * factor for x in temp[2:]]
+                use = [SYMBOLS[temp[1]]] + [str(x) for x in values]
                 self.value += ' '.join(use) + '\n'
 
 
