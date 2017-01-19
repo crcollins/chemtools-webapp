@@ -4,7 +4,7 @@ import logging
 
 
 logger = logging.getLogger(__name__)
-HARTREETOEV = 27.211383858491185
+HARTREE_TO_EV = 27.211383858491185
 SYMBOLS = {
     '1': 'H',
     '2': 'He',
@@ -663,7 +663,7 @@ class HOMO(LineParser):
         if "occ. eigenvalues" in line:
             self.prevline = line
         elif "virt. eigenvalues" in line and self.prevline:
-            self.value = str(float(self.prevline.split()[-1]) * HARTREETOEV)
+            self.value = str(float(self.prevline.split()[-1]) * HARTREE_TO_EV)
             self.prevline = ''
             self.done = True
 
@@ -683,7 +683,7 @@ class LUMO(LineParser):
         if "occ. eigenvalues" in line:
             self.prevline = line
         elif "virt. eigenvalues" in line and self.prevline:
-            self.value = str(float(line.split()[4]) * HARTREETOEV)
+            self.value = str(float(line.split()[4]) * HARTREE_TO_EV)
             self.prevline = ''
             self.done = True
 
