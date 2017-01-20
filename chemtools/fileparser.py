@@ -1077,6 +1077,23 @@ class ForceVectors(LineParser):
 
             if self.dashes:
                 temp = line.strip().split()
+
+                # This is an awful hack to fix Gaussian not having a space
+                # between values if they get to be too large. Things get worse
+                # when the numbers are one digit larger. In that case Gaussian
+                # will not output a number. So, we select numbers based on
+                # their index from the end of the line.
+                if len(temp) != 5:
+                    line = line.strip()
+                    temp = [
+                            '',
+                            temp[1],
+                            line[-45:-30],
+                            line[-30:-15],
+                            line[-15:],
+                    ]
+                    temp = [x.strip() for x in temp]
+
                 factor = HARTREE_TO_EV / BOHR_TO_ANGSTROM
                 values = [float(x) * factor for x in temp[2:]]
                 use = [SYMBOLS[temp[1]]] + [str(x) for x in values]
