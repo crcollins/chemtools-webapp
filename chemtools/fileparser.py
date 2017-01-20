@@ -246,10 +246,6 @@ class Log(object):
 
             self.parsers = [self.setup_parsers()]
             self.parser_labels = [START]
-            # This initialization is just in case the file is empty
-            # If the file is empty, then line will not be defined causing a
-            # UnboundLocalError when it does the check for normal termination.
-            line = ''
             completed = False
             started = False
             current_parsers = self.parsers[0]
