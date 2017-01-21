@@ -1167,6 +1167,9 @@ class SumMullikenCharges(LineParser):
             temp = line.strip().split()
             if len(temp) == 1:
                 return
+            elif len(temp) != 3:
+                self.done = True
+                return
             self.value += ' '.join(temp[:]) + '\n'
 
 
