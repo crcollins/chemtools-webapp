@@ -919,6 +919,12 @@ class InputGeometry(LineParser):
                     self.done = True
                     self.start = False
                 return
+            elif len(temp) < 4:
+                # The geometry is probably a Z-matrix, so reset and ignore
+                self.done = False
+                self.start = False
+                self.value = ''
+                return
 
             if delimiter == ',':
                 # Skip the zero value
