@@ -360,8 +360,9 @@ class Log(object):
 
     def get_transformation(self):
         try:
-            _, input_geom = self.get_geometry_array(self.parsers[0]['InputGeometry'][0])
-            _, partial_geom = self.get_geometry_array(self.parsers[0]['PartialGeometry'][0])
+            parsers = self.parsers[0]
+            _, input_geom = self.get_geometry_array(parsers['InputGeometry'][0])
+            _, partial_geom = self.get_geometry_array(parsers['PartialGeometry'][0])
             # This tolerance was selected based on the max precision of
             # Gaussian inputs.
             if not numpy.allclose(input_geom, partial_geom, atol=1e-5):
