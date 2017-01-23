@@ -1245,6 +1245,11 @@ class FileParserTestCase(TestCase):
             lines = [x[1:4] + x[5:] for i, x in enumerate(reader) if i]
             self.assertEqual(expected, lines)
 
+    def test_parse_logs_no_logs(self):
+        logset = fileparser.LogSet()
+        logset.parse_files([])
+        self.assertEqual("\n\n", logset.format_output(errors=False))
+
     def test_format_header(self):
         path = os.path.join(settings.MEDIA_ROOT, "tests", "A_TON_A_A.log")
         log = fileparser.Log(path)
