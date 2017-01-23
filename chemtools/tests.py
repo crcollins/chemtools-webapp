@@ -1245,6 +1245,18 @@ class FileParserTestCase(TestCase):
             lines = [x[1:4] + x[5:] for i, x in enumerate(reader) if i]
             self.assertEqual(expected, lines)
 
+    def test_format_header(self):
+        path = os.path.join(settings.MEDIA_ROOT, "tests", "A_TON_A_A.log")
+        log = fileparser.Log(path)
+
+        expected = ["Filename", "Name", "Type", "ExactName", "Features",
+                    "Options", "HOMO (eV)", "LUMO (eV)", "HomoOrbital",
+                    "Dipole (Debye)", "Energy (Hartrees)", "BandGap (eV)",
+                    "Time (Hours)", "DipoleVector (Debye)",
+                    "ExcitationDipoleVector (Au)", "OscillatorStrength",
+                    "SpatialExtent (Au)", "StepNumber"]
+        self.assertEqual(expected, log.format_header().split(','))
+
     def test_parse_log_open(self):
         path = os.path.join(settings.MEDIA_ROOT, "tests", "A_TON_A_A.log")
         log = fileparser.Log(path)
