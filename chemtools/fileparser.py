@@ -491,7 +491,6 @@ class Log(object):
     @classmethod
     def format_header(cls):
         nonparsed = ["Filename", "Name", "Type"]
-        import pdb; pdb.set_trace()
         units = [cls.PARSERS[x].UNITS for x in cls.ORDER]
         values = [x + ' (%s)' % y if y else x for x, y in zip(cls.ORDER, units)]
         return ','.join(nonparsed + values)
