@@ -1277,7 +1277,7 @@ if __name__ == "__main__":
 
             except Exception as e:
                 logger.info(
-                    "Problem parsing file: %s - %s" (log.name, str(e)))
+                    "Problem parsing file: %s - %s" % (log.name, str(e)))
 
         def write_file(self):
             logs = LogSet(self.split_iter)
