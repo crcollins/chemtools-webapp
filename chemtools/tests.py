@@ -1388,6 +1388,19 @@ class FileParserTestCase(TestCase):
         # TODO Needs a better test
         self.assertEqual(5, len(actual))
 
+    def test_parse_odd_force(self):
+        name = "odd_force.log"
+        path = os.path.join(settings.MEDIA_ROOT, "tests", name)
+        log = fileparser.Log(path)
+
+        # This is a two part test, one it is making sure that it does not
+        # blow up with an error, and it needs an additional check for the
+        # value.
+        actual = log.format_outx()
+        self.assertEqual(146 , len(actual))
+        # Check if one of the huge vaules in it
+        self.assertIn("-50394.5620476", actual[1])
+
     def test_Output_newline(self):
         out = fileparser.Output()
         string = "Some message"
