@@ -1287,6 +1287,9 @@ class FileParserTestCase(TestCase):
             lines = [x[1:4] + x[5:] for x in reader]
             self.assertEqual(expected, lines)
 
+        with self.assertRaises(Exception):
+            log.format_gjf()
+
     def test_parse_nonbenzo(self):
         path = os.path.join(settings.MEDIA_ROOT, "tests", "1_04_0.log")
         log = fileparser.Log(path)
