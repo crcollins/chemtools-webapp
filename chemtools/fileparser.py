@@ -367,9 +367,10 @@ class Log(object):
             # Gaussian inputs.
             if not numpy.allclose(input_geom, partial_geom, atol=1e-5):
                 self.Rot, self.trans = procrustes(input_geom, partial_geom)
-        except NameError: # numpy is not installed
-            print "WARNING: Numpy is not installed, so outx geometries might not be correct."
-            pass
+        except NameError:
+            logger.warn("Numpy is not installed, so outx geometries might not be correct.")
+        except IndexError:
+            logger.warn("Using Z-matrix. No transformation.")
 
     def transform_geometry(self, geometry):
         elements, geom = self.get_geometry_array(geometry)
