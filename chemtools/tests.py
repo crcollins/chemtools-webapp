@@ -1378,6 +1378,20 @@ class FileParserTestCase(TestCase):
         expected += "0 1\nH 0.3784566169 0. 0.\nH 1.1215433831 0. 0.\n\n"
         self.assertEqual(expected, actual)
 
+    def test_parse_log_format_gjf_td(self):
+        name = "A_TON_A_A.log"
+        path = os.path.join(settings.MEDIA_ROOT, "tests", name)
+        log = fileparser.Log(path)
+
+        actual = log.format_gjf(td=True).split("\n")[:4]
+        expected = [
+                    "%nprocshared=16",
+                    "%mem=59GB",
+                    "%chk=A_TON_A_A_TD.chk",
+                    "# td b3lyp/6-31g(d)",
+        ]
+        self.assertEqual(expected, actual)
+
     def test_parse_log_format_out(self):
         name = "A.log"
         path = os.path.join(settings.MEDIA_ROOT, "tests", name)
