@@ -1392,6 +1392,13 @@ class FileParserTestCase(TestCase):
         ]
         self.assertEqual(expected, actual)
 
+    def test_parse_log_transform(self):
+        name = "transform.log"
+        path = os.path.join(settings.MEDIA_ROOT, "tests", name)
+        log = fileparser.Log(path)
+        self.assertIsNotNone(log.Rot)
+        self.assertIsNotNone(log.trans)
+
     def test_parse_log_format_out(self):
         name = "A.log"
         path = os.path.join(settings.MEDIA_ROOT, "tests", name)
