@@ -7,7 +7,33 @@ from chemtools.mol_name import get_exact_name
 from models import DataPoint, FeatureVector
 
 
+def get_mapping(header):
+    keys = ('Name', 'Options', 'Occupied', 'HOMO', 'Virtual', 'LUMO',
+            'HomoOrbital', 'Dipole', 'Energy', 'Excited', 'BandGap', 'Time')
+    mapping = {x: None for x in keys}
+    cleaned = [x.split('(')[0] for x in header]
+    for j, value in enumerate(cleaned):
+        if value in mapping:
+            mapping[value] = j
+
+    duplicates = (
+                    ('HOMO', 'Occupied'),
+                    ('LUMO', 'Virtual'),
+                    ('Excited', 'BandGap')
+    )
+    for x, y in duplicates:
+        if mapping[x] is not None and mapping[y] is not None:
+            if mapping[x] != mapping[y]:
+                raise ValueError('The two mapping values do not match.')
+        else:
+            value = mapping[x] or mapping[y]
+            mapping[x] = value
+            mapping[y] = value
+    return mapping
+
+
 def main(csvfile):
+    # TODO use Pandas
     reader = csv.reader(csvfile, delimiter=',', quotechar='"')
 
     points = []
@@ -21,12 +47,14 @@ def main(csvfile):
     now = timezone.now()
 
     count = 0
-    for row in reader:
+    for i, row in enumerate(reader):
+        if not i:
+            mapping = get_mapping(row)
         if row == []:
             continue
         try:
             try:
-                exact_name = get_exact_name(row[1])
+                exact_name = get_exact_name(row[mapping["Name"]])
                 try:
                     decay_feature = get_decay_feature_vector(exact_name)
                     feature_vector = True
@@ -51,16 +79,16 @@ def main(csvfile):
                 feature_vector = None
                 exact_name = None
 
-            # TODO Fix this
+            band_gap = row[mapping["BandGap"]]
             data = {
-                "name": row[1],
-                "options": row[5],
-                "homo": row[6],
-                "lumo": row[7],
-                "homo_orbital": row[8],
-                "dipole": row[9],
-                "energy": row[10],
-                "band_gap": row[11] if row[11] != '---' else None,
+                "name": row[mapping["Name"]],
+                "options": row[mapping["Options"]],
+                "homo": row[mapping["HOMO"]],
+                "lumo": row[mapping["LUMO"]],
+                "homo_orbital": row[mapping["HomoOrbital"]],
+                "dipole": row[mapping["Dipole"]],
+                "energy": row[mapping["Energy"]],
+                "band_gap": band_gap if band_gap != '---' else None,
                 "exact_name": exact_name,
                 "created": now,
             }
