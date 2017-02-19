@@ -38,7 +38,7 @@ id_rsa_ssh_key_pub = File.read(File.join(path, "id_rsa.pub"))
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   if File.file?("chemtools-precise32.box")
-    config.vm.box = "chemtools-precise32"
+    config.vm.box = "chemtools-precise32.box"
   elsif ENV["NEW"]
     config.vm.box = "ubuntu/xenial64"
   else
