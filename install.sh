@@ -52,6 +52,7 @@ EOF
         NGINX_SETTINGS=nginx_settings.conf
     else
         NGINX_SETTINGS=nginx_settings_https.conf
+        sudo openssl dhparam -out /etc/ssl/certs/dhparam.pem 2048
     fi
     sudo sed -e "s/\$INSTALL_USER/$INSTALL_USER/g"      \
              -e "s,\$CHEMTOOLS_DIR,$CHEMTOOLS_DIR,g"    \
