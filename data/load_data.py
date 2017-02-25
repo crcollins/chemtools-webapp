@@ -50,7 +50,8 @@ def main(csvfile):
     for i, row in enumerate(reader):
         if not i:
             mapping = get_mapping(row)
-        if row == []:
+            continue
+        if row == [] or len(row) < len(mapping):
             continue
         try:
             try:
