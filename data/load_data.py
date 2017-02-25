@@ -11,7 +11,7 @@ def get_mapping(header):
     keys = ('Name', 'Options', 'Occupied', 'HOMO', 'Virtual', 'LUMO',
             'HomoOrbital', 'Dipole', 'Energy', 'Excited', 'BandGap', 'Time')
     mapping = {x: None for x in keys}
-    cleaned = [x.split('(')[0] for x in header]
+    cleaned = [x.split('(')[0].strip() for x in header]
     for j, value in enumerate(cleaned):
         if value in mapping:
             mapping[value] = j
