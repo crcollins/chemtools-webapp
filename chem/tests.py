@@ -996,7 +996,7 @@ class UtilsTestCase(TestCase):
             # 'property_predictions': (
             #     ("HOMO", "homo", "eV", -5.6866366091077571),
             #     ("LUMO", "lumo", "eV", -2.1298787902985779),
-            #     ("Band Gap", "gap", "eV", 3.4415766653971942),
+            #     ("Excitation Energy", "gap", "eV", 3.4415766653971942),
             # ),
             'exact_name': '24aaA_TON_A_A_n1_m1_x1_y1_z1',
             'property_limits': {

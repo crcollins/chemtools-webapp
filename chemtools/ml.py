@@ -169,6 +169,6 @@ def get_properties_from_decay_with_predictions(feature):
     return [
         Property("HOMO", "homo", "eV", homo[0], 0.09),
         Property("LUMO", "lumo", "eV", lumo[0], 0.08),
-        Property("Band Gap", "gap", "eV", gap[0], 0.10),
+        Property("Excitation Energy", "gap", "eV", gap[0], 0.10),
     ]
 

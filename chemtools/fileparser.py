@@ -233,7 +233,7 @@ class Output(object):
 class Log(object):
     PARSERS = dict()
     ORDER = ["ExactName", "Features", "Options", "HOMO", "LUMO",
-             "HomoOrbital", "Dipole", "Energy", "BandGap", "Time",
+             "HomoOrbital", "Dipole", "Energy", "ExcitationEnergy", "Time",
              "DipoleVector", "ExcitationDipoleVector", "OscillatorStrength",
              "SpatialExtent", "StepNumber"]
 
@@ -729,11 +729,11 @@ class Time(LineParser):
 
 
 @Log.add_parser
-class BandGap(LineParser):
+class ExcitationEnergy(LineParser):
     UNITS = 'eV'
 
     def __init__(self, *args, **kwargs):
-        super(BandGap, self).__init__(*args, **kwargs)
+        super(ExcitationEnergy, self).__init__(*args, **kwargs)
 
     @is_done
     def parse(self, line):

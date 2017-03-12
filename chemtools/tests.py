@@ -1256,7 +1256,7 @@ class FileParserTestCase(TestCase):
 
         expected = ["Filename", "Name", "Type", "ExactName", "Features",
                     "Options", "HOMO (eV)", "LUMO (eV)", "HomoOrbital",
-                    "Dipole (Debye)", "Energy (Hartrees)", "BandGap (eV)",
+                    "Dipole (Debye)", "Energy (Hartrees)", "ExcitationEnergy (eV)",
                     "Time (Hours)", "DipoleVector (Debye)",
                     "ExcitationDipoleVector (Au)", "OscillatorStrength",
                     "SpatialExtent (Au)", "StepNumber"]

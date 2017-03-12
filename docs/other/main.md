@@ -12,7 +12,7 @@ All of the following forms of output are possible for all of the molecules gener
 - json - this returns a json object with all of the properties of a molecule.
 - Job - there also is a job form on each molecule page that will allow generation of job files for any of the clusters given a few parameters.
 
-In addition to the files, the page for each structure also includes the exact name, the feature vector, and estimates for the HOMO, LUMO, and Band Gap energies. These estimates are calculated using a support vector machines predictor which was trained on about 1100 single core benzobisazole structures with side lengths less than 5 aryl groups.
+In addition to the files, the page for each structure also includes the exact name, the feature vector, and estimates for the HOMO, LUMO, and Excitation energies. These estimates are calculated using a support vector machines predictor which was trained on about 1100 single core benzobisazole structures with side lengths less than 5 aryl groups.
 
 Currently the system implemented updates the predictors every night if there have been more structures added to the database.
 

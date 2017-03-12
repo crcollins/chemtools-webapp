@@ -9,7 +9,7 @@ from models import DataPoint, FeatureVector
 
 def get_mapping(header):
     keys = ('Name', 'Options', 'Occupied', 'HOMO', 'Virtual', 'LUMO',
-            'HomoOrbital', 'Dipole', 'Energy', 'Excited', 'BandGap', 'Time')
+            'HomoOrbital', 'Dipole', 'Energy', 'ExcitationEnergy', 'BandGap', 'Time')
     mapping = {x: None for x in keys}
     cleaned = [x.split('(')[0].strip() for x in header]
     for j, value in enumerate(cleaned):
@@ -19,7 +19,7 @@ def get_mapping(header):
     duplicates = (
                     ('HOMO', 'Occupied'),
                     ('LUMO', 'Virtual'),
-                    ('Excited', 'BandGap')
+                    ('ExcitationEnergy', 'BandGap')
     )
     for x, y in duplicates:
         if mapping[x] is not None and mapping[y] is not None:
