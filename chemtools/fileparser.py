@@ -233,8 +233,11 @@ class Output(object):
 class Log(object):
     PARSERS = dict()
     ORDER = ["ExactName", "Features", "Options", "HOMO", "LUMO",
-             "HomoOrbital", "Dipole", "Energy", "ExcitationEnergy", "Time",
-             "DipoleVector", "ExcitationDipoleVector", "OscillatorStrength",
+             "HomoOrbital", "Dipole", "Energy",
+             "ExcitationEnergy1", "ExcitationEnergy2", "ExcitationEnergy3",
+             "Time", "DipoleVector",
+             "ExcitationDipoleVector1", "ExcitationDipoleVector2", "ExcitationDipoleVector3",
+             "OscillatorStrength1", "OscillatorStrength2", "OscillatorStrength3",
              "SpatialExtent", "StepNumber"]
 
     def __init__(self, f, fname=None):
@@ -404,9 +407,15 @@ class Log(object):
         return new_labels
 
     @classmethod
-    def add_parser(cls, parser):
-        cls.PARSERS[parser.__name__] = parser
-        return parser
+    def add_parser(cls, name=None):
+        def inner(parser):
+            if name is None:
+                use = parser.__name__
+            else:
+                use = name
+            cls.PARSERS[use] = parser
+            return parser
+        return inner
 
     def format_gjf(self, td=False, *args, **kwargs):
         if len(self.parsers) > 1:
@@ -570,7 +579,7 @@ class LineParser(object):
 ##############################################################################
 ##############################################################################
 
-@Log.add_parser
+@Log.add_parser()
 class ExactName(LineParser):
 
     def __init__(self, *args, **kwargs):
@@ -588,7 +597,7 @@ class ExactName(LineParser):
         return
 
 
-@Log.add_parser
+@Log.add_parser()
 class Features(LineParser):
 
     def __init__(self, *args, **kwargs):
@@ -614,7 +623,7 @@ class Features(LineParser):
         return
 
 
-@Log.add_parser
+@Log.add_parser()
 class Options(LineParser):
 
     def __init__(self, *args, **kwargs):
@@ -637,7 +646,7 @@ class Options(LineParser):
             self.value += line.lstrip("# ")
 
 
-@Log.add_parser
+@Log.add_parser()
 class ChargeMultiplicity(LineParser):
 
     def __init__(self, *args, **kwargs):
@@ -654,7 +663,7 @@ class ChargeMultiplicity(LineParser):
             self.done = True
 
 
-@Log.add_parser
+@Log.add_parser()
 class HomoOrbital(LineParser):
 
     def __init__(self, *args, **kwargs):
@@ -676,7 +685,7 @@ class HomoOrbital(LineParser):
             self.done = True
 
 
-@Log.add_parser
+@Log.add_parser()
 class Energy(LineParser):
     UNITS = 'Hartrees'
 
@@ -711,7 +720,7 @@ class Energy(LineParser):
             self.prevline = line.strip()
 
 
-@Log.add_parser
+@Log.add_parser()
 class Time(LineParser):
     UNITS = 'Hours'
 
@@ -728,22 +737,7 @@ class Time(LineParser):
             self.done = True
 
 
-@Log.add_parser
-class ExcitationEnergy(LineParser):
-    UNITS = 'eV'
-
-    def __init__(self, *args, **kwargs):
-        super(ExcitationEnergy, self).__init__(*args, **kwargs)
-
-    @is_done
-    def parse(self, line):
-        # " Excited State   1:      Singlet-A      2.9126 eV  425.67 nm  f=0.7964  <S**2>=0.000"
-        if "Excited State   1:" in line:
-            self.value = line.split()[4]
-            self.done = True
-
-
-@Log.add_parser
+@Log.add_parser()
 class HOMO(LineParser):
     UNITS = 'eV'
 
@@ -763,7 +757,7 @@ class HOMO(LineParser):
             self.done = True
 
 
-@Log.add_parser
+@Log.add_parser()
 class LUMO(LineParser):
     UNITS = 'eV'
 
@@ -783,7 +777,7 @@ class LUMO(LineParser):
             self.done = True
 
 
-@Log.add_parser
+@Log.add_parser()
 class Geometry(LineParser):
     UNITS = 'Angstrom'
 
@@ -842,7 +836,7 @@ class Geometry(LineParser):
                 self.value += line.strip('\n')
 
 
-@Log.add_parser
+@Log.add_parser()
 class PartialGeometry(LineParser):
     UNITS = 'Angstrom'
 
@@ -883,7 +877,7 @@ class PartialGeometry(LineParser):
             # TODO THIS NEEDS self.done
 
 
-@Log.add_parser
+@Log.add_parser()
 class InputGeometry(LineParser):
     UNITS = 'Angstrom'
 
@@ -938,7 +932,7 @@ class InputGeometry(LineParser):
             self.value += ' '.join([x for x in temp if x]) + '\n'
 
 
-@Log.add_parser
+@Log.add_parser()
 class Header(LineParser):
 
     def __init__(self, *args, **kwargs):
@@ -962,7 +956,7 @@ class Header(LineParser):
                 self.value = self.value.strip()
 
 
-@Log.add_parser
+@Log.add_parser()
 class Dipole(LineParser):
     UNITS = 'Debye'
 
@@ -978,7 +972,7 @@ class Dipole(LineParser):
             self.done = True
 
 
-@Log.add_parser
+@Log.add_parser()
 class DipoleVector(LineParser):
     UNITS = 'Debye'
 
@@ -995,44 +989,73 @@ class DipoleVector(LineParser):
             self.done = True
 
 
-@Log.add_parser
-class ExcitationDipoleVector(LineParser):
-    UNITS = 'Au'
+def generate_excitation_parsers(n):
+    '''
+    Class generation to prevent duplicateing code for each excitation energy
+    '''
 
-    def __init__(self, *args, **kwargs):
-        super(ExcitationDipoleVector, self).__init__(*args, **kwargs)
-        self.start = False
-        self.value = '[]'
+    @Log.add_parser("ExcitationEnergy%d" % n)
+    class ExcitationEnergy(LineParser):
+        UNITS = 'eV'
 
-    @is_done
-    def parse(self, line):
-         # " Ground to excited state transition electric dipole moments (Au):"
-         # "       state          X           Y           Z        Dip. S.      Osc."
-         # "         1         1.0081     -0.2949      0.0000      1.1032      0.1299"
-        line = line.strip()
-        if "transition electric dipole" in line:
-            self.start = True
+        def __init__(self, *args, **kwargs):
+            super(ExcitationEnergy, self).__init__(*args, **kwargs)
+            self.n = n
 
-        if self.start and line.startswith("1"):
-            self.value = str([float(x) for x in line.split()[1:4]])
-            self.done = True
+        @is_done
+        def parse(self, line):
+            # " Excited State   1:      Singlet-A      2.9126 eV  425.67 nm  f=0.7964  <S**2>=0.000"
+            if "Excited State   %d:" % n in line:
+                self.value = line.split()[4]
+                self.done = True
+
+    @Log.add_parser("ExcitationDipoleVector%d" % n)
+    class ExcitationDipoleVector(LineParser):
+        UNITS = 'Au'
+
+        def __init__(self, *args, **kwargs):
+            super(ExcitationDipoleVector, self).__init__(*args, **kwargs)
+            self.start = False
+            self.value = '[]'
+            self.n = n
+
+        @is_done
+        def parse(self, line):
+            # " Ground to excited state transition electric dipole moments (Au):"
+            # "       state          X           Y           Z        Dip. S.      Osc."
+            # "         1         1.0081     -0.2949      0.0000      1.1032      0.1299"
+            line = line.strip()
+            if "transition electric dipole" in line:
+                self.start = True
+
+            if self.start and line.startswith(str(n)):
+                self.value = str([float(x) for x in line.split()[1:4]])
+                self.done = True
 
 
-@Log.add_parser
-class OscillatorStrength(LineParser):
+    @Log.add_parser("OscillatorStrength%d" % n)
+    class OscillatorStrength(LineParser):
 
-    def __init__(self, *args, **kwargs):
-        super(OscillatorStrength, self).__init__(*args, **kwargs)
+        def __init__(self, *args, **kwargs):
+            super(OscillatorStrength, self).__init__(*args, **kwargs)
+            self.n = n
 
-    @is_done
-    def parse(self, line):
-        # " Excited State   1:      Singlet-A      2.9126 eV  425.67 nm  f=0.7964  <S**2>=0.000"
-        if "Excited State   1:" in line:
-            self.value = line.split()[8][2:]
-            self.done = True
+        @is_done
+        def parse(self, line):
+            # " Excited State   1:      Singlet-A      2.9126 eV  425.67 nm  f=0.7964  <S**2>=0.000"
+            if "Excited State   %d:" % n in line:
+                self.value = line.split()[8][2:]
+                self.done = True
+
+    return ExcitationEnergy, ExcitationDipoleVector, OscillatorStrength
+
+# Generate class for first 3 excitations because they are included by default
+# in gaussian TD calculations
+for i in xrange(1, 4):
+    generate_excitation_parsers(i)
 
 
-@Log.add_parser
+@Log.add_parser()
 class SpatialExtent(LineParser):
     UNITS = 'Au'
 
@@ -1047,7 +1070,7 @@ class SpatialExtent(LineParser):
             self.done = True
 
 
-@Log.add_parser
+@Log.add_parser()
 class ForceVectors(LineParser):
     UNITS = 'eV/Angstrom'
 
@@ -1105,7 +1128,7 @@ class ForceVectors(LineParser):
                 self.value += ' '.join(use) + '\n'
 
 
-@Log.add_parser
+@Log.add_parser()
 class MullikenCharges(LineParser):
     UNITS = 'Au'
 
@@ -1139,7 +1162,7 @@ class MullikenCharges(LineParser):
             self.value += ' '.join(temp[1:]) + '\n'
 
 
-@Log.add_parser
+@Log.add_parser()
 class SumMullikenCharges(LineParser):
     UNITS = 'Au'
 
@@ -1176,7 +1199,7 @@ class SumMullikenCharges(LineParser):
             self.value += ' '.join(temp[:]) + '\n'
 
 
-@Log.add_parser
+@Log.add_parser()
 class StepNumber(LineParser):
 
     def __init__(self, *args, **kwargs):
