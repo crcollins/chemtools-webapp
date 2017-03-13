@@ -1024,8 +1024,9 @@ def generate_excitation_parsers(n):
             # " Ground to excited state transition electric dipole moments (Au):"
             # "       state          X           Y           Z        Dip. S.      Osc."
             # "         1         1.0081     -0.2949      0.0000      1.1032      0.1299"
-            line = line.strip()
-            if "transition electric dipole" in line:
+            # Lower case is required because some versions use "Transition"
+            line = line.strip().lower()
+            if "transition electric dipole" in line.lower():
                 self.start = True
 
             if self.start and line.startswith(str(n)):
