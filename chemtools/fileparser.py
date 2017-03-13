@@ -1005,7 +1005,7 @@ def generate_excitation_parsers(n):
         @is_done
         def parse(self, line):
             # " Excited State   1:      Singlet-A      2.9126 eV  425.67 nm  f=0.7964  <S**2>=0.000"
-            if "Excited State   %d:" % n in line:
+            if "Excited State   %d:" % self.n in line:
                 self.value = line.split()[4]
                 self.done = True
 
@@ -1029,7 +1029,7 @@ def generate_excitation_parsers(n):
             if "transition electric dipole" in line.lower():
                 self.start = True
 
-            if self.start and line.startswith(str(n)):
+            if self.start and line.startswith(str(self.n)):
                 self.value = str([float(x) for x in line.split()[1:4]])
                 self.done = True
 
@@ -1044,7 +1044,7 @@ def generate_excitation_parsers(n):
         @is_done
         def parse(self, line):
             # " Excited State   1:      Singlet-A      2.9126 eV  425.67 nm  f=0.7964  <S**2>=0.000"
-            if "Excited State   %d:" % n in line:
+            if "Excited State   %d:" % self.n in line:
                 self.value = line.split()[8][2:]
                 self.done = True
 
