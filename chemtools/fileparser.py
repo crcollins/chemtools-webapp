@@ -991,7 +991,7 @@ class DipoleVector(LineParser):
 
 def generate_excitation_parsers(n):
     '''
-    Class generation to prevent duplicateing code for each excitation energy
+    Class generation to prevent duplicating code for each excitation energy
     '''
 
     @Log.add_parser("ExcitationEnergy%d" % n)
@@ -1026,7 +1026,7 @@ def generate_excitation_parsers(n):
             # "         1         1.0081     -0.2949      0.0000      1.1032      0.1299"
             # Lower case is required because some versions use "Transition"
             line = line.strip().lower()
-            if "transition electric dipole" in line.lower():
+            if "transition electric dipole" in line:
                 self.start = True
 
             if self.start and line.startswith(str(self.n)):
