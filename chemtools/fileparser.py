@@ -238,6 +238,7 @@ class Log(object):
              "Time", "DipoleVector",
              "ExcitationDipoleVector1", "ExcitationDipoleVector2", "ExcitationDipoleVector3",
              "OscillatorStrength1", "OscillatorStrength2", "OscillatorStrength3",
+             "ExcitationType1", "ExcitationType2", "ExcitationType3",
              "SpatialExtent", "StepNumber"]
 
     def __init__(self, f, fname=None):
@@ -1009,6 +1010,7 @@ def generate_excitation_parsers(n):
                 self.value = line.split()[4]
                 self.done = True
 
+
     @Log.add_parser("ExcitationDipoleVector%d" % n)
     class ExcitationDipoleVector(LineParser):
         UNITS = 'Au'
@@ -1046,6 +1048,21 @@ def generate_excitation_parsers(n):
             # " Excited State   1:      Singlet-A      2.9126 eV  425.67 nm  f=0.7964  <S**2>=0.000"
             if "Excited State   %d:" % self.n in line:
                 self.value = line.split()[8][2:]
+                self.done = True
+
+
+    @Log.add_parser("ExcitationType%d" % n)
+    class ExcitationType(LineParser):
+
+        def __init__(self, *args, **kwargs):
+            super(ExcitationType, self).__init__(*args, **kwargs)
+            self.n = n
+
+        @is_done
+        def parse(self, line):
+            # " Excited State   1:      Singlet-A      2.9126 eV  425.67 nm  f=0.7964  <S**2>=0.000"
+            if "Excited State   %d:" % self.n in line:
+                self.value = line.split()[3]
                 self.done = True
 
     return ExcitationEnergy, ExcitationDipoleVector, OscillatorStrength
