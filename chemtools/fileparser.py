@@ -414,6 +414,7 @@ class Log(object):
                 use = parser.__name__
             else:
                 use = name
+                parser.__name__ = name
             cls.PARSERS[use] = parser
             return parser
         return inner
