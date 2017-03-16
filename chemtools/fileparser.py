@@ -1066,7 +1066,7 @@ def generate_excitation_parsers(n):
                 self.value = line.split()[3]
                 self.done = True
 
-    return ExcitationEnergy, ExcitationDipoleVector, OscillatorStrength
+    return ExcitationEnergy, ExcitationDipoleVector, OscillatorStrength, ExcitationType
 
 # Generate class for first 3 excitations because they are included by default
 # in gaussian TD calculations
