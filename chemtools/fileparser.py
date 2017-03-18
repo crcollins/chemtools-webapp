@@ -324,7 +324,7 @@ class Log(object):
 
     def previous_parsers_empty(self):
         prev = self.parsers[-1]
-        return prev["Energy"].done == False or prev["StepNumber"].done == False
+        return not prev["Energy"].done or not prev["StepNumber"].done
 
     def cleanup_name(self):
         name, _ = os.path.splitext(self.fname)
