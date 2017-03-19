@@ -3,7 +3,7 @@ import hashlib
 from itertools import product
 import csv
 
-from django.test import TestCase
+from django.test import SimpleTestCase
 from django.conf import settings
 from django.core.management import call_command
 import numpy
@@ -406,7 +406,7 @@ B 5 1 F
 PNG_HASH = "4cbf2c82970819ccbe66025fdbc627171af31571c96e06323a98c945"
 SVG_HASH = "c095979c874d01bd997ac6435b9e72a74e510060aad2df7ca4d58c1d"
 
-class StructureTestCase(TestCase):
+class StructureTestCase(SimpleTestCase):
     templates = [
         "{0}_TON",
         "CON_{0}",
@@ -736,7 +736,7 @@ class StructureTestCase(TestCase):
                 self.assertEqual(message, str(e))
 
 
-class NamedMoleculeTestCase(TestCase):
+class NamedMoleculeTestCase(SimpleTestCase):
     templates = [
         "{0}_TON",
         "CON_{0}",
@@ -916,7 +916,7 @@ class NamedMoleculeTestCase(TestCase):
         self.assertTrue(sum(diff13) < eps)
 
 
-class MolNameTestCase(TestCase):
+class MolNameTestCase(SimpleTestCase):
     pairs = [
         ('234', '2**3**4aaA**'),
         ('10234', '10**2**3**4aaA**'),
@@ -1153,13 +1153,13 @@ class MolNameTestCase(TestCase):
             self.assertEqual(res, expected)
 
 
-class ExtractorTestCase(TestCase):
+class ExtractorTestCase(SimpleTestCase):
 
     def test_extractor_command(self):
         call_command("extract")
 
 
-class MLTestCase(TestCase):
+class MLTestCase(SimpleTestCase):
 
     def test_get_core_features(self):
         cores = [
@@ -1200,7 +1200,7 @@ class MLTestCase(TestCase):
                          DECAY_DISTANCE_CORRECTION_FEATURE_VECTOR)
 
 
-class FileParserTestCase(TestCase):
+class FileParserTestCase(SimpleTestCase):
 
     def test_parse_files(self):
         base = os.path.join(settings.MEDIA_ROOT, "tests")
@@ -1450,7 +1450,7 @@ class FileParserTestCase(TestCase):
         self.assertEqual(test.format_output(errors=True), expected)
 
 
-class UtilsTestCase(TestCase):
+class UtilsTestCase(SimpleTestCase):
 
     def test_replace_geom_vars(self):
         geom, variables = METHANE.strip().split("\n\n")
@@ -1485,7 +1485,7 @@ class UtilsTestCase(TestCase):
             self.assertEqual(result, expected)
 
 
-class GraphTestCase(TestCase):
+class GraphTestCase(SimpleTestCase):
 
     def test_graph(self):
         # doesn't break
@@ -1538,7 +1538,7 @@ class GraphTestCase(TestCase):
             ["TON", '7', "CCC", '9', '4', "E/ZON"]))
 
 
-class RandomGenTestCase(TestCase):
+class RandomGenTestCase(SimpleTestCase):
     def test_random_names(self):
         names = [x for x in random_gen.random_names("2", "*",  flip=[''], n=1, max_layers=1)]
         self.assertEqual(names, ["2**"])
