@@ -10,11 +10,11 @@ use it.
 The parser is split into two main parts, the Log object and the LineParser
 objects. The Log object stores all of the parsers for a single log file. It
 also is responsible for formatting the output. The LineParser objects are then
-as their name implies, an object that reads a single line of the log file at 
+as their name implies, an object that reads a single line of the log file at
 a time. This distinction, makes it easy to add new properties to the parsing
 without affecting the other line parsers.
 
-The LineParsers themselves are designed to be typeless, specifically, 
+The LineParsers themselves are designed to be typeless, specifically,
 returning values as strings. This has a slight drawback when the parsers
 collect information with more complex types (such as vectors).
 """
