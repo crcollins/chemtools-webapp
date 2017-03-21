@@ -273,20 +273,17 @@ class Log(object):
             self.parsers = [self.setup_parsers()]
             self.parser_labels = [START]
             completed = False
-            started = False
             current_parsers = self.parsers[0]
             self.windows_file = False
+
+            for line in f:
+                if "******************************************" in line:
+                    break
 
             for line in f:
                 if '\r' in line:
                     line = line.replace('\r', '')
                     self.windows_file = True
-
-                if "******************************************" in line:
-                    started = True
-
-                if not started:
-                    continue
 
                 if "Normal termination of Gaussian" in line:
                     completed = True
