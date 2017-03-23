@@ -1116,6 +1116,9 @@ class UploadsTestCase(TestCase):
                             "---",
                             "---",
                             "---",
+                            "---",
+                            "---",
+                            "---",
                             "1800.4170",
                             "7"]
                 lines = [x for x in reader]
