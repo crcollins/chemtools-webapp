@@ -162,7 +162,7 @@ def convert_logs(logsets):
             nvals.append(num)
             homovals.append(parser["HOMO"])
             lumovals.append(parser["LUMO"])
-            gapvals.append(parser["ExcitationEnergy"])
+            gapvals.append(parser["ExcitationEnergy1"])
 
         f = StringIO(name=key)
         f.write(', '.join(nvals) + '\n')
