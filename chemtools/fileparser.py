@@ -666,6 +666,10 @@ class Options(LineParser):
             if "--------" in line:
                 self.done = True
                 return
+            elif "\\\\" in line:
+                # In block at end of file
+                self.done = True
+                line = line.split("\\\\")[0]
 
             self.value += line.lstrip("# ")
 
