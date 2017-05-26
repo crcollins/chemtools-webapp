@@ -25,10 +25,10 @@ import multiprocessing
 import logging
 
 try:
-    import numpy
     # Fix for issues with openblas and multiprocessing
     # https://mail.scipy.org/pipermail/numpy-discussion/2013-June/066885.html
     os.environ["OPENBLAS_NUM_THREADS"] = "1"
+    import numpy
 except ImportError:
     # If there is no numpy, we will just ignore it. This means that it will
     # not be able to convert standard orientation calculations.
