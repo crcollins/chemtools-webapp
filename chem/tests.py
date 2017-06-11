@@ -1108,7 +1108,7 @@ class UploadsTestCase(TestCase):
                             "---",
                             "---",
                             "---",
-                            "0.35",
+                            "0.357194444444",
                             "[0.0, 0.0, 0.0001]",
                             "[]",
                             "[]",
@@ -1123,7 +1123,7 @@ class UploadsTestCase(TestCase):
                             "7"]
                 lines = [x for x in reader]
                 results = lines[1][:4] + lines[1][5:]
-                self.assertEqual(results, expected)
+                self.assertEqual(expected, results)
 
     def test_log_parse_steps(self):
         test_path = os.path.join(settings.MEDIA_ROOT, "tests")

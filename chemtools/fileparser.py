@@ -763,7 +763,7 @@ class Time(LineParser):
         if 'Job cpu time' in line:
             # " Job cpu time:  0 days  1 hours 24 minutes  3.8 seconds."
             t = line.split()[3:][0::2]
-            con = (24., 1., 1 / 60., 1 / 3600)
+            con = (24., 1., 1 / 60., 1 / 3600.)
             self.value = str(sum(float(x) * con[i] for i, x in enumerate(t)))
             self.done = True
 
