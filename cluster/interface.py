@@ -147,7 +147,7 @@ def get_specific_jobs(credential, jobids):
     }
     try:
         results["cluster"] = credential.cluster.name
-        ssh = credential.get_ssh_connection()
+        credential.get_ssh_connection()
     except:
         results["error"] = "Invalid credential"
         results["cluster"] = None
@@ -253,14 +253,13 @@ def get_log_status(credential, names):
     try:
         results["cluster"] = credential.cluster.name
         ssh = credential.get_ssh_connection()
-        sftp = credential.get_sftp_connection()
     except:
         results["error"] = "Invalid credential"
         results["cluster"] = None
         logger.info("Invalid credential %s" % credential)
         return results
 
-    with ssh, sftp:
+    with ssh:
         status = []
         for name in names:
             path = "chemtools/done/%s.log" % name
