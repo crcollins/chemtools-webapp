@@ -63,11 +63,11 @@ KILL_ERROR = "You must be a staff user to kill a job."
 CRED_ERROR = "Invalid credential"
 
 
-def run_fake_job(credential):
+def run_fake_job(credential, length=0):
     gjfstring = "EMPTY"
-    jobstring = "sleep 0"
+    jobstring = "sleep %d" % length
     results = interface.run_job(credential, gjfstring, jobstring)
-    return results["jobid"]
+    return results
 
 
 class SSHPageTestCase(TestCase):
@@ -112,8 +112,8 @@ class SSHPageTestCase(TestCase):
 
     @skipUnless(server_exists(**SERVER), "Requires external test server.")
     def test_job_detail(self):
-        interface.run_job(self.credential2, '', 'sleep 10')
-        results = interface.get_all_jobs(self.user, self.cluster.name)
+        run_fake_job(self.credential2, 10)
+        results = interface.get_all_jobs([self.credential2])
 
         jobid = results[0]["jobs"][0][0]
         url = reverse(views.job_detail, args=(self.cluster.name, jobid))
@@ -167,7 +167,7 @@ class SSHPageTestCase(TestCase):
         r = self.client.login(**SUPER_USER_LOGIN)
         self.assertTrue(r)
 
-        jobid = run_fake_job(self.credential2)
+        jobid = run_fake_job(self.credential2)['jobid']
         data = {
             jobid: "on",
         }
@@ -575,7 +575,6 @@ class InterfaceTestCase(TestCase):
         super_user = get_user_model().objects.create_superuser(**SUPER_USER)
         super_user.save()
 
-
         self.cluster = models.Cluster(**CLUSTER)
         self.cluster.save()
         self.credential = models.Credential(
@@ -590,8 +589,8 @@ class InterfaceTestCase(TestCase):
         with self.credential2.get_ssh_connection() as ssh:
             ssh.exec_command(
                 "sudo chown root:root chemtools; sudo chmod 700 chemtools")
-            results = interface.run_job(
-                self.credential2, '', jobstring='sleep 0')
+
+            results = run_fake_job(self.credential2)
             ssh.exec_command(
                 "sudo chown vagrant:vagrant chemtools; chmod 775 chemtools")
             self.assertIn('mkdir: cannot create directory', results["error"])
@@ -605,7 +604,7 @@ class InterfaceTestCase(TestCase):
         self.assertEqual(results["error"], CRED_ERROR)
 
     def test_run_job(self):
-        results = interface.run_job(self.credential2, '', jobstring='sleep 0')
+        results = run_fake_job(self.credential2)
         self.assertEqual(results["error"], None)
 
     def test_run_jobs_staff_error(self):
@@ -633,7 +632,7 @@ class InterfaceTestCase(TestCase):
         self.assertIn("qsub -", results["failed"][0][1])
 
     def test_run_job_states(self):
-        results = interface.run_job(self.credential2, '', jobstring='sleep 10')
+        results = run_fake_job(self.credential2, 10)
         jobid = results["jobid"]
         self.assertEqual(results["error"], None)
         job = models.Job.objects.get(jobid=jobid)
@@ -655,13 +654,13 @@ class InterfaceTestCase(TestCase):
         self.assertEqual(results["error"], CRED_ERROR)
 
     def test_kill_jobs_run_through(self):
-        results = interface.run_job(self.credential2, '', jobstring='sleep 10')
+        results = run_fake_job(self.credential2, 10)
         jobid = results["jobid"]
         results = interface.kill_jobs(self.credential2, [jobid])
         self.assertEqual(results["error"], None)
 
     def test_kill_jobs_run_through_no_job(self):
-        results = interface.run_job(self.credential2, '', jobstring='sleep 10')
+        results = run_fake_job(self.credential2, 10)
         jobid = results["jobid"]
         models.Job.objects.filter(
             credential=self.credential2, jobid=jobid).delete()
@@ -683,7 +682,7 @@ class InterfaceTestCase(TestCase):
         self.assertEqual(results, expected)
 
     def test_get_all_jobs(self):
-        results = interface.get_all_jobs(self.user)
+        results = interface.get_all_jobs([self.credential])
         results[0]["jobs"] = []
         expected = [
             {
