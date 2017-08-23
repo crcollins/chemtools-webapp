@@ -8,6 +8,7 @@ from django.test import Client, TestCase
 from django.core.urlresolvers import reverse
 from django.contrib.auth import get_user_model
 from django.core.management import call_command
+import mock
 
 import views
 import models
@@ -15,7 +16,8 @@ import utils
 import interface
 from account.views import account_page
 from project.utils import get_sftp_connection, get_ssh_connection, AESCipher
-from project.utils import SSHClient, SFTPClient, server_exists
+from project.utils import SSHClient, SFTPClient
+from project.utils import StringIO
 
 
 SERVER = {
@@ -70,9 +72,38 @@ def run_fake_job(credential, length=0):
     return results
 
 
+def make_io_triplet(stdin='', stdout='', stderr=''):
+    return StringIO(stdin), StringIO(stdout), StringIO(stderr)
+
+
+def mock_exec_command(string):
+    if "qsub" in string:
+        stdout = "1337.hostname"
+    else:
+        stdout = ''
+    return make_io_triplet(stdout=stdout)
+
+
+def build_mock_connections(obj):
+    patcher_ssh = mock.patch('cluster.models.get_ssh_connection')
+    obj.addCleanup(patcher_ssh.stop)
+    patcher_sftp = mock.patch('cluster.models.get_sftp_connection')
+    obj.addCleanup(patcher_sftp.stop)
+
+    mock_ssh = mock.MagicMock(SSHClient, name='SSH', autospec=True)
+    mock_ssh.exec_command.side_effect = mock_exec_command
+    mock_sftp = mock.MagicMock(SFTPClient, name='SFTP', autospec=True)
+    mock_ssh_conn = patcher_ssh.start()
+    mock_sftp_conn = patcher_sftp.start()
+    mock_ssh_conn.return_value = mock_ssh
+    mock_sftp_conn.return_value = mock_sftp
+    return mock_ssh, mock_sftp
+
+
 class SSHPageTestCase(TestCase):
 
     def setUp(self):
+        self.mock_ssh, self.mock_sftp = build_mock_connections(self)
         user = get_user_model().objects.create_user(**USER)
         user.save()
         self.user = user
@@ -110,7 +141,6 @@ class SSHPageTestCase(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
-    @skipUnless(server_exists(**SERVER), "Requires external test server.")
     def test_job_detail(self):
         run_fake_job(self.credential2, 10)
         results = interface.get_all_jobs([self.credential2])
@@ -125,7 +155,6 @@ class SSHPageTestCase(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
-    @skipUnless(server_exists(**SERVER), "Requires external test server.")
     def test_job_detail_fail(self):
         url = reverse(views.job_detail, args=(self.cluster.name, 100000000000))
         response = self.client.get(url)
@@ -158,7 +187,6 @@ class SSHPageTestCase(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
-    @skipUnless(server_exists(**SERVER), "Requires external test server.")
     def test_kill_job(self):
         url = reverse(views.kill_job, args=(CLUSTER['name'], ))
         response = self.client.get(url)
@@ -174,7 +202,6 @@ class SSHPageTestCase(TestCase):
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, 302)
 
-    @skipUnless(server_exists(**SERVER), "Requires external test server.")
     def test_kill_job_invalid(self):
         url = reverse(views.kill_job, args=(CLUSTER['name'], ))
         response = self.client.get(url)
@@ -219,6 +246,7 @@ class SSHPageTestCase(TestCase):
 class SSHSettingsTestCase(TestCase):
 
     def setUp(self):
+        self.mock_ssh, self.mock_sftp = build_mock_connections(self)
         user = get_user_model().objects.create_user(**USER)
         test_path = os.path.join(settings.MEDIA_ROOT, "tests")
         with open(os.path.join(test_path, "id_rsa.pub"), 'r') as f:
@@ -271,7 +299,6 @@ class SSHSettingsTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn("Settings Successfully Saved", response.content)
 
-    @skipUnless(server_exists(**SERVER), "Requires external test server.")
     def test_add_credential_password(self):
         r = self.client.login(**USER_LOGIN)
         self.assertTrue(r)
@@ -309,7 +336,6 @@ class SSHSettingsTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn("Your passwords do not match", response.content)
 
-    @skipUnless(server_exists(**SERVER), "Requires external test server.")
     def test_add_credential_key(self):
         r = self.client.login(**USER_LOGIN)
         self.assertTrue(r)
@@ -327,7 +353,6 @@ class SSHSettingsTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn("Settings Successfully Saved", response.content)
 
-    @skipUnless(server_exists(**SERVER), "Requires external test server.")
     def test_test_credential(self):
         r = self.client.login(**USER_LOGIN)
         self.assertTrue(r)
@@ -354,19 +379,20 @@ class SSHSettingsTestCase(TestCase):
         r = self.client.login(**USER_LOGIN)
         self.assertTrue(r)
 
-        url = reverse(account_page, args=(USER["username"], "credentials"))
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        with mock.patch.object(models.Credential, 'connection_works',
+                               side_effect=[False]):
+            url = reverse(account_page, args=(USER["username"], "credentials"))
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 200)
 
-        data = {
-            "test": "on",
-            cred.get_long_name(): "on",
-        }
-        response = self.client.post(url, data)
-        self.assertEqual(response.status_code, 200)
-        self.assertIn('class="danger"', response.content)
+            data = {
+                "test": "on",
+                cred.get_long_name(): "on",
+            }
+            response = self.client.post(url, data)
+            self.assertEqual(response.status_code, 200)
+            self.assertIn('class="danger"', response.content)
 
-    @skipUnless(server_exists(**SERVER), "Requires external test server.")
     def test_test_credential_both(self):
         user = get_user_model().objects.get(username=USER["username"])
         cred = models.Credential(user=user,
@@ -377,19 +403,21 @@ class SSHSettingsTestCase(TestCase):
         r = self.client.login(**USER_LOGIN)
         self.assertTrue(r)
 
-        url = reverse(account_page, args=(USER["username"], "credentials"))
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        with mock.patch.object(models.Credential, 'connection_works',
+                               side_effect=[False, True]):
+            url = reverse(account_page, args=(USER["username"], "credentials"))
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 200)
 
-        data = {
-            "test": "on",
-            cred.get_long_name(): "on",
-            "vagrant@localhost:2222-1": "on",
-        }
-        response = self.client.post(url, data)
-        self.assertEqual(response.status_code, 200)
-        self.assertIn('class="danger"', response.content)
-        self.assertIn('class="success"', response.content)
+            data = {
+                "test": "on",
+                cred.get_long_name(): "on",
+                "vagrant@localhost:2222-1": "on",
+            }
+            response = self.client.post(url, data)
+            self.assertEqual(response.status_code, 200)
+            self.assertIn('class="danger"', response.content)
+            self.assertIn('class="success"', response.content)
 
     def test_delete_credential(self):
         r = self.client.login(**USER_LOGIN)
@@ -440,28 +468,24 @@ class SSHSettingsTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn("Settings Successfully Saved", response.content)
 
-    @skipUnless(server_exists(**SERVER), "Requires external test server.")
     def test_credential_ssh(self):
         with self.credential.get_ssh_connection():
             pass
         with self.credential2.get_ssh_connection():
             pass
 
-    @skipUnless(server_exists(**SERVER), "Requires external test server.")
     def test_credential_sftp(self):
         with self.credential.get_sftp_connection():
             pass
         with self.credential2.get_sftp_connection():
             pass
 
-    @skipUnless(server_exists(**SERVER), "Requires external test server.")
     def test_get_ssh_connection_obj(self):
         ssh = self.credential.get_ssh_connection()
         self.assertTrue(isinstance(ssh, SSHClient))
         obj = utils.get_ssh_connection_obj(self.credential)
         self.assertTrue(isinstance(obj, SSHClient))
 
-    @skipUnless(server_exists(**SERVER), "Requires external test server.")
     def test_get_ssh_connection_obj_SSHClient(self):
         ssh = self.credential.get_ssh_connection()
         self.assertEqual(utils.get_ssh_connection_obj(ssh), ssh)
@@ -471,14 +495,12 @@ class SSHSettingsTestCase(TestCase):
         with self.assertRaises(TypeError):
             utils.get_ssh_connection_obj(obj)
 
-    @skipUnless(server_exists(**SERVER), "Requires external test server.")
     def test_get_sftp_connection_obj(self):
         sftp = self.credential.get_sftp_connection()
         self.assertTrue(isinstance(sftp, SFTPClient))
         obj = utils.get_sftp_connection_obj(self.credential)
         self.assertTrue(isinstance(obj, SFTPClient))
 
-    @skipUnless(server_exists(**SERVER), "Requires external test server.")
     def test_get_sftp_connection_obj_SFTPClient(self):
         sftp = self.credential.get_sftp_connection()
         self.assertEqual(utils.get_sftp_connection_obj(sftp), sftp)
@@ -491,19 +513,32 @@ class SSHSettingsTestCase(TestCase):
 
 class UtilsTestCase(TestCase):
 
-    @skipUnless(server_exists(**SERVER), "Requires external test server.")
-    def test_get_sftp_password(self):
-        sftp = get_sftp_connection("localhost", "vagrant",
-                                   password="vagrant", port=2222)
+    @mock.patch('project.utils.paramiko')
+    @mock.patch('project.utils.SFTPClient')
+    def test_get_sftp_password(self, mock_sftp, mock_paramiko):
+        sftp = get_sftp_connection(SERVER['hostname'],
+                                   SERVER['username'],
+                                   password=SERVER['password'],
+                                   port=SERVER['port'])
+        expected = mock.call(password=SERVER['password'],
+                             username=SERVER['username'])
+        self.assertEqual(mock_paramiko.Transport().connect.call_args,
+                         expected)
+        mock_sftp.from_transport.assert_called_once()
         with sftp:
             pass
 
-    @skipUnless(server_exists(**SERVER), "Requires external test server.")
-    def test_get_sftp_key(self):
+    @mock.patch('project.utils.paramiko')
+    @mock.patch('project.utils.SFTPClient')
+    def test_get_sftp_key(self, mock_sftp, mock_paramiko):
         test_path = os.path.join(settings.MEDIA_ROOT, "tests")
         with open(os.path.join(test_path, "id_rsa"), 'r') as key:
-            sftp = get_sftp_connection("localhost", "vagrant",
-                                       key=key, port=2222)
+            sftp = get_sftp_connection(SERVER['hostname'], SERVER['username'],
+                                       key=key, port=SERVER['port'])
+            mock_paramiko.RSAKey.from_private_key.assert_called_once()
+            mock_connect = mock_paramiko.Transport().connect.call_args
+            self.assertEqual(mock_connect[1]['username'], SERVER['username'])
+            mock_sftp.from_transport.assert_called_once()
             with sftp:
                 pass
 
@@ -512,19 +547,31 @@ class UtilsTestCase(TestCase):
             with get_sftp_connection("localhost", "username"):
                 pass
 
-    @skipUnless(server_exists(**SERVER), "Requires external test server.")
-    def test_get_ssh_password(self):
+    @mock.patch('project.utils.SSHClient')
+    def test_get_ssh_password(self, mock_ssh):
         ssh = get_ssh_connection("localhost", "vagrant",
                                  password="vagrant", port=2222)
+
+        mock_connect = mock_ssh.mock_calls[-1]
+        self.assertEqual(mock_connect[1][0], SERVER['hostname'])
+        self.assertEqual(mock_connect[2]['password'], SERVER['password'])
+        self.assertEqual(mock_connect[2]['username'], SERVER['username'])
+        self.assertEqual(mock_connect[2]['port'], SERVER['port'])
         with ssh:
             pass
 
-    @skipUnless(server_exists(**SERVER), "Requires external test server.")
-    def test_get_ssh_key(self):
+    @mock.patch('project.utils.paramiko')
+    @mock.patch('project.utils.SSHClient')
+    def test_get_ssh_key(self, mock_ssh, mock_paramiko):
         test_path = os.path.join(settings.MEDIA_ROOT, "tests")
         with open(os.path.join(test_path, "id_rsa"), 'r') as key:
             ssh = get_ssh_connection("localhost", "vagrant",
                                      key=key, port=2222)
+            mock_paramiko.RSAKey.from_private_key.assert_called_once()
+            mock_connect = mock_ssh.mock_calls[-1]
+            self.assertEqual(mock_connect[1][0], SERVER['hostname'])
+            self.assertEqual(mock_connect[2]['username'], SERVER['username'])
+            self.assertEqual(mock_connect[2]['port'], SERVER['port'])
             with ssh:
                 pass
 
@@ -560,10 +607,10 @@ class UtilsTestCase(TestCase):
         self.assertRaises(TypeError, cipher.decrypt, ct)
 
 
-@skipUnless(server_exists(**SERVER), "Requires external test server.")
 class InterfaceTestCase(TestCase):
 
     def setUp(self):
+        self.mock_ssh, self.mock_sftp = build_mock_connections(self)
         self.user = get_user_model().objects.create_user(**USER)
         test_path = os.path.join(settings.MEDIA_ROOT, "tests")
         with open(os.path.join(test_path, "id_rsa.pub"), 'r') as f:
@@ -589,6 +636,10 @@ class InterfaceTestCase(TestCase):
         with self.credential2.get_ssh_connection() as ssh:
             ssh.exec_command(
                 "sudo chown root:root chemtools; sudo chmod 700 chemtools")
+
+            self.mock_ssh.exec_command.side_effect = [
+                make_io_triplet(stderr='mkdir: cannot create directory'),
+            ]
 
             results = run_fake_job(self.credential2)
             ssh.exec_command(
@@ -627,12 +678,29 @@ class InterfaceTestCase(TestCase):
         names = ['benz; ls files.gjf']
         gjfs = ['']
         job = 'sleep 0'
+        # first call is to mkdir
+        self.mock_ssh.exec_command.side_effect = [
+                make_io_triplet(),
+                make_io_triplet(stderr='qsub error'),
+        ]
         results = interface.run_jobs(
             self.credential2, names, gjfs, jobstring=job)
         self.assertIn("qsub -", results["failed"][0][1])
 
     def test_run_job_states(self):
         results = run_fake_job(self.credential2, 10)
+        string = "\n"
+        string += "yahead.chem.cmu.edu: \n"
+        string += "    Req'd  Req'd   Elap\n"
+        string += "Job ID Username Queue Jobname SessID NDS TSK Memory Time S Time\n"
+        string += "------------------------\n"
+        string += "1337.hostname vagrant batch name.job 24044 1 8 -- 5:0 %s 4:1\n"
+        self.mock_ssh.exec_command.side_effect = [
+                make_io_triplet(),
+                make_io_triplet(stdout=string % models.Job.RUNNING),
+                make_io_triplet(),
+                make_io_triplet(stdout=string % models.Job.COMPLETED),
+        ]
         jobid = results["jobid"]
         self.assertEqual(results["error"], None)
         job = models.Job.objects.get(jobid=jobid)
@@ -640,7 +708,6 @@ class InterfaceTestCase(TestCase):
         call_command("update_jobs")
         job = models.Job.objects.get(jobid=jobid)
         self.assertEqual(job.state, models.Job.RUNNING)
-        time.sleep(10)
         call_command("update_jobs")
         job = models.Job.objects.get(jobid=jobid)
         self.assertEqual(job.state, models.Job.COMPLETED)
@@ -702,6 +769,11 @@ class InterfaceTestCase(TestCase):
         self.assertEqual(results, expected)
 
     def test_get_all_log_data(self):
+        self.mock_ssh.exec_command.side_effect = [
+            make_io_triplet(stdout="chemtools/fileparser.py"),
+            make_io_triplet(),
+            make_io_triplet(stdout="Filename,..."),
+        ]
         results = interface.get_all_log_data(self.credential2)
         self.assertEqual(results["error"], None)
         self.assertIn("Filename", results["results"])
@@ -713,6 +785,12 @@ class InterfaceTestCase(TestCase):
                 f.write("import sys\n")
                 f.write("print('No module named argparse', file=sys.stderr)")
 
+        # Check with ls, and then fail twice when running fileparser
+        self.mock_ssh.exec_command.side_effect = [
+            make_io_triplet(stdout='chemtools/fileparser.py'),
+            make_io_triplet(stderr='No module named argparse'),
+            make_io_triplet(stderr='No module named argparse'),
+        ]
         results = interface.get_all_log_data(self.credential2)
         self.assertIn("No module named argparse", results["error"])
 
@@ -735,6 +813,12 @@ class InterfaceTestCase(TestCase):
                 f.write("import sys\n")
                 f.write("print('No module named argparse', file=sys.stderr)")
 
+        # Check with ls, and then fail twice when running fileparser
+        self.mock_ssh.exec_command.side_effect = [
+            make_io_triplet(stdout='chemtools/fileparser.py'),
+            make_io_triplet(stderr='No module named argparse'),
+            make_io_triplet(stderr='No module named argparse'),
+        ]
         results = interface.get_log_data(self.credential2, [""])
         self.assertIn("No module named argparse", results["error"])
 
@@ -750,10 +834,28 @@ class InterfaceTestCase(TestCase):
         self.assertEqual(results["error"], CRED_ERROR)
 
 
-@skipUnless(server_exists(**SERVER), "Requires external test server.")
 class ManagementTestCase(TestCase):
 
     def setUp(self):
+        self.mock_ssh, self.mock_sftp = build_mock_connections(self)
+
+        def get_filesystem_state(string):
+            if ".log" not in string:
+                return make_io_triplet(stdout='1337')
+            # Mapping of file system state messages
+            mapping = {
+                "done/walltime.log": ("", "tail: cannot open"),
+                "walltime.log": ("", ""),
+                "done/completed.log": ("Normal termination of Gaussian", ""),
+                "done/failed.log": ("", ""),
+                "done/missing.log": ("", "tail: cannot open"),
+                "missing.log": ("", "tail: cannot open"),
+            }
+            string = string.split()[-1].replace("chemtools/", "")
+            stdout, stderr = mapping.get(string, ("", ""))
+            return make_io_triplet(stdout=stdout, stderr=stderr)
+
+        self.mock_ssh.exec_command.side_effect = get_filesystem_state
         super_user = get_user_model().objects.create_superuser(**SUPER_USER)
         super_user.save()
 
@@ -762,11 +864,6 @@ class ManagementTestCase(TestCase):
         self.credential = models.Credential(
             user=super_user, cluster=self.cluster, **CREDENTIAL)
         self.credential.save()
-        with self.credential.get_ssh_connection() as ssh:
-            ssh.exec_command("touch chemtools/walltime.log")
-            ssh.exec_command("touch chemtools/done/failed.log")
-            c = "echo 'Normal termination of Gaussian' > chemtools/done/completed.log"
-            ssh.exec_command(c)
 
     def test_update_jobs(self):
         job = models.Job(credential=self.credential,
