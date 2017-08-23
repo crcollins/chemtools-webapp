@@ -1,17 +1,17 @@
 import os
-from unittest import skipUnless
 
 from django.test import Client, TestCase
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.contrib.auth import get_user_model
 from Crypto.PublicKey import RSA
+import mock
 
 import views
 import utils
 
 from cluster.models import Cluster, Credential
-from project.utils import server_exists
+from project.utils import SSHClient
 
 
 SERVER = {
@@ -275,7 +275,16 @@ class SettingsTestCase(TestCase):
             self.assertIn("The two password fields", response.content)
 
 
-@skipUnless(server_exists(**SERVER), "Requires external test server.")
+def build_mock_connections(obj):
+    patcher_ssh = mock.patch('cluster.models.get_ssh_connection')
+    obj.addCleanup(patcher_ssh.stop)
+
+    mock_ssh = mock.MagicMock(SSHClient, name='SSH', autospec=True)
+    mock_ssh_conn = patcher_ssh.start()
+    mock_ssh_conn.return_value = mock_ssh
+    return mock_ssh
+
+
 class SSHKeyTestCase(TestCase):
     cluster = {
         "name": "test-machine",
@@ -299,6 +308,7 @@ class SSHKeyTestCase(TestCase):
     }]
 
     def setUp(self):
+        self.mock_ssh = build_mock_connections(self)
         self.client = Client()
         for user in self.users:
             new_user = get_user_model().objects.create_user(user["username"],
@@ -337,15 +347,6 @@ class SSHKeyTestCase(TestCase):
             use_password=True)
         credential2.save()
         self.credential2 = credential2
-
-        s = "cp ~/.ssh/authorized_keys ~/.ssh/authorized_keys.chemtools.bak"
-        with self.credential.get_ssh_connection() as ssh:
-            ssh.exec_command(s)
-
-    def tearDown(self):
-        s = "cp ~/.ssh/authorized_keys.chemtools.bak ~/.ssh/authorized_keys"
-        with self.credential2.get_ssh_connection() as ssh:
-            ssh.exec_command(s)
 
     def test_change_ssh_key(self):
         user = self.users[1]

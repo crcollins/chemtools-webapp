@@ -3,15 +3,15 @@ import csv
 import zipfile
 import itertools
 import urllib
-from unittest import skipUnless
 import json
 
 from django.test import Client, TestCase
 from django.core.urlresolvers import reverse
 from django.contrib.auth import get_user_model
 from django.conf import settings
+import mock
 
-from project.utils import StringIO, server_exists
+from project.utils import StringIO, SSHClient, SFTPClient
 from data.models import DataPoint
 from account.models import CustomUser
 from cluster.models import Cluster, Credential
@@ -772,10 +772,37 @@ class PostsFailTestCase(TestCase):
             self.assertIn("has-error", value["job_form_html"])
 
 
-@skipUnless(server_exists(**SERVER), "Requires external test server.")
+def make_io_triplet(stdin='', stdout='', stderr=''):
+    return StringIO(stdin), StringIO(stdout), StringIO(stderr)
+
+
+def mock_exec_command(string):
+    if "qsub" in string:
+        stdout = "1337.hostname"
+    else:
+        stdout = ''
+    return make_io_triplet(stdout=stdout)
+
+
+def build_mock_connections(obj):
+    patcher_ssh = mock.patch('cluster.models.get_ssh_connection')
+    obj.addCleanup(patcher_ssh.stop)
+    patcher_sftp = mock.patch('cluster.models.get_sftp_connection')
+    obj.addCleanup(patcher_sftp.stop)
+
+    mock_ssh = mock.MagicMock(SSHClient, name='SSH', autospec=True)
+    mock_ssh.exec_command.side_effect = mock_exec_command
+    mock_sftp = mock.MagicMock(SFTPClient, name='SFTP', autospec=True)
+    mock_ssh_conn = patcher_ssh.start()
+    mock_sftp_conn = patcher_sftp.start()
+    mock_ssh_conn.return_value = mock_ssh
+    mock_sftp_conn.return_value = mock_sftp
+    return mock_ssh, mock_sftp
+
 class PostsTestCase(TestCase):
 
     def setUp(self):
+        self.mock_ssh, self.mock_sftp = build_mock_connections(self)
         self.client = Client()
         new_user = get_user_model().objects.create_superuser(**SUPER_USER)
         new_user.save()
@@ -1024,10 +1051,10 @@ class UtilsTestCase(TestCase):
         self.assertEqual(s.size, len(string))
 
 
-@skipUnless(server_exists(**SERVER), "Requires external test server.")
 class UtilsServerTestCase(TestCase):
 
     def setUp(self):
+        self.mock_ssh, self.mock_sftp = build_mock_connections(self)
         self.user = get_user_model().objects.create_user(**USER)
         test_path = os.path.join(settings.MEDIA_ROOT, "tests")
         with open(os.path.join(test_path, "id_rsa.pub"), 'r') as f:
