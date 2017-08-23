@@ -549,6 +549,7 @@ class UtilsTestCase(TestCase):
         cipher = AESCipher()
         string = "The quick brown fox jumps over the lazy dog."
         ct = cipher.encrypt(string)
+        self.assertNotEqual(ct, string)
         pt = cipher.decrypt(ct)
         self.assertEqual(pt, string)
 
