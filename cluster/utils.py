@@ -1,5 +1,6 @@
 import threading
 import logging
+from collections import defaultdict
 
 from project.utils import SSHClient, SFTPClient
 
@@ -90,7 +91,6 @@ def _make_folders(ssh):
 
 
 def add_fileparser(ssh, sftp):
-
     command = "ls chemtools/fileparser.py"
     _, stdout, stderr = ssh.exec_command(command)
     if stderr.read():
@@ -226,7 +226,7 @@ def get_jobs(credentials):
 
     clusters = [x for x in results if x]
     for cred, cluster in zip(credentials, clusters):
-        jobs = {}
+        jobs = defaultdict(list)
         jobids = []
         for job in cluster["jobs"]:
             status = job[-1]
@@ -234,10 +234,7 @@ def get_jobs(credentials):
             jobids.append(job_id)
             if not Job.objects.filter(jobid=job_id, credential=cred):
                 continue  # outside submited jobs not allowed
-            if status in jobs:
-                jobs[status].append(job_id)
-            else:
-                jobs[status] = [job_id]
+            jobs[status].append(job_id)
         running = Job.get_running_jobs(credential=cred)
         unknown = running.exclude(
             jobid__in=set(jobids)).values_list('jobid', flat=True)
