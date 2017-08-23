@@ -106,7 +106,6 @@ class SSHPageTestCase(TestCase):
         self.mock_ssh, self.mock_sftp = build_mock_connections(self)
         user = get_user_model().objects.create_user(**USER)
         user.save()
-        self.user = user
         super_user = get_user_model().objects.create_superuser(**SUPER_USER)
         super_user.save()
 
@@ -145,6 +144,7 @@ class SSHPageTestCase(TestCase):
         run_fake_job(self.credential2, 10)
         results = interface.get_all_jobs([self.credential2])
 
+        #  cred, ..., job0, id
         jobid = results[0]["jobs"][0][0]
         url = reverse(views.job_detail, args=(self.cluster.name, jobid))
         response = self.client.get(url)
@@ -293,7 +293,7 @@ class SSHSettingsTestCase(TestCase):
         name = models.Cluster.objects.filter(port=2222)[0].get_long_name()
         data = {
             "delete": "on",
-            name : "on",
+            name: "on",
         }
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, 200)
@@ -669,22 +669,20 @@ class InterfaceTestCase(TestCase):
     def test_run_jobs(self):
         names = ['test', 'test2']
         gjfs = ['', '']
-        job = 'sleep 0'
         results = interface.run_jobs(
-            self.credential2, names, gjfs, jobstring=job)
+            self.credential2, names, gjfs, jobstring='sleep 0')
         self.assertEqual(results["error"], None)
 
     def test_run_jobs_qsub_error(self):
         names = ['benz; ls files.gjf']
         gjfs = ['']
-        job = 'sleep 0'
         # first call is to mkdir
         self.mock_ssh.exec_command.side_effect = [
                 make_io_triplet(),
                 make_io_triplet(stderr='qsub error'),
         ]
         results = interface.run_jobs(
-            self.credential2, names, gjfs, jobstring=job)
+            self.credential2, names, gjfs, jobstring='sleep 0')
         self.assertIn("qsub -", results["failed"][0][1])
 
     def test_run_job_states(self):

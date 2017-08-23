@@ -135,8 +135,9 @@ def _run_job(ssh, sftp, gjfstring, jobstring=None, **kwargs):
         f2.write(jobstring)
         f2.close()
 
-        # TODO: Make this safer
-        s = "cd chemtools; qsub " + "%s.job" % name
+        # TODO: Make this safer, this should fail before
+        # TODO: Make test for failing before
+        s = "cd chemtools; qsub %s.job" % name
         _, stdout, stderr = ssh.exec_command(s)
         stderr = stderr.readlines()
         if stderr:
@@ -198,10 +199,7 @@ def _get_jobs(cred, cluster, i, results):
                 if t == []:
                     break
 
-                temp = []
-                for idx in colsidx:
-                    temp.append(t[idx])
-                temp[0] = temp[0].split('.')[0]
+                temp = [t[j] if j else t[j].split('.')[0] for j in colsidx]
                 jobs.append(temp)
         results[i] = {"name": cluster, "columns": WANTED_COLS, "jobs": jobs}
     except Exception:
