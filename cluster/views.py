@@ -30,7 +30,12 @@ def cluster_job_index(request, cluster):
 @login_required
 def get_job_list(request):
     cluster = request.REQUEST.get("cluster", "")
-    jobs = interface.get_all_jobs(request.user, cluster)
+    if cluster:
+        creds = request.user.credentials.filter(cluster__name__iexact=cluster)
+    else:
+        creds = request.user.credentials.all()
+
+    jobs = interface.get_all_jobs(creds)
     a = {
         "is_authenticated": request.user.is_authenticated(),
         "clusters": jobs,
@@ -165,6 +170,5 @@ def cluster_settings(request, username):
         "clusters": Cluster.get_clusters(request.user),
     }
     return render(request, "cluster/cluster_settings.html", c)
-
 
 

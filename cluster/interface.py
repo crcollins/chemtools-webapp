@@ -122,25 +122,19 @@ def kill_jobs(credential, jobids):
     return results
 
 
-def get_all_jobs(user, cluster=None):
-    if cluster:
-        creds = user.credentials.filter(cluster__name__iexact=cluster)
-    else:
-        creds = user.credentials.all()
-
+def get_all_jobs(credentials):
+    updates = [Job.get_oldest_update_time(credential=x) for x in credentials]
     # TUNABLE: change time constraint
-    temp = Job.get_oldest_update_time(user=user)
-    if (timezone.now() - temp).seconds > 60:
-        jobs = get_jobs(creds)
+    if any((timezone.now() - x).seconds > 60 for x in updates):
+        jobs = get_jobs(credentials)
     else:
         jobs = []
-        for cred in creds:
-            objs = Job.get_running_jobs()
-            temp = [x.format() for x in objs]
+        for cred in credentials:
+            objs = Job.get_running_jobs(credential=cred)
             jobs.append({
                 "name": cred.cluster.name,
                 "columns": WANTED_COLS,
-                "jobs": temp,
+                "jobs": [x.format() for x in objs],
             })
     return jobs
 
