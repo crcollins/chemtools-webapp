@@ -1,6 +1,4 @@
 import os
-from unittest import skipUnless
-import time
 import json
 
 from django.conf import settings
