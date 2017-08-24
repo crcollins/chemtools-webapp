@@ -11,7 +11,7 @@ import views
 import utils
 
 from cluster.models import Cluster, Credential
-from project.utils import SSHClient
+from project.utils import SSHClient, SFTPClient, StringIO
 
 
 SERVER = {
@@ -275,14 +275,26 @@ class SettingsTestCase(TestCase):
             self.assertIn("The two password fields", response.content)
 
 
+def mock_exec_command(string):
+    return StringIO(''), StringIO(''), StringIO('')
+
+
 def build_mock_connections(obj):
     patcher_ssh = mock.patch('cluster.models.get_ssh_connection')
     obj.addCleanup(patcher_ssh.stop)
+    patcher_sftp = mock.patch('cluster.models.get_sftp_connection')
+    obj.addCleanup(patcher_sftp.stop)
 
     mock_ssh = mock.MagicMock(SSHClient, name='SSH', autospec=True)
+    mock_ssh.__enter__().exec_command.side_effect = mock_exec_command
+    mock_sftp = mock.MagicMock(SFTPClient, name='SFTP', autospec=True)
+    mock_sftp.__enter__().open().__enter__().__iter__.return_value = iter(["not chemtools",
+                                                                  "chemtools-webapp"])
     mock_ssh_conn = patcher_ssh.start()
+    mock_sftp_conn = patcher_sftp.start()
     mock_ssh_conn.return_value = mock_ssh
-    return mock_ssh
+    mock_sftp_conn.return_value = mock_sftp
+    return mock_ssh, mock_sftp
 
 
 class SSHKeyTestCase(TestCase):
@@ -308,7 +320,7 @@ class SSHKeyTestCase(TestCase):
     }]
 
     def setUp(self):
-        self.mock_ssh = build_mock_connections(self)
+        self.mock_ssh, self.mock_sftp = build_mock_connections(self)
         self.client = Client()
         for user in self.users:
             new_user = get_user_model().objects.create_user(user["username"],
