@@ -92,7 +92,8 @@ def get_sftp_connection(hostname, username, key=None, password=None, port=22):
     return SFTPClient.from_transport(transport)
 
 
-def get_ssh_connection(hostname, username, key=None, password=None, port=22, timeout=None):
+def get_ssh_connection(hostname, username, key=None, password=None,
+                       port=22, timeout=None):
     if key is None and password is None:
         raise Exception("no key or password")
     client = SSHClient()

@@ -13,7 +13,6 @@ import mock
 
 from project.utils import StringIO, SSHClient, SFTPClient
 from data.models import DataPoint
-from account.models import CustomUser
 from cluster.models import Cluster, Credential
 from chemtools.constants import KEYWORDS
 import views
@@ -22,7 +21,8 @@ import utils
 from models import ErrorReport
 
 
-NAMES = ["24a_TON", "24b_TSP_24a_24a", "CON_24a", "A_TON_A_A", "TON_CCC", "EON"]
+NAMES = ["24a_TON", "24b_TSP_24a_24a",
+         "CON_24a", "A_TON_A_A", "TON_CCC", "EON"]
 BAD_NAMES = [
     ("2a_TON_CC", "no rgroups allowed on aryl0"),
     ("ASADA", "Bad Substituent Name(s): [u'S']"),
@@ -827,7 +827,6 @@ class PostsTestCase(TestCase):
             self.assertEqual(response.status_code, 200)
             url = reverse(views.molecule_detail, args=(name, ))
             response = self.client.post(url, options)
-
             results = json.loads(response.content)
             self.assertIsNone(results["error"])
             self.assertTrue(len(results["worked"]))
@@ -1065,7 +1064,6 @@ class UtilsServerTestCase(TestCase):
 
         super_user = get_user_model().objects.create_superuser(**SUPER_USER)
         super_user.save()
-
 
         self.cluster = Cluster(**CLUSTER)
         self.cluster.save()

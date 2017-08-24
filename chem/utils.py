@@ -58,7 +58,7 @@ def get_multi_molecule_status(string, autoflip=False):
             exact_spacer = name
         if exact_spacer not in unique_molecules:
             unique_molecules[exact_spacer] = [mol.name, error_report,
-                                            name_error, new]
+                                              name_error, new]
 
     return zip(*unique_molecules.values())
 
@@ -75,7 +75,7 @@ def run_standard_jobs(credential, string, mol_settings, job_settings):
         if not credential.user.is_staff:
             results["error"] = "You must be a staff user to submit a job."
             return results
-    except:
+    except Exception as e:
         results["error"] = "Invalid credential"
         results["cluster"] = None
         return results
