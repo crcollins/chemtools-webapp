@@ -31,8 +31,8 @@ def register_user(request):
         )
 
         new_user = get_user_model().objects.create_user(d["username"],
-                                            d["email"],
-                                            d["new_password1"])
+                                                        d["email"],
+                                                        d["new_password1"])
         new_user.is_active = False
 
         activation_key = utils.generate_key(d["username"])
@@ -106,7 +106,8 @@ def main_settings(request, username):
         d = dict(settings_form.cleaned_data)
         if request.user.email != d.get("email"):
             request.user.email = d.get("email")
-            logger.info("User '%s' updated email to %s." % (request.user.username, request.user.email))
+            logger.info("User '%s' updated email to %s." %
+                        (request.user.username, request.user.email))
             changed = True
 
         if d.get("new_ssh_keypair"):
@@ -116,16 +117,17 @@ def main_settings(request, username):
                     utils.update_all_ssh_keys(request.user, keys["public"])
                 except Exception as e:
                     logger.warn("User '%s' tried to update ssh keys and got an error: %s" % (username, str(e)))
+                    # TODO add failed state
                     pass
             request.user.public_key = keys["public"]
             request.user.private_key = keys["private"]
             logger.info("User '%s' updated ssh keys." % request.user.username)
             changed = True
 
-
         if d.get("xsede_username") != request.user.xsede_username:
             request.user.xsede_username = d.get("xsede_username")
-            logger.info("User '%s' updated xsede_username to %s." % (request.user.username, request.user.xsede_username))
+            logger.info("User '%s' updated xsede_username to %s." %
+                        (request.user.username, request.user.xsede_username))
             changed = True
 
     if changed:

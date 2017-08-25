@@ -288,8 +288,6 @@ def build_mock_connections(obj):
     mock_ssh = mock.MagicMock(SSHClient, name='SSH', autospec=True)
     mock_ssh.__enter__().exec_command.side_effect = mock_exec_command
     mock_sftp = mock.MagicMock(SFTPClient, name='SFTP', autospec=True)
-    mock_sftp.__enter__().open().__enter__().__iter__.return_value = iter(["not chemtools",
-                                                                  "chemtools-webapp"])
     mock_ssh_conn = patcher_ssh.start()
     mock_sftp_conn = patcher_sftp.start()
     mock_ssh_conn.return_value = mock_ssh
@@ -395,6 +393,9 @@ class SSHKeyTestCase(TestCase):
                                                  "settings")))
         self.assertEqual(response.status_code, 200)
 
+        opener = self.mock_sftp.__enter__().open()
+        opener.__enter__().__iter__.return_value = iter(["not chemtools",
+                                                         "chemtools-webapp"])
         initial = profile.public_key
         data = {"new_ssh_keypair": "on", "email": user["email"]}
         response = self.client.post(reverse(views.account_page,
