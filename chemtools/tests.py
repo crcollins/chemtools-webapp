@@ -16,8 +16,8 @@ import ml
 import structure
 import fileparser
 import graph
-import interface
 import random_gen
+from management.commands.update_ml import lock
 from project.utils import StringIO
 
 # TON
@@ -1157,6 +1157,43 @@ class ExtractorTestCase(SimpleTestCase):
 
     def test_extractor_command(self):
         call_command("extract")
+
+
+class UpdateMLTestCase(SimpleTestCase):
+
+    @mock.patch('os.remove')
+    def test_lock(self, mock_remove):
+        @lock
+        def test_function(x):
+            return x + x
+
+        mock_open = mock.mock_open()
+        with mock.patch('chemtools.management.commands.update_ml.open',
+                        mock_open, create=True):
+            ret = test_function(1)
+        self.assertEqual(ret, 2)
+        self.assertEqual(mock_remove.call_args[0], ('.updating_ml', ))
+        self.assertEqual(mock_open.call_args[0], ('.updating_ml', 'w'))
+
+    @mock.patch('os.path.exists', return_value=True)
+    def test_lock_exists(self, mock_exists):
+        @lock
+        def test_function(x):
+            return x + x
+
+        self.assertIsNone(test_function(1))
+
+    @mock.patch('os.remove')
+    def test_lock_exception(self, mock_remove):
+        @lock
+        def test_function(x):
+            raise ValueError('some error')
+
+        mock_open = mock.mock_open()
+        with mock.patch('chemtools.management.commands.update_ml.open',
+                        mock_open, create=True):
+            self.assertIsNone(test_function(1))
+            self.assertEqual(len(mock_remove.mock_calls), 1)
 
 
 class MLTestCase(SimpleTestCase):
