@@ -1,0 +1,42 @@
+{% extends "chem/base.html" %}
+
+{% block content %}
+{% for error in errors %}
+    <p>{{ error }}</p>
+{% endfor %}
+
+{% for filename, data, image in results %}
+<div class="col-lg text-center">
+<div class="table-responsive">
+    {{ filename }}
+    <br/>
+
+    {% for name, total, vert, vert_percent, horz, horz_percent in data %}
+    <table class="table">
+        <thead>
+            <td>{{ name }}</td>
+            <td>Raw</td>
+            <td>Percent</td>
+        </thead>
+        <tr>
+            <td>Vertical:</td>
+            <td>{{ vert|floatformat:2 }}</td><td>{{ vert_percent|floatformat:2 }}%</td>
+        </tr>
+        <tr>
+            <td>Horizontal:</td>
+            <td>{{ horz|floatformat:2 }}</td><td>{{ horz_percent|floatformat:2 }}%</td>
+        </tr>
+        <tr>
+            <td>Total:</td>
+            <td>{{ total|floatformat:2 }}</td><td></td>
+        </tr>
+    </table>
+    {% endfor %}
+    <br />
+    <img src="{{ image }}"></img>
+</div>
+</div>
+<hr>
+{% endfor %}
+{% endblock %}
+

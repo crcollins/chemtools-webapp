@@ -79,6 +79,7 @@ class UploadForm(forms.Form):
         ("longchain", "Long Chain Limit"),
         ("structureview", "Structure View"),
         ("gjfreset", "Gjf Reset"),
+        ("percent", "Percent"),
     )
     files = MultiFileField()
     options = forms.ChoiceField(widget=forms.RadioSelect, choices=CHOICES)

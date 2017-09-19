@@ -21,6 +21,7 @@ from chemtools import gjfwriter
 from chemtools import fileparser, dataparser
 from chemtools.mol_name import name_expansion
 from chemtools.interface import get_multi_molecule, get_multi_job
+from chemtools.percent import compute_axes_percents
 import cluster.interface
 from project.utils import StringIO
 from data import load_data
@@ -293,6 +294,7 @@ def upload_data(request):
         "longchain": long_chain_limit,
         "gjfreset": reset_gjf,
         "structureview": view_structure,
+        "percent": get_percent,
     }
 
     if request.method == "POST":
@@ -451,6 +453,17 @@ def view_structure(request, upload_form):
         "images": images,
     }
     return render(request, "chem/structure_view.html", c)
+
+def get_percent(request, upload_form):
+    results = []
+    for f in upload_form.cleaned_data["files"]:
+        homo, lumo, image = compute_axes_percents(f)
+        results.append((f.name, (homo, lumo), image))
+
+    c = {
+        "results": results,
+    }
+    return render(request, "chem/percent_view.html", c)
 
 ###########################################################
 ###########################################################
