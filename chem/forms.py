@@ -18,6 +18,9 @@ class MultiFileInput(forms.FileInput):
 
     def render(self, name, value, attrs={}):
         attrs['multiple'] = 'multiple'
+        # Hack to remove border from file upload box.
+        # This is removing "form-control" from class
+        attrs['class'] = ''
         return super(MultiFileInput, self).render(name, None, attrs=attrs)
 
     def value_from_datadict(self, data, files, name):
