@@ -82,7 +82,7 @@ def breadth_first_search(structure):
     return links, tree
 
 
-def graph_distance(structure, start, end):
+def graph_distance(start, end):
     point = start
     tree = Tree(point)
     visited = {tree.value: 0}
@@ -131,6 +131,8 @@ def prune_cycles(cycles, link_nodes):
         # [Link1, 0, Link2, 1, 2, Link2, Link1]
         # goes to [Link1, 0, Link2, Link2, Link1]
         start = temp.index(True, 1) + 1     # +1 include the second True value
+        # Hack to fix the issue with 3 link atoms listed
+        start -= sum(temp) % 2
         end = temp[::-1].index(True, 1) + 1
         final.append(cycle[:start] + cycle[-end:])
     return final
@@ -234,7 +236,7 @@ def identify_cycle_types(structure, cycles):
         lengths = [len(x) for x in cycle_group]
         if len(lengths) == 3:
             if lengths == [5, 6, 5]:
-                core = identify_core(structure, cycle_group)
+                core = identify_core(cycle_group)
                 types.append(core)
             elif lengths == [6, 5, 6]:
                 types.append("7")
@@ -242,7 +244,7 @@ def identify_cycle_types(structure, cycles):
                 types.append("10")
         elif len(lengths) == 2:
             if lengths == [6, 5]:
-                core = identify_core(structure, cycle_group)
+                core = identify_core(cycle_group)
                 types.append(core)
             else:
                 types.append("9")
@@ -252,7 +254,7 @@ def identify_cycle_types(structure, cycles):
     return types
 
 
-def identify_core(structure, fused_cycle):
+def identify_core(fused_cycle):
     pairs = []
     for ring in fused_cycle:
         temp = []
@@ -267,7 +269,7 @@ def identify_core(structure, fused_cycle):
     else:
         side1, name_atoms1 = identify_core_side(pairs[0])
         side2, name_atoms2 = identify_core_side(pairs[2])
-        dist = graph_distance(structure, name_atoms1[0], name_atoms2[0])
+        dist = graph_distance(name_atoms1[0], name_atoms2[0])
         if dist == 4:
             start = 'C'
         elif dist == 5:
