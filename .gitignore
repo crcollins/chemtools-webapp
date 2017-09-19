@@ -12,3 +12,5 @@ logfile.log*
 docs/static/*
 static/*
 temp/*
+play/*
+*.swp
