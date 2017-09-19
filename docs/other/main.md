@@ -54,6 +54,10 @@ Where lines starting with "#" are comments. The `n` values can be given as eithe
 
 The actual reading of information can also be done now using just the log files. If you upload a set of log files with `n1, n2, ... nN` somewhere in the filename these logs will be put together. Once together they will be parsed for the relevant data and the long chain limit will be calculated. This simplifies the process by not requiring the creation of a separate file just for the data.
 
+#### Structure View ####
+
+A simple option to view the structure of a gjf or log file. This displays a simplfied png of the molecule for quickly viewing without needing a proper molecule renderer. This also supports multiple molecules at the same time.
+
 
 #### Gjf Reset ####
 
@@ -61,6 +65,9 @@ This takes a log file and returns a gjf file with the extracted geometry. This i
 
 In addition to just being able to write out the gjf with the same parameters that were used to generate the log file, this also allows the creation of TDDFT files. If you are logged in, you can use this same mechanism to then submit the TDDFT calculation on the spot.
 
+#### Percent ####
+
+This is a feature implemented just for benzobisazole molecules. It also requires that the calculations used must have included the `pop=full`, `pop=regu`, or any other calculation that ouputs the Molecular Orbital Coefficients block in gaussian. With those requirements met, this will compute the percent of the HOMO and LUMO orbitals that are on the horizontal and vertical axes. It will also display a simple view of the molecule to show what atoms were placed in which group.
 
 ### Users ###
 #### Account ####
