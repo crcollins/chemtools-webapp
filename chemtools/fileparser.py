@@ -264,7 +264,7 @@ class Log(object):
              "ExcitationDipoleVector1", "ExcitationDipoleVector2", "ExcitationDipoleVector3",
              "OscillatorStrength1", "OscillatorStrength2", "OscillatorStrength3",
              "ExcitationType1", "ExcitationType2", "ExcitationType3",
-             "SpatialExtent", "StepNumber", "Polarizability"]
+             "SpatialExtent", "StepNumber", "Polarizability", "MP2Energy"]
 
     def __init__(self, f, fname=None):
         if not hasattr(f, "read"):  # filename
@@ -807,6 +807,33 @@ class Energy(LineParser):
 
         if "{0}HF=".format(self.delimiter) in modline:
             idx = modline.index("HF=") + 3
+            self.value = modline[idx:].split(self.delimiter)[0].strip()
+            self.start = True
+            if self.delimiter in modline[idx:]:
+                self.done = True
+        elif self.start:
+            self.value += line.split(self.delimiter)[0].strip()
+            if self.delimiter in line:
+                self.done = True
+        else:
+            self.prevline = line.strip()
+
+
+@Log.add_parser()
+class MP2Energy(LineParser):
+    UNITS = 'Hartrees'
+
+    def __init__(self, *args, **kwargs):
+        super(MP2Energy, self).__init__(*args, **kwargs)
+        self.start = False
+        self.prevline = ''
+
+    @is_done
+    def parse(self, line):
+        # " \HF=-316.5838826\MP2=-317.7864997\RMSD=2.767e-09\RMSF=1.655e-04\Dipole"
+        modline = self.prevline + line.strip()
+        if "{0}MP2=".format(self.delimiter) in modline:
+            idx = modline.index("MP2=") + 4
             self.value = modline[idx:].split(self.delimiter)[0].strip()
             self.start = True
             if self.delimiter in modline[idx:]:
