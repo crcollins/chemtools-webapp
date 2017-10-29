@@ -750,6 +750,40 @@ class Polarizability(LineParser):
             self.value = str(float(temp[0]) + float(temp[2]) + float(temp[5]))
 
 
+
+
+@Log.add_parser()
+class PolarizabilityMatrix(LineParser):
+    UNITS = 'Angstrom^3'
+
+    def __init__(self, *args, **kwargs):
+        super(PolarizabilityMatrix, self).__init__(*args, **kwargs)
+        self.start = False
+        self.prevline = ''
+
+    @is_done
+    def parse(self, line):
+        # " -09\Dipole=-0.5978252,-0.2679164,0.4957565\Polar=76.3129847,18.3406662                          # " ,55.0554933,3.8136524,3.491361,37.3385617\PG=C01 [X(C4H7N3)]\\@
+
+        modline = self.prevline + line.strip()
+
+        if "{0}Polar=".format(self.delimiter) in modline:
+            idx = modline.index("Polar=") + 6
+            self.value = modline[idx:].split(self.delimiter)[0].strip()
+            self.start = True
+            if self.delimiter in modline[idx:]:
+                self.done = True
+        elif self.start:
+            self.value += line.split(self.delimiter)[0].strip()
+            if self.delimiter in line:
+                self.done = True
+        else:
+            self.prevline = line.strip()
+
+        if self.done:
+            self.value = self.value.split(',')
+
+
 @Log.add_parser()
 class Energy(LineParser):
     UNITS = 'Hartrees'
