@@ -77,7 +77,6 @@ $(function() {
 {% endif %}
 
     <form multiple enctype="multipart/form-data" id="id_form" role="form" action="." method="post">
-        {% csrf_token %}
         <div id="id_upload_form">
             {% crispy upload_form %}
         </div>
