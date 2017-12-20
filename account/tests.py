@@ -407,6 +407,34 @@ class SSHKeyTestCase(TestCase):
         self.assertNotEqual(profile.public_key, initial)
         self.credential.get_ssh_connection()
 
+    def test_update_ssh_keys_fail(self):
+        user = self.users[0]
+        profile = get_user_model().objects.get(username=user["username"])
+        r = self.client.login(username=user["username"],
+                              password=user["new_password1"])
+        self.assertTrue(r)
+
+        response = self.client.get(reverse(views.account_page,
+                                           args=(user["username"],
+                                                 "settings")))
+        self.assertEqual(response.status_code, 200)
+
+        def mock_exec_command2(string):
+            print string
+            return StringIO(''), StringIO(''), StringIO('some cp error')
+
+        "Unable to update ssh key"
+        self.mock_ssh.__enter__().exec_command.side_effect = mock_exec_command2
+        initial = profile.public_key
+        data = {"new_ssh_keypair": "on", "email": user["email"]}
+        response = self.client.post(reverse(views.account_page,
+                                            args=(user["username"],
+                                                  "settings")),
+                                    data)
+        self.assertIn("Settings Successfully Saved", response.content)
+        profile = get_user_model().objects.get(username=user["username"])
+        self.assertNotEqual(profile.public_key, initial)
+        self.credential.get_ssh_connection()
 
 class LoginTestCase(TestCase):
 
