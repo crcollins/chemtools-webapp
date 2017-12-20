@@ -1341,3 +1341,20 @@ class UploadsTestCase(TestCase):
         }
         response = self.client.post(reverse(views.upload_data), data)
         self.assertEqual(response.status_code, 200)
+
+    def test_get_percent(self):
+        name = os.path.join(settings.MEDIA_ROOT, "tests", "4_TON_5_4.log")
+        with open(name, 'r') as log:
+            data = {
+                "files": log,
+                "options": "percent",
+            }
+            response = self.client.post(reverse(views.upload_data), data)
+            self.assertEqual(response.status_code, 200)
+            # HOMO Vert
+            self.assertIn("0.39", response.content)
+            self.assertIn("95.36%", response.content)
+            # LUMO Horz
+            self.assertIn("0.32", response.content)
+            self.assertIn("65.75%", response.content)
+
