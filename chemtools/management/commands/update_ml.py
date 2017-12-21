@@ -5,7 +5,6 @@ import cPickle
 from django.core.management.base import BaseCommand
 from django.core.files import File
 import numpy
-import scipy.optimize
 from sklearn import svm
 from sklearn import cross_validation
 from sklearn.metrics import mean_absolute_error
@@ -70,121 +69,62 @@ def scan(X, y, function, params):
     return train_results, test_results
 
 
-class OptimizedCLF(object):
+class MultiStageRegression(object):
+    def __init__(self, model=None):
+        if model is None:
+            model = svm.SVR
+        self.model = model
+        self._models = None
 
-    def __init__(self, X, y, func, params):
-        self.params = params
-        self.func = func
-        self.X = X
-        self.y = y
-        self.optimized_clf = None
-        self.optimized_params = None
+    def fit(self, X, y, sample_weight=None):
+        if len(y.shape) == 1:
+            y = y.reshape(y.shape[0], 1)
 
-    def __call__(self, *args):
-        a = dict(zip(self.params.keys(), *args))
-        clf = self.func(**a)
-        train, test = test_clf_kfold(self.X, self.y, clf, folds=5)
-        return test[0]
+        first_layer = []
+        predictions = []
+        for i in xrange(y.shape[1]):
+            m = self.model()
+            m.fit(X, y[:, i])
+            predictions.append(m.predict(X))
+            first_layer.append(m)
 
-    def get_optimized_clf(self):
-        if not len(self.params.keys()):
-            self.optimized_clf = self.func()
-        if self.optimized_clf is not None:
-            return self.optimized_clf
-        items = self.params.items()
-        types = set([list, tuple])
-        listparams = dict((k, v) for k, v in items if type(v) in types)
-        itemparams = dict((k, v) for k, v in items if type(v) not in types)
-        listvalues = []
-        itemvalues = []
-        if listparams:
-            _, test = scan(self.X, self.y, self.func, listparams)
-            listvalues = []
-            temp = numpy.unravel_index(test.argmin(), test.shape)
-            for i, pick in enumerate(listparams.values()):
-                listvalues.append(pick[temp[i]])
-            listvalues = listvalues[::-1]
-        if itemparams:
-            bounds = ((1e-8, None), ) * len(self.params.keys())
-            results = scipy.optimize.fmin_l_bfgs_b(
-                self,
-                self.params.values(),
-                bounds=bounds,
-                approx_grad=True,
-                epsilon=0.1,
-                maxiter=15,
-                maxfun=30,
-            )
-            itemvalues = results[0].tolist()
-        keys = listparams.keys() + itemparams.keys()
-        values = listvalues + itemvalues
-        self.optimized_params = dict(zip(keys, values))
-        self.optimized_clf = self.func(**self.optimized_params)
-        return self.optimized_clf
+        second_layer = []
+        for i in xrange(y.shape[1]):
+            added = predictions[:i] + predictions[i + 1:]
+            X_new = numpy.hstack([X] + added)
+            m = self.model()
+            m.fit(X_new, y[:, i])
+            second_layer.append(m)
+        self._models = [first_layer, second_layer]
+        return self
+
+    def predict(self, X):
+        if self._models is None:
+            raise ValueError("Model has not been fit")
+        predictions = []
+        for model in self._models[0]:
+            predictions.append(model.predict(X))
+
+        res = []
+        for i in xrange(len(predictions)):
+            added = predictions[:i] + predictions[i + 1:]
+            X_new = numpy.hstack([X] + added)
+            m = self._models[1][i]
+            res.append(m.predict(X_new))
+        return numpy.array(res)
 
 
-def fit_func(X, y, clf=None):
-    func = svm.SVR
-    if clf is None:
-        params = {"C": 10, "gamma": 0.05}
-    else:
-        print "Using previous clf"
-        params = {"C": clf.C, "gamma": clf.gamma}
-
-    clf = OptimizedCLF(X, y, func, params).get_optimized_clf()
-    train, test = test_clf_kfold(X, y, clf, folds=10)
-    clf.fit(X, y.T.tolist()[0])
-    clf.test_error = test
-    return clf
-
-
-def get_first_layer(X, homo, lumo, gap, in_clfs=None):
-    print "Creating first layer"
-    if in_clfs is not None:
-        in_homo_clf, in_lumo_clf, in_gap_clf = in_clfs
-    else:
-        in_homo_clf, in_lumo_clf, in_gap_clf = [None] * 3
-
-    homo_clf = fit_func(X, homo, clf=in_homo_clf)
-    lumo_clf = fit_func(X, lumo, clf=in_lumo_clf)
-    gap_clf = fit_func(X, gap, clf=in_gap_clf)
-    return homo_clf, lumo_clf, gap_clf
-
-
-def get_second_layer(X, homo, lumo, gap, clfs, in_pred_clfs=None):
-    print "Creating second layer"
-    if in_pred_clfs is not None:
-        in_pred_homo, in_pred_lumo, in_pred_gap = in_pred_clfs
-    else:
-        in_pred_homo, in_pred_lumo, in_pred_gap = [None] * 3
-
-    homo_clf, lumo_clf, gap_clf = clfs
-    homop = numpy.matrix(homo_clf.predict(X)).T
-    lumop = numpy.matrix(lumo_clf.predict(X)).T
-    gapp = numpy.matrix(gap_clf.predict(X)).T
-
-    X_homo = numpy.concatenate([X, lumop, gapp], 1)
-    X_lumo = numpy.concatenate([X, gapp, homop], 1)
-    X_gap = numpy.concatenate([X, homop, lumop], 1)
-
-    pred_homo_clf = fit_func(X_homo, homo, clf=in_pred_homo)
-    pred_lumo_clf = fit_func(X_lumo, lumo, clf=in_pred_lumo)
-    pred_gap_clf = fit_func(X_gap, gap, clf=in_pred_gap)
-    return pred_homo_clf, pred_lumo_clf, pred_gap_clf
-
-
-def save_clfs(clfs, pred_clfs):
+def save_model(model, errors):
     print "Saving clfs"
 
     with StringIO(name="decay_predictors.pkl") as f:
-        cPickle.dump((clfs, pred_clfs), f, protocol=-1)
+        cPickle.dump(model, f, protocol=-1)
         f.seek(0)
 
-        homo, lumo, gap = pred_clfs
         pred = Predictor(
-            homo_error=homo.test_error[0],
-            lumo_error=lumo.test_error[0],
-            gap_error=gap.test_error[0],
+            homo_error=errors[0],
+            lumo_error=errors[1],
+            gap_error=errors[2],
             pickle=File(f),
         )
         pred.save()
@@ -202,6 +142,8 @@ def run_all():
     print "Loading Data"
     FEATURE, HOMO, LUMO, GAP = DataPoint.get_all_data()
     in_clfs, in_pred_clfs = pred.get_predictors()
-    clfs = get_first_layer(FEATURE, HOMO, LUMO, GAP, in_clfs)
-    pred_clfs = get_second_layer(FEATURE, HOMO, LUMO, GAP, clfs, in_pred_clfs)
-    save_clfs(clfs, pred_clfs)
+    model = MultiStageRegression()
+    y = numpy.hstack([HOMO, LUMO, GAP])
+    model.fit(FEATURE, y)
+
+    save_model(model)
