@@ -70,32 +70,30 @@ def scan(X, y, function, params):
 
 
 class MultiStageRegression(object):
-    def __init__(self, model=None):
-        if model is None:
-            model = svm.SVR
+    def __init__(self, model=svm.SVR):
         self.model = model
-        self._models = None
+        self._first_layer = None
+        self._second_layer = None
 
     def fit(self, X, y, sample_weight=None):
         if len(y.shape) == 1:
             y = y.reshape(y.shape[0], 1)
 
-        first_layer = []
+        self._first_layer = []
         predictions = []
         for i in xrange(y.shape[1]):
             m = self.model()
             m.fit(X, y[:, i])
             predictions.append(m.predict(X))
-            first_layer.append(m)
+            self._first_layer.append(m)
 
-        second_layer = []
+        self._second_layer = []
         for i in xrange(y.shape[1]):
             added = predictions[:i] + predictions[i + 1:]
             X_new = numpy.hstack([X] + added)
             m = self.model()
             m.fit(X_new, y[:, i])
-            second_layer.append(m)
-        self._models = [first_layer, second_layer]
+            self._second_layer.append(m)
         return self
 
     def predict(self, X):
