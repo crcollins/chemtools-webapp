@@ -38,7 +38,7 @@ class Command(BaseCommand):
         run_all()
 
 
-def test_clf_kfold(X, y, clf, folds=10):
+def test_clf_kfold(X, y, clf, folds=5):
     train = numpy.zeros(folds)
     cross = numpy.zeros(folds)
     folds = cross_validation.KFold(y.shape[0], n_folds=folds)
@@ -138,10 +138,22 @@ def run_all():
         return
 
     print "Loading Data"
-    FEATURE, HOMO, LUMO, GAP = DataPoint.get_all_data()
-    in_clfs, in_pred_clfs = pred.get_predictors()
+    X, HOMO, LUMO, GAP = DataPoint.get_all_data()
     model = MultiStageRegression()
     y = numpy.hstack([HOMO, LUMO, GAP])
-    model.fit(FEATURE, y)
 
-    save_model(model)
+    n = X.shape[0]
+    split = int(0.9 * n)
+    idxs = np.arange(n)
+    np.random.shuffle(idxs)
+    train_idx = idxs[:split]
+    test_idx = idxs[split:]
+    X_train = X[train_idx, :]
+    X_test = X[test_idx, :]
+    y_train = y[train_idx, :]
+    y_test = y[test_idx, :]
+
+    model.fit(X_train, y_train)
+    errors = np.abs(model.predict(X_test) - y_test).mean(0)
+    save_model(model, errors)
+
