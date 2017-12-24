@@ -100,14 +100,13 @@ class MultiStageRegression(object):
         if self._models is None:
             raise ValueError("Model has not been fit")
         predictions = []
-        for model in self._models[0]:
+        for model in self._first_layer:
             predictions.append(model.predict(X))
 
         res = []
-        for i in xrange(len(predictions)):
+        for i, m in enumerate(self._second_layer):
             added = predictions[:i] + predictions[i + 1:]
             X_new = numpy.hstack([X] + added)
-            m = self._models[1][i]
             res.append(m.predict(X_new))
         return numpy.array(res)
 
