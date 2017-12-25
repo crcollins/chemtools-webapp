@@ -1,13 +1,13 @@
 import os
-import itertools
 import cPickle
 
 from django.core.management.base import BaseCommand
 from django.core.files import File
 import numpy
 from sklearn import svm
-from sklearn import cross_validation
+from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import mean_absolute_error
+import sklearn
 
 from data.models import DataPoint, Predictor
 from project.utils import StringIO
@@ -38,39 +38,8 @@ class Command(BaseCommand):
         run_all()
 
 
-def test_clf_kfold(X, y, clf, folds=5):
-    train = numpy.zeros(folds)
-    cross = numpy.zeros(folds)
-    folds = cross_validation.KFold(y.shape[0], n_folds=folds)
-    for i, (train_idx, test_idx) in enumerate(folds):
-        X_train = X[train_idx]
-        X_test = X[test_idx]
-        y_train = y[train_idx].T.tolist()[0]
-        y_test = y[test_idx].T.tolist()[0]
-        clf.fit(X_train, y_train)
-        train[i] = mean_absolute_error(clf.predict(X_train), y_train)
-        cross[i] = mean_absolute_error(clf.predict(X_test), y_test)
-    return (train.mean(), train.std()), (cross.mean(), cross.std())
-
-
-def scan(X, y, function, params):
-    size = [len(x) for x in params.values()]
-    train_results = numpy.zeros(size)
-    test_results = numpy.zeros(size)
-    keys = params.keys()
-    values = params.values()
-    for group in itertools.product(*values):
-        idx = tuple([a.index(b) for a, b in zip(values, group) if len(a) > 1])
-        a = dict(zip(keys, group))
-        clf = function(**a)
-        train, test = test_clf_kfold(X, y, clf)
-        train_results[idx] = train[0]
-        test_results[idx] = test[0]
-    return train_results, test_results
-
-
 class MultiStageRegression(object):
-    def __init__(self, model=svm.SVR):
+    def __init__(self, model=svm.SVR()):
         self.model = model
         self._first_layer = None
         self._second_layer = None
@@ -82,33 +51,33 @@ class MultiStageRegression(object):
         self._first_layer = []
         predictions = []
         for i in xrange(y.shape[1]):
-            m = self.model()
+            m = sklearn.clone(self.model)
             m.fit(X, y[:, i])
-            predictions.append(m.predict(X))
+            predictions.append(m.predict(X).reshape(-1, 1))
             self._first_layer.append(m)
 
         self._second_layer = []
         for i in xrange(y.shape[1]):
             added = predictions[:i] + predictions[i + 1:]
             X_new = numpy.hstack([X] + added)
-            m = self.model()
+            m = sklearn.clone(self.model)
             m.fit(X_new, y[:, i])
             self._second_layer.append(m)
         return self
 
     def predict(self, X):
-        if self._models is None:
+        if self._first_layer is None or self._second_layer is None:
             raise ValueError("Model has not been fit")
         predictions = []
         for model in self._first_layer:
-            predictions.append(model.predict(X))
+            predictions.append(model.predict(X).reshape(-1, 1))
 
         res = []
         for i, m in enumerate(self._second_layer):
             added = predictions[:i] + predictions[i + 1:]
             X_new = numpy.hstack([X] + added)
             res.append(m.predict(X_new))
-        return numpy.array(res)
+        return numpy.array(res).T
 
 
 def save_model(model, errors):
@@ -127,24 +96,36 @@ def save_model(model, errors):
         pred.save()
 
 
-@lock
+#@lock
 def run_all():
-    pred = Predictor.objects.latest()
-    latest = DataPoint.objects.latest()
+    #pred = Predictor.objects.latest()
+    #latest = DataPoint.objects.latest()
 
-    if latest.created < pred.created:
-        print "No Update"
-        return
+    #if latest.created < pred.created:
+    #    print "No Update"
+    #    return
 
-    print "Loading Data"
-    X, HOMO, LUMO, GAP = DataPoint.get_all_data()
-    model = MultiStageRegression()
+    #print "Loading Data"
+    #X, HOMO, LUMO, GAP = DataPoint.get_all_data()
+    n = 40
+    m = 5
+    X = numpy.random.rand(n, m)
+    homo_weights = numpy.arange(m)
+    lumo_weights = numpy.arange(m)
+    gap_weights = numpy.arange(m)
+    numpy.random.shuffle(homo_weights)
+    numpy.random.shuffle(lumo_weights)
+    numpy.random.shuffle(gap_weights)
+
+    HOMO = (X.dot(homo_weights) + numpy.random.randn(n)).reshape(-1, 1)
+    LUMO = (X.dot(lumo_weights) + numpy.random.randn(n)).reshape(-1, 1)
+    GAP = (X.dot(gap_weights) + numpy.random.randn(n)).reshape(-1, 1)
     y = numpy.hstack([HOMO, LUMO, GAP])
 
     n = X.shape[0]
     split = int(0.9 * n)
-    idxs = np.arange(n)
-    np.random.shuffle(idxs)
+    idxs = numpy.arange(n)
+    numpy.random.shuffle(idxs)
     train_idx = idxs[:split]
     test_idx = idxs[split:]
     X_train = X[train_idx, :]
@@ -152,7 +133,12 @@ def run_all():
     y_train = y[train_idx, :]
     y_test = y[test_idx, :]
 
+    params = {"gamma": [1e-9, 1e-7, 1e-5, 1e-3, 1e-1, 1e1],
+              "C": [1e-9, 1e-7, 1e-5, 1e-3, 1e-1, 1e1]}
+    inner_model = GridSearchCV(estimator=svm.SVR(kernel="rbf"),
+                               param_grid=params)
+    model = MultiStageRegression(model=inner_model)
     model.fit(X_train, y_train)
-    errors = np.abs(model.predict(X_test) - y_test).mean(0)
-    save_model(model, errors)
-
+    errors = numpy.abs(model.predict(X_test) - y_test).mean(0)
+    print errors
+    # save_model(model, errors)
