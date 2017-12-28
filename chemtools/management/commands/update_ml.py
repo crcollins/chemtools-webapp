@@ -97,30 +97,17 @@ def save_model(model, errors):
         pred.save()
 
 
-#@lock
-def run_all():
-    #pred = Predictor.objects.latest()
-    #latest = DataPoint.objects.latest()
+@lock
+def run_all(force=False):
+    pred = Predictor.objects.latest()
+    latest = DataPoint.objects.latest()
 
-    #if latest.created < pred.created:
-    #    print "No Update"
-    #    return
+    if not force and latest.created < pred.created:
+        print "No Update"
+        return
 
-    #print "Loading Data"
-    #X, HOMO, LUMO, GAP = DataPoint.get_all_data()
-    n = 40
-    m = 5
-    X = numpy.random.rand(n, m)
-    homo_weights = numpy.arange(m)
-    lumo_weights = numpy.arange(m)
-    gap_weights = numpy.arange(m)
-    numpy.random.shuffle(homo_weights)
-    numpy.random.shuffle(lumo_weights)
-    numpy.random.shuffle(gap_weights)
-
-    HOMO = (X.dot(homo_weights) + numpy.random.randn(n)).reshape(-1, 1)
-    LUMO = (X.dot(lumo_weights) + numpy.random.randn(n)).reshape(-1, 1)
-    GAP = (X.dot(gap_weights) + numpy.random.randn(n)).reshape(-1, 1)
+    print "Loading Data"
+    X, HOMO, LUMO, GAP = DataPoint.get_all_data()
     y = numpy.hstack([HOMO, LUMO, GAP])
 
     n = X.shape[0]
@@ -134,13 +121,14 @@ def run_all():
     y_train = y[train_idx, :]
     y_test = y[test_idx, :]
 
-    params = {"gamma": [1e-9, 1e-7, 1e-5, 1e-3, 1e-1, 1e1],
-              "C": [1e-9, 1e-7, 1e-5, 1e-3, 1e-1, 1e1]}
+    print "Building Model"
+    params = {"gamma": [1e-5, 1e-3, 1e-1, 1e1, 1e3],
+              "C": [1e-5, 1e-3, 1e-1, 1e1, 1e3]}
     inner_model = GridSearchCV(estimator=svm.SVR(kernel="rbf"),
                                param_grid=params)
     model = MultiStageRegression(model=inner_model)
     model.fit(X_train, y_train)
 
     errors = numpy.abs(model.predict(X_test) - y_test).mean(0)
-    print errors
-    # save_model(model, errors)
+    print "Errors:", errors
+    save_model(model, errors)
