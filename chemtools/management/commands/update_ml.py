@@ -30,11 +30,15 @@ def lock(func):
 
 
 class Command(BaseCommand):
-    args = ''
+    args = 'force'
     help = 'Update ML data'
 
     def handle(self, *args, **options):
-        run_all()
+        if not len(args):
+            force = False
+        else:
+            force = bool(args[0])
+        run_all(force=force)
 
 
 class MultiStageRegression(object):
