@@ -6,7 +6,6 @@ from django.core.files import File
 import numpy
 from sklearn import svm
 from sklearn.model_selection import GridSearchCV
-from sklearn.metrics import mean_absolute_error
 import sklearn
 
 from data.models import DataPoint, Predictor
@@ -17,7 +16,7 @@ def lock(func):
     def wrapper(*args, **kwargs):
         # Not very safe, but it will work well enough
         if os.path.exists(".updating_ml"):
-            print "Already running"
+            print "Already Running"
             return
         with open(".updating_ml", "w"):
             try:
@@ -78,13 +77,13 @@ class MultiStageRegression(object):
             raise ValueError("Model has not been fit")
 
         predictions = self._predict_inner(X, self._first_layer)
+        return numpy.hstack(predictions)
         res = self._predict_inner(X, self._second_layer, predictions)
         return numpy.hstack(res)
 
 
 def save_model(model, errors):
-    print "Saving clfs"
-
+    print "Saving Model"
     with StringIO(name="decay_predictors.pkl") as f:
         cPickle.dump(model, f, protocol=-1)
         f.seek(0)
