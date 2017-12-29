@@ -5,7 +5,7 @@ from django.core.management.base import BaseCommand
 from django.core.files import File
 import numpy
 from sklearn import svm
-from sklearn.model_selection import GridSearchCV
+from sklearn.model_selection import GridSearchCV, train_test_split
 
 from chemtools.ml import MultiStageRegression
 from data.models import DataPoint, Predictor
@@ -69,17 +69,7 @@ def run_all(force=False):
     X, HOMO, LUMO, GAP = DataPoint.get_all_data()
     y = numpy.hstack([HOMO, LUMO, GAP])
 
-    n = X.shape[0]
-    split = int(0.9 * n)
-    idxs = numpy.arange(n)
-    numpy.random.shuffle(idxs)
-    train_idx = idxs[:split]
-    test_idx = idxs[split:]
-    X_train = X[train_idx, :]
-    X_test = X[test_idx, :]
-    y_train = y[train_idx, :]
-    y_test = y[test_idx, :]
-
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1)
     print "Building Model"
     params = {"gamma": [1e-5, 1e-3, 1e-1, 1e1, 1e3],
               "C": [1e-5, 1e-3, 1e-1, 1e1, 1e3]}
