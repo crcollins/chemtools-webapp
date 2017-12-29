@@ -225,7 +225,7 @@ class NamedMolecule(Molecule):
         try:
             exact_name = self.get_exact_name(spacers=True)
             return get_decay_distance_correction_feature_vector(exact_name,
-                                                            **kwargs)
+                                                                **kwargs)
         except ValueError:
             return None
 
@@ -234,7 +234,8 @@ class NamedMolecule(Molecule):
         try:
             feature = [self.get_decay_feature_vector()]
             results = get_properties_from_decay_with_predictions(feature)
-        except ValueError:
+        except ValueError as e:
+            logger.info("Property prediction error: %s" % e)
             results = {}
         return results
 

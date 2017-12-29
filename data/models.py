@@ -121,7 +121,8 @@ class Predictor(models.Model):
 
 class JobTemplate(models.Model):
     name = models.CharField(max_length=60)
-    creator = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='templates', null=True)
+    creator = models.ForeignKey(settings.AUTH_USER_MODEL,
+                                related_name='templates', null=True)
     template = models.FileField(upload_to="job_templates")
 
     def read(self):
@@ -140,7 +141,8 @@ class JobTemplate(models.Model):
     @classmethod
     def get_templates(cls, user=None):
         if user is not None:
-            return JobTemplate.objects.filter(Q(creator=user) | Q(creator__isnull=True))
+            return JobTemplate.objects.filter(Q(creator=user) |
+                                              Q(creator__isnull=True))
         else:
             return JobTemplate.objects.filter(creator__isnull=True)
 
