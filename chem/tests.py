@@ -1017,6 +1017,7 @@ class UtilsTestCase(TestCase):
         results = utils.get_molecule_info_status(name)
         del results["features"]
         del results["property_predictions"]
+        del results["property_limits"]
         expected = {
             'molecule': '24a_TON',
             # 'property_predictions': (
@@ -1025,16 +1026,16 @@ class UtilsTestCase(TestCase):
             #     ("Excitation Energy", "gap", "eV", 3.4415766653971942),
             # ),
             'exact_name': '24aaA_TON_A_A_n1_m1_x1_y1_z1',
-            'property_limits': {
-                'm': [
-                    -5.5380175794413322,
-                    -2.3145802963818163,
-                    2.9191909229300554],
-                'n': [
-                    -5.74066757207639,
-                    -2.9489392195479147,
-                    2.5846925036411794]
-            },
+            #'property_limits': {
+            #    'm': [
+            #        -5.5380175794413322,
+            #        -2.3145802963818163,
+            #        2.9191909229300554],
+            #    'n': [
+            #        -5.74066757207639,
+            #        -2.9489392195479147,
+            #        2.5846925036411794]
+            #},
             'error_report': None,
             'name_error': None,
             'datapoints': [],
