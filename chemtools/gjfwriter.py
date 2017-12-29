@@ -232,7 +232,7 @@ class NamedMolecule(Molecule):
     @cache
     def get_property_predictions(self):
         try:
-            feature = self.get_decay_feature_vector()
+            feature = [self.get_decay_feature_vector()]
             results = get_properties_from_decay_with_predictions(feature)
         except ValueError:
             results = {}

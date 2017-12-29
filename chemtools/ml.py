@@ -148,27 +148,13 @@ def decay_function(distance, power=1, H=1, lacunarity=1):
 
 def get_properties_from_decay_with_predictions(feature):
     pred = Predictor.objects.latest()
-    clfs, pred_clfs = pred.get_predictors()
-    (HOMO_CLF, LUMO_CLF, GAP_CLF) = clfs
-    (PRED_HOMO_CLF, PRED_LUMO_CLF, PRED_GAP_CLF) = pred_clfs
+    model = pred.get_predictors()
 
-    homo = HOMO_CLF.predict(feature)[0]
-    lumo = LUMO_CLF.predict(feature)[0]
-    gap = GAP_CLF.predict(feature)[0]
-
-    feature_gap = numpy.concatenate([feature, [homo, lumo]])
-    feature_homo = numpy.concatenate([feature, [lumo, gap]])
-    feature_lumo = numpy.concatenate([feature, [gap, homo]])
-
-    gap = PRED_GAP_CLF.predict(feature_gap)
-    homo = PRED_HOMO_CLF.predict(feature_homo)
-    lumo = PRED_LUMO_CLF.predict(feature_lumo)
-
-    Property = namedtuple("Property", ("title", "short", "units", "value", "error"))
-
-    return [
-        Property("HOMO", "homo", "eV", homo[0], 0.09),
-        Property("LUMO", "lumo", "eV", lumo[0], 0.08),
-        Property("Excitation Energy", "gap", "eV", gap[0], 0.10),
-    ]
-
+    homo, lumo, gap = model.predict(feature)[0]
+    Property = namedtuple("Property", ("title", "short", "units", "value",
+                                       "error"))
+    return (
+        Property("HOMO", "homo", "eV", homo, pred.homo_error),
+        Property("LUMO", "lumo", "eV", lumo, pred.lumo_error),
+        Property("Excitation Energy", "gap", "eV", gap, pred.gap_error),
+    )

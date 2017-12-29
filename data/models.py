@@ -112,13 +112,11 @@ class Predictor(models.Model):
 
     def get_predictors(self):
         try:
-            return self.clfs, self.pred_clfs
+            return self.model
         except AttributeError:
-            logger.info("Loading a new clf pair")
-            clfs, pred_clfs = cPickle.load(self.pickle)
-            self.clfs = clfs
-            self.pred_clfs = pred_clfs
-            return clfs, pred_clfs
+            logger.info("Loading a new model")
+            self.model = cPickle.load(self.pickle)
+            return self.model
 
 
 class JobTemplate(models.Model):

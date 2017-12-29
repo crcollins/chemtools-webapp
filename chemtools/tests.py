@@ -870,8 +870,8 @@ class NamedMoleculeTestCase(SimpleTestCase):
 
     def test_get_property_limits(self):
         expected = {
-            'm': [-5.5869186860636297, -2.3643993898975104, 2.8965423408215436],
-            'n': [-5.8448639927073103, -3.0465275857469756, 2.5353557258137798],
+            'm': [-5.5238336014572944, -2.4292945255652385, 2.773031447100569],
+            'n': [-5.6668281822767339, -2.9182488959607396, 2.5468187207780622],
         }
         obj = gjfwriter.NamedMolecule("24b_TON")
         results = obj.get_property_limits()
@@ -880,7 +880,7 @@ class NamedMoleculeTestCase(SimpleTestCase):
     def test_get_property_limits_polymer(self):
         expected = {
             'm': [None, None, None],
-            'n': [-5.8448639927073103, -3.0465275857469756, 2.5353557258137798]
+            'n': [-5.6668281822767339, -2.9182488959607396, 2.5468187207780622]
         }
         obj = gjfwriter.NamedMolecule("24b_TON_n2")
         results = obj.get_property_limits()
