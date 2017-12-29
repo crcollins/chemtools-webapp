@@ -6,8 +6,8 @@ from django.core.files import File
 import numpy
 from sklearn import svm
 from sklearn.model_selection import GridSearchCV
-import sklearn
 
+from chemtools.ml import MultiStageRegression
 from data.models import DataPoint, Predictor
 from project.utils import StringIO
 
@@ -39,51 +39,6 @@ class Command(BaseCommand):
         else:
             force = bool(args[0])
         run_all(force=force)
-
-
-class MultiStageRegression(object):
-    def __init__(self, model=svm.SVR()):
-        self.model = model
-        self._first_layer = None
-        self._second_layer = None
-
-    def _fit_inner(self, X, y, predictions=None):
-        models = []
-        res = []
-        for i in xrange(y.shape[1]):
-            if predictions is not None:
-                added = predictions[:i] + predictions[i + 1:]
-                X = numpy.hstack([X] + added)
-            m = sklearn.clone(self.model)
-            m.fit(X, y[:, i])
-            res.append(m.predict(X).reshape(-1, 1))
-            models.append(m)
-        return models, res
-
-    def fit(self, X, y, sample_weight=None):
-        if len(y.shape) == 1:
-            y = y.reshape(y.shape[0], 1)
-        self._first_layer, predictions = self._fit_inner(X, y)
-        self._second_layer, _ = self._fit_inner(X, y, predictions)
-        return self
-
-    def _predict_inner(self, X, models, predictions=None):
-        res = []
-        for i, m in enumerate(models):
-            if predictions is not None:
-                added = predictions[:i] + predictions[i + 1:]
-                X = numpy.hstack([X] + added)
-            res.append(m.predict(X).reshape(-1, 1))
-        return res
-
-    def predict(self, X):
-        if self._first_layer is None or self._second_layer is None:
-            raise ValueError("Model has not been fit")
-
-        predictions = self._predict_inner(X, self._first_layer)
-        return numpy.hstack(predictions)
-        res = self._predict_inner(X, self._second_layer, predictions)
-        return numpy.hstack(res)
 
 
 def save_model(model, errors):
