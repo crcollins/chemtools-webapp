@@ -5,6 +5,6 @@ paramiko==1.12.1
 pycrypto==2.6.1
 scipy==0.15.1
 django-crispy-forms==1.4.0
-scikit-learn==0.14.1
+scikit-learn==0.19.1
 django-sslserver==0.12
 mock==2.0.0
