@@ -27,10 +27,12 @@ class MultiStageRegression(object):
         for i in xrange(y.shape[1]):
             if predictions is not None:
                 added = predictions[:i] + predictions[i + 1:]
-                X = numpy.hstack([X] + added)
+                X_new = numpy.hstack([X] + added)
+            else:
+                X_new = X
             m = sklearn.clone(self.model)
-            m.fit(X, y[:, i])
-            res.append(m.predict(X).reshape(-1, 1))
+            m.fit(X_new, y[:, i])
+            res.append(m.predict(X_new).reshape(-1, 1))
             models.append(m)
         return models, res
 
@@ -46,8 +48,10 @@ class MultiStageRegression(object):
         for i, m in enumerate(models):
             if predictions is not None:
                 added = predictions[:i] + predictions[i + 1:]
-                X = numpy.hstack([X] + added)
-            res.append(m.predict(X).reshape(-1, 1))
+                X_new = numpy.hstack([X] + added)
+            else:
+                X_new = X
+            res.append(m.predict(X_new).reshape(-1, 1))
         return res
 
     def predict(self, X):
@@ -55,7 +59,6 @@ class MultiStageRegression(object):
             raise ValueError("Model has not been fit")
 
         predictions = self._predict_inner(X, self._first_layer)
-        return numpy.hstack(predictions)
         res = self._predict_inner(X, self._second_layer, predictions)
         return numpy.hstack(res)
 
