@@ -26,7 +26,7 @@ exclude_lines =
     except ImportError:
     except:  # sometimes this times out
 # omit = */tests.py
-omit = project/wsgi.py,chemtools/update_ml.py,env/*
+omit = project/wsgi.py,env/*,play/*,chemtools/random_gen.py
 ignore_errors = True
 show_missing = True
 
