@@ -1200,6 +1200,20 @@ class UpdateMLTestCase(SimpleTestCase):
             self.assertEqual(len(mock_remove.mock_calls), 1)
 
 
+class Model(object):
+    def __init__(self):
+        self.weights = None
+
+    def get_params(self, *args, **kwargs):
+        return {}
+
+    def fit(self, X, y):
+        self.weights = numpy.ones(X.shape[1])
+
+    def predict(self, X):
+        return X.dot(self.weights)
+
+
 class MLTestCase(SimpleTestCase):
 
     def test_get_core_features(self):
@@ -1239,6 +1253,20 @@ class MLTestCase(SimpleTestCase):
         name = "A**_TON_2**4aa3**5aa2**5aa4aaA**_A**_n1_m1_x1_y1_z1"
         self.assertEqual(ml.get_decay_distance_correction_feature_vector(name),
                          DECAY_DISTANCE_CORRECTION_FEATURE_VECTOR)
+
+    def test_MultiStageRegression(self):
+        n = 5
+        m = 2
+        p = 3
+        res = m * p
+        X = numpy.ones((n, m)) + numpy.arange(n).reshape(-1, 1)
+        y = numpy.zeros((n, p))
+        m = ml.MultiStageRegression(model=Model())
+        m.fit(X, y)
+
+        col = numpy.arange(res, res * n + 1, res)
+        expected = numpy.tile(col, (p, 1)).T
+        self.assertTrue(numpy.allclose(m.predict(X), expected))
 
 
 class FileParserTestCase(SimpleTestCase):
