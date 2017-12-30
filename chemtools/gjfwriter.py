@@ -47,6 +47,7 @@ class Molecule(object):
     @cache
     def structure(self):
         return self._structure
+
     @structure.setter
     def structure(self, value):
         self._structure = value
@@ -87,7 +88,8 @@ class Molecule(object):
                 string += geometry
             else:
                 string += "\n\n--Link1--\n"
-                string += header_template.format(keywords=keywords, geom="geom=check guess=read")
+                string += header_template.format(keywords=keywords,
+                                                 geom="geom=check guess=read")
         return string
 
     def get_mol2(self):
@@ -255,4 +257,3 @@ class NamedMolecule(Molecule):
             "name_error": self.get_name_error(),
             "structure_type": self.get_structure_type(),
         }
-
