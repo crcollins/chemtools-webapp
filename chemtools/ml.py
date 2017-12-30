@@ -119,8 +119,8 @@ def get_end_decay(left, center, right, power=1, H=1, lacunarity=1):
             idx = both.index(char)
             if char in second and part == 2:
                 idx = both.index(char, idx + 1)
-            partfeatures[
-                idx] += decay_function(count + 1, power=power, H=H, lacunarity=lacunarity)
+            partfeatures[idx] += decay_function(count + 1, power=power,
+                                                H=H, lacunarity=lacunarity)
         endfeatures.extend(partfeatures)
     return endfeatures
 

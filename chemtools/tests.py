@@ -453,11 +453,11 @@ class StructureTestCase(SimpleTestCase):
 
     def test_draw_no_hydrogen(self):
         struct = structure.from_name("TON")
-        result = struct.draw(10, hydrogens=False)
+        struct.draw(10, hydrogens=False)
 
     def test_draw_no_fancy_bonds(self):
         struct = structure.from_name("TON")
-        result = struct.draw(10, fancy_bonds=False)
+        struct.draw(10, fancy_bonds=False)
 
     def test_get_center(self):
         struct = structure.from_name("TON")
@@ -508,7 +508,8 @@ class StructureTestCase(SimpleTestCase):
         path = os.path.join(settings.MEDIA_ROOT, "tests", "A_TON_A_A.gjf")
         s = structure.from_gjf(open(path, 'r'))
         self.assertEqual(
-            [x.strip() for x in s.gjf.split()], [x.strip() for x in STRUCTURE_GJF.split()])
+            [x.strip() for x in s.gjf.split()],
+            [x.strip() for x in STRUCTURE_GJF.split()])
 
     def test_from_log(self):
         path = os.path.join(settings.MEDIA_ROOT, "tests", "A_TON_A_A.log")
@@ -520,19 +521,20 @@ class StructureTestCase(SimpleTestCase):
         f = StringIO(string)
         s = structure.from_gjf(f)
         self.assertEqual(
-            [x.strip() for x in s.gjf.split()], [x.strip() for x in METHANE_ALL.split()])
+            [x.strip() for x in s.gjf.split()],
+            [x.strip() for x in METHANE_ALL.split()])
 
     def test_from_gjf_invalid_header(self):
         string = "%chk=c#hk.chk\nasd\n\nTitle\n\n0 1" + METHANE_REPLACED
         f = StringIO(string)
         with self.assertRaises(Exception):
-            s = structure.from_gjf(f)
+            structure.from_gjf(f)
 
     def test_from_gjf_invalid_sections(self):
         string = "%chk=chk.chk\n# hf geom=(connectivity,modredundant)\n\nTitle\n\n0 1"
         f = StringIO(string)
         with self.assertRaises(Exception):
-            s = structure.from_gjf(f)
+            structure.from_gjf(f)
 
     def test_from_gjf_bonds(self):
         string = "%chk=chk.chk\n# hf geom=connectivity\n\nTitle\n\n0 1" + \
@@ -540,41 +542,46 @@ class StructureTestCase(SimpleTestCase):
         f = StringIO(string)
         s = structure.from_gjf(f)
         self.assertEqual(
-            [x.strip() for x in s.gjf.split()], [x.strip() for x in STRUCTURE_GJF.split()])
+            [x.strip() for x in s.gjf.split()],
+            [x.strip() for x in STRUCTURE_GJF.split()])
 
     def test_from_gjf_parameters(self):
         string = "%chk=chk.chk\n# hf\n\nTitle\n\n0 1" + METHANE
         f = StringIO(string)
         s = structure.from_gjf(f)
         self.assertEqual(
-            [x.strip() for x in s.gjf.split()], [x.strip() for x in METHANE_ALL.split()])
+            [x.strip() for x in s.gjf.split()],
+            [x.strip() for x in METHANE_ALL.split()])
 
     def test_from_gjf_zmatrix(self):
         string = "%chk=chk.chk\n# hf\n\nTitle\n\n0 1" + METHANE
         f = StringIO(string)
         s = structure.from_gjf(f)
         self.assertEqual(
-            [x.strip() for x in s.gjf.split()], [x.strip() for x in METHANE_ALL.split()])
+            [x.strip() for x in s.gjf.split()],
+            [x.strip() for x in METHANE_ALL.split()])
 
     def test_from_gjf_redundant(self):
         string = METHANE_FREEZE
         f = StringIO(string)
         s = structure.from_gjf(f)
         self.assertEqual(
-            [x.strip() for x in s.gjf.split()], [x.strip() for x in METHANE_ALL.split()])
+            [x.strip() for x in s.gjf.split()],
+            [x.strip() for x in METHANE_ALL.split()])
 
     def test_from_gjf_redundant_no_parameters(self):
         string = METHANE_FREEZE2
         f = StringIO(string)
         s = structure.from_gjf(f)
         self.assertEqual(
-            [x.strip() for x in s.gjf.split()], [x.strip() for x in METHANE_ALL.split()])
+            [x.strip() for x in s.gjf.split()],
+            [x.strip() for x in METHANE_ALL.split()])
 
     def test_from_gjf_too_many_first(self):
         string = METHANE_FREEZE.replace("modredundant", "") + METHANE
         f = StringIO(string)
         with self.assertRaises(Exception):
-            s = structure.from_gjf(f)
+            structure.from_gjf(f)
 
     def test_cores(self):
         for core in self.cores:
@@ -855,9 +862,6 @@ class NamedMoleculeTestCase(SimpleTestCase):
         expected = 'C8H4N2O2'
         self.assertEqual(value, expected)
 
-    def test_build_perturb(self):
-        obj = gjfwriter.NamedMolecule("TON", perturb=0.1)
-
     # def test_get_png_data_url(self):
     #     obj = gjfwriter.NamedMolecule("TON")
     #     string = obj.get_png_data_url()
@@ -906,8 +910,8 @@ class NamedMoleculeTestCase(SimpleTestCase):
         diff12 = []
         diff13 = []
         for atom1, atom2, atom3 in zip(obj1.structure.atoms,
-                                    obj2.structure.atoms,
-                                    obj3.structure.atoms):
+                                       obj2.structure.atoms,
+                                       obj3.structure.atoms):
             diff12.append(numpy.linalg.norm(atom1.xyz - atom2.xyz))
             diff13.append(numpy.linalg.norm(atom1.xyz - atom3.xyz))
 
