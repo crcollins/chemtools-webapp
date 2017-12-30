@@ -19,6 +19,7 @@ import graph
 import random_gen
 from management.commands.update_ml import lock
 from project.utils import StringIO
+from data.models import DataPoint
 
 # TON
 NAIVE_FEATURE_VECTOR = [
@@ -405,6 +406,18 @@ B 5 1 F
 # hashlib.sha224(string).hexdigest()
 PNG_HASH = "4cbf2c82970819ccbe66025fdbc627171af31571c96e06323a98c945"
 SVG_HASH = "c095979c874d01bd997ac6435b9e72a74e510060aad2df7ca4d58c1d"
+DATA_POINT = {
+    "name": "A_TON_A_A",
+    "exact_name": "A_TON_A_A_n1_m1_x1_y1_z1",
+    "options": "td B3LYP/6-31g(d) geom=connectivity",
+    "homo": -6.460873931,
+    "lumo": -1.31976745,
+    "homo_orbital": 41,
+    "dipole": 0.0006,
+    "energy": -567.1965205,
+    "band_gap": 4.8068,
+}
+
 
 class StructureTestCase(SimpleTestCase):
     templates = [
@@ -1165,6 +1178,9 @@ class ExtractorTestCase(SimpleTestCase):
 
 class UpdateMLTestCase(SimpleTestCase):
 
+    def setUp(self):
+        DataPoint(**DATA_POINT).save()
+
     @mock.patch('os.remove')
     def test_lock(self, mock_remove):
         @lock
@@ -1198,6 +1214,15 @@ class UpdateMLTestCase(SimpleTestCase):
                         mock_open, create=True):
             self.assertIsNone(test_function(1))
             self.assertEqual(len(mock_remove.mock_calls), 1)
+
+    @mock.patch('data.models.DataPoint.get_all_data')
+    def test(self, get_all_data):
+        X = numpy.random.rand(10, 2)
+        HOMO = numpy.random.rand(10, 1)
+        LUMO = numpy.random.rand(10, 1)
+        GAP = numpy.random.rand(10, 1)
+        get_all_data.return_value = X, HOMO, LUMO, GAP
+        call_command("update_ml")
 
 
 class Model(object):
