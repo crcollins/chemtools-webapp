@@ -9,7 +9,8 @@ from models import DataPoint, FeatureVector
 
 def get_mapping(header):
     keys = ('Name', 'Options', 'Occupied', 'HOMO', 'Virtual', 'LUMO',
-            'HomoOrbital', 'Dipole', 'Energy', 'ExcitationEnergy1', 'BandGap', 'Time')
+            'HomoOrbital', 'Dipole', 'Energy', 'ExcitationEnergy1',
+            'BandGap', 'Excited', 'Time')
     mapping = {x: None for x in keys}
     cleaned = [x.split('(')[0].strip() for x in header]
     for j, value in enumerate(cleaned):
@@ -19,16 +20,19 @@ def get_mapping(header):
     duplicates = (
                     ('HOMO', 'Occupied'),
                     ('LUMO', 'Virtual'),
-                    ('ExcitationEnergy1', 'BandGap')
+                    ('ExcitationEnergy1', 'Excited', 'BandGap')
     )
-    for x, y in duplicates:
-        if mapping[x] is not None and mapping[y] is not None:
-            if mapping[x] != mapping[y]:
-                raise ValueError('The two mapping values do not match.')
+    for groups in duplicates:
+        if all(mapping[x] is not None for x in groups):
+            first = mapping[groups[0]]
+            if any(first != mapping[x] for x in groups[1:]):
+                raise ValueError('The mapping values do not match.')
         else:
-            value = mapping[x] or mapping[y]
-            mapping[x] = value
-            mapping[y] = value
+            values = [mapping[x] for x in groups if mapping[x] is not None]
+            if not len(values):
+                continue
+            for x in groups:
+                mapping[x] = values[0]
     return mapping
 
 
@@ -51,7 +55,7 @@ def main(csvfile):
         if not i:
             mapping = get_mapping(row)
             continue
-        if row == [] or len(row) < len(mapping):
+        if row == [] or len(row) < max(mapping.values()):
             continue
         try:
             try:
