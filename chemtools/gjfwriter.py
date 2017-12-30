@@ -4,11 +4,8 @@ import base64
 import logging
 import re
 
-import numpy
-from numpy.linalg import norm
-
 import structure
-from constants import KEYWORDS, NUMBERS
+from constants import KEYWORDS
 from mol_name import get_exact_name, autoflip_name, get_structure_type
 from ml import get_decay_distance_correction_feature_vector, \
     get_binary_feature_vector, get_decay_feature_vector, \
@@ -122,40 +119,6 @@ class Molecule(object):
 
     def get_json(self):
         return self.structure.json
-
-    @cache
-    def get_coulomb_matrix(self):
-        coords = []
-        other = []
-
-        for atom in self.structure.atoms:
-            coords.append(atom.xyz)
-            other.append(NUMBERS[atom.element])
-
-        N = len(self.structure.atoms)
-        data = numpy.matrix(numpy.zeros((N, N)))
-        for i, x in enumerate(coords):
-            for j, y in enumerate(coords[:i]):
-                val = (other[i] * other[j]) / norm(x - y)
-                data[i, j] = val
-                data[j, i] = val
-
-        diag = [0.5 * x ** 2.4 for x in other]
-        for i, x in enumerate(diag):
-            data[i, i] = x
-
-        return data
-
-    @cache
-    def get_coulomb_matrix_feature(self):
-        data = self.get_coulomb_matrix()
-        vector = []
-        end = []
-        for i in xrange(data.shape[0]):
-            for j in xrange(0, i):
-                vector.append(data[i, j])
-            end.append(data[i, i])
-        return vector + end
 
     def get_element_counts(self):
         elems = [x.element for x in self.structure.atoms]
