@@ -1,4 +1,9 @@
+import logging
+
 from constants import CORE_COMBO, CORE_FREE
+
+
+logger = logging.getLogger(__name__)
 
 
 class Tree(object):
@@ -127,6 +132,8 @@ def prune_cycles(cycles, link_nodes):
         if sum(temp) <= 2:
             final.append(cycle)
             continue
+        if sum(temp) == 3:
+            logger.warning("Something is not right")
 
         # [Link1, 0, Link2, 1, 2, Link2, Link1]
         # goes to [Link1, 0, Link2, Link2, Link1]
