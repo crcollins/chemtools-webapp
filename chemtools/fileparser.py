@@ -602,6 +602,21 @@ class LineParser(object):
     def __str__(self):
         return str(self.value)
 
+    def find_in_end_block(self, key, line):
+        modline = self.prevline + line.strip()
+
+        if "{0}{1}=".format(self.delimiter, key) in modline:
+            idx = modline.index(key + "=") + len(key) + 1
+            self.value = modline[idx:].split(self.delimiter)[0].strip()
+            self.start = True
+            if self.delimiter in modline[idx:]:
+                self.done = True
+        elif self.start:
+            self.value += line.split(self.delimiter)[0].strip()
+            if self.delimiter in line:
+                self.done = True
+        else:
+            self.prevline = line.strip()
 
 ##############################################################################
 ##############################################################################
@@ -729,27 +744,12 @@ class Polarizability(LineParser):
     def parse(self, line):
         # " -09\Dipole=-0.5978252,-0.2679164,0.4957565\Polar=76.3129847,18.3406662                          # " ,55.0554933,3.8136524,3.491361,37.3385617\PG=C01 [X(C4H7N3)]\\@
 
-        modline = self.prevline + line.strip()
-
-        if "{0}Polar=".format(self.delimiter) in modline:
-            idx = modline.index("Polar=") + 6
-            self.value = modline[idx:].split(self.delimiter)[0].strip()
-            self.start = True
-            if self.delimiter in modline[idx:]:
-                self.done = True
-        elif self.start:
-            self.value += line.split(self.delimiter)[0].strip()
-            if self.delimiter in line:
-                self.done = True
-        else:
-            self.prevline = line.strip()
+        self.find_in_end_block("Polar", line)
 
         if self.done:
             temp = self.value.split(',')
             # compute trace of polarizability matrix
             self.value = str(float(temp[0]) + float(temp[2]) + float(temp[5]))
-
-
 
 
 @Log.add_parser()
@@ -765,20 +765,7 @@ class PolarizabilityMatrix(LineParser):
     def parse(self, line):
         # " -09\Dipole=-0.5978252,-0.2679164,0.4957565\Polar=76.3129847,18.3406662                          # " ,55.0554933,3.8136524,3.491361,37.3385617\PG=C01 [X(C4H7N3)]\\@
 
-        modline = self.prevline + line.strip()
-
-        if "{0}Polar=".format(self.delimiter) in modline:
-            idx = modline.index("Polar=") + 6
-            self.value = modline[idx:].split(self.delimiter)[0].strip()
-            self.start = True
-            if self.delimiter in modline[idx:]:
-                self.done = True
-        elif self.start:
-            self.value += line.split(self.delimiter)[0].strip()
-            if self.delimiter in line:
-                self.done = True
-        else:
-            self.prevline = line.strip()
+        self.find_in_end_block("Polar", line)
 
         if self.done:
             self.value = self.value.split(',')
@@ -803,20 +790,7 @@ class Energy(LineParser):
             self.done = True
             return
 
-        modline = self.prevline + line.strip()
-
-        if "{0}HF=".format(self.delimiter) in modline:
-            idx = modline.index("HF=") + 3
-            self.value = modline[idx:].split(self.delimiter)[0].strip()
-            self.start = True
-            if self.delimiter in modline[idx:]:
-                self.done = True
-        elif self.start:
-            self.value += line.split(self.delimiter)[0].strip()
-            if self.delimiter in line:
-                self.done = True
-        else:
-            self.prevline = line.strip()
+        self.find_in_end_block("HF", line)
 
 
 @Log.add_parser()
@@ -831,19 +805,7 @@ class MP2Energy(LineParser):
     @is_done
     def parse(self, line):
         # " \HF=-316.5838826\MP2=-317.7864997\RMSD=2.767e-09\RMSF=1.655e-04\Dipole"
-        modline = self.prevline + line.strip()
-        if "{0}MP2=".format(self.delimiter) in modline:
-            idx = modline.index("MP2=") + 4
-            self.value = modline[idx:].split(self.delimiter)[0].strip()
-            self.start = True
-            if self.delimiter in modline[idx:]:
-                self.done = True
-        elif self.start:
-            self.value += line.split(self.delimiter)[0].strip()
-            if self.delimiter in line:
-                self.done = True
-        else:
-            self.prevline = line.strip()
+        self.find_in_end_block("MP2", line)
 
 
 @Log.add_parser()
@@ -1160,7 +1122,6 @@ def generate_excitation_parsers(n):
                 self.value = str([float(x) for x in line.split()[1:4]])
                 self.done = True
 
-
     @Log.add_parser("OscillatorStrength%d" % n)
     class OscillatorStrength(LineParser):
 
@@ -1174,7 +1135,6 @@ def generate_excitation_parsers(n):
             if "Excited State   %d:" % self.n in line:
                 self.value = line.split()[8][2:]
                 self.done = True
-
 
     @Log.add_parser("ExcitationType%d" % n)
     class ExcitationType(LineParser):
