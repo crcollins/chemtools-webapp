@@ -304,6 +304,29 @@ DATA_POINT = {
 }
 
 
+def row_select(row):
+    return row[1:4] + row[5:]
+
+
+path = os.path.join(settings.MEDIA_ROOT, "tests", "results.csv")
+with open(path, 'r') as f:
+    reader = csv.reader(f, delimiter=',', quotechar='"')
+    LOG_DATA = {}
+    for i, row in enumerate(reader):
+        if not row:
+            continue
+        if not i:
+            key = 'header'
+        else:
+            key = row[0]
+
+        if key in LOG_DATA:
+            LOG_DATA[key] = [LOG_DATA[key],
+                             row_select(row)]
+        else:
+            LOG_DATA[key] = row_select(row)
+
+
 class StructureTestCase(SimpleTestCase):
     templates = [
         "{0}_TON",
@@ -1184,40 +1207,8 @@ class FileParserTestCase(SimpleTestCase):
         logset.parse_files(paths)
         with StringIO(logset.format_output(errors=False)) as f:
             reader = csv.reader(f, delimiter=',', quotechar='"')
-            expected = [
-                ["A_TON_A_A", "Final", "A_TON_A_A_n1_m1_x1_y1_z1",
-                 "opt B3LYP/6-31g(d) geom=connectivity",
-                 "-6.46079886952", "-1.31975211714", "41",
-                 "0.0001", "-567.1965205", "---", "---", "---", "0.357194444444",
-                 "[0.0, 0.0, 0.0001]", "[]", "[]", "[]", "---", "---",
-                 "---", "---", "---", "---", "1800.4170", "7", '---', '---'],
-                ["A_TON_A_A", "Final", "A_TON_A_A_n1_m1_x1_y1_z1",
-                 "td B3LYP/6-31g(d)", "-6.46079886952",
-                 "-1.31975211714", "41", "0.0001",
-                 "-567.196520530", "4.8068", "4.9452", "5.7197", "0.152083333333",
-                 "[0.0, 0.0, 0.0001]", "[1.0081, -0.2949, 0.0]",
-                 "[1.258, 0.591, 0.0]", "[0.0, 0.0, 0.1339]", "0.1299",
-                 "0.2340", "0.0025", "Singlet-A", "Singlet-A", "Singlet-A",
-                 "1800.4171", "---", '---', '---'],
-                ["A_CON_A_A", "Final", "A_CON_A_A_n1_m1_x1_y1_z1",
-                 "td B3LYP/6-31g(d)", "-6.59495099194",
-                 "-1.19594032058", "41", "2.1565",
-                 "-567.195824267", "4.7914", "5.0977", "5.8131", "0.159611111111",
-                 "[0.0, -2.1565, 0.0001]", "[0.9867, 0.0, 0.0]",
-                 "[-0.0021, -0.7349, 0.0]", "[0.0001, 0.0, 0.1564]", "0.1143",
-                 "0.0675", "0.0035", "Singlet-A", "Singlet-A", "Singlet-A",
-                 "1800.8262", "---", '---', '---'],
-                ["crazy", "Final", "---",
-                 "td=(nstates=10) pbeh1pbe/6-311g(d,p) scrf=(cpcm,solvent=dichloromethane) geom=connectivity",
-                 "-4.87464730441",
-                 "-2.47732438648", "371", "0.9760",
-                 "-6879.24036746", "1.8620", "2.1422", "2.8923", "34.3205277778",
-                 "[0.0009, -0.976, -0.0035]", "[-4.3094, -0.0002, -0.0268]",
-                 "[-0.0001, 0.6834, 0.0]", "[5.1014, 0.0002, -0.2671]",
-                 "0.8472", "0.0245", "1.8492", "Singlet-A", "Singlet-A",
-                 "Singlet-A", "199573.1185", "---", '---', '---'],
-            ]
-            lines = [x[1:4] + x[5:] for i, x in enumerate(reader) if i]
+            expected = [LOG_DATA[x] for x in files]
+            lines = [row_select(x) for i, x in enumerate(reader) if i]
             self.assertEqual(expected, lines)
 
     def test_parse_logs_no_logs(self):
@@ -1229,69 +1220,46 @@ class FileParserTestCase(SimpleTestCase):
         path = os.path.join(settings.MEDIA_ROOT, "tests", "A_TON_A_A.log")
         log = fileparser.Log(path)
 
-        expected = ["Filename", "Name", "Type", "ExactName", "Features",
-                    "Options", "HOMO (eV)", "LUMO (eV)", "HomoOrbital",
-                    "Dipole (Debye)", "Energy (Hartrees)", "ExcitationEnergy1 (eV)",
-                    "ExcitationEnergy2 (eV)", "ExcitationEnergy3 (eV)",
-                    "Time (Hours)", "DipoleVector (Debye)",
-                    "ExcitationDipoleVector1 (Au)",  "ExcitationDipoleVector2 (Au)",
-                    "ExcitationDipoleVector3 (Au)", "OscillatorStrength1",
-                    "OscillatorStrength2", "OscillatorStrength3",
-                    "ExcitationType1", "ExcitationType2", "ExcitationType3",
-                    "SpatialExtent (Au)", "StepNumber", "Polarizability (Angstrom^3)",
-                    "MP2Energy (Hartrees)"]
-        self.assertEqual(expected, log.format_header().split(','))
+        expected = LOG_DATA['header']
+        value = log.format_header().split(',')
+        self.assertEqual(expected, row_select(value))
 
     def test_parse_log_open(self):
-        path = os.path.join(settings.MEDIA_ROOT, "tests", "A_TON_A_A.log")
+        name = "A_TON_A_A.log"
+        path = os.path.join(settings.MEDIA_ROOT, "tests", name)
         log = fileparser.Log(path)
 
         with StringIO(log.format_data()) as f:
             reader = csv.reader(f, delimiter=',', quotechar='"')
-            expected = [
-                ["A_TON_A_A", "Final", "A_TON_A_A_n1_m1_x1_y1_z1",
-                 "opt B3LYP/6-31g(d) geom=connectivity",
-                 "-6.46079886952", "-1.31975211714", "41",
-                 "0.0001", "-567.1965205", "---", "---", "---", "0.357194444444",
-                 "[0.0, 0.0, 0.0001]", "[]", "[]", "[]", "---", "---", "---",
-                 "---", "---", "---", "1800.4170", "7", '---', '---'],
-            ]
-            lines = [x[1:4] + x[5:] for x in reader]
+            expected = [LOG_DATA[name]]
+            lines = [row_select(x) for x in reader]
             self.assertEqual(expected, lines)
 
     def test_parse_invalid_log(self):
-        path = os.path.join(settings.MEDIA_ROOT, "tests", "invalid.log")
+        name = "invalid.log"
+        path = os.path.join(settings.MEDIA_ROOT, "tests", name)
         log = fileparser.Log(path)
 
         with StringIO(log.format_data()) as f:
             reader = csv.reader(f, delimiter=',', quotechar='"')
-            expected = [
-                ["invalid", "Final", "---", "---", "---", "---",
-                 "---", "---", "---", "---", "---", "---", "---",
-                 "[]", "[]", "[]", "[]", "---", "---", "---", "---",
-                 "---", "---", "---", "---", '---', '---'],
-            ]
-            lines = [x[1:4] + x[5:] for x in reader]
+            expected = [LOG_DATA[name]]
+            lines = [row_select(x) for x in reader]
             self.assertEqual(expected, lines)
 
         with self.assertRaises(Exception):
             log.format_gjf()
 
     def test_parse_nonbenzo(self):
-        path = os.path.join(settings.MEDIA_ROOT, "tests", "1_04_0.log")
+        name = '1_04_0.log'
+        path = os.path.join(settings.MEDIA_ROOT, "tests", name)
         log = fileparser.Log(path)
 
         with StringIO(log.format_data()) as f:
             reader = csv.reader(f, delimiter=',', quotechar='"')
-            expected = ['1_04_0', 'Final', '---', '[]',
-                        'opt b3lyp/6-31g(d) geom=connectivity', '-4.28307181933',
-                        '-1.27539756145', '257', '0.0666', '-4507.6791248',
-                        '---', '---', '---', '1.43511111111', '[0.0, 0.0, -0.0666]',
-                        '[]', '[]', '[]', '---', '---', '---', '---', '---', '---',
-                        '75848.1170', '1', '---', '---']
+            expected = LOG_DATA[name]
             for line in reader:
                 pass
-            self.assertEqual(expected, line[1:])
+            self.assertEqual(expected, row_select(line))
 
     def test_parse_nonbenzo_windows(self):
         name = "methane_windows.log"
@@ -1300,14 +1268,10 @@ class FileParserTestCase(SimpleTestCase):
 
         with StringIO(log.format_data()) as f:
             reader = csv.reader(f, delimiter=',', quotechar='"')
-            expected = ['methane_windows', 'Final', '---', '[]',
-                        'OPT B3LYP/3-21G GEOM=CONNECTIVITY', '-10.5803302719',
-                        '3.96823610808', '5', '0.0000', '-40.3016014', '---',
-                        '---', '---', '0.00111111111111', '[0.0, 0.0, 0.0]', '[]', '[]', '[]',
-                        '---', '---', '---', '---', '---', '---', '35.4879', '2', '---', '---']
+            expected = LOG_DATA[name]
             for line in reader:
                 pass
-            actual = [x.lower() for x in line[1:]]
+            actual = [x.lower() for x in row_select(line)]
             expected = [x.lower() for x in expected]
             self.assertEqual(expected, actual)
 
@@ -1318,17 +1282,10 @@ class FileParserTestCase(SimpleTestCase):
 
         with StringIO(log.format_data()) as f:
             reader = csv.reader(f, delimiter=',', quotechar='"')
-            expected = ['methane_td_windows', 'Final', '---', '[]',
-                        'TD RB3LYP/3-21G GEOM=CONNECTIVITY', '-10.5803302719',
-                        '3.96823610808', '5', '0.0000', '-40.3016014127', '13.3534',
-                        '13.3534', '13.3534', '0.00138888888889', '[0.0, 0.0, 0.0]',
-                        '[0.4521, -0.4162, -0.2196]', '[0.3943, 0.5012, -0.1383]',
-                        '[0.2569, -0.0368, 0.5987]',
-                        '0.1393', '0.1393', '0.1393', 'singlet-t2', 'singlet-t2',
-                        'singlet-t2', '35.4879', '---', '---', '---']
+            expected = LOG_DATA[name]
             for line in reader:
                 pass
-            actual = [x.lower() for x in line[1:]]
+            actual = [x.lower() for x in row_select(line)]
             expected = [x.lower() for x in expected]
             self.assertEqual(expected, actual)
 
@@ -1339,22 +1296,8 @@ class FileParserTestCase(SimpleTestCase):
 
         with StringIO(log.format_data()) as f:
             reader = csv.reader(f, delimiter=',', quotechar='"')
-            expected = [
-                        ["opt b3lyp/6-31g(d,p) geom=connectivity",
-                         "-11.7422563626", "2.74508440364", "1", "0.0000",
-                         "-1.1785393", "---", "---", "---", "0.00130555555556",
-                         "[0.0, 0.0, 0.0]", "[]", "[]", "[]", "---", "---",
-                         "---", "---", "---", "---", "5.1246", "5", '---', '---'],
-                        ["td b3lyp/6-31g(d,p) geom=check guess=read",
-                         "-11.7422563626", "2.74508440364", "1", "0.0000",
-                         "-1.17853927765", "14.5967", "28.4721", "40.0255",
-                         "0.000416666666667", "[0.0, 0.0, 0.0]",
-                         "[0.0, 0.0, -1.2973]", "[0.0, 0.0, 0.0]", "[0.0, 0.0, 0.2607]",
-                         "0.6019", "0.0000", "0.0667", "singlet-sgu", "singlet-sgg",
-                         "singlet-sgu", "5.1246", "---", '---', '---']
-                     ]
-
-            actual = [[y.lower() for y in x[5:]] for x in reader]
+            expected = [[y.lower() for y in x] for x in LOG_DATA[name]]
+            actual = [[y.lower() for y in row_select(x)] for x in reader]
             self.assertEqual(expected, actual)
 
     def test_parse_log_format_gjf(self):
