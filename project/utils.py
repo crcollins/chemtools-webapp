@@ -63,7 +63,8 @@ class SSHClient(paramiko.SSHClient):
             _, _, err = self.exec_command(base)
             if not err.readlines():
                 self.base = base
-                break
+                return
+        raise ValueError("Could not find command base")
 
 
 class SFTPClient(paramiko.SFTPClient):
