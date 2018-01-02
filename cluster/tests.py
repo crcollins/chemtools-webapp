@@ -962,3 +962,68 @@ class ModelTestCase(TestCase):
         )
         expected = ('1', 'vagrant', 'test', '59GB', '1:00', '--', 'Q')
         self.assertEqual(job.format(), expected)
+
+
+class SSHClientTestCase(TestCase):
+    def setUp(self):
+        self.mock_ssh, _ = build_mock_connections(self)
+
+    @mock.patch("paramiko.SSHClient.close")
+    def test_context_manager(self, mock_close):
+        with SSHClient():
+            pass
+        mock_close.assert_called_once()
+
+    @mock.patch("paramiko.SSHClient.exec_command")
+    def test_exec_command(self, mock_exec):
+        self.mock_ssh.exec_command.side_effect = [
+            make_io_triplet(),
+        ]
+        base = ". ~/.bash_profile; "
+        command = base + "something"
+        ssh = SSHClient()
+        ssh.exec_command(command)
+        call = mock.call(command)
+        self.assertEqual(mock_exec.call_args, call)
+
+    @mock.patch("paramiko.SSHClient.exec_command")
+    @mock.patch("paramiko.SSHClient.connect")
+    def test_connect(self, mock_connect, mock_exec):
+        mock_exec.side_effect = [
+            make_io_triplet(),
+        ]
+        ssh = SSHClient()
+        ssh.connect()
+        mock_connect.assert_called_once()
+        self.assertNotEqual(ssh.base, '')
+
+    @mock.patch("paramiko.SSHClient.exec_command")
+    def test_determine_base(self, mock_exec):
+        mock_exec.side_effect = [
+            make_io_triplet(stdout='', stderr='something'),
+            make_io_triplet(),
+        ]
+        ssh = SSHClient()
+        ssh.determine_base()
+        self.assertEqual(ssh.base, 'source .login; ')
+
+    @mock.patch("paramiko.SSHClient.exec_command")
+    def test_determine_base_error(self, mock_exec):
+        mock_exec.side_effect = [
+            make_io_triplet(stdout='', stderr='something'),
+            make_io_triplet(stdout='', stderr='something'),
+            make_io_triplet(stdout='', stderr='something'),
+        ]
+        ssh = SSHClient()
+        with self.assertRaises(ValueError):
+            ssh.determine_base()
+
+
+class SFTPClientTestCase(TestCase):
+    @mock.patch('paramiko.SFTPClient.__init__')
+    @mock.patch('project.utils.SFTPClient.close')
+    def test_context_manager(self, mock_close, mock_sftp):
+        test = mock.MagicMock()
+        with SFTPClient(test):
+            pass
+        mock_close.assert_called_once()
