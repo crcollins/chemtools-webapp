@@ -1113,13 +1113,14 @@ class UpdateMLTestCase(SimpleTestCase):
             self.assertIsNone(test_function(1))
             self.assertEqual(len(mock_remove.mock_calls), 1)
 
+    @mock.patch('data.models.Predictor.save')
     @mock.patch('data.models.DataPoint.get_all_data')
-    def test(self, get_all_data):
+    def test_update_ml(self, mock_get_all_data, mock_save):
         X = numpy.random.rand(10, 2)
         HOMO = numpy.random.rand(10, 1)
         LUMO = numpy.random.rand(10, 1)
         GAP = numpy.random.rand(10, 1)
-        get_all_data.return_value = X, HOMO, LUMO, GAP
+        mock_get_all_data.return_value = X, HOMO, LUMO, GAP
         call_command("update_ml")
 
 
