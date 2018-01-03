@@ -75,7 +75,9 @@ def new_point(coord1=None, radius=None, coord2=None, angle=None, coord3=None, di
         # ; however, this does not account for the sign of the zero! This extra
         # bit of information determines which side of the zero point to go from
         # and can mean the difference in the correct result and garbage.
-        if float(axis[2, 0]) is -0.0:
+        # The string comparison is required because that is the only way to
+        # determine if it is negative zero.
+        if str(axis[2, 0]) == '-0.0':
             axis = numpy.matrix([0., 0.,  -1.]).T
         else:
             axis = numpy.matrix([0., 0.,  -1.]).T
