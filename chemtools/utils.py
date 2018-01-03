@@ -80,7 +80,7 @@ def new_point(coord1=None, radius=None, coord2=None, angle=None, coord3=None, di
         if str(axis[2, 0]) == '-0.0':
             axis = numpy.matrix([0., 0.,  -1.]).T
         else:
-            axis = numpy.matrix([0., 0.,  -1.]).T
+            axis = numpy.matrix([0., 0.,  1.]).T
     curr_angle = angle_between(coord2 - coord1, coord - coord1)
     rot = get_axis_rotation_matrix(axis, math.radians(angle) - curr_angle)
     coord = rot * (coord - coord1) + coord1
