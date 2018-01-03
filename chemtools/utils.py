@@ -91,27 +91,19 @@ def new_point(coord1=None, radius=None, coord2=None, angle=None, coord3=None, di
     curr_angle = get_dihedral(axis, coord, coord1, coord2, coord3)
     r_dihedral = math.radians(dihedral)
 
-    neg_rotation_amount = math.radians(dihedral) - curr_angle
-    neg_rot = get_axis_rotation_matrix(axis, neg_rotation_amount)
-    neg_coord = neg_rot * (coord - coord1) + coord1
-    neg_angle = get_dihedral(axis, neg_coord, coord1, coord2, coord3)
-    neg_val = max(neg_angle, r_dihedral) - min(neg_angle, r_dihedral)
-    if neg_val > math.pi:
-        neg_val = (2 * math.pi) - neg_angle
+    def inner(rotation_amount):
+        rot = get_axis_rotation_matrix(axis, rotation_amount)
+        new_coord = rot * (coord - coord1) + coord1
+        angle = get_dihedral(axis, new_coord, coord1, coord2, coord3)
+        val = max(angle, r_dihedral) - min(angle, r_dihedral)
+        if val > math.pi:
+            val = (2 * math.pi) - angle
+        return val, new_coord
 
-    pos_rotation_amount = curr_angle - math.radians(dihedral)
-    pos_rot = get_axis_rotation_matrix(axis, pos_rotation_amount)
-    pos_coord = pos_rot * (coord - coord1) + coord1
-    pos_angle = get_dihedral(axis, pos_coord, coord1, coord2, coord3)
-    pos_val = max(pos_angle, r_dihedral) - min(pos_angle, r_dihedral)
-    if pos_val > math.pi:
-        pos_val = (2 * math.pi) - pos_angle
-
-    if pos_val < neg_val:
-        coord = pos_coord
-    else:
-        coord = neg_coord
-    return coord
+    rotation_amount = curr_angle - math.radians(dihedral)
+    neg_val, neg_coord = inner(-rotation_amount)
+    pos_val, pos_coord = inner(rotation_amount)
+    return pos_coord if pos_val < neg_val else neg_coord
 
 
 def replace_geom_vars(geom, variables):
