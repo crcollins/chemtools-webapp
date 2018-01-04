@@ -58,7 +58,9 @@ def get_dihedral(axis, coord1, coord2, coord3, coord4):
     return angle_between(plane1, plane2)
 
 
-def new_point(coord1=None, radius=None, coord2=None, angle=None, coord3=None, dihedral=None):
+def new_point(coord1=None, radius=None,
+              coord2=None, angle=None,
+              coord3=None, dihedral=None):
     if coord1 is None:
         return numpy.zeros((3, 1))
 
