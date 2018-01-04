@@ -224,17 +224,17 @@ class ModelTestCase(TestCase):
 
     def test_get_all_data(self):
         FEATURE, HOMO, LUMO, GAP = models.DataPoint.get_all_data()
-        self.assertTrue((FEATURE == numpy.matrix([[1, 2, 3]])).all())
-        self.assertTrue((HOMO == numpy.matrix([[-6.460873931]])).all())
-        self.assertTrue((LUMO == numpy.matrix([[-1.31976745]])).all())
-        self.assertTrue((GAP == numpy.matrix([[4.8068]])).all())
+        self.assertTrue((FEATURE == numpy.array([[1, 2, 3]])).all())
+        self.assertTrue((HOMO == numpy.array([[-6.460873931]])).all())
+        self.assertTrue((LUMO == numpy.array([[-1.31976745]])).all())
+        self.assertTrue((GAP == numpy.array([[4.8068]])).all())
 
     def test_get_all_data_no_default(self):
         FEATURE, HOMO, LUMO, GAP = models.DataPoint.get_all_data(type=2)
-        self.assertTrue((FEATURE == numpy.matrix([[1]])).all())
-        self.assertTrue((HOMO == numpy.matrix([[1.0]])).all())
-        self.assertTrue((LUMO == numpy.matrix([[2.0]])).all())
-        self.assertTrue((GAP == numpy.matrix([[2.0]])).all())
+        self.assertTrue((FEATURE == numpy.array([[1]])).all())
+        self.assertTrue((HOMO == numpy.array([[1.0]])).all())
+        self.assertTrue((LUMO == numpy.array([[2.0]])).all())
+        self.assertTrue((GAP == numpy.array([[2.0]])).all())
 
     def test_jobtemplate(self):
         data = OPTIONS.copy()

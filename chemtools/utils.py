@@ -13,7 +13,7 @@ def get_axis_rotation_matrix(axis, theta):
     ux = axis[0, 0] / r
     uy = axis[1, 0] / r
     uz = axis[2, 0] / r
-    rot = numpy.matrix([
+    rot = numpy.array([
         [ct + ux ** 2 * nct, ux * uy * nct - uz * st, ux * uz * nct + uy * st],
         [uy * ux * nct + uz * st, ct + uy ** 2 * nct, uy * uz * nct - ux * st],
         [uz * ux * nct - uy * st, uz * uy * nct + ux * st, ct + uz ** 2 * nct],
@@ -22,9 +22,7 @@ def get_axis_rotation_matrix(axis, theta):
 
 
 def get_angles(vector):
-    x = vector[0, 0]
-    y = vector[1, 0]
-    z = vector[2, 0]
+    x, y, z = vector
     r = numpy.linalg.norm(vector)
     azimuth = math.atan2(y, x)
     altitude = math.asin(z / r)
@@ -33,20 +31,20 @@ def get_angles(vector):
 
 def get_full_rotation_matrix(vector, azimuth, altitude):
     xyaxis = vector[:2, 0]
-    zaxis = numpy.matrix([0, 0,  1]).T
-    raxis = numpy.cross(zaxis.T, xyaxis.T)
-    rotz = get_axis_rotation_matrix(numpy.matrix(raxis).T, altitude)
+    zaxis = numpy.array([[0, 0,  1]]).T
+    raxis = numpy.cross(zaxis.T, xyaxis.T).reshape(-1, 1)
+    rotz = get_axis_rotation_matrix(raxis, altitude)
     rotxy = get_axis_rotation_matrix(-zaxis, azimuth)
     return rotxy * rotz
 
 
 def project_plane(normal, vec):
     n = normal / numpy.linalg.norm(normal)
-    return vec - (vec.T * n)[0, 0] * n
+    return vec - vec.T.dot(n) * n
 
 
 def angle_between(vec1, vec2):
-    dot = (vec1.T * vec2)[0, 0]
+    dot = vec1.T.dot(vec2)[0, 0]
     cross = numpy.cross(vec1.T, vec2.T)
     norm = numpy.linalg.norm(cross)
     # This is more numerically stable than the expected equation
@@ -62,9 +60,9 @@ def get_dihedral(axis, coord1, coord2, coord3, coord4):
 
 def new_point(coord1=None, radius=None, coord2=None, angle=None, coord3=None, dihedral=None):
     if coord1 is None:
-        return numpy.matrix([0., 0., 0.]).T
+        return numpy.zeros((3, 1))
 
-    coord = coord1 + numpy.matrix([radius, 0., 0.]).T
+    coord = coord1 + numpy.array([[radius, 0., 0.]]).T
     if coord2 is None:
         return coord
 
@@ -78,12 +76,12 @@ def new_point(coord1=None, radius=None, coord2=None, angle=None, coord3=None, di
         # The string comparison is required because that is the only way to
         # determine if it is negative zero.
         if str(axis[2, 0]) == '-0.0':
-            axis = numpy.matrix([0., 0.,  -1.]).T
+            axis = numpy.array([[0., 0., -1.]]).T
         else:
-            axis = numpy.matrix([0., 0.,  1.]).T
+            axis = numpy.array([[0., 0., 1.]]).T
     curr_angle = angle_between(coord2 - coord1, coord - coord1)
     rot = get_axis_rotation_matrix(axis, math.radians(angle) - curr_angle)
-    coord = rot * (coord - coord1) + coord1
+    coord = rot.dot(coord - coord1) + coord1
     if coord3 is None:
         return coord
 
@@ -93,7 +91,7 @@ def new_point(coord1=None, radius=None, coord2=None, angle=None, coord3=None, di
 
     def inner(rotation_amount):
         rot = get_axis_rotation_matrix(axis, rotation_amount)
-        new_coord = rot * (coord - coord1) + coord1
+        new_coord = rot.dot(coord - coord1) + coord1
         angle = get_dihedral(axis, new_coord, coord1, coord2, coord3)
         val = max(angle, r_dihedral) - min(angle, r_dihedral)
         if val > math.pi:

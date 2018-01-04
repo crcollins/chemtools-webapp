@@ -57,7 +57,7 @@ class DataPoint(models.Model):
             LUMO[i] = x.lumo
             GAP[i] = x.band_gap
             vectors.append(x.vectors.get(type=type).vector)
-        FEATURE = numpy.matrix(vectors)
+        FEATURE = numpy.array(vectors)
         return FEATURE, HOMO, LUMO, GAP
 
 

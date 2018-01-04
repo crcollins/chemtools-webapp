@@ -131,7 +131,7 @@ def get_end_decay_corrected(left, center, right, power=1, H=1, lacunarity=1):
         struct = from_data(name)
         atoms = [x.atoms[1] for x in struct.open_ends("~")]
         lengths.append(norm(atoms[0].xyz - atoms[1].xyz))
-    lengths = numpy.matrix(lengths)
+    lengths = numpy.array([lengths])
     minlen = lengths.argmin()
     ratio_matrix = lengths / lengths.T
 

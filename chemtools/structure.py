@@ -295,7 +295,7 @@ class Atom(object):
     def __init__(self, x, y, z, element, parent=None):
         self.parent = parent
         self.element = element
-        self.xyz = numpy.matrix([x, y, z], dtype=float).T
+        self.xyz = numpy.array([[x, y, z]], dtype=float).T
         self.bonds = []
 
     def remove(self):
@@ -442,12 +442,12 @@ class Structure(object):
         '''Draws a basic image of the molecule.'''
         offset = 0.25
         mins, maxs = self.bounding_box()
-        mins = (mins - offset).T.tolist()[0]
-        dimensions = self.get_dimensions() + 2 * offset
+        dimensions = (maxs - mins) + 2 * offset
         dimensions *= scale
+        mins = mins - offset
 
-        WIDTH = int(dimensions[1, 0])
-        HEIGHT = int(dimensions[0, 0])
+        WIDTH = int(dimensions[1])
+        HEIGHT = int(dimensions[0])
 
         f = StringIO()
         surface = cairo.SVGSurface(f, WIDTH, HEIGHT)
@@ -456,14 +456,14 @@ class Structure(object):
         ctx.scale(scale, scale)
         ctx.rotate(math.pi / 2)
         # hack to fix the translation from the rotation
-        ctx.translate(0, -dimensions[1, 0] / scale)
+        ctx.translate(0, -dimensions[1] / scale)
         ctx.translate(-mins[0], -mins[1])
         ctx.set_line_width(0.1)
 
         def draw_bond(ctx, coords1, coords2, unit, factors):
             for x in factors:
-                ctx.move_to(*((x * unit + coords1).T.tolist()[0]))
-                ctx.line_to(*((x * unit + coords2).T.tolist()[0]))
+                ctx.move_to(*(x * unit + coords1))
+                ctx.line_to(*(x * unit + coords2))
                 ctx.stroke()
 
         ctx.set_source_rgb(*COLORS2['1'])
@@ -473,12 +473,12 @@ class Structure(object):
             if colors:
                 ctx.set_source_rgb(*COLORS2[bond.type])
 
-            coords1 = numpy.matrix(bond.atoms[0].xyz_tuple[:2]).T
-            coords2 = numpy.matrix(bond.atoms[1].xyz_tuple[:2]).T
+            coords1 = numpy.array(bond.atoms[0].xyz_tuple[:2])
+            coords2 = numpy.array(bond.atoms[1].xyz_tuple[:2])
 
             temp = (coords2 - coords1)
             mag = numpy.linalg.norm(temp)
-            unit = numpy.matrix([-temp[1, 0] / mag, temp[0, 0] / mag]).T
+            unit = numpy.array([-temp[1] / mag, temp[0] / mag])
             if fancy_bonds:
                 if bond.type == '2':
                     draw_bond(ctx, coords1, coords2, unit, [0.1, -0.1])
@@ -559,7 +559,7 @@ class Structure(object):
     def rotate_3d(self, rotation_matrix, point, offset):
         for atom in self.atoms:
             coords = atom.xyz - point
-            atom.xyz = rotation_matrix * coords + offset
+            atom.xyz = rotation_matrix.dot(coords) + offset
 
     def displace(self, displacement):
         '''Runs a uniform displacement on all the atoms in the structure.'''
@@ -571,19 +571,15 @@ class Structure(object):
         normal = bonds[0].atoms[1].xyz - bonds[1].atoms[1].xyz
         # self.reflect(normal)
         mat = get_axis_rotation_matrix(normal, math.radians(angle))
-        temp = numpy.matrix([0, 0, 0]).T
+        temp = numpy.zeros((3, 1))
         self.rotate_3d(mat, temp, temp)
 
     def bounding_box(self):
         '''Returns the bounding box of the structure.'''
-        coords = numpy.concatenate([x.xyz for x in self.atoms], 1)
+        coords = numpy.hstack([x.xyz for x in self.atoms])
         mins = numpy.min(coords, 1)
         maxs = numpy.max(coords, 1)
         return mins, maxs
-
-    def get_dimensions(self):
-        mins, maxs = self.bounding_box()
-        return maxs - mins
 
     ###########################################################################
     # Manipulate
@@ -643,11 +639,11 @@ class Structure(object):
         vec2 = C2.xyz - R2.xyz
 
         # diff = [azimuth, altitude]
-        vec1_angles = numpy.matrix(get_angles(vec1))
-        vec2_angles = numpy.matrix(get_angles(vec2))
+        vec1_angles = numpy.array(get_angles(vec1))
+        vec2_angles = numpy.array(get_angles(vec2))
         diff = vec1_angles - vec2_angles
         # angle of 1 - angle of 2 = angle to rotate
-        rot = get_full_rotation_matrix(vec2, -diff[0, 0], -diff[0, 1])
+        rot = get_full_rotation_matrix(vec2, -diff[0], -diff[1])
         fragment.rotate_3d(rot, R2xyz, C1xyz)
 
         if bond1.atoms[0].element[0] in CONNECTIONS:
@@ -696,32 +692,32 @@ class Structure(object):
     def stack(self, x, y, z):
         '''Returns a structure with x,y,z stacking.'''
         frags = [self]
-        bb = self.bounding_box()
-        size = (bb[1] - bb[0]).T.tolist()[0]
+        bb_min, bb_max = self.bounding_box()
+        size = bb_max - bb_min
         for i, axis in enumerate((x, y, z)):
             # means there is nothing to stack
             if axis <= 1:
                 continue
             axisfrags = copy.deepcopy(frags)
             for num in xrange(1, axis):
-                use = [0, 0, 0]
-                use[i] = num * (2 + size[i])
+                displace = numpy.zeros((3, 1))
+                displace[i] = num * (2 + size[i])
                 for f in axisfrags:
                     a = copy.deepcopy(f)
-                    a.displace(numpy.matrix(use).T)
+                    a.displace(displace)
                     frags.append(a)
         return Structure.concatenate(frags)
 
     def perturb(self, delta=0.1):
         for atom in self.atoms:
-            atom.xyz += numpy.matrix(numpy.random.uniform(-delta, delta, size=(3, 1)))
+            atom.xyz += numpy.random.uniform(-delta, delta, size=(3, 1))
 
     ###########################################################################
     # Properties
     ###########################################################################
 
     def get_center(self):
-        totals = numpy.matrix([0.0, 0.0, 0.0]).T
+        totals = numpy.zeros((3, 1))
         for atom in self.atoms:
             totals += atom.xyz
         return totals / len(self.atoms)
@@ -730,14 +726,14 @@ class Structure(object):
         return sum(MASSES[atom.element] for atom in self.atoms)
 
     def get_mass_center(self):
-        totals = numpy.matrix([0.0, 0.0, 0.0]).T
+        totals = numpy.zeros((3, 1))
         for atom in self.atoms:
             totals += atom.xyz * MASSES[atom.element]
         return totals / self.get_mass()
 
     def get_moment_of_inertia(self, direction=None, offset=None):
         if direction is None:
-            direction = numpy.matrix([0.0, 0.0, 1.0]).T
+            direction = numpy.array([[0., 0., 1.]]).T
         if offset is None:
             offset = self.get_mass_center()
 

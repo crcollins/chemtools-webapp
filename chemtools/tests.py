@@ -383,41 +383,36 @@ class StructureTestCase(SimpleTestCase):
     def test_get_center(self):
         struct = structure.from_name("TON")
         result = struct.get_center()
-        expected = [0.657275, 1.12065, -0.00013125]
-        expected = numpy.matrix([
-                                0.657275,
-                                1.12065,
-                                -0.00013125
-                                ]).T
+        expected = numpy.array([[0.657275, 1.12065, -0.00013125]]).T
         self.assertTrue(numpy.allclose(result, expected))
 
     def test_get_mass_center(self):
         struct = structure.from_name("TON")
         result = struct.get_mass_center()
-        expected = numpy.matrix([
+        expected = numpy.array([[
                                 0.657283740998029,
                                 1.12065,
                                 -0.00011002400525567719
-                                ]).T
+                                ]]).T
         self.assertTrue(numpy.allclose(result, expected))
 
     def test_get_moment_of_inertia(self):
         struct = structure.from_name("TON")
-        direction = numpy.matrix([0, 1, 0]).T
-        offset = numpy.matrix([0, 0, 0]).T
+        direction = numpy.array([[0, 1, 0]]).T
+        offset = numpy.array([[0, 0, 0]]).T
         result = struct.get_moment_of_inertia(direction=direction,
                                               offset=offset)
         self.assertAlmostEqual(result, 239.74162427124799)
 
     def test_get_moment_of_inertia_no_direction(self):
         struct = structure.from_name("TON")
-        offset = numpy.matrix([100, 0, 0]).T
+        offset = numpy.array([[100, 0, 0]]).T
         result = struct.get_moment_of_inertia(offset=offset)
         self.assertAlmostEqual(result, 1581424.2246356755)
 
     def test_get_moment_of_inertia_no_offset(self):
         struct = structure.from_name("TON")
-        direction = numpy.matrix([0, 1, 0]).T
+        direction = numpy.array([[0, 1, 0]]).T
         result = struct.get_moment_of_inertia(direction=direction)
         self.assertAlmostEqual(result, 170.56126165978225)
 
@@ -466,13 +461,14 @@ class StructureTestCase(SimpleTestCase):
             [x.strip() for x in s.gjf.split()],
             [x.strip() for x in STRUCTURE_GJF.split()])
 
-    def test_from_gjf_parameters(self):
-        string = "%chk=chk.chk\n# hf\n\nTitle\n\n0 1" + METHANE
-        f = StringIO(string)
-        s = structure.from_gjf(f)
-        self.assertEqual(
-            [x.strip() for x in s.gjf.split()],
-            [x.strip() for x in METHANE_ALL.split()])
+    # This is the same as test_from_gjf_zmatrix
+    #def test_from_gjf_parameters(self):
+    #    string = "%chk=chk.chk\n# hf\n\nTitle\n\n0 1" + METHANE
+    #    f = StringIO(string)
+    #    s = structure.from_gjf(f)
+    #    self.assertEqual(
+    #        [x.strip() for x in s.gjf.split()],
+    #        [x.strip() for x in METHANE_ALL.split()])
 
     def test_from_gjf_zmatrix(self):
         string = "%chk=chk.chk\n# hf\n\nTitle\n\n0 1" + METHANE
