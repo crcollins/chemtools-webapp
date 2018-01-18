@@ -35,7 +35,7 @@ def get_full_rotation_matrix(vector, azimuth, altitude):
     raxis = numpy.cross(zaxis.T, xyaxis.T).reshape(-1, 1)
     rotz = get_axis_rotation_matrix(raxis, altitude)
     rotxy = get_axis_rotation_matrix(-zaxis, azimuth)
-    return rotxy * rotz
+    return rotxy.dot(rotz)
 
 
 def project_plane(normal, vec):
