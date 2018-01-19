@@ -540,8 +540,8 @@ class Structure(object):
                         rights.append(atom.id)
 
                 for left, right in product(lefts, rights):
-                    string += ' '.join(['D'] + [str(x)
-                                                for x in [left] + ids + [right]] + ['F']) + '\n'
+                    data = [str(x) for x in [left] + ids + [right]]
+                    string += ' '.join(['D'] + data + ['F']) + '\n'
         return string
 
     @property
@@ -650,8 +650,10 @@ class Structure(object):
             bond1.atoms = (C2, C1)
         else:
             bond1.atoms = (C1, C2)
+
         # remove the extension parts
-        [x.remove() for x in (bond2, R1, R2)]
+        for x in (bond2, R1, R2):
+            x.remove()
 
         if freeze:
             self.frozen.append(bond1.atoms)
