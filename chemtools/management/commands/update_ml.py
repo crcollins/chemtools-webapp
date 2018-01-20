@@ -1,5 +1,6 @@
 import os
 import cPickle
+import logging
 
 from django.core.management.base import BaseCommand
 from django.core.files import File
@@ -12,17 +13,20 @@ from data.models import DataPoint, Predictor
 from project.utils import StringIO
 
 
+logger = logging.getLogger(__name__)
+
+
 def lock(func):
     def wrapper(*args, **kwargs):
         # Not very safe, but it will work well enough
         if os.path.exists(".updating_ml"):
-            print "Already Running"
+            logger.info("Already Running")
             return
         with open(".updating_ml", "w"):
             try:
                 value = func(*args, **kwargs)
             except Exception as e:
-                print e
+                logger.info("Exception: %s" % e)
                 value = None
         os.remove(".updating_ml")
         return value
@@ -42,7 +46,7 @@ class Command(BaseCommand):
 
 
 def save_model(model, errors):
-    print "Saving Model"
+    logger.info("Saving Model")
     with StringIO(name="decay_predictors.pkl") as f:
         cPickle.dump(model, f, protocol=-1)
         f.seek(0)
@@ -62,15 +66,15 @@ def run_all(force=False):
     latest = DataPoint.objects.latest()
 
     if not force and latest.created < pred.created:
-        print "No Update"
+        logger.info("No Update")
         return
 
-    print "Loading Data"
+    logger.info("Loading Data")
     X, HOMO, LUMO, GAP = DataPoint.get_all_data()
     y = numpy.hstack([HOMO, LUMO, GAP])
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1)
-    print "Building Model"
+    logger.info("Building Model")
     params = {"gamma": [1e-5, 1e-3, 1e-1, 1e1, 1e3],
               "C": [1e-5, 1e-3, 1e-1, 1e1, 1e3]}
     inner_model = GridSearchCV(estimator=svm.SVR(kernel="rbf"),
@@ -79,5 +83,5 @@ def run_all(force=False):
     model.fit(X_train, y_train)
 
     errors = numpy.abs(model.predict(X_test) - y_test).mean(0)
-    print "Errors:", errors
+    logger.info("Errors: %s" % errors)
     save_model(model, errors)
