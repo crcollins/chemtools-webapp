@@ -14,6 +14,6 @@ NO_CHARGES
 
 @<TRIPOS>ATOM
 1 H1     0.1000     0.0000     0.0000 H
-2 Sg2     1.4000     0.0000     0.0000 Sg
+2 Sg2     1.2000     0.0000     0.0000 Sg
 @<TRIPOS>BOND
 1 1 2 1
