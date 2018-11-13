@@ -1342,6 +1342,7 @@ if __name__ == "__main__":
                 self.files = [x for x in self.files if x.endswith(".log")]
             self.output_gjf = args.gjf | args.td
             self.output_out = args.out
+            self.output_dir = args.out_dir
             self.output_outx = args.outx
             self.td = args.td
             self.split_iter = args.split_iter
@@ -1398,7 +1399,8 @@ if __name__ == "__main__":
                     if len(result) > 1:
                         tail = ('_step%03d' % i) + ending
 
-                    with open(log.name + tail, 'w') as outputfile:
+                    path = os.path.join(self.output_dir, log.name + tail)
+                    with open(path, 'w') as outputfile:
                         outputfile.write(string)
 
             except Exception as e:
@@ -1453,6 +1455,8 @@ if __name__ == "__main__":
                         help='Toggles splitting log files per iteration in optimization.')
     parser.add_argument('-O', action="store_true", dest="out", default=False,
                         help='Toggles writing .out files from logs.')
+    parser.add_argument('-d', dest="out_dir", default='',
+                        help='Sets the location to save out files')
     parser.add_argument('-X', action="store_true", dest="outx", default=False,
                         help='Toggles writing .outx files from logs.')
 
