@@ -5,6 +5,8 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.contrib.auth import get_user_model
 from Crypto.PublicKey import RSA
+from Crypto.Signature import pss
+from Crypto.Hash import SHA256
 import mock
 
 import views
@@ -522,8 +524,12 @@ class UtilsTestCase(TestCase):
         pubkey = RSA.importKey(keypair["public"])
 
         message = "The quick brown fox jumps over the lazy dog."
-        sig = key.sign(message, '')
-        self.assertTrue(pubkey.verify(message, sig))
+        h = SHA256.new(message)
+        sig = pss.new(key).sign(h)
+        try:
+            pss.new(pubkey).verify(h, sig)
+        except ValueError:
+            self.fail()
 
     def test_invalid_key_pair(self):
         private = b"thisisnotavalidprivatekey"
@@ -539,8 +545,10 @@ class UtilsTestCase(TestCase):
         pubkey = RSA.importKey(keypair1["public"])
 
         message = "The quick brown fox jumps over the lazy dog."
-        sig = key.sign(message, '')
-        self.assertFalse(pubkey.verify(message, sig))
+        h = SHA256.new(message)
+        sig = pss.new(key).sign(h)
+        with self.assertRaises(ValueError):
+            pss.new(pubkey).verify(h, sig)
 
     def test_generate_key(self):
         self.assertIsNotNone(utils.generate_key("some string"))
