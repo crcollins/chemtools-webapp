@@ -55,10 +55,13 @@ class EncryptedCharField(models.CharField):
     __metaclass__ = models.SubfieldBase
 
     def to_python(self, value):
-        if value is not None and value.startswith("$AES$"):
-            return self.cipher.decrypt(value[len("$AES$"):])
-        else:
+        if value is None:
             return value
+        if value.startswith("$AES$"):
+            return self.cipher.decrypt(value[len("$AES$"):])
+        # Warning: This strips all unicode chars. This is a hack because I
+        # can not figure out how to get the validation to work right...
+        return value.encode('ascii', 'ignore')
 
     def get_prep_value(self, value):
         return "$AES$" + self.cipher.encrypt(value)
