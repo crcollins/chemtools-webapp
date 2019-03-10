@@ -23,6 +23,7 @@ collect information with more complex types (such as vectors).
 import os
 import multiprocessing
 import logging
+from __future__ import print_function
 
 try:
     # Fix for issues with openblas and multiprocessing
@@ -1154,7 +1155,7 @@ def generate_excitation_parsers(n):
 
 # Generate class for first 3 excitations because they are included by default
 # in gaussian TD calculations
-for i in xrange(1, 4):
+for i in range(1, 4):
     generate_excitation_parsers(i)
 
 
@@ -1423,7 +1424,7 @@ if __name__ == "__main__":
                 with open(self.outputfilename, 'w') as outputfile:
                     outputfile.write(logs.format_output(errors=self.error))
             else:
-                print logs.format_output(errors=self.error)
+                print(logs.format_output(errors=self.error))
 
     parser = argparse.ArgumentParser(
         description="This program extracts data from Gaussian log files.")
