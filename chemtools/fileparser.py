@@ -350,8 +350,8 @@ class Log(object):
             search_all = True
 
         search_all = False
-        for label, parser in zip(self.parser_labels, self.parsers)[
-                parser_idx::-1]:
+        pairs = list(zip(self.parser_labels, self.parsers))
+        for label, parser in pairs[parser_idx::-1]:
             value, done = parser[key]
             if done:
                 break
