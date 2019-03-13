@@ -18,12 +18,11 @@ The LineParsers themselves are designed to be typeless, specifically,
 returning values as strings. This has a slight drawback when the parsers
 collect information with more complex types (such as vectors).
 """
-
+from __future__ import print_function
 
 import os
 import multiprocessing
 import logging
-from __future__ import print_function
 
 try:
     # Fix for issues with openblas and multiprocessing
