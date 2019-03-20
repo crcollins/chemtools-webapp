@@ -258,7 +258,8 @@ class Output(object):
 
 class Log(object):
     PARSERS = dict()
-    ORDER = ["ExactName", "Features", "Options", "HOMO", "LUMO",
+    ORDER = ["ExactName", "Features", "Options",
+             "HOMO", "LUMO", "BetaHOMO", "BetaLUMO",
              "HomoOrbital", "Dipole", "Energy",
              "ExcitationEnergy1", "ExcitationEnergy2", "ExcitationEnergy3",
              "Time", "DipoleVector",
@@ -833,14 +834,15 @@ class HOMO(LineParser):
     def __init__(self, *args, **kwargs):
         super(HOMO, self).__init__(*args, **kwargs)
         self.prevline = ''
+        self.base = 'Alpha'
 
     @is_done
     def parse(self, line):
         # " Alpha  occ. eigenvalues --   -0.27354  -0.26346  -0.25649  -0.21987  -0.21885"
         # " Alpha virt. eigenvalues --   -0.00138   0.03643   0.07104   0.08148   0.08460"
-        if "occ. eigenvalues" in line:
+        if "occ. eigenvalues" in line and self.base in line:
             self.prevline = line
-        elif "virt. eigenvalues" in line and self.prevline:
+        elif "virt. eigenvalues" in line and self.base in line and self.prevline:
             self.value = str(float(self.prevline.split()[-1]) * HARTREE_TO_EV)
             self.prevline = ''
             self.done = True
@@ -853,17 +855,38 @@ class LUMO(LineParser):
     def __init__(self, *args, **kwargs):
         super(LUMO, self).__init__(*args, **kwargs)
         self.prevline = ''
+        self.base = 'Alpha'
 
     @is_done
     def parse(self, line):
         # " Alpha  occ. eigenvalues --   -0.27354  -0.26346  -0.25649  -0.21987  -0.21885"
         # " Alpha virt. eigenvalues --   -0.00138   0.03643   0.07104   0.08148   0.08460"
-        if "occ. eigenvalues" in line:
+        if "occ. eigenvalues" in line and self.base in line:
             self.prevline = line
-        elif "virt. eigenvalues" in line and self.prevline:
+        elif "virt. eigenvalues" in line and self.base in line and self.prevline:
             self.value = str(float(line.split()[4]) * HARTREE_TO_EV)
             self.prevline = ''
             self.done = True
+
+
+@Log.add_parser()
+class BetaHOMO(HOMO):
+    UNITS = 'eV'
+
+    def __init__(self, *args, **kwargs):
+        super(BetaHOMO, self).__init__(*args, **kwargs)
+        self.prevline = ''
+        self.base = 'Beta'
+
+
+@Log.add_parser()
+class BetaLUMO(LUMO):
+    UNITS = 'eV'
+
+    def __init__(self, *args, **kwargs):
+        super(BetaLUMO, self).__init__(*args, **kwargs)
+        self.prevline = ''
+        self.base = 'Beta'
 
 
 @Log.add_parser()

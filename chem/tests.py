@@ -1128,6 +1128,8 @@ class UploadsTestCase(TestCase):
                             "opt B3LYP/6-31g(d) geom=connectivity",
                             "-6.46079886952",
                             "-1.31975211714",
+                            "---",
+                            "---",
                             "41",
                             "0.0001",
                             "-567.1965205",

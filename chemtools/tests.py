@@ -1258,6 +1258,18 @@ class FileParserTestCase(SimpleTestCase):
                 pass
             self.assertEqual(expected, row_select(line))
 
+    def test_parse_triplet(self):
+        name = '4_triplet.log'
+        path = os.path.join(settings.MEDIA_ROOT, "tests", name)
+        log = fileparser.Log(path)
+
+        with StringIO(log.format_data()) as f:
+            reader = csv.reader(f, delimiter=',', quotechar='"')
+            expected = LOG_DATA[name]
+            for line in reader:
+                pass
+            self.assertEqual(expected, row_select(line))
+
     def test_parse_nonbenzo_windows(self):
         name = "methane_windows.log"
         path = os.path.join(settings.MEDIA_ROOT, "tests", name)
