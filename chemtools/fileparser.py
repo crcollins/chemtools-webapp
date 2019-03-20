@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
 A parser to extract information from Gaussian log files.
 
